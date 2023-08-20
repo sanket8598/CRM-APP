@@ -1,10 +1,14 @@
 package ai.rnt.crm.restcontroller;
 
+import java.security.cert.CollectionCertStoreParameters;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,11 +19,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.payloads.JwtAuthRequest;
+import ai.rnt.crm.payloads.JwtAuthResponse;
 import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.config.CustomUserDetails;
 import ai.rnt.crm.util.Sha1Encryptor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
@@ -34,27 +41,26 @@ public class LoginController {
 	private JWTTokenHelper helper;
 
 	@PostMapping("/login")
-	public ResponseEntity<Map<String, Object>> createAuthenticationToken(@RequestBody @Valid JwtAuthRequest jwtAuthRequest) {
+	public ResponseEntity<JwtAuthResponse> createAuthenticationToken(
+			@RequestBody @Valid JwtAuthRequest jwtAuthRequest) {
 		log.info("calling login api...");
-		Map<String, Object> map = new HashMap<>();
 		try {
 			jwtAuthRequest.setPassword(Sha1Encryptor.encryptThisString(jwtAuthRequest.getPassword()));
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(),
-					jwtAuthRequest.getPassword()));
+			authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
 			UserDetails loadUserByUsername = customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId());
 			String token = helper.generateToken(loadUserByUsername);
-			if (token != null) {
-				map.put("success", true);
-				map.put("token", token);
-			}
+			if (Objects.nonNull(token))
+				return new ResponseEntity<JwtAuthResponse>(JwtAuthResponse.builder().status(true).token(token).build(),
+						HttpStatus.OK);
+			return new ResponseEntity<JwtAuthResponse>(JwtAuthResponse.builder().status(false).token(null).build(),
+					HttpStatus.NO_CONTENT);
+
 		} catch (Exception e) {
-			log.error("Error Occured while login.. {}",e);
-			if(e.getClass().equals(BadCredentialsException.class)) {
-			map.put("success", false);
-			map.put("message", "Your Credentials are not Valid");
-			}
+			log.error("Error Occured while login.. {}", e.getLocalizedMessage());
+			throw new CRMException(e);
 		}
-		return ResponseEntity.ok(map);
+
 	}
 
 }
