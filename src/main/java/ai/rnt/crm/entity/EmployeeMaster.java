@@ -4,7 +4,7 @@ import static javax.persistence.CascadeType.DETACH;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.CascadeType.REFRESH;
-import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.time.LocalDate;
@@ -19,8 +19,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -75,9 +73,8 @@ public class EmployeeMaster extends Auditable {
 	@Column(name = "date_of_departure")
 	private LocalDate departureDate;
 
-	@ManyToMany(fetch = LAZY, cascade = { PERSIST, MERGE, DETACH, REFRESH })
+	@ManyToMany(fetch =EAGER, cascade = { PERSIST, MERGE, DETACH, REFRESH })
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	@JsonIgnore
 	private List<RoleMaster> employeeRole = new ArrayList<>();
 
 }

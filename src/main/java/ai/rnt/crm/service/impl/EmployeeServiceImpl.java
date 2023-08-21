@@ -1,6 +1,6 @@
 package ai.rnt.crm.service.impl;
 
-import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
 
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public Optional<EmployeeDto> getEmployeeByUserId(String userId) {
-		return evalMapper(employeeDaoService.getEmployeebyUserId(userId), EmployeeDto.class);
+		return TO_Employee.apply(employeeDaoService.getEmployeebyUserId(userId).get());
 	}
 
 }

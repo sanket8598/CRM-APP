@@ -30,6 +30,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.payloads.ApiError;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,7 +78,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@Override
 	protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		ApiError apiError = new ApiError(INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(),
+		ApiError apiError = new ApiError(BAD_REQUEST, ex.getLocalizedMessage(),
 				Arrays.asList("Request method not supported"));
 		log.error("handleHttpRequestMethodNotSupported api error: {}", apiError);
 		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getHttpStatus());
@@ -124,6 +125,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				exc.getException().getClass().equals(BadCredentialsException.class) ? BAD_CREDENTIALS
 						: exc.getMessage()),
 				HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	@ExceptionHandler(ExpiredJwtException.class)
+	private ResponseEntity<ApiError> handleExpiredJwtException(ExpiredJwtException exc) {
+		return new ResponseEntity<>(new ApiError(false,
+				"Jwt Token Expired :"+exc.getMessage()),
+				HttpStatus.REQUEST_TIMEOUT);
 	}
 
 	@Override

@@ -12,22 +12,26 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
-@EnableWebMvc
 @RequiredArgsConstructor
-public class SecurityConfig{
+@EnableWebMvc
+@Slf4j
+public class SecurityConfig implements WebMvcConfigurer{
 	
    private final CustomUserDetails customUserDetails;
    private final JwtAuthenticationFilter authenticationFilter;
    private final JWTAuthenticationEntryPoint authenticationEntryPoint;
 	
-	private static final String[] PUBLIC_URLS= {"/api/v1/auth/**"
+	private static final String[] PUBLIC_URLS= {"/api/v1/auth/**","/api/v1/auth/**"
 			,"/v3/api-docs",
 			"/v2/api-docs",
 			"swagger-resources/**",
@@ -49,7 +53,7 @@ public class SecurityConfig{
 						        .anyRequest()
 						        .authenticated();
 					} catch (Exception e) {
-						
+						log.error("error occurred in the ");
 					}
 				})
                 .exceptionHandling(handling -> handling
@@ -82,5 +86,14 @@ public class SecurityConfig{
 		provider.setPasswordEncoder(passwordEncoder());
 		return provider;
 	}
+    
+
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/" + "**").allowedOrigins("*")
+		.allowedMethods("*").allowedHeaders("*").exposedHeaders("*");
+	}
+    
+    
 	
 }

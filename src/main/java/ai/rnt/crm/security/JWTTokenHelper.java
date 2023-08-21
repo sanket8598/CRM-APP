@@ -3,15 +3,21 @@ package ai.rnt.crm.security;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import ai.rnt.crm.dto.EmployeeDto;
+import ai.rnt.crm.dto.Role;
+import ai.rnt.crm.service.EmployeeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
 
 /**
  * 
@@ -23,12 +29,15 @@ import io.jsonwebtoken.SignatureAlgorithm;
  * @since 19-08-2023
  */
 @Component
+@RequiredArgsConstructor
 public class JWTTokenHelper {
+
+	private final EmployeeService service;
 
 	@Value("${jwt.secret}")
 	private String secret;
 
-	 public static final long JWT_TOKEN_VALIDITY=100*60*60;
+	public static final long JWT_TOKEN_VALIDITY = 100 * 60 * 60;
 
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
@@ -53,6 +62,13 @@ public class JWTTokenHelper {
 
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
+		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
+			claims.put("StaffId", emp.getStaffId());
+			claims.put("fullName", emp.getFirstName() + " " + emp.getLastName());
+			claims.put("Role",
+					emp.getEmployeeRole().stream().filter(r ->r.getRoleName().equalsIgnoreCase("Policy Admin"))
+							.map(Role::getRoleName).collect(Collectors.toList()));
+		});
 		return createToken(claims, userDetails.getUsername());
 	}
 

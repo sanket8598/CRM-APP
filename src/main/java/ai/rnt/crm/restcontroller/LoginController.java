@@ -1,8 +1,9 @@
 package ai.rnt.crm.restcontroller;
 
-import java.security.cert.CollectionCertStoreParameters;
-import java.util.Collections;
-import java.util.HashMap;
+import static ai.rnt.crm.constants.ApiConstants.AUTH;
+import static ai.rnt.crm.constants.ApiConstants.LOGIN;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -11,36 +12,39 @@ import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.payloads.JwtAuthRequest;
 import ai.rnt.crm.payloads.JwtAuthResponse;
 import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.config.CustomUserDetails;
+import ai.rnt.crm.util.JwtTokenDecoder;
 import ai.rnt.crm.util.Sha1Encryptor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/api/v1/auth/")
+@RequestMapping(AUTH)
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class LoginController {
 
-	private AuthenticationManager authenticationManager;
+	private final AuthenticationManager authenticationManager;
 
-	private CustomUserDetails customUserDetails;
-	private JWTTokenHelper helper;
+	private final CustomUserDetails customUserDetails;
+	private final JWTTokenHelper helper;
 
-	@PostMapping("/login")
+	@PostMapping(LOGIN)
 	public ResponseEntity<JwtAuthResponse> createAuthenticationToken(
 			@RequestBody @Valid JwtAuthRequest jwtAuthRequest) {
 		log.info("calling login api...");
@@ -51,9 +55,9 @@ public class LoginController {
 			UserDetails loadUserByUsername = customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId());
 			String token = helper.generateToken(loadUserByUsername);
 			if (Objects.nonNull(token))
-				return new ResponseEntity<JwtAuthResponse>(JwtAuthResponse.builder().status(true).token(token).build(),
+				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).build(),
 						HttpStatus.OK);
-			return new ResponseEntity<JwtAuthResponse>(JwtAuthResponse.builder().status(false).token(null).build(),
+			return new ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(),
 					HttpStatus.NO_CONTENT);
 
 		} catch (Exception e) {
@@ -61,6 +65,25 @@ public class LoginController {
 			throw new CRMException(e);
 		}
 
+	}
+	
+	@PostMapping("/tokenparse")
+	@CrossOrigin(origins = "*", allowedHeaders = "*")
+	public ResponseEntity<Map<String, Object>> tokenDecode(@RequestBody String token) {
+		Map<String, Object> map = null;
+		try {
+			map = new LinkedHashMap<>();
+			JwtTokenDecoder jtd = new JwtTokenDecoder();
+			String decodedToken = jtd.testDecodeJWT(token);
+			ObjectMapper objectMapper = new ObjectMapper();
+			JsonNode json = objectMapper.readTree(decodedToken);
+			map.put("StaffId",json.get("StaffId"));
+			map.put("fullName", json.get("fullName"));
+			map.put("Role", json.get("Role"));
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		return ResponseEntity.ok(map);
 	}
 
 }

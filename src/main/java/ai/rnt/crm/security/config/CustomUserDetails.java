@@ -1,5 +1,6 @@
 package ai.rnt.crm.security.config;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,8 +28,9 @@ public class CustomUserDetails implements UserDetailsService{
 		try {
 			Optional<EmployeeDto> user = employeeService.getEmployeeByUserId(userId);
 			if(Objects.nonNull(user) && user.isPresent())
-				return new User(user.get().getUserID(), user.get().getPassword(),user.get().getEmployeeRole().stream().map(role->new  SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList()));
+				return new User(user.get().getUserID(), user.get().getPassword(),new ArrayList<>());
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("Exception occurred while loading user by name... {}",userId);
 		}
 		throw new UsernameNotFoundException("User not found with username: " + userId);
