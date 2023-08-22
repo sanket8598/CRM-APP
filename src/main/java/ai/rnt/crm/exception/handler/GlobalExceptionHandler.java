@@ -3,7 +3,6 @@ package ai.rnt.crm.exception.handler;
 import static ai.rnt.crm.constants.MessageConstants.BAD_CREDENTIALS;
 import static ai.rnt.crm.util.HttpUtils.getURL;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import java.util.ArrayList;

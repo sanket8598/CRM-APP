@@ -3,6 +3,7 @@ package ai.rnt.crm.payloads;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +22,8 @@ import lombok.Data;
 @Data
 @JsonPropertyOrder({"status", "message","timestamp", "errors", "messages" })
 @JsonInclude(NON_NULL)
-public class ApiError {
+public class ApiError implements Serializable{
+	private static final long serialVersionUID = -582783404133488565L;
 	@JsonProperty("SUCCESS")
 	private boolean status;
 	@JsonProperty("MESSAGE")

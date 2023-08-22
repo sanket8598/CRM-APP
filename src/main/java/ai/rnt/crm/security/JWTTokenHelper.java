@@ -3,7 +3,6 @@ package ai.rnt.crm.security;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import ai.rnt.crm.dto.EmployeeDto;
 import ai.rnt.crm.dto.Role;
 import ai.rnt.crm.service.EmployeeService;
 import io.jsonwebtoken.Claims;
@@ -83,5 +81,4 @@ public class JWTTokenHelper {
 		final String username = extractUsername(token);
 		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}
-
 }

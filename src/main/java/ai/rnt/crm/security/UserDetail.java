@@ -1,18 +1,12 @@
 package ai.rnt.crm.security;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.User;
 
-import ai.rnt.crm.entity.RoleMaster;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
@@ -26,55 +20,23 @@ import lombok.Setter;
  * @since 19-08-2023
  * @see org.springframework.security.core.userdetails.UserDetails
  */
-@AllArgsConstructor
 @Getter
 @Setter
-@NoArgsConstructor
-public class UserDetail implements UserDetails{
+public class UserDetail extends User{
 	
 
 	private static final long serialVersionUID = 338308531428207638L;
 
-	private String userId;
+	private Integer staffId;
+
+	public UserDetail(String username, String password, boolean enabled, boolean accountNonExpired,
+			boolean credentialsNonExpired, boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities,
+			Integer staffId) {
+		super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
+		this.staffId = staffId;
+	}
 	
-	private String password1;
-	
-	private List<RoleMaster> roles=new ArrayList<>();
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return roles.stream().map(role->new  SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
-	}
-
-	@Override
-	public String getPassword() {
-		return password1;
-	}
-
-	@Override
-	public String getUsername() {
-		return userId;
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
 
 
 }

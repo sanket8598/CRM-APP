@@ -17,6 +17,7 @@ import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import ai.rnt.crm.service.EmployeeService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -33,8 +34,8 @@ import lombok.Setter;
 @Table(name = "role_master")
 @Setter
 @Getter
-@NoArgsConstructor
 public class RoleMaster extends Auditable {
+
 
 	private static final long serialVersionUID = -5825772919090321935L;
 

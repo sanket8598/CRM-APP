@@ -3,7 +3,6 @@ package ai.rnt.crm.exception;
 import ai.rnt.crm.payloads.ApiError;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.StandardException;
 
 //@StandardException
 @Getter

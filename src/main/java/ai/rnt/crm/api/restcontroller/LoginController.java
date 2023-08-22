@@ -1,4 +1,4 @@
-package ai.rnt.crm.restcontroller;
+package ai.rnt.crm.api.restcontroller;
 
 import static ai.rnt.crm.constants.ApiConstants.AUTH;
 import static ai.rnt.crm.constants.ApiConstants.LOGIN;
