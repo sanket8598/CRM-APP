@@ -1,6 +1,7 @@
 package ai.rnt.crm.api.restcontroller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/lead/")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class LeadsController {
 	
 	private final CompanyRepository repository;
@@ -25,7 +27,6 @@ public class LeadsController {
 
 	@PostMapping("/saveCompany")
 	public ResponseEntity<Company> saveCompany(@RequestBody Company company){
-		System.out.println("api Called ..."+company);
 		return ResponseEntity.ok(repository.save(company));
 	}
 }

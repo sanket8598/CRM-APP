@@ -1,12 +1,12 @@
 package ai.rnt.crm.entity;
 
-import javax.annotation.Generated;
+import static javax.persistence.GenerationType.IDENTITY;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import static javax.persistence.GenerationType.IDENTITY;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +27,7 @@ public class Company extends Auditable{
 	@GeneratedValue(strategy =IDENTITY)
 	private Integer companyId;
 	
+	@Column(name="companyName")
 	private String companyName;
 
 }

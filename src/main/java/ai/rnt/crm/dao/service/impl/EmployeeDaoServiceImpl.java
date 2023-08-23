@@ -3,6 +3,7 @@ package ai.rnt.crm.dao.service.impl;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.entity.EmployeeMaster;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class EmployeeDaoServiceImpl implements EmployeeDaoService{
 
 	private final EmployeeMasterRepository employeeMasterRepository;

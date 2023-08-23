@@ -17,6 +17,20 @@ import ai.rnt.crm.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 
+ * This class overrides the details of the spring security's UserDetailsService
+ * 
+ * @author Sanket Wakankar
+ * @version 1.0
+ * @since 19-08-2023
+ * @see org.springframework.security.core.userdetails.UserDetails
+ */
+/**
+ * @author Sanket Wakankar
+ * @version 1.0 
+ * @since 17-08-2023
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,8 +38,24 @@ public class CustomUserDetails implements UserDetailsService {
 
 	private final EmployeeService employeeService;
 
+	/**
+	 * Overrided method use to pass the User with the Custom Details.
+	 * Core interface which loads user-specific data.
+	 * <p>
+	 * It is used throughout the framework as a user DAO and is the strategy used by the
+	 * {@link org.springframework.security.authentication.dao.DaoAuthenticationProvider
+	 * DaoAuthenticationProvider}.
+	 *
+	 * <p>
+	 * The interface requires only one read-only method, which simplifies support for new
+	 * data-access strategies.
+	 *
+	 * @author Ben Alex
+	 * @see org.springframework.security.authentication.dao.DaoAuthenticationProvider
+	 * @see UserDetails
+	 */
 	@Override
-	public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+	public UserDetail loadUserByUsername(String userId) throws UsernameNotFoundException {
 		try {
 			Optional<EmployeeDto> user = employeeService.getEmployeeByUserId(userId);
 			if (Objects.nonNull(user) && user.isPresent())
@@ -35,7 +65,7 @@ public class CustomUserDetails implements UserDetailsService {
 						user.get().getStaffId());
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("Exception occurred while loading user by name... {}", userId);
+			log.error("Exception occurred while loading user by name... {}", userId,e);
 		}
 		throw new UsernameNotFoundException("User not found with username: " + userId);
 	}

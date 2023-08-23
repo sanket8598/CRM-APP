@@ -17,6 +17,7 @@ import javax.persistence.PreUpdate;
 import ai.rnt.crm.security.UserDetail;
 
 /**
+ * This Abstract Class used to give the fields which we used in every entity.
  * @author Sanket Wakankar
  * @since 19-08-2023
  * @version 1.0
@@ -51,8 +52,8 @@ public abstract class Auditable implements Serializable{
 	@PrePersist
 	public void beforPersist() {
 		if(nonNull(getContext()) && nonNull(getContext().getAuthentication()) 
-				&& nonNull(getContext().getAuthentication().getPrincipal())) {
-			UserDetail details =(UserDetail) getContext().getAuthentication().getPrincipal();
+				&& nonNull(getContext().getAuthentication().getDetails())) {
+			UserDetail details =(UserDetail) getContext().getAuthentication().getDetails();
 			this.createdBy = details.getStaffId();
 		}
 		this.createdDate = now();
@@ -61,8 +62,8 @@ public abstract class Auditable implements Serializable{
 	@PreUpdate
 	public void beforUpdate() {
 		if(nonNull(getContext()) && nonNull(getContext().getAuthentication()) 
-				&& nonNull(getContext().getAuthentication().getPrincipal())) {
-			UserDetail details =(UserDetail) getContext().getAuthentication().getPrincipal();
+				&& nonNull(getContext().getAuthentication().getDetails())) {
+			UserDetail details =(UserDetail) getContext().getAuthentication().getDetails();
 			this.updatedBy = details.getStaffId();
 		}
 		this.updatedDate = now();
@@ -71,8 +72,8 @@ public abstract class Auditable implements Serializable{
 	@PreRemove
 	public void beforDelete() {
 		if(nonNull(getContext()) && nonNull(getContext().getAuthentication()) 
-				&& nonNull(getContext().getAuthentication().getPrincipal())) {
-			UserDetail details =(UserDetail) getContext().getAuthentication().getPrincipal();
+				&& nonNull(getContext().getAuthentication().getDetails())) {
+			UserDetail details =(UserDetail) getContext().getAuthentication().getDetails();
 			this.deletedBy = details.getStaffId();
 		}
 		this.deletedDate = now();

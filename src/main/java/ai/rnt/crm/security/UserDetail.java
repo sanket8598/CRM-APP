@@ -5,15 +5,12 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-
-
 /**
  * 
- * This class overrides the details of the spring security's UserDetails
+ * This class used to extend and override the details of the spring security's User Class
  * 
  * @author Sanket Wakankar
  * @version 1.0
@@ -22,8 +19,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class UserDetail extends User{
-	
+public class UserDetail extends User {
 
 	private static final long serialVersionUID = 338308531428207638L;
 
@@ -35,8 +31,5 @@ public class UserDetail extends User{
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
 		this.staffId = staffId;
 	}
-	
-
-
 
 }
