@@ -29,6 +29,7 @@ import ai.rnt.crm.payloads.JwtAuthResponse;
 import ai.rnt.crm.payloads.JwtAuthResponse.JwtAuthResponseBuilder;
 import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.UserDetail;
+import ai.rnt.crm.util.Sha1Encryptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,11 +66,13 @@ public class JwtAuthorizationFilter extends UsernamePasswordAuthenticationFilter
 		JsonNode jsonNode = null;
 		try (ServletInputStream s = request.getInputStream()) {
 			jsonNode = objectMapper.readTree(s);
-			String username = String.valueOf(jsonNode.get("userId"));
-			String password = String.valueOf(jsonNode.get("password"));
+			String username = String.valueOf(jsonNode.get("userId")).replaceAll("\"","");
+			System.out.println(jsonNode.get("userId")+" "+jsonNode.get("password"));
+			String password = String.valueOf(jsonNode.get("password")).replaceAll("\"","");
+			System.out.println(username+" "+password);
 			UserDetails userDetail = customUserDetails.loadUserByUsername(username);
 			if(nonNull(userDetail))
-				return attemptAuthenticationHead(username, password, userDetail);
+				return attemptAuthenticationHead(username,Sha1Encryptor.encryptThisString(password), userDetail);
 			log.info("Authenticating user. Username {}", username);
 		}catch (Exception e) {
 			log.info("Exception Occured While Login Api. {}", e.getLocalizedMessage());

@@ -20,6 +20,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Where;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,6 +38,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @NoArgsConstructor
+@Where(clause = "deleted_by is null")
 public class EmployeeMaster extends Auditable {
 
 	private static final long serialVersionUID = 931377982617396405L;
@@ -48,8 +51,8 @@ public class EmployeeMaster extends Auditable {
 	@Column(name = "Password")
 	private String password;
 
-	@Column(name = "User_Id")
-	private String userID;
+	@Column(name = "user_id")
+	private String userId;
 
 	@Column(name = "F_Name")
 	private String firstName; // first_name
@@ -61,10 +64,10 @@ public class EmployeeMaster extends Auditable {
 	private String lastName;
 
 	@Column(name = "Email_Id")
-	private String emailID;
+	private String emailId;
 
 	@Column(name = "Manager_ID")
-	private Integer managerID;
+	private Integer managerId;
 
 	@Column(name = "Emp_Job_Title")
 	private String employeeJobTitle;
@@ -73,8 +76,10 @@ public class EmployeeMaster extends Auditable {
 	@Column(name = "date_of_departure")
 	private LocalDate departureDate;
 
-	@ManyToMany(fetch =EAGER, cascade = { PERSIST, MERGE, DETACH, REFRESH })
-	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@ManyToMany(fetch = EAGER, cascade = { PERSIST, MERGE, DETACH, REFRESH })
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), 
+	               inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@Where(clause = "deleted_by is null")
 	private List<RoleMaster> employeeRole = new ArrayList<>();
 
 }

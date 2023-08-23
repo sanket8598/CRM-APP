@@ -44,28 +44,29 @@ public class LoginController {
 	private final CustomUserDetails customUserDetails;
 	private final JWTTokenHelper helper;
 
-	@PostMapping(LOGIN)
-	public ResponseEntity<JwtAuthResponse> createAuthenticationToken(
-			@RequestBody @Valid JwtAuthRequest jwtAuthRequest) {
-		log.info("calling login api...");
-		try {
-			jwtAuthRequest.setPassword(Sha1Encryptor.encryptThisString(jwtAuthRequest.getPassword()));
-			authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
-			UserDetails loadUserByUsername = customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId());
-			String token = helper.generateToken(loadUserByUsername);
-			if (Objects.nonNull(token))
-				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).build(),
-						HttpStatus.OK);
-			return new ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(),
-					HttpStatus.NO_CONTENT);
-
-		} catch (Exception e) {
-			log.error("Error Occured while login.. {}", e.getLocalizedMessage());
-			throw new CRMException(e);
-		}
-
-	}
+	/*
+	 * @PostMapping(LOGIN) public ResponseEntity<JwtAuthResponse>
+	 * createAuthenticationToken(
+	 * 
+	 * @RequestBody @Valid JwtAuthRequest jwtAuthRequest) {
+	 * log.info("calling login api..."); try {
+	 * jwtAuthRequest.setPassword(Sha1Encryptor.encryptThisString(jwtAuthRequest.
+	 * getPassword())); authenticationManager.authenticate( new
+	 * UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(),
+	 * jwtAuthRequest.getPassword())); UserDetails loadUserByUsername =
+	 * customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()); String
+	 * token = helper.generateToken(loadUserByUsername); if (Objects.nonNull(token))
+	 * return new
+	 * ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).build(),
+	 * HttpStatus.OK); return new
+	 * ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(),
+	 * HttpStatus.NO_CONTENT);
+	 * 
+	 * } catch (Exception e) { log.error("Error Occured while login.. {}",
+	 * e.getLocalizedMessage()); throw new CRMException(e); }
+	 * 
+	 * }
+	 */
 	
 	@PostMapping("/tokenparse")
 	@CrossOrigin(origins = "*", allowedHeaders = "*")

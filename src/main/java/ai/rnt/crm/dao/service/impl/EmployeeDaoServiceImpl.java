@@ -17,7 +17,7 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService{
 	
 	@Override
 	public Optional<EmployeeMaster> getEmployeebyUserId(String userId) {
-		return employeeMasterRepository.findByUserID(userId);
+		return employeeMasterRepository.findByUserId(userId);
 	}
 
 }
