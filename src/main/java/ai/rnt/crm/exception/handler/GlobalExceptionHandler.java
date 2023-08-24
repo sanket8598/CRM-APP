@@ -113,7 +113,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			errors.add(fieldName + ": " + error.getDefaultMessage());
 		});
 		log.error("handleMethodArgumentNotValid api error: {}", exc);
-		return new ResponseEntity<Object>(new ApiError(BAD_REQUEST, ! errors.isEmpty() ? errors.get(0) : null, errors),BAD_REQUEST);
+		return new ResponseEntity<>(new ApiError(BAD_REQUEST, ! errors.isEmpty() ? errors.get(0) : null, errors),BAD_REQUEST);
 	}
 	
 	

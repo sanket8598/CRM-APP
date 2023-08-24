@@ -40,14 +40,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JWTTokenHelper helper;
 
 	/**
-	 * Used Same contract as for {@code doFilter}, but guaranteed to be just invoked
-	 * once per request within a single request thread. See
-	 * {@link #shouldNotFilterAsyncDispatch()} for details.
-	 * <p>
-	 * Provides HttpServletRequest and HttpServletResponse arguments instead of the
-	 * default ServletRequest and ServletResponse ones.
+	 * {@inheritDoc}
 	 * 
-	 * @since 23/08/2023
+	 * @since version 1.0
 	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -76,8 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			}
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
-			e.printStackTrace();
-			log.error("Got Excetion while checking request authorizations. Request: {}. Tokan: {}",
+			log.error("Got Excetion while checking request authorizations. Request: {}",
 					request.getHeader(AUTHORIZATION));
 		}
 	}

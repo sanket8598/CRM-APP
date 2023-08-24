@@ -45,7 +45,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 						.antMatchers(PUBLIC_URLS).permitAll().antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						.requestMatchers(CorsUtils::isPreFlightRequest).permitAll().anyRequest().authenticated();
 			} catch (Exception e) {
-				log.error("error occurred in the securityFilterChain... {}", e);
+				log.error("error occurred in the securityFilterChain... {}", e.getMessage());
 			}
 		}).exceptionHandling(handling -> handling.authenticationEntryPoint(authenticationEntryPoint))
 				.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

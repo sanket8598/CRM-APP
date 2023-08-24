@@ -2,8 +2,8 @@ package ai.rnt.crm.api.restcontroller;
 
 import static ai.rnt.crm.constants.ApiConstants.AUTH;
 import static ai.rnt.crm.constants.ApiConstants.LOGIN;
+import static ai.rnt.crm.constants.ApiConstants.TOKENPARSE;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -67,7 +67,7 @@ public class LoginController {
 
 	}
 	
-	@PostMapping("/tokenparse")
+	@PostMapping(TOKENPARSE)
 	public ResponseEntity<Map<String, Object>> tokenDecode(@RequestBody @NonNull String token) {
 		try {
 			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(token));
