@@ -1,10 +1,13 @@
 package ai.rnt.crm.security;
 
+import java.security.KeyPairGenerator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -13,11 +16,12 @@ import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dto.Role;
 import ai.rnt.crm.service.EmployeeService;
-import ai.rnt.crm.util.KeyGenerator;
+import ai.rnt.crm.util.AESKeyGenerator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is used to get the information from DB and set it in the JWT
@@ -29,11 +33,11 @@ import lombok.RequiredArgsConstructor;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JWTTokenHelper {
 
 	private final EmployeeService service;
-	private final KeyGenerator keyGenerator;
-
+    private final AESKeyGenerator aesKeyGenerator;
 	@Value("${jwt.secret.key}")
 	private String secret;
 
@@ -53,7 +57,7 @@ public class JWTTokenHelper {
 	}
 
 	private Claims extractAllClaims(String token) {
-		return Jwts.parser().setSigningKey(getKey()).parseClaimsJws(token).getBody();
+		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 	}
 
 	private Boolean isTokenExpired(String token) {
@@ -72,11 +76,10 @@ public class JWTTokenHelper {
 	}
 
 	private String createToken(Map<String, Object> claims, String subject) {
-
-		return Jwts.builder().setHeaderParam("alg", "AES").setHeaderParam("enc", "A256GCM").setClaims(claims)
+		return Jwts.builder().setClaims(claims)
 				.setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-				.signWith(SignatureAlgorithm.HS256, getKey()).compact();
+				.signWith(SignatureAlgorithm.HS256, secret).compact();
 	}
 
 	public Boolean validateToken(String token, UserDetails userDetails) {
@@ -85,6 +88,40 @@ public class JWTTokenHelper {
 	}
 
 	public SecretKey getKey() {
-		return keyGenerator.generateKey(secret);
+		return aesKeyGenerator.generateKey(secret);
+	}
+	
+	public String encryptJwtTokenTOAES(String token) {
+		try {
+		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+		keyGen.init(256); // You can choose 128, 192, or 256 bits key size
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.ENCRYPT_MODE, getKey());
+		return new String(cipher.doFinal(token.getBytes()));
+		}catch(Exception e) {
+			log.error("error while encrypting the jwt token.. {}",e);
+		}
+		return token;
+	}
+	
+	public String decrypJwtTokenAES(String token){
+		try {
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.DECRYPT_MODE, getKey());
+		return new String(cipher.doFinal(token.getBytes()));
+	}catch(Exception e) {
+		log.error("error while decrypting the jwt token.. {}",e);
+	}
+		return token;
+		
+	}
+	public void getKeyPair() {
+		try {
+		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048);
+        keyPairGenerator.generateKeyPair();
+		}catch(Exception e) {
+			log.error("error while decrypting the jwt token.. {}",e);
+		}
 	}
 }

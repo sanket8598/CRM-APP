@@ -3,6 +3,7 @@ package ai.rnt.crm.api.restcontroller;
 import static ai.rnt.crm.constants.ApiConstants.AUTH;
 import static ai.rnt.crm.constants.ApiConstants.LOGIN;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -26,10 +27,10 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.payloads.JwtAuthRequest;
 import ai.rnt.crm.payloads.JwtAuthResponse;
 import ai.rnt.crm.security.JWTTokenHelper;
-import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.security.config.CustomUserDetails;
 import ai.rnt.crm.util.JwtTokenDecoder;
 import ai.rnt.crm.util.Sha1Encryptor;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,8 +54,7 @@ public class LoginController {
 			jwtAuthRequest.setPassword(Sha1Encryptor.encryptThisString(jwtAuthRequest.getPassword()));
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
-			UserDetail loadUserByUsername = customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId());
-			String token = helper.generateToken(loadUserByUsername);
+			String token = helper.generateToken(customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()));
 			if (Objects.nonNull(token))
 				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).build(), HttpStatus.OK);
 			return new ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(),
@@ -68,20 +68,17 @@ public class LoginController {
 	}
 	
 	@PostMapping("/tokenparse")
-	public ResponseEntity<Map<String, Object>> tokenDecode(@RequestBody String token) {
-		Map<String, Object> map = null;
+	public ResponseEntity<Map<String, Object>> tokenDecode(@RequestBody @NonNull String token) {
 		try {
-			map = new LinkedHashMap<>();
-			JwtTokenDecoder jtd = new JwtTokenDecoder();
-			String decodedToken = jtd.testDecodeJWT(token);
-			ObjectMapper objectMapper = new ObjectMapper();
-			JsonNode json = objectMapper.readTree(decodedToken);
+			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(token));
+			Map<String, Object> map = new LinkedHashMap<>();
 			map.put("fullName", json.get("fullName"));
 			map.put("Role", json.get("Role"));
+			return ResponseEntity.ok(map);
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			log.error("error occured while decoding the token.. {}",e.getLocalizedMessage());
+			throw new CRMException(e);
 		}
-		return ResponseEntity.ok(map);
 	}
 
 }

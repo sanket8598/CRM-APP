@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @since 19-08-2023
  */
 @Component
-public class KeyGenerator {
+public class AESKeyGenerator {
 	
 	
 	public SecretKey generateKey(String secret) {

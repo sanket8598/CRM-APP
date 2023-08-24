@@ -63,6 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				String userName;
 				if (requestTokenHeader.startsWith(TOKEN_PREFIX_BEARER) && Objects.nonNull(requestTokenHeader)) {
 					requestTokenHeader = requestTokenHeader.substring(7);
+					
 					userName = this.helper.extractUsername(requestTokenHeader);
 					UserDetail loadUserByUsername = this.detailsService.loadUserByUsername(userName);
 					if (Boolean.TRUE.equals(this.helper.validateToken(requestTokenHeader, loadUserByUsername))) {
