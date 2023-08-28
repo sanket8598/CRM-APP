@@ -6,8 +6,11 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.io.IOException;
+import java.security.PrivateKey;
+import java.util.Base64;
 import java.util.Objects;
 
+import javax.crypto.Cipher;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,13 +21,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+import ai.rnt.crm.api.restcontroller.LoginController;
 import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.UserDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * This class is the entryPoint and every request goes through this doFilterInternal method.
+ * This class is the entryPoint and every request goes through this
+ * doFilterInternal method.
  * 
  * @author Sanket Wakankar
  * @version 1.0
@@ -58,7 +63,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				String userName;
 				if (requestTokenHeader.startsWith(TOKEN_PREFIX_BEARER) && Objects.nonNull(requestTokenHeader)) {
 					requestTokenHeader = requestTokenHeader.substring(7);
-					
+					PrivateKey privateKey = LoginController.keystore.get(requestTokenHeader);
+					Cipher decryptionCipher = Cipher.getInstance("RSA");
+					decryptionCipher.init(Cipher.DECRYPT_MODE, privateKey);
+					requestTokenHeader = new String(
+							decryptionCipher.doFinal(Base64.getDecoder().decode(requestTokenHeader)));
 					userName = this.helper.extractUsername(requestTokenHeader);
 					UserDetail loadUserByUsername = this.detailsService.loadUserByUsername(userName);
 					if (Boolean.TRUE.equals(this.helper.validateToken(requestTokenHeader, loadUserByUsername))) {
@@ -71,8 +80,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			}
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("Got Excetion while checking request authorizations. Request: {}",
-					request.getHeader(AUTHORIZATION));
+					request.getHeader(AUTHORIZATION), e.getMessage());
 		}
 	}
 

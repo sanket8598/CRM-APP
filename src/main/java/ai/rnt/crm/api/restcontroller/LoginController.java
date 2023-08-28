@@ -4,10 +4,15 @@ import static ai.rnt.crm.constants.ApiConstants.AUTH;
 import static ai.rnt.crm.constants.ApiConstants.LOGIN;
 import static ai.rnt.crm.constants.ApiConstants.TOKENPARSE;
 
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import javax.crypto.Cipher;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -45,6 +50,7 @@ public class LoginController {
 
 	private final CustomUserDetails customUserDetails;
 	private final JWTTokenHelper helper;
+	public static HashMap<String, PrivateKey> keystore = new HashMap<>();
 
 	@PostMapping(LOGIN)
 	public ResponseEntity<JwtAuthResponse> createAuthenticationToken(
@@ -55,8 +61,15 @@ public class LoginController {
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
 			String token = helper.generateToken(customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()));
-			if (Objects.nonNull(token))
-				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).build(), HttpStatus.OK);
+			if (Objects.nonNull(token)) {
+				KeyPair keyPair = helper.getKeyPair();
+				Cipher cipher = Cipher.getInstance("RSA");
+				cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPublic());
+				String newToken = Base64.getEncoder().encodeToString(cipher.doFinal(token.getBytes()));
+				keystore.put(newToken, keyPair.getPrivate());
+				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(newToken).build(),
+						HttpStatus.OK);
+			}
 			return new ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(),
 					HttpStatus.NO_CONTENT);
 
@@ -66,7 +79,7 @@ public class LoginController {
 		}
 
 	}
-	
+
 	@PostMapping(TOKENPARSE)
 	public ResponseEntity<Map<String, Object>> tokenDecode(@RequestBody @NonNull String token) {
 		try {
@@ -76,7 +89,7 @@ public class LoginController {
 			map.put("Role", json.get("Role"));
 			return ResponseEntity.ok(map);
 		} catch (Exception e) {
-			log.error("error occured while decoding the token.. {}",e.getLocalizedMessage());
+			log.error("error occured while decoding the token.. {}", e.getLocalizedMessage());
 			throw new CRMException(e);
 		}
 	}

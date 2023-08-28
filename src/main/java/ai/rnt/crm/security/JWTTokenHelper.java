@@ -1,5 +1,6 @@
 package ai.rnt.crm.security;
 
+import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Date;
 import java.util.HashMap;
@@ -115,13 +116,14 @@ public class JWTTokenHelper {
 		return token;
 		
 	}
-	public void getKeyPair() {
+	public KeyPair getKeyPair() {
 		try {
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(2048);
-        keyPairGenerator.generateKeyPair();
+       return keyPairGenerator.generateKeyPair();
 		}catch(Exception e) {
-			log.error("error while decrypting the jwt token.. {}",e);
+			log.error("error occured while getting the Keys.{} ",e.getMessage());
 		}
+		return null;
 	}
 }
