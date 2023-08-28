@@ -7,17 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dto.Role;
 import ai.rnt.crm.service.EmployeeService;
-import ai.rnt.crm.util.AESKeyGenerator;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -38,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 public class JWTTokenHelper {
 
 	private final EmployeeService service;
-    private final AESKeyGenerator aesKeyGenerator;
 	@Value("${jwt.secret.key}")
 	private String secret;
 
@@ -88,34 +82,6 @@ public class JWTTokenHelper {
 		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}
 
-	public SecretKey getKey() {
-		return aesKeyGenerator.generateKey(secret);
-	}
-	
-	public String encryptJwtTokenTOAES(String token) {
-		try {
-		KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-		keyGen.init(256); // You can choose 128, 192, or 256 bits key size
-		Cipher cipher = Cipher.getInstance("AES");
-		cipher.init(Cipher.ENCRYPT_MODE, getKey());
-		return new String(cipher.doFinal(token.getBytes()));
-		}catch(Exception e) {
-			log.error("error while encrypting the jwt token.. {}",e);
-		}
-		return token;
-	}
-	
-	public String decrypJwtTokenAES(String token){
-		try {
-		Cipher cipher = Cipher.getInstance("AES");
-		cipher.init(Cipher.DECRYPT_MODE, getKey());
-		return new String(cipher.doFinal(token.getBytes()));
-	}catch(Exception e) {
-		log.error("error while decrypting the jwt token.. {}",e);
-	}
-		return token;
-		
-	}
 	public KeyPair getKeyPair() {
 		try {
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
