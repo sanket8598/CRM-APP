@@ -28,7 +28,7 @@ public class EmployeeToDtoMapper {
 		};
 	/**
 	 * @since 21-08-2023
-	 * @version 1.3
+	 * @version 1.0
 	 *
 	 */
 	public static final Function<Collection<EmployeeMaster>, Collection<EmployeeDto>> TO_Employees = e ->{

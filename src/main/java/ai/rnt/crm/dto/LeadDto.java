@@ -23,8 +23,8 @@ public class LeadDto {
 
 	private Float budgetAmount;
 
-	private String businessCard;
-	
 	private String assignTo;
+	
+	private CompanyDto companyDto;
 
 }
