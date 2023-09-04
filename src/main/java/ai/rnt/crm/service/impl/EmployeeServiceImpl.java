@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dto.EmployeeDto;
+import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 
@@ -30,7 +31,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public Optional<EmployeeDto> getEmployeeByUserId(String userId) {
-		return TO_Employee.apply(employeeDaoService.getEmployeebyUserId(userId).get());
+		return TO_Employee.apply(employeeDaoService.getEmployeebyUserId(userId).orElseThrow(()->new ResourceNotFoundException("Employee", "userId", userId)));
 	}
 
 }

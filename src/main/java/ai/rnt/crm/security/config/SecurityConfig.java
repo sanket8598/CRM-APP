@@ -77,7 +77,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
 	/**
 	 * This method will configure cross origin access to api's.
-	 * 
+	 * {@inheritDoc}
 	 * @since version 1.0
 	 */
 	@Override

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import ai.rnt.crm.constants.EncryptionAlgoConstants;
 import ai.rnt.crm.dto.Role;
 import ai.rnt.crm.service.EmployeeService;
 import io.jsonwebtoken.Claims;
@@ -84,7 +85,7 @@ public class JWTTokenHelper {
 
 	public KeyPair getKeyPair() {
 		try {
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(EncryptionAlgoConstants.RSA);
         keyPairGenerator.initialize(2048);
        return keyPairGenerator.generateKeyPair();
 		}catch(Exception e) {

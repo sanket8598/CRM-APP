@@ -4,7 +4,6 @@ import ai.rnt.crm.payloads.ApiError;
 import lombok.Getter;
 import lombok.Setter;
 
-//@StandardException
 @Getter
 @Setter
 public class CRMException extends RuntimeException {

@@ -121,7 +121,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(CRMException.class)
 	private ResponseEntity<ApiError> handleCRMException(CRMException exc) {
 		return new ResponseEntity<>(new ApiError(false,
-				exc.getException().getClass().equals(BadCredentialsException.class) ? BAD_CREDENTIALS
+				exc.getException() instanceof BadCredentialsException ? BAD_CREDENTIALS
 						: exc.getMessage()),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
