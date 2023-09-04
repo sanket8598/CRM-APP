@@ -54,12 +54,12 @@ public class Leads extends Auditable {
 	private String topic;
 
 	@Column(name = "company_website")
-	private Integer companyWebsite;
+	private String companyWebsite;
 
 	@Column(name = "budget_amount")
 	private Float budgetAmount;
 
-	@Column(name = "business_card")
+	@Column(name = "business_card",columnDefinition = "LONGTEXT")
 	private String businessCard;
 
 	@Column(name = "customer_need")
