@@ -53,13 +53,19 @@ public class Leads extends Auditable {
 	@Column(name = "topic")
 	private String topic;
 
+	@Column(name = "email")
+	private String email;
+
+	@Column(name = "assign_to")
+	private String assignTo;
+
 	@Column(name = "company_website")
 	private String companyWebsite;
 
 	@Column(name = "budget_amount")
 	private Float budgetAmount;
 
-	@Column(name = "business_card",columnDefinition = "LONGTEXT")
+	@Column(name = "business_card", columnDefinition = "LONGTEXT")
 	private String businessCard;
 
 	@Column(name = "customer_need")
@@ -72,7 +78,6 @@ public class Leads extends Auditable {
 	@JoinColumn(name = "lead_source_id")
 	private LeadSourceMaster leadSourceMaster;
 
-	
 	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "service_falls_id")
 	private ServiceFallsMaster serviceFallsMaster;
@@ -80,11 +85,11 @@ public class Leads extends Auditable {
 	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "company_id")
 	private CompanyMaster companyMaster;
-	
-	@OneToMany(mappedBy="lead",cascade = ALL)
-	private List<AddEmail> emails=new ArrayList<>();
-	
-	@OneToMany(mappedBy="lead",cascade = ALL)
-	private List<AddCall> calls=new ArrayList<>();
+
+	@OneToMany(mappedBy = "lead", cascade = ALL)
+	private List<AddEmail> emails = new ArrayList<>();
+
+	@OneToMany(mappedBy = "lead", cascade = ALL)
+	private List<AddCall> calls = new ArrayList<>();
 
 }

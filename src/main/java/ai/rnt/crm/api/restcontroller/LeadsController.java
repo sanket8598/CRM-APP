@@ -20,13 +20,8 @@ public class LeadsController {
 	
 	private final CompanyRepository repository;
 	
-	@GetMapping("/get")
-	public ResponseEntity<String> getAllData(){
-		return ResponseEntity.ok("werttr");
-	}
-
-	@PostMapping("/saveCompany")
-	public ResponseEntity<Company> saveCompany(@RequestBody Company company){
+	@PostMapping("/saveLead")
+	public ResponseEntity<Company> saveLead(@RequestBody Company company){
 		return ResponseEntity.ok(repository.save(company));
 	}
 }
