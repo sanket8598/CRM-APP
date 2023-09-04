@@ -1,6 +1,7 @@
 package ai.rnt.crm.entity;
 
 import static javax.persistence.GenerationType.IDENTITY;
+import static javax.persistence.CascadeType.ALL;
 
 import java.sql.Date;
 
@@ -8,6 +9,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
@@ -61,8 +64,9 @@ public class Contacts extends Auditable {
 	@Column(name = "contact_number_secondary")
 	private String contactNumberSecondary;
 
-	@Column(name = "company_id")
-	private Integer companyId;
+	@ManyToOne(cascade=ALL)
+	@JoinColumn(name = "company_id")
+	private CompanyMaster companyMaster;
 
 	@Column(name = "linkedin_id")
 	private String linkedinId;

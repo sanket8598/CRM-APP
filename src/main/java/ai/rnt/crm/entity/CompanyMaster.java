@@ -1,11 +1,19 @@
 package ai.rnt.crm.entity;
 
 import static javax.persistence.GenerationType.IDENTITY;
+import static javax.persistence.CascadeType.ALL;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
@@ -44,15 +52,24 @@ public class CompanyMaster extends Auditable {
 	@Column(name = "address_line1")
 	private String addressLineOne;
 
-	@Column(name = "country_id")
-	private Integer countryId;
+	@ManyToOne(cascade =ALL)
+	@JoinColumn(name = "country_id")
+	private CountryMaster country;
 
-	@Column(name = "state_id")
-	private Integer stateId;
+	@JoinColumn(name = "state_id")
+	@ManyToOne(cascade =ALL)
+	private StateMaster state;
 
-	@Column(name = "city_id")
-	private Integer cityId;
+	@ManyToOne(cascade =ALL)
+	@JoinColumn(name = "city_id")
+	private CityMaster city;
 
 	@Column(name = "zipcode")
 	private String zipCode;
+	
+	@OneToMany(mappedBy="companyMaster",cascade =ALL)
+	private List<Leads> leads=new ArrayList<>();
+	
+	@OneToMany(mappedBy="companyMaster",cascade =ALL)
+	private List<Contacts> contacts=new ArrayList<>();
 }

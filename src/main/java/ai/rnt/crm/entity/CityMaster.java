@@ -1,11 +1,16 @@
 package ai.rnt.crm.entity;
 
 import static javax.persistence.GenerationType.IDENTITY;
+import static javax.persistence.CascadeType.ALL;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
@@ -40,5 +45,8 @@ public class CityMaster extends Auditable {
 
 	@Column(name = "city")
 	private String city;
+	
+	@OneToMany(cascade =ALL,mappedBy = "city")
+	private List<CompanyMaster> contacts=new ArrayList<>();
 
 }
