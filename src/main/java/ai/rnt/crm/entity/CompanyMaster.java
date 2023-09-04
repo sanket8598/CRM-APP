@@ -1,11 +1,14 @@
 package ai.rnt.crm.entity;
 
+import static javax.persistence.GenerationType.IDENTITY;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import static javax.persistence.GenerationType.IDENTITY;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Where;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +25,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "Crm_company_master")
-public class CrmCompanyMaster extends Auditable {
+@Where(clause = "deleted_by is null")
+public class CompanyMaster extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 

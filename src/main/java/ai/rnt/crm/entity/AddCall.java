@@ -6,7 +6,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.Where;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +27,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "crm_add_call")
-public class CrmAddCall extends Auditable {
+@Where(clause = "deleted_by is null")
+public class AddCall extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -53,7 +58,8 @@ public class CrmAddCall extends Auditable {
 	@Column(name = "duration")
 	private String duration;
 
-	@Column(name = "lead_id")
-	private Integer leadId;
+	@ManyToOne
+	@JoinColumn(name="lead_id")
+	private Leads lead;
 
 }

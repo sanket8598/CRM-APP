@@ -15,6 +15,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Where;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Getter;
@@ -32,6 +34,7 @@ import lombok.Setter;
 @Table(name = "role_master")
 @Setter
 @Getter
+@Where(clause = "deleted_by is null")
 public class RoleMaster extends Auditable {
 
 
@@ -49,6 +52,7 @@ public class RoleMaster extends Auditable {
 			CascadeType.REFRESH })
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
 	@JsonBackReference
+	@Where(clause = "deleted_by is null")
 	private List<EmployeeMaster> employees = new ArrayList<>();
 
 }

@@ -10,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Where;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,7 +27,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Table(name = "crm_contacts")
-public class CrmContacts extends Auditable {
+@Where(clause = "deleted_by is null")
+public class Contacts extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 

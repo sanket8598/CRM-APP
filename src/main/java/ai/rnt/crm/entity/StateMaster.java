@@ -8,6 +8,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Where;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,24 +17,28 @@ import lombok.Setter;
 /**
  * @author Nikhil Gaikwad
  * @version 1.0
- * @since 22/08/2023
+ * @since 22/08/2023 
  *
  */
 @Entity
-@Table(name = "crm_lead_source_master")
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
-public class CrmLeadSourceMaster extends Auditable {
+@Table(name = "crm_state_master")
+@Where(clause = "deleted_by is null")
+public class StateMaster extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "lead_source_id")
-	private Integer leadSourceId;
+	@Column(name = "state_id")
+	private Integer stateId;
 
-	@Column(name = "source_name")
-	private String sourceName;
+	@Column(name = "country_id")
+	private Integer countryId;
+
+	@Column(name = "state")
+	private String state;
 
 }
