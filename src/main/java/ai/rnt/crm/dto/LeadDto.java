@@ -18,13 +18,18 @@ public class LeadDto {
 	private String email;
 
 	private Integer companyWebsite;
-
 	private Integer leadSourceId;
+	private Integer serviceFallsId;
+	private Integer companyId;
+
+	private LeadSourceDto leadSourceMaster;
+	
+	private ServiceFallsDto serviceFallsMaster;
 
 	private Float budgetAmount;
 
 	private String assignTo;
-	
-	private CompanyDto companyDto;
+
+	private CompanyDto companyMaster;
 
 }

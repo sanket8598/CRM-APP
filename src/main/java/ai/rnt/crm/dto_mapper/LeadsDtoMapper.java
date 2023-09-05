@@ -1,7 +1,9 @@
 package ai.rnt.crm.dto_mapper;
 
-import static ai.rnt.crm.util.FunctionUtil.evalMapper;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
+import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE;
+import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER;
+import static ai.rnt.crm.util.FunctionUtil.evalMapper;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.dto.NewLeadDto;
 import ai.rnt.crm.entity.Leads;
 
 public class LeadsDtoMapper {
@@ -28,7 +31,9 @@ public class LeadsDtoMapper {
 	 */
 	public static final Function<LeadDto, Optional<Leads>> TO_LEAD = e ->{
 		Leads leads = evalMapper(e, Leads.class).get();
-		leads.setCompanyMaster(TO_COMPANY.apply(e.getCompanyDto()).get());
+		TO_COMPANY.apply(e.getCompanyMaster()).ifPresent(leads::setCompanyMaster);
+		TO_LEAD_SOURCE.apply(e.getLeadSourceMaster()).ifPresent(leads::setLeadSourceMaster);
+		TO_SERVICEFALLMASTER.apply(e.getServiceFallsMaster()).ifPresent(leads::setServiceFallsMaster);
 		return Optional.of(leads);
 	};
 	/**
@@ -57,5 +62,7 @@ public class LeadsDtoMapper {
 	 */
 	public static final Function<Collection<Leads>, List<LeadDto>> TO_LEAD_DTOS = e -> e.stream()
 			.map(dm -> TO_LEAD_DTO.apply(dm).get()).collect(Collectors.toList());
+	
+	public static final Function<NewLeadDto, Optional<Leads>> TO_NEWLEAD = e -> evalMapper(e, Leads.class);
 
 }
