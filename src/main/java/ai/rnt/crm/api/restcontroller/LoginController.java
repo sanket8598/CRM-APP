@@ -3,6 +3,8 @@ package ai.rnt.crm.api.restcontroller;
 import static ai.rnt.crm.constants.ApiConstants.AUTH;
 import static ai.rnt.crm.constants.ApiConstants.LOGIN;
 import static ai.rnt.crm.constants.ApiConstants.TOKENPARSE;
+import static ai.rnt.crm.constants.EncryptionAlgoConstants.RSA;
+import static java.util.Objects.nonNull;
 
 import java.security.KeyPair;
 import java.security.PrivateKey;
@@ -10,7 +12,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import javax.crypto.Cipher;
 import javax.validation.Valid;
@@ -19,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +34,7 @@ import ai.rnt.crm.payloads.JwtAuthResponse;
 import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.config.CustomUserDetails;
 import ai.rnt.crm.util.JwtTokenDecoder;
+import ai.rnt.crm.util.RSAToJwtDecoder;
 import ai.rnt.crm.util.Sha1Encryptor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -43,14 +44,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(AUTH)
 @Slf4j
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class LoginController {
 
 	private final AuthenticationManager authenticationManager;
 
 	private final CustomUserDetails customUserDetails;
 	private final JWTTokenHelper helper;
-	public static HashMap<String, PrivateKey> keystore = new HashMap<>();
+	public static final Map<String, PrivateKey> keystore = new HashMap<>();
 
 	@PostMapping(LOGIN)
 	public ResponseEntity<JwtAuthResponse> createAuthenticationToken(
@@ -61,9 +61,9 @@ public class LoginController {
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
 			String token = helper.generateToken(customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()));
-			if (Objects.nonNull(token)) {
+			if (nonNull(token)) {
 				KeyPair keyPair = helper.getKeyPair();
-				Cipher cipher = Cipher.getInstance("RSA");
+				Cipher cipher = Cipher.getInstance(RSA);
 				cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPublic());
 				String newToken = Base64.getEncoder().encodeToString(cipher.doFinal(token.getBytes()));
 				keystore.put(newToken, keyPair.getPrivate());
@@ -83,7 +83,7 @@ public class LoginController {
 	@PostMapping(TOKENPARSE)
 	public ResponseEntity<Map<String, Object>> tokenDecode(@RequestBody @NonNull String token) {
 		try {
-			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(token));
+			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(RSAToJwtDecoder.rsaToJwtDecoder(token)));
 			Map<String, Object> map = new LinkedHashMap<>();
 			map.put("fullName", json.get("fullName"));
 			map.put("Role", json.get("Role"));

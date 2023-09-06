@@ -1,5 +1,7 @@
 package ai.rnt.crm.security;
 
+import static ai.rnt.crm.constants.RoleConstants.CRM_ADMIN;
+import static ai.rnt.crm.constants.RoleConstants.CRM_USER;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Date;
@@ -65,8 +67,8 @@ public class JWTTokenHelper {
 		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
 			claims.put("fullName", emp.getFirstName() + " " + emp.getLastName());
 			claims.put("Role",
-					emp.getEmployeeRole().stream().filter(r -> r.getRoleName().equalsIgnoreCase("Policy Admin"))
-							.map(Role::getRoleName).findAny().orElse("CRM USER"));
+					emp.getEmployeeRole().stream().filter(r -> r.getRoleName().equalsIgnoreCase(CRM_ADMIN))
+							.map(Role::getRoleName).findAny().orElse(CRM_USER));
 		});
 		return createToken(claims, userDetails.getUsername());
 	}

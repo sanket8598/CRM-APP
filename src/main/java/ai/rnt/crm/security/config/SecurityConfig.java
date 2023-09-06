@@ -1,6 +1,8 @@
 package ai.rnt.crm.security.config;
 
 import static ai.rnt.crm.security.AuthenticationUtil.PUBLIC_URLS;
+import static ai.rnt.crm.constants.RoleConstants.CRM_ADMIN;
+import static ai.rnt.crm.constants.RoleConstants.CRM_USER;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,7 +45,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 						// we can give give access to the api based on the role or using
 						// e.g.antMatchers("/api/users/{path}").hasRole(null)
 						.antMatchers(PUBLIC_URLS).permitAll().antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-						.requestMatchers(CorsUtils::isPreFlightRequest).permitAll().anyRequest().authenticated();
+						.requestMatchers(CorsUtils::isPreFlightRequest).permitAll().anyRequest().authenticated().anyRequest().hasAnyRole(CRM_ADMIN,CRM_USER);
 			} catch (Exception e) {
 				log.error("error occurred in the securityFilterChain... {}", e.getMessage());
 			}
