@@ -3,6 +3,7 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 import java.util.EnumMap;
 
@@ -46,6 +47,21 @@ public class LeadServiceImpl implements LeadService {
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(String leadsStatus) {
+		EnumMap<ApiResponse, Object> getAllLeads = new EnumMap<>(ApiResponse.class);
+		try {
+			if(isNull(leadsStatus))
+				leadDaoService.getAll();
+			else
+			   getAllLeads.put(MESSAGE, leadDaoService.getLeadsByStatus(leadsStatus));
+			
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+		return null;
 	}
 
 }

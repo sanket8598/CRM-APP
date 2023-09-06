@@ -11,5 +11,7 @@ public final class ApiConstants {
 	public static final String TOKENPARSE = SEPERATOR + "tokenparse";
 	public static final String LEAD = BASE + "lead" + SEPERATOR;
 	public static final String CREATE_LEAD = SEPERATOR + "create";
+	public static final String GET_LEADS_BY_STATUS = SEPERATOR + "getLeadsByStatus"+SEPERATOR+"{leadsStatus}";
+	public static final String GET_ALL_LEADS = SEPERATOR + "getAllLeads";
 
 }

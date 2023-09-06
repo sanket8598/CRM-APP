@@ -10,4 +10,6 @@ import ai.rnt.crm.enums.ApiResponse;
 public interface LeadService  {
 
 	public ResponseEntity<EnumMap<ApiResponse,Object>> createLead(LeadDto leadDto);
+
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(String leadsStatus);
 }

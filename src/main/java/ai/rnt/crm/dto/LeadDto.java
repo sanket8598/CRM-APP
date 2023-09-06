@@ -30,6 +30,8 @@ public class LeadDto {
 	private Float budgetAmount;
 
 	private Integer assignTo;
+	
+	private String status;
 
 
 }

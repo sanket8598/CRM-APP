@@ -55,9 +55,13 @@ public class Leads extends Auditable {
 
 	@Column(name = "email")
 	private String email;
+	
+	@Column(name = "status")
+	private String status;	
 
-	@Column(name = "assign_to")
-	private Integer assignTo;
+	@JoinColumn(name = "assign_to")
+	@ManyToOne(cascade = ALL)
+	private EmployeeMaster assignTo;
 
 	@Column(name = "company_website")
 	private String companyWebsite;
