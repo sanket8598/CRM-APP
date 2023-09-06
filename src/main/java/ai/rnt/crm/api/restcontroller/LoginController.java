@@ -50,7 +50,7 @@ public class LoginController {
 
 	private final CustomUserDetails customUserDetails;
 	private final JWTTokenHelper helper;
-	public static final Map<String, PrivateKey> keystore = new HashMap<>();
+	public static Map<String, PrivateKey> keystore = new HashMap<>();
 
 	@PostMapping(LOGIN)
 	public ResponseEntity<JwtAuthResponse> createAuthenticationToken(
@@ -81,9 +81,12 @@ public class LoginController {
 	}
 
 	@PostMapping(TOKENPARSE)
-	public ResponseEntity<Map<String, Object>> tokenDecode(@RequestBody @NonNull String token) {
+	public ResponseEntity<Map<String, Object>> tokenDecode(@RequestBody @NonNull Map<String,String> token) {
 		try {
-			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(RSAToJwtDecoder.rsaToJwtDecoder(token)));
+			log.info("token inside tokenParse...{}",token.get("token"));
+			String rsaToJwtDecoder = RSAToJwtDecoder.rsaToJwtDecoder(token.get("token"));
+			log.info("token after RSA inside tokenParse...{}",rsaToJwtDecoder);
+			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(rsaToJwtDecoder));
 			Map<String, Object> map = new LinkedHashMap<>();
 			map.put("fullName", json.get("fullName"));
 			map.put("Role", json.get("Role"));

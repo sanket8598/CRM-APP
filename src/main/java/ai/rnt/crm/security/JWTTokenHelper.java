@@ -2,12 +2,15 @@ package ai.rnt.crm.security;
 
 import static ai.rnt.crm.constants.RoleConstants.CRM_ADMIN;
 import static ai.rnt.crm.constants.RoleConstants.CRM_USER;
+import static ai.rnt.crm.util.RoleUtil.GET_ROLE;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -67,8 +70,7 @@ public class JWTTokenHelper {
 		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
 			claims.put("fullName", emp.getFirstName() + " " + emp.getLastName());
 			claims.put("Role",
-					emp.getEmployeeRole().stream().filter(r -> r.getRoleName().equalsIgnoreCase(CRM_ADMIN))
-							.map(Role::getRoleName).findAny().orElse(CRM_USER));
+					emp.getEmployeeRole().stream().map(Role::getRoleName).map(GET_ROLE).collect(Collectors.joining(",")).split(",")[0]);
 		});
 		return createToken(claims, userDetails.getUsername());
 	}
