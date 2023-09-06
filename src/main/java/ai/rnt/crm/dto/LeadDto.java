@@ -17,7 +17,7 @@ public class LeadDto {
 
 	private String email;
 
-	private Integer companyWebsite;
+	private String companyWebsite;
 	private Integer leadSourceId;
 	private Integer serviceFallsId;
 	private Integer companyId;
@@ -28,7 +28,7 @@ public class LeadDto {
 
 	private Float budgetAmount;
 
-	private String assignTo;
+	private Integer assignTo;
 
 	private CompanyDto companyMaster;
 

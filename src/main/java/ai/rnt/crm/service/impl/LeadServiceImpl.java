@@ -1,6 +1,6 @@
 package ai.rnt.crm.service.impl;
 
-import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_NEWLEAD;
+import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static java.util.Objects.nonNull;
 
@@ -17,7 +17,7 @@ import ai.rnt.crm.dao.service.CompanyMasterService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
-import ai.rnt.crm.dto.NewLeadDto;
+import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
@@ -34,10 +34,10 @@ public class LeadServiceImpl implements LeadService {
 	private final CompanyMasterService companyMasterService;
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> createLead(NewLeadDto leadDto, MultipartFile file) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> createLead(LeadDto leadDto, MultipartFile file) {
 		EnumMap<ApiResponse, Object> createMap = new EnumMap<>(ApiResponse.class);
 		try {
-			Leads leads = TO_NEWLEAD.apply(leadDto).orElseThrow(null);
+			Leads leads = TO_LEAD.apply(leadDto).orElseThrow(null);
 			if (nonNull(file) && !file.isEmpty())
 				leads.setBusinessCard(Base64.getEncoder().encodeToString(file.getBytes()));
 			serviceFallsDaoSevice.getById(leadDto.getServiceFallsId()).ifPresent(leads::setServiceFallsMaster);

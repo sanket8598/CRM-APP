@@ -1,8 +1,5 @@
 package ai.rnt.crm.dto_mapper;
 
-import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
-import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE;
-import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER;
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
 
 import java.util.Collection;
@@ -29,13 +26,8 @@ public class LeadsDtoMapper {
 	 * @since 04-09-2023
 	 * @version 1.0
 	 */
-	public static final Function<LeadDto, Optional<Leads>> TO_LEAD = e ->{
-		Leads leads = evalMapper(e, Leads.class).get();
-		TO_COMPANY.apply(e.getCompanyMaster()).ifPresent(leads::setCompanyMaster);
-		TO_LEAD_SOURCE.apply(e.getLeadSourceMaster()).ifPresent(leads::setLeadSourceMaster);
-		TO_SERVICEFALLMASTER.apply(e.getServiceFallsMaster()).ifPresent(leads::setServiceFallsMaster);
-		return Optional.of(leads);
-	};
+	public static final Function<LeadDto, Optional<Leads>> TO_LEAD = e -> evalMapper(e, Leads.class);
+		;
 	/**
 	 * @since 04-09-2023
 	 * @version 1.0

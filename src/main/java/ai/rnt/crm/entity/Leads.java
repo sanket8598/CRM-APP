@@ -57,7 +57,7 @@ public class Leads extends Auditable {
 	private String email;
 
 	@Column(name = "assign_to")
-	private String assignTo;
+	private Integer assignTo;
 
 	@Column(name = "company_website")
 	private String companyWebsite;
