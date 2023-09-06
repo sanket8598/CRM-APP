@@ -20,10 +20,18 @@ public class RoleUtil {
 	public static final Predicate<String> ALLOW_ROLES = s -> {
 		if (isNull(s))
 			return false;
-		return RoleUtil.APP_ROLES.get().stream().anyMatch(s::equalsIgnoreCase);
+		if(RoleUtil.APP_ROLES.get().stream().anyMatch(s::equalsIgnoreCase))
+		   return true;
+		return false;
 	};
 
 	public static final Supplier<List<String>> APP_ROLES = () -> Arrays.asList(CRM_ADMIN, CRM_USER);
 
-	public static final UnaryOperator<String> GET_ROLE= s -> ALLOW_ROLES.test(s) ? s : "Don't Have Role";
+	public static final UnaryOperator<String> GET_ROLE= s ->{
+		if(CRM_ADMIN.equalsIgnoreCase(s))
+			return s;
+		else if(CRM_USER.equalsIgnoreCase(s)) 
+			return s;
+		return null;
+	};
 }

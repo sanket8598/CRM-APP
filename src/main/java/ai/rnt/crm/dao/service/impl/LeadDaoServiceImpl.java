@@ -29,6 +29,6 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 
 	@Override
 	public List<LeadDto> getAll() {
-		return leadsRepository.findAll();
+		return null;
 	}
 }

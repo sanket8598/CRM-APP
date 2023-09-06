@@ -19,6 +19,7 @@ import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
+import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.LeadService;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +31,7 @@ public class LeadServiceImpl implements LeadService {
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
 	private final LeadSourceDaoService leadSourceDaoService;
 	private final CompanyMasterService companyMasterService;
+	private final EmployeeService employeeService;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> createLead(LeadDto leadDto) {
@@ -39,6 +41,7 @@ public class LeadServiceImpl implements LeadService {
 			serviceFallsDaoSevice.getById(leadDto.getServiceFallsId()).ifPresent(leads::setServiceFallsMaster);
 			leadSourceDaoService.getById(leadDto.getLeadSourceId()).ifPresent(leads::setLeadSourceMaster);
 			companyMasterService.getById(leadDto.getCompanyId()).ifPresent(leads::setCompanyMaster);
+			employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setAssignTo);
 			if (nonNull(leadDaoService.addLead(leads)))
 				createMap.put(MESSAGE, "Lead Added Successfully");
 			else

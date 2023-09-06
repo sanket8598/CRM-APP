@@ -27,7 +27,7 @@ public class LeadDto {
 
 	private String businessCard;
 
-	private Float budgetAmount;
+	private Double budgetAmount;
 
 	private Integer assignTo;
 	

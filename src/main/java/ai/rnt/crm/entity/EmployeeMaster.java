@@ -4,6 +4,7 @@ import static javax.persistence.CascadeType.DETACH;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.CascadeType.REFRESH;
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -18,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
@@ -81,6 +83,9 @@ public class EmployeeMaster extends Auditable {
 	               inverseJoinColumns = @JoinColumn(name = "role_id"))
 	@Where(clause = "deleted_by is null")
 	private List<RoleMaster> employeeRole = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "assignTo",cascade =ALL)
+	private List<Leads> leads = new ArrayList<>();
 
 }
 //@formatter:on

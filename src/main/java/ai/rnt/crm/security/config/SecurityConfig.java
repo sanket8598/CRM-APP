@@ -1,8 +1,6 @@
 package ai.rnt.crm.security.config;
 
 import static ai.rnt.crm.security.AuthenticationUtil.PUBLIC_URLS;
-import static ai.rnt.crm.constants.RoleConstants.CRM_ADMIN;
-import static ai.rnt.crm.constants.RoleConstants.CRM_USER;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @SuppressWarnings("deprecation")
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig implements WebMvcConfigurer {
 
 	private final CustomUserDetails customUserDetails;
@@ -38,14 +38,14 @@ public class SecurityConfig implements WebMvcConfigurer {
 	private final JWTAuthenticationEntryPoint authenticationEntryPoint;
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> {
 			try {
 				csrf.disable().authorizeHttpRequests()
-						// we can give give access to the api based on the role or using
-						// e.g.antMatchers("/api/users/{path}").hasRole(null)
+				// we can give give access to the api based on the role or using
+				// e.g.antMatchers("/api/users/{path}").hasRole(null)
 						.antMatchers(PUBLIC_URLS).permitAll().antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-						.requestMatchers(CorsUtils::isPreFlightRequest).permitAll().anyRequest().authenticated().anyRequest().hasAnyRole(CRM_ADMIN,CRM_USER);
+						.requestMatchers(CorsUtils::isPreFlightRequest).permitAll().anyRequest().authenticated();
 			} catch (Exception e) {
 				log.error("error occurred in the securityFilterChain... {}", e.getMessage());
 			}
@@ -59,18 +59,18 @@ public class SecurityConfig implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return NoOpPasswordEncoder.getInstance();
 	}
 
 	@Bean
-	public AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration)
+	AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration)
 			throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 
 	@Bean
-	public DaoAuthenticationProvider daoAuthenticationProvider() {
+	DaoAuthenticationProvider daoAuthenticationProvider() {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 		provider.setUserDetailsService(this.customUserDetails);
 		provider.setPasswordEncoder(passwordEncoder());
@@ -78,8 +78,8 @@ public class SecurityConfig implements WebMvcConfigurer {
 	}
 
 	/**
-	 * This method will configure cross origin access to api's.
-	 * {@inheritDoc}
+	 * This method will configure cross origin access to api's. {@inheritDoc}
+	 * 
 	 * @since version 1.0
 	 */
 	@Override

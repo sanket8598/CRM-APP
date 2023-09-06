@@ -8,5 +8,7 @@ import ai.rnt.crm.entity.EmployeeMaster;
 public interface EmployeeDaoService extends CrudService<EmployeeMaster, EmployeeDto>{
 	
 	Optional<EmployeeMaster> getEmployeebyUserId(String userId);
+	
+	Optional<EmployeeDto> getById(Integer assignTo);
 
 }

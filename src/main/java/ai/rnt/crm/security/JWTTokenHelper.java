@@ -1,7 +1,5 @@
 package ai.rnt.crm.security;
 
-import static ai.rnt.crm.constants.RoleConstants.CRM_ADMIN;
-import static ai.rnt.crm.constants.RoleConstants.CRM_USER;
 import static ai.rnt.crm.util.RoleUtil.GET_ROLE;
 
 import java.security.KeyPair;
@@ -10,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -70,14 +67,13 @@ public class JWTTokenHelper {
 		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
 			claims.put("fullName", emp.getFirstName() + " " + emp.getLastName());
 			claims.put("Role",
-					emp.getEmployeeRole().stream().map(Role::getRoleName).map(GET_ROLE).collect(Collectors.joining(",")).split(",")[0]);
+			 emp.getEmployeeRole().stream().map(Role::getRoleName).map(GET_ROLE).findFirst().orElse("Don't Have Role"));
 		});
 		return createToken(claims, userDetails.getUsername());
 	}
 
 	private String createToken(Map<String, Object> claims, String subject) {
-		return Jwts.builder().setClaims(claims)
-				.setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
 				.signWith(SignatureAlgorithm.HS256, secret).compact();
 	}
@@ -89,11 +85,11 @@ public class JWTTokenHelper {
 
 	public KeyPair getKeyPair() {
 		try {
-		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(EncryptionAlgoConstants.RSA);
-        keyPairGenerator.initialize(2048);
-       return keyPairGenerator.generateKeyPair();
-		}catch(Exception e) {
-			log.error("error occured while getting the Keys.{} ",e.getMessage());
+			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(EncryptionAlgoConstants.RSA);
+			keyPairGenerator.initialize(2048);
+			return keyPairGenerator.generateKeyPair();
+		} catch (Exception e) {
+			log.error("error occured while getting the Keys.{} ", e.getMessage());
 		}
 		return null;
 	}

@@ -89,7 +89,7 @@ public class LoginController {
 			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(rsaToJwtDecoder));
 			Map<String, Object> map = new LinkedHashMap<>();
 			map.put("fullName", json.get("fullName"));
-			map.put("Role", json.get("Role"));
+			map.put("role", json.get("Role"));
 			return ResponseEntity.ok(map);
 		} catch (Exception e) {
 			log.error("error occured while decoding the token.. {}", e.getLocalizedMessage());

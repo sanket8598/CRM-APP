@@ -43,5 +43,7 @@ public class AuthenticationUtil {
 	
 	public static final String[] PUBLIC_URLS = { "/api/v1/auth/**", "/v3/api-docs", "/v2/api-docs",
 			"swagger-resources/**", "swagger-ui/**", "/webjars/**" };
+	public static final String[] ADMIN_URLS = { "/api/v1/admin/**" };
+	public static final String[] USER_URLS = { "/api/v1/user/**"};
 
 }

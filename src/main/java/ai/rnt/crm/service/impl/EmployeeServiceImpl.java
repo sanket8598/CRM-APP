@@ -1,6 +1,7 @@
 package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
+import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EmployeeMaster;
 
 import java.util.Optional;
 
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dto.EmployeeDto;
+import ai.rnt.crm.entity.EmployeeMaster;
+import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,15 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public Optional<EmployeeDto> getEmployeeByUserId(String userId) {
 		return TO_Employee.apply(employeeDaoService.getEmployeebyUserId(userId).orElseThrow(()->new ResourceNotFoundException("Employee", "userId", userId)));
+	}
+
+	@Override
+	public Optional<EmployeeMaster> getById(Integer assignTo) {
+		try {
+			return TO_EmployeeMaster.apply(employeeDaoService.getById(assignTo).get());
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
 	}
 
 }

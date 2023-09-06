@@ -1,6 +1,9 @@
 package ai.rnt.crm.entity;
 
 import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.DETACH;
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
@@ -22,8 +25,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * @author Nikhil Gaikwad
- * @@since 22-08-2023.
+ * @author Sanket Wakankar
+ * @since 22-08-2023.
  * @version 1.0
  */
 @Entity
@@ -60,14 +63,14 @@ public class Leads extends Auditable {
 	private String status;	
 
 	@JoinColumn(name = "assign_to")
-	@ManyToOne(cascade = ALL)
+	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	private EmployeeMaster assignTo;
 
 	@Column(name = "company_website")
 	private String companyWebsite;
 
 	@Column(name = "budget_amount")
-	private Float budgetAmount;
+	private Double budgetAmount;
 
 	@Column(name = "business_card", columnDefinition = "LONGTEXT")
 	private String businessCard;
