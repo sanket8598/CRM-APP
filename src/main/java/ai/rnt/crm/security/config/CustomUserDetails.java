@@ -1,6 +1,5 @@
 package ai.rnt.crm.security.config;
 
-import static ai.rnt.crm.util.RoleUtil.GET_ROLE;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -53,7 +52,7 @@ public class CustomUserDetails implements UserDetailsService {
 			if (Objects.nonNull(user))
 				return new UserDetail(
 						user.getUserID(), user.getPassword(), true, true, true, true, user.getEmployeeRole().stream()
-								.map(Role::getRoleName).map(GET_ROLE).map(SimpleGrantedAuthority::new).collect(Collectors.toList()),
+								.map(Role::getRoleName).map(SimpleGrantedAuthority::new).collect(Collectors.toList()),
 						user.getStaffId());
 		} catch (Exception e) {
 			log.error("Exception occurred while loading user by name... {}", userId, e);
