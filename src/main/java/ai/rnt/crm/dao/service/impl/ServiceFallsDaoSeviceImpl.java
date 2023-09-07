@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -18,6 +19,11 @@ public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice{
 	@Override
 	public Optional<ServiceFallsMaster> getById(Integer serviceFallsId) {
 		return serviceFallRepository.findById(serviceFallsId);
+	}
+
+	@Override
+	public List<ServiceFallsMaster> getAllSerciveFalls() {
+		return serviceFallRepository.findAll();
 	}
 
 }

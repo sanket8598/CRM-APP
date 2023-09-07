@@ -2,6 +2,7 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
+import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
@@ -84,4 +85,15 @@ public class LeadServiceImpl implements LeadService {
 		}
 	}
 
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllLeadSource() {
+		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		try {
+			resultMap.put(ApiResponse.SUCCESS, true);
+			resultMap.put(ApiResponse.DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
+			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
 }

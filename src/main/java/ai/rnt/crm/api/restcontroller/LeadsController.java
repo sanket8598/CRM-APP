@@ -2,6 +2,8 @@ package ai.rnt.crm.api.restcontroller;
 
 import static ai.rnt.crm.constants.ApiConstants.CREATE_LEAD;
 import static ai.rnt.crm.constants.ApiConstants.GET_ALL_LEADS;
+import static ai.rnt.crm.constants.ApiConstants.GET_ALL_LEAD_SOURCE;
+import static ai.rnt.crm.constants.ApiConstants.GET_ALL_SERVICE_FALLS;
 import static ai.rnt.crm.constants.ApiConstants.GET_LEADS_BY_STATUS;
 import static ai.rnt.crm.constants.ApiConstants.LEAD;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.LeadService;
+import ai.rnt.crm.service.ServiceFallsService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,6 +31,8 @@ import lombok.RequiredArgsConstructor;
 public class LeadsController {
 
 	private final LeadService leadService;
+	
+	private final ServiceFallsService serviceFallsService;
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping(CREATE_LEAD)
@@ -39,5 +44,15 @@ public class LeadsController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(
 			@PathVariable(name = "leadsStatus", required = false) String leadsStatus) {
 		return leadService.getLeadsByStatus(leadsStatus);
+	}
+	
+	@GetMapping(GET_ALL_SERVICE_FALLS)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllSerciveFalls() {
+		return serviceFallsService.getAllSerciveFalls();
+	}
+	
+	@GetMapping(GET_ALL_LEAD_SOURCE)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllLeadSource() {
+		return leadService.getAllLeadSource();
 	}
 }

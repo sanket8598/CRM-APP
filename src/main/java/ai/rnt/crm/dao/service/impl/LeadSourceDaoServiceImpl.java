@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -11,13 +12,18 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class LeadSourceDaoServiceImpl implements LeadSourceDaoService{
-	
+public class LeadSourceDaoServiceImpl implements LeadSourceDaoService {
+
 	private final LeadSourceMasterRepository leadSourceMasterRepository;
-	
+
 	@Override
 	public Optional<LeadSourceMaster> getById(Integer leadSourceId) {
 		return leadSourceMasterRepository.findById(leadSourceId);
+	}
+
+	@Override
+	public List<LeadSourceMaster> getAllLeadSource() {
+		return leadSourceMasterRepository.findAll();
 	}
 
 }
