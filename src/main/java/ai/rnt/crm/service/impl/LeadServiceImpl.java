@@ -1,8 +1,10 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
+import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
-import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
+import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import ai.rnt.crm.dao.service.CompanyMasterService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
+import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.entity.Leads;
@@ -40,6 +43,7 @@ public class LeadServiceImpl implements LeadService {
 	private final LeadSourceDaoService leadSourceDaoService;
 	private final CompanyMasterService companyMasterService;
 	private final EmployeeService employeeService;
+	private final RoleMasterDaoService roleMasterDaoService;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> createLead(LeadDto leadDto) {
@@ -89,10 +93,26 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllLeadSource() {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
-			resultMap.put(ApiResponse.SUCCESS, true);
-			resultMap.put(ApiResponse.DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
+			resultMap.put(SUCCESS, true);
+			resultMap.put(DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
 		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData() {
+		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		try {
+			Map<String, Object> dataMap = new HashMap<>();
+			dataMap.put("serviceFallData",TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
+			dataMap.put("leadSourceData", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
+			dataMap.put("assignToData", TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
+			resultMap.put(SUCCESS, true);
+			resultMap.put(DATA,dataMap);
+			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
+		}catch (Exception e) {
 			throw new CRMException(e);
 		}
 	}

@@ -104,6 +104,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		log.error("error occured while invalid request body...{}",ex);
 		return new ResponseEntity<>(new ApiError(false, ex.getMessage()), HttpStatus.NOT_ACCEPTABLE);
 	}
 

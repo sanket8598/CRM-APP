@@ -12,6 +12,7 @@ import java.util.EnumMap;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(LEAD)
+@CrossOrigin("*")
 @RequiredArgsConstructor
 public class LeadsController {
 
@@ -54,5 +56,9 @@ public class LeadsController {
 	@GetMapping(GET_ALL_LEAD_SOURCE)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllLeadSource() {
 		return leadService.getAllLeadSource();
+	}
+	@GetMapping("/getDropDownData")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData(){
+		return leadService.getAllDropDownData();
 	}
 }

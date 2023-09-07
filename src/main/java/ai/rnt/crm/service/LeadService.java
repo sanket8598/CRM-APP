@@ -15,4 +15,6 @@ public interface LeadService {
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllLeadSource();
 
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData();
+
 }
