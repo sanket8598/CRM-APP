@@ -84,7 +84,7 @@ public class EmployeeMaster extends Auditable {
 	@Where(clause = "deleted_by is null")
 	private List<RoleMaster> employeeRole = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "assignTo",cascade =ALL)
+	@OneToMany(mappedBy = "employee",cascade =ALL)
 	private List<Leads> leads = new ArrayList<>();
 
 }

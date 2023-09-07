@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.LeadDaoService;
-import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.repository.LeadsRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +22,12 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 	}
 
 	@Override
-	public Leads getLeadsByStatus(String leadsStatus) {
-		return leadsRepository.findLeadsByStatus(leadsStatus);
+	public List<Leads> getLeadsByStatus(String leadsStatus) {
+		return leadsRepository.findByStatus(leadsStatus);
 	}
 
 	@Override
-	public List<LeadDto> getAll() {
-		return null;
+	public List<Leads> getAllLeads() {
+		return leadsRepository.findAll();
 	}
 }

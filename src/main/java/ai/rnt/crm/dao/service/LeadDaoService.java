@@ -9,8 +9,8 @@ public interface LeadDaoService extends CrudService<Leads, LeadDto> {
 
 	Leads addLead(Leads leads);
 
-	Leads getLeadsByStatus(String leadsStatus);
+	List<Leads> getLeadsByStatus(String leadsStatus);
 	
-    List<LeadDto> getAll();
+    List<Leads> getAllLeads();
 
 }

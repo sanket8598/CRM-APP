@@ -18,6 +18,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
 
 import lombok.Getter;
@@ -63,8 +65,9 @@ public class Leads extends Auditable {
 	private String status;	
 
 	@JoinColumn(name = "assign_to")
+	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
-	private EmployeeMaster assignTo;
+	private EmployeeMaster employee;
 
 	@Column(name = "company_website")
 	private String companyWebsite;
