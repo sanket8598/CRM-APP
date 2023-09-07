@@ -1,6 +1,7 @@
 package ai.rnt.crm.api.restcontroller;
 
 import static ai.rnt.crm.constants.ApiConstants.AUTH;
+import static ai.rnt.crm.constants.ApiConstants.GET_ADMIN_AND_USER;
 import static ai.rnt.crm.constants.ApiConstants.LOGIN;
 import static ai.rnt.crm.constants.ApiConstants.TOKENPARSE;
 import static ai.rnt.crm.constants.EncryptionAlgoConstants.RSA;
@@ -9,6 +10,7 @@ import static java.util.Objects.nonNull;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.util.Base64;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,11 +31,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.payloads.JwtAuthRequest;
 import ai.rnt.crm.payloads.JwtAuthResponse;
 import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.config.CustomUserDetails;
+import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.JwtTokenDecoder;
 import ai.rnt.crm.util.RSAToJwtDecoder;
 import ai.rnt.crm.util.Sha1Encryptor;
@@ -47,6 +52,8 @@ import lombok.extern.slf4j.Slf4j;
 public class LoginController {
 
 	private final AuthenticationManager authenticationManager;
+	
+	private final EmployeeService employeeService;
 
 	private final CustomUserDetails customUserDetails;
 	private final JWTTokenHelper helper;
@@ -97,4 +104,8 @@ public class LoginController {
 		}
 	}
 
+	@GetMapping(GET_ADMIN_AND_USER)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser() {
+		return employeeService.getAdminAndUser();
+	}
 }

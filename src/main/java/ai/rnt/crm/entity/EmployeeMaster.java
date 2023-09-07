@@ -87,5 +87,15 @@ public class EmployeeMaster extends Auditable {
 	@OneToMany(mappedBy = "employee",cascade =ALL)
 	private List<Leads> leads = new ArrayList<>();
 
+	public EmployeeMaster(Integer staffId, String firstName, String lastName, LocalDate departureDate) {
+		super();
+		this.staffId = staffId;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.departureDate = departureDate;
+	}
+	
+	
+
 }
 //@formatter:on

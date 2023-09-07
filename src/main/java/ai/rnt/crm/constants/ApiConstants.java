@@ -20,5 +20,6 @@ public final class ApiConstants {
 	public static final String SERVICE_FALLS = BASE + "serviceFalls" + SEPERATOR;
 	public static final String GET_ALL_SERVICE_FALLS = SEPERATOR + "getAllSerciveFalls";
 	public static final String GET_ALL_LEAD_SOURCE = SEPERATOR + "getAllLeadSource";
+	public static final String GET_ADMIN_AND_USER = SEPERATOR + "getAdminAndUser";
 
 }

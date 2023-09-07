@@ -20,6 +20,11 @@ public class ServiceFallsServiceImpl implements ServiceFallsService {
 
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
 
+	/**@author Nikhil Gaikwad
+	 * @Version 1.0
+	 * @since 07-09-2023 
+	 *
+	 */
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllSerciveFalls() {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
