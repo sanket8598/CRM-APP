@@ -1,6 +1,7 @@
 package ai.rnt.crm.util;
 
 import static ai.rnt.crm.constants.RoleConstants.CRM_ADMIN;
+import static ai.rnt.crm.constants.RoleConstants.NO_ROLE;
 import static ai.rnt.crm.constants.RoleConstants.CRM_USER;
 import static java.util.Objects.isNull;
 
@@ -29,9 +30,9 @@ public class RoleUtil {
 
 	public static final UnaryOperator<String> GET_ROLE= s ->{
 		if(CRM_ADMIN.equalsIgnoreCase(s))
-			return s;
+			return CRM_ADMIN;
 		else if(CRM_USER.equalsIgnoreCase(s)) 
-			return s;
-		return null;
+			return CRM_USER;
+		return NO_ROLE;
 	};
 }
