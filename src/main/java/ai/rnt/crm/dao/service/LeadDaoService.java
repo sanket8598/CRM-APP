@@ -13,4 +13,6 @@ public interface LeadDaoService extends CrudService<Leads, LeadDto> {
 
 	List<Leads> getAllLeads();
 
+	List<Leads> getLeadDashboardData();
+
 }

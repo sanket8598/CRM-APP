@@ -2,6 +2,7 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
+import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
@@ -10,6 +11,8 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FOUND;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -17,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +60,7 @@ public class LeadServiceImpl implements LeadService {
 				createMap.put(MESSAGE, "Lead Added Successfully");
 			else
 				createMap.put(MESSAGE, "Lead Not Added");
-			return new ResponseEntity<>(createMap, HttpStatus.CREATED);
+			return new ResponseEntity<>(createMap, CREATED);
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}
@@ -72,18 +74,18 @@ public class LeadServiceImpl implements LeadService {
 			if (isNull(leadsStatus)) {
 				Map<String, Object> dataMap = new HashMap<>();
 				List<Leads> allLeads = leadDaoService.getAllLeads();
-				dataMap.put("allLead", TO_LEAD_DTOS.apply(allLeads));
+				dataMap.put("allLead", TO_DASHBOARD_LEADDTOS.apply(allLeads));
 				dataMap.put("openLead",
-						TO_LEAD_DTOS.apply(allLeads.stream().filter(l -> nonNull(l.getStatus())
+						TO_DASHBOARD_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(l.getStatus())
 								&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
 								.collect(Collectors.toList())));
-				dataMap.put("closeLead", TO_LEAD_DTOS.apply(allLeads.stream().filter(l -> nonNull(l.getStatus())
+				dataMap.put("closeLead", TO_DASHBOARD_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(l.getStatus())
 						&& (l.getStatus().equalsIgnoreCase("close") || l.getStatus().equalsIgnoreCase("disqualify")))
 						.collect(Collectors.toList())));
 				getAllLeads.put(DATA, dataMap);
 			} else
 				getAllLeads.put(DATA, TO_LEAD_DTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
-			return new ResponseEntity<>(getAllLeads, HttpStatus.FOUND);
+			return new ResponseEntity<>(getAllLeads, FOUND);
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}
@@ -95,7 +97,7 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			resultMap.put(SUCCESS, true);
 			resultMap.put(DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
-			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
+			return new ResponseEntity<>(resultMap, FOUND);
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}
@@ -106,13 +108,37 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Map<String, Object> dataMap = new HashMap<>();
-			dataMap.put("serviceFallData",TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
+			dataMap.put("serviceFallData", TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put("leadSourceData", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put("assignToData", TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
 			resultMap.put(SUCCESS, true);
-			resultMap.put(DATA,dataMap);
-			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
-		}catch (Exception e) {
+			resultMap.put(DATA, dataMap);
+			return new ResponseEntity<>(resultMap, FOUND);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardData() {
+		EnumMap<ApiResponse, Object> leadsDashboardData = new EnumMap<>(ApiResponse.class);
+		try {
+			leadsDashboardData.put(SUCCESS, true);
+			leadsDashboardData.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadDashboardData()));
+			return new ResponseEntity<>(leadsDashboardData, FOUND);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(String leadsStatus) {
+		EnumMap<ApiResponse, Object> leadsDataByStatus = new EnumMap<>(ApiResponse.class);
+		try {
+			leadsDataByStatus.put(SUCCESS, true);
+			leadsDataByStatus.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
+			return new ResponseEntity<>(leadsDataByStatus, FOUND);
+		} catch (Exception e) {
 			throw new CRMException(e);
 		}
 	}

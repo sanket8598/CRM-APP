@@ -1,9 +1,12 @@
 package ai.rnt.crm.api.restcontroller;
 
 import static ai.rnt.crm.constants.ApiConstants.CREATE_LEAD;
+import static ai.rnt.crm.constants.ApiConstants.DASHBOARD_ALL_LEADS;
+import static ai.rnt.crm.constants.ApiConstants.DASHBOARD_LEADS_BY_Status;
 import static ai.rnt.crm.constants.ApiConstants.GET_ALL_LEADS;
 import static ai.rnt.crm.constants.ApiConstants.GET_ALL_LEAD_SOURCE;
 import static ai.rnt.crm.constants.ApiConstants.GET_ALL_SERVICE_FALLS;
+import static ai.rnt.crm.constants.ApiConstants.GET_DROP_DOWN_DATA;
 import static ai.rnt.crm.constants.ApiConstants.GET_LEADS_BY_STATUS;
 import static ai.rnt.crm.constants.ApiConstants.LEAD;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
@@ -33,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 public class LeadsController {
 
 	private final LeadService leadService;
-	
+
 	private final ServiceFallsService serviceFallsService;
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
@@ -47,18 +50,34 @@ public class LeadsController {
 			@PathVariable(name = "leadsStatus", required = false) String leadsStatus) {
 		return leadService.getLeadsByStatus(leadsStatus);
 	}
-	
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping(GET_ALL_SERVICE_FALLS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllSerciveFalls() {
 		return serviceFallsService.getAllSerciveFalls();
 	}
-	
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping(GET_ALL_LEAD_SOURCE)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllLeadSource() {
 		return leadService.getAllLeadSource();
 	}
-	@GetMapping("/getDropDownData")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData(){
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping(GET_DROP_DOWN_DATA)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData() {
 		return leadService.getAllDropDownData();
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping(DASHBOARD_ALL_LEADS)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardData() {
+		return leadService.getLeadDashboardData();
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping(DASHBOARD_LEADS_BY_Status)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(@PathVariable String leadsStatus) {
+		return leadService.getLeadDashboardDataByStatus(leadsStatus);
 	}
 }

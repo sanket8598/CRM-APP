@@ -15,6 +15,7 @@ import javax.persistence.PreRemove;
 import javax.persistence.PreUpdate;
 
 import ai.rnt.crm.security.UserDetail;
+import lombok.Getter;
 
 /**
  * This Abstract Class used to give the fields which we used in every entity.
@@ -26,6 +27,7 @@ import ai.rnt.crm.security.UserDetail;
  
 @Embeddable
 @MappedSuperclass
+@Getter
 public abstract class Auditable implements Serializable{
 	
 

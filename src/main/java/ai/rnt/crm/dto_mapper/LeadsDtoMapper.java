@@ -8,9 +8,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.LeadDashboardDto;
 import ai.rnt.crm.dto.LeadDto;
-import ai.rnt.crm.dto.NewLeadDto;
 import ai.rnt.crm.entity.Leads;
+import ai.rnt.crm.util.ConvertDateFormat;
 
 public class LeadsDtoMapper {
 
@@ -55,6 +56,13 @@ public class LeadsDtoMapper {
 	public static final Function<Collection<Leads>, List<LeadDto>> TO_LEAD_DTOS = e -> e.stream()
 			.map(dm -> TO_LEAD_DTO.apply(dm).get()).collect(Collectors.toList());
 	
-	public static final Function<NewLeadDto, Optional<Leads>> TO_NEWLEAD = e -> evalMapper(e, Leads.class);
+	
+	public static final Function<Leads, Optional<LeadDashboardDto>> TO_DASHBOARD_LEADDTO = e -> {
+		Optional<LeadDashboardDto> leadDashboardDto = evalMapper(e, LeadDashboardDto.class);
+		leadDashboardDto.ifPresent(l->l.setCreatedOn(ConvertDateFormat.convertDate(e.getCreatedDate())));
+		return leadDashboardDto;
+	};
 
+	public static final Function<Collection<Leads>, List<LeadDashboardDto>> TO_DASHBOARD_LEADDTOS = e -> e.stream()
+			.map(dm -> TO_DASHBOARD_LEADDTO.apply(dm).get()).collect(Collectors.toList());
 }

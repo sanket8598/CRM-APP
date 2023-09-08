@@ -30,4 +30,9 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 	public List<Leads> getAllLeads() {
 		return leadsRepository.findAll();
 	}
+
+	@Override
+	public List<Leads> getLeadDashboardData() {
+		return leadsRepository.findAll();
+	}
 }

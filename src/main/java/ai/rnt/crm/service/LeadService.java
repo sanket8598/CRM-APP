@@ -17,4 +17,8 @@ public interface LeadService {
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData();
 
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardData();
+
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(String leadsStatus);
+
 }
