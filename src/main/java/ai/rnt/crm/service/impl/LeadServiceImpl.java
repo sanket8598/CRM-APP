@@ -138,8 +138,11 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(String leadsStatus) {
 		EnumMap<ApiResponse, Object> leadsDataByStatus = new EnumMap<>(ApiResponse.class);
 		try {
+			if(nonNull(leadsStatus)&&leadsStatus.equalsIgnoreCase("All")) 
+				leadsDataByStatus.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadDashboardData()));
+			else
+				leadsDataByStatus.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
 			leadsDataByStatus.put(SUCCESS, true);
-			leadsDataByStatus.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
 			return new ResponseEntity<>(leadsDataByStatus, FOUND);
 		} catch (Exception e) {
 			throw new CRMException(e);
