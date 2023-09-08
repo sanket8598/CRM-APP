@@ -1,11 +1,13 @@
 package ai.rnt.crm.exception.handler;
 
-import static ai.rnt.crm.constants.MessageConstants.BAD_CREDENTIALS;
 import static ai.rnt.crm.constants.MessageConstants.ACCESS_DENIED;
+import static ai.rnt.crm.constants.MessageConstants.BAD_CREDENTIALS;
+import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
 import static ai.rnt.crm.util.HttpUtils.getURL;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -54,6 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 @ResponseBody
 @RequiredArgsConstructor
+@Component
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -166,6 +170,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	private ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException exc) {
 		log.error("handle AccessDenied api error handler: {}", exc.getMessage());
 		return new ResponseEntity<>(new ApiError(false, ACCESS_DENIED+""+exc.getMessage()),
+				HttpStatus.UNAUTHORIZED);
+	}
+	@ExceptionHandler(InvalidKeyException.class)
+	private ResponseEntity<ApiError> handleInvalidKeyException(InvalidKeyException exc) {
+		log.error("handle InvalidKeyException handler: {}", exc.getMessage());
+		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED),
 				HttpStatus.UNAUTHORIZED);
 	}
 

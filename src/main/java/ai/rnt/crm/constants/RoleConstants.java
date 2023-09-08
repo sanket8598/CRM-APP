@@ -7,4 +7,5 @@ public class RoleConstants {
 	public static final String CHECK_BOTH_ACCESS="hasAuthority('"+CRM_ADMIN+"')"+" || hasAuthority('"+CRM_USER+"')";
 	public static final String CHECK_ADMIN_ACCESS="hasAuthority('"+CRM_ADMIN+"')";
 	public static final String CHECK_USER_ACCESS="hasAuthority('"+CRM_USER+"')";
+	public static final String NO_ROLE="Don't Have Role";
 }

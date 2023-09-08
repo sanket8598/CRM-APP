@@ -1,6 +1,7 @@
 package ai.rnt.crm.security;
 
 import static ai.rnt.crm.util.RoleUtil.GET_ROLE;
+import static ai.rnt.crm.constants.RoleConstants.NO_ROLE;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -39,7 +40,7 @@ public class JWTTokenHelper {
 	@Value("${jwt.secret.key}")
 	private String secret;
 
-	public static final long JWT_TOKEN_VALIDITY = 100 * 60 * 60;
+	public static final long JWT_TOKEN_VALIDITY = 1000 * 60 * 60;
 
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
@@ -67,7 +68,7 @@ public class JWTTokenHelper {
 		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
 			claims.put("fullName", emp.getFirstName() + " " + emp.getLastName());
 			claims.put("Role",
-			 emp.getEmployeeRole().stream().map(Role::getRoleName).map(GET_ROLE).findFirst().orElse("Don't Have Role"));
+			 emp.getEmployeeRole().stream().map(Role::getRoleName).map(GET_ROLE).findFirst().orElse(NO_ROLE));
 		});
 		return createToken(claims, userDetails.getUsername());
 	}
