@@ -10,8 +10,10 @@ import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.LeadDashboardDto;
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.dto.LeadsCardDto;
 import ai.rnt.crm.entity.Leads;
-import ai.rnt.crm.util.ConvertDateFormat;
+import ai.rnt.crm.util.ConvertDateFormatUtil;
+import ai.rnt.crm.util.LeadsCardUtil;
 
 public class LeadsDtoMapper {
 
@@ -59,10 +61,20 @@ public class LeadsDtoMapper {
 	
 	public static final Function<Leads, Optional<LeadDashboardDto>> TO_DASHBOARD_LEADDTO = e -> {
 		Optional<LeadDashboardDto> leadDashboardDto = evalMapper(e, LeadDashboardDto.class);
-		leadDashboardDto.ifPresent(l->l.setCreatedOn(ConvertDateFormat.convertDate(e.getCreatedDate())));
+		leadDashboardDto.ifPresent(l->l.setCreatedOn(ConvertDateFormatUtil.convertDate(e.getCreatedDate())));
 		return leadDashboardDto;
 	};
 
 	public static final Function<Collection<Leads>, List<LeadDashboardDto>> TO_DASHBOARD_LEADDTOS = e -> e.stream()
 			.map(dm -> TO_DASHBOARD_LEADDTO.apply(dm).get()).collect(Collectors.toList());
+	
+	
+	public static final Function<Leads, Optional<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTO = e -> {
+		Optional<LeadsCardDto> leadDashboardDto = evalMapper(e, LeadsCardDto.class);
+		leadDashboardDto.ifPresent(l->l.setShortName(LeadsCardUtil.shortName(e.getFirstName(), e.getLastName())));
+		return leadDashboardDto;
+	};
+
+	public static final Function<Collection<Leads>, List<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTOS = e -> e.stream()
+			.map(dm -> TO_DASHBOARD_CARDS_LEADDTO.apply(dm).get()).collect(Collectors.toList());
 }

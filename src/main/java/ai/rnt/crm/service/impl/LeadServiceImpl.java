@@ -5,6 +5,7 @@ import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
+import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_CARDS_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
@@ -52,6 +53,7 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> createMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads leads = TO_LEAD.apply(leadDto).orElseThrow(null);
+			leads.setStatus("Open");
 			serviceFallsDaoSevice.getById(leadDto.getServiceFallsId()).ifPresent(leads::setServiceFallsMaster);
 			leadSourceDaoService.getById(leadDto.getLeadSourceId()).ifPresent(leads::setLeadSourceMaster);
 			companyMasterService.getById(leadDto.getCompanyId()).ifPresent(leads::setCompanyMaster);
@@ -60,6 +62,7 @@ public class LeadServiceImpl implements LeadService {
 				createMap.put(MESSAGE, "Lead Added Successfully");
 			else
 				createMap.put(MESSAGE, "Lead Not Added");
+			createMap.put(SUCCESS, true);
 			return new ResponseEntity<>(createMap, CREATED);
 		} catch (Exception e) {
 			throw new CRMException(e);
@@ -74,12 +77,12 @@ public class LeadServiceImpl implements LeadService {
 			if (isNull(leadsStatus)) {
 				Map<String, Object> dataMap = new HashMap<>();
 				List<Leads> allLeads = leadDaoService.getAllLeads();
-				dataMap.put("allLead", TO_DASHBOARD_LEADDTOS.apply(allLeads));
+				dataMap.put("allLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads));
 				dataMap.put("openLead",
-						TO_DASHBOARD_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(l.getStatus())
+						TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(l.getStatus())
 								&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
 								.collect(Collectors.toList())));
-				dataMap.put("closeLead", TO_DASHBOARD_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(l.getStatus())
+				dataMap.put("closeLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(l.getStatus())
 						&& (l.getStatus().equalsIgnoreCase("close") || l.getStatus().equalsIgnoreCase("disqualify")))
 						.collect(Collectors.toList())));
 				getAllLeads.put(DATA, dataMap);
