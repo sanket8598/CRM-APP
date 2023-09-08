@@ -32,7 +32,7 @@ import lombok.Setter;
  * @version 1.0
  */
 @Entity
-@Table(name = "crm_lead_master")
+@Table(name = "crm_lead")
 @Getter
 @Setter
 @NoArgsConstructor
