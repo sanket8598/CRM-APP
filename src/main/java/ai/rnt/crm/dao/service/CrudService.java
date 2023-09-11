@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * This is base interface for all services it contains basic common operation of table 
  * and common methods. This interface requires two generic arguments first is entity and 
- * anther is dto. 
+ * another is dto. 
  * @param entity
  * @param dto
  * 
