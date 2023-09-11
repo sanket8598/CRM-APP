@@ -18,4 +18,14 @@ public class CompanyDto {
 	private String companyName;
 	
 	private String companyWebsite;
+	
+	private String addressLineOne;
+	
+	private CountryDto country;
+	
+	private StateDto state;
+	
+	private CityDto city;
+	
+	private String zipCode;
 }
