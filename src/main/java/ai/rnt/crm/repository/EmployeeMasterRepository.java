@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import ai.rnt.crm.entity.EmployeeMaster;
 
+
 public interface EmployeeMasterRepository extends JpaRepository<EmployeeMaster, Integer> {
 	
-	Optional<EmployeeMaster> findByUserID(String userId);
+	Optional<EmployeeMaster> findByUserId(String userId);
 }

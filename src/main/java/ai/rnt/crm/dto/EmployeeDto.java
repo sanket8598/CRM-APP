@@ -3,7 +3,6 @@ package ai.rnt.crm.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import ai.rnt.crm.entity.RoleMaster;
 import lombok.Data;
 
 @Data
@@ -24,6 +23,6 @@ public class EmployeeDto {
 
 	private String employeeJobTitle;
 
-	private List<RoleMaster> employeeRole = new ArrayList<>();
+	private List<Role> employeeRole = new ArrayList<>();
 
 }

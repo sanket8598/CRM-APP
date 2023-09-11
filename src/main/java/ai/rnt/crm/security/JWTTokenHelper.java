@@ -1,5 +1,10 @@
 package ai.rnt.crm.security;
 
+import static ai.rnt.crm.util.RoleUtil.GET_ROLE;
+import static ai.rnt.crm.constants.RoleConstants.NO_ROLE;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,12 +14,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import ai.rnt.crm.constants.EncryptionAlgoConstants;
+import ai.rnt.crm.dto.Role;
+import ai.rnt.crm.service.EmployeeService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * 
  * This class is used to get the information from DB and set it in the JWT
  * token.
  * 
@@ -23,12 +32,15 @@ import io.jsonwebtoken.SignatureAlgorithm;
  * @since 19-08-2023
  */
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class JWTTokenHelper {
 
-	@Value("${jwt.secret}")
+	private final EmployeeService service;
+	@Value("${jwt.secret.key}")
 	private String secret;
 
-	 public static final long JWT_TOKEN_VALIDITY=100*60*60;
+	public static final long JWT_TOKEN_VALIDITY = 1000 * 60 * 60;
 
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
@@ -53,11 +65,15 @@ public class JWTTokenHelper {
 
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
+		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
+			claims.put("fullName", emp.getFirstName() + " " + emp.getLastName());
+			claims.put("Role",
+			 emp.getEmployeeRole().stream().map(Role::getRoleName).map(GET_ROLE).findFirst().orElse(NO_ROLE));
+		});
 		return createToken(claims, userDetails.getUsername());
 	}
 
 	private String createToken(Map<String, Object> claims, String subject) {
-
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
 				.signWith(SignatureAlgorithm.HS256, secret).compact();
@@ -68,4 +84,14 @@ public class JWTTokenHelper {
 		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 	}
 
+	public KeyPair getKeyPair() {
+		try {
+			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(EncryptionAlgoConstants.RSA);
+			keyPairGenerator.initialize(2048);
+			return keyPairGenerator.generateKeyPair();
+		} catch (Exception e) {
+			log.error("error occured while getting the Keys.{} ", e.getMessage());
+		}
+		return null;
+	}
 }

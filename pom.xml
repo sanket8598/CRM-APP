@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.7.14</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ai.rnt.crm</groupId>
-	<artifactId>CRM</artifactId>
+	<artifactId>RNT-CRM</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
-	<name>CRM</name>
+	<name>RNT-CRM</name>
 	<description>CRM stands for “Customer Relationship Management” and is a software system that helps business owners easily track all communications and nurture relationships with their leads and clients.</description>
 	<properties>
 		<java.version>1.8</java.version>
@@ -77,15 +76,20 @@
 			<artifactId>jjwt</artifactId>
 			<version>${jwt.token.version}</version>
 		</dependency>
-		       <!-- https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter -->
-<dependency>
-    <groupId>io.springfox</groupId>
-    <artifactId>springfox-boot-starter</artifactId>
-    <version>${swagger.version}</version>
-</dependency>
+		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+			<version>${swagger.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
+	<finalName>rnt-crm</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

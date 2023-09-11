@@ -83,7 +83,7 @@ public interface CrudService<ENTITY, DTO> {
 	 * @since version 1.0
 	 */
 	@Transactional
-	default boolean delete(Long id) throws Exception {
+	default boolean delete(Integer id) throws Exception {
 		throw new UnsupportedOperationException("delete method is not implemented");
 	}
 	/**
@@ -94,7 +94,7 @@ public interface CrudService<ENTITY, DTO> {
 	 * @version 1.3
 	 */
 	@Transactional
-	default boolean deleteById(Long id) throws Exception {
+	default boolean deleteById(Integer id) throws Exception {
 		throw new UnsupportedOperationException("deleteById method is not implemented");
 	}
 	/**
@@ -108,7 +108,7 @@ public interface CrudService<ENTITY, DTO> {
 	 * {@link UnsupportedOperationException} if this method is not implemented
 	 * @since version 1.0
 	 */
-	default Optional<DTO> getById(Long id) throws Exception {
+	default Optional<DTO> getById(Integer id) throws Exception {
 		throw new UnsupportedOperationException("getById method is not implemented");
 	}
 	/**
@@ -118,7 +118,7 @@ public interface CrudService<ENTITY, DTO> {
 	 * {@link UnsupportedOperationException} if this method is not implemented
 	 * @since version 2.0
 	 */
-	default Optional<ENTITY> getEntityById(Long id) throws Exception {
+	default Optional<ENTITY> getEntityById(Integer id) throws Exception {
 		throw new UnsupportedOperationException("getEntityById method is not implemented");
 	}
 	/**
@@ -132,7 +132,7 @@ public interface CrudService<ENTITY, DTO> {
 	 * {@link UnsupportedOperationException} if this method is not implemented
 	 * @since version 2.0
 	 */
-	default Collection<DTO> getByIds(Long... ids) throws Exception {
+	default Collection<DTO> getByIds(Integer... ids) throws Exception {
 		throw new UnsupportedOperationException("getByIds method is not implemented");
 	}
 	/**
@@ -146,7 +146,7 @@ public interface CrudService<ENTITY, DTO> {
 	 * {@link UnsupportedOperationException} if this method is not implemented
 	 * @since version 2.0
 	 */
-	default Collection<ENTITY> getEntitysByIds(Long... ids) throws Exception {
+	default Collection<ENTITY> getEntitysByIds(Integer... ids) throws Exception {
 		throw new UnsupportedOperationException("getByIds method is not implemented");
 	}
 	/**
@@ -198,7 +198,7 @@ public interface CrudService<ENTITY, DTO> {
 	 * {@link UnsupportedOperationException} if this method is not implemented
 	 * @since version 1.0
 	 */
-	default boolean existsById(Long id) throws Exception {
+	default boolean existsById(Integer id) throws Exception {
 		throw new UnsupportedOperationException("existByid method is not implemented");
 	}
 

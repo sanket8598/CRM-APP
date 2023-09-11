@@ -17,8 +17,8 @@ import org.modelmapper.convention.MatchingStrategies;
  * This utility class contains the method used to perform operation on java functions 
  * and convertions between entity and DTO, and DTO into entity.
  * 
- * @author Shubham Lekurwale
- * @since 25-Sep-2021
+ * @author Sanket Wakankar
+ * @since 19-08-2023
  * @version 1.0
  * File FunctionUtil 
  */
@@ -65,7 +65,7 @@ public class FunctionUtil {
 	 * @param obj
 	 * @param clazz
 	 * @return Map fields of passed object to passed class
-	 * @since version 1.3
+	 * @since version 1.0
 	 */
 	public static <T> Optional<T> evalMapperProjection(Object obj, Class<T> clazz) {
 		return isNull(obj) || isNull(clazz) ? Optional.empty() : Optional.of(mp.map(obj, clazz));

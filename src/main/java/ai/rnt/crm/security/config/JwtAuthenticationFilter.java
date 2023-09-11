@@ -1,6 +1,15 @@
 package ai.rnt.crm.security.config;
 
+import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
+import static ai.rnt.crm.constants.SecurityConstant.TOKEN_PREFIX_BEARER;
+import static ai.rnt.crm.security.AuthenticationUtil.ALLOW_URL;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
+
 import java.io.IOException;
+import java.security.InvalidKeyException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -8,65 +17,73 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.security.JWTTokenHelper;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import lombok.AllArgsConstructor;
+import ai.rnt.crm.security.UserDetail;
+import ai.rnt.crm.util.RSAToJwtDecoder;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * This class is the entryPoint and every request goes through this
+ * doFilterInternal method.
+ * 
+ * @author Sanket Wakankar
+ * @version 1.0
+ * @since 19-08-2023
+ */
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	private CustomUserDetails detailsService;
+	private final CustomUserDetails detailsService;
 
-	private JWTTokenHelper helper;
+	private final JWTTokenHelper helper;
 
+	/**
+	 * This method is entrypoint for every request of the application.<br>
+	 * {@inheritDoc}
+	 * 
+	 * @since version 1.0
+	 */
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-
-		// 1.get token
-		String reqToken = request.getHeader("Authorization");
-
-		String userName = null;
-		String token = null;
-		if (request != null && (reqToken != null && reqToken.startsWith("Bearer"))) {
-			token = reqToken.substring(7);
-			try {
-				userName = this.helper.extractUsername(token);
-			} catch (IllegalArgumentException e) {
-				System.out.println("Unable to get JWT Token");
-			} catch (ExpiredJwtException e) {
-				System.out.println("JWT Token has Expired");
-			} catch (MalformedJwtException e) {
-				System.out.println("Invalid JWT Token");
+		try {
+			if (ALLOW_URL.test(request.getServletPath())) {
+				filterChain.doFilter(request, response);
+				return;
+			} else {
+				String requestTokenHeader = request.getHeader(AUTHORIZATION);
+				if (isNull(requestTokenHeader))
+					throw new MissingServletRequestPartException("AUTHORIZATION Header is missing");
+				String userName;
+				if (requestTokenHeader.startsWith(TOKEN_PREFIX_BEARER) && nonNull(requestTokenHeader)) {
+					requestTokenHeader = requestTokenHeader.substring(7);
+					requestTokenHeader=RSAToJwtDecoder.rsaToJwtDecoder(requestTokenHeader);
+					userName = this.helper.extractUsername(requestTokenHeader);
+					UserDetail loadUserByUsername = this.detailsService.loadUserByUsername(userName);
+					if (Boolean.TRUE.equals(this.helper.validateToken(requestTokenHeader, loadUserByUsername))) {
+						UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+								requestTokenHeader, null, loadUserByUsername.getAuthorities());
+						usernamePasswordAuthenticationToken.setDetails(loadUserByUsername);
+						getContext().setAuthentication(usernamePasswordAuthenticationToken);
+					}
+				}
 			}
-		} else {
-			System.out.println("Jwt Token Does not begin with Bearer");
+			filterChain.doFilter(request, response);
+		} catch (Exception e) {
+			log.error("Got Excetion while checking request authorizations. Request: {}",
+					request.getHeader(AUTHORIZATION), e.getMessage());
+			if(e instanceof InvalidKeyException)
+				throw new CRMException(TOKEN_EXPIRED);
+					
 		}
-
-		// once we get the token, now validate..
-		if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			UserDetails loadUserByUsername = this.detailsService.loadUserByUsername(userName);
-			if (Boolean.TRUE.equals(this.helper.validateToken(token, loadUserByUsername))) {
-				UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(token,
-						null, loadUserByUsername.getAuthorities());
-				authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-				SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-			} else
-				System.out.println("Invalid Jwt Token");
-
-		} else {
-			System.out.println("username is null or context is not null");
-		}
-		filterChain.doFilter(request, response);
 	}
 
 }
