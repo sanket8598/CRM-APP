@@ -1,11 +1,10 @@
 package ai.rnt.crm.entity;
 
-import static javax.persistence.GenerationType.IDENTITY;
 import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,7 +46,7 @@ public class CompanyMaster extends Auditable {
 	private String companyName;
 
 	@Column(name = "website")
-	private String website;
+	private String companyWebsite;
 
 	@Column(name = "address_line1")
 	private String addressLineOne;
@@ -67,7 +66,7 @@ public class CompanyMaster extends Auditable {
 	@Column(name = "zipcode")
 	private String zipCode;
 	
-	@OneToMany(mappedBy="companyMaster",cascade =ALL)
+	@OneToMany(mappedBy="companyMaster",cascade ={ ALL })
 	private List<Leads> leads=new ArrayList<>();
 	
 	@OneToMany(mappedBy="companyMaster",cascade =ALL)

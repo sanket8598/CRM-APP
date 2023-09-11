@@ -21,4 +21,6 @@ public interface LeadService {
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(String leadsStatus);
 
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editLead(Integer leadId);
+
 }

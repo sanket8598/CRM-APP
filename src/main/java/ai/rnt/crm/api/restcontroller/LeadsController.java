@@ -80,4 +80,11 @@ public class LeadsController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(@PathVariable String leadsStatus) {
 		return leadService.getLeadDashboardDataByStatus(leadsStatus);
 	}
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/edit/{leadId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> edittLead(@PathVariable Integer leadId) {
+		return leadService.editLead(leadId);
+	}
+	
+	
 }

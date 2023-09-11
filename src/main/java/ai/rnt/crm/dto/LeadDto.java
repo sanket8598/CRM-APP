@@ -11,7 +11,7 @@ public class LeadDto {
 
 	private String lastName;
 
-	private Integer phoneNumber;
+	private String phoneNumber;
 
 	private String topic;
 
@@ -23,7 +23,7 @@ public class LeadDto {
 
 	private Integer serviceFallsId;
 
-	private Integer companyId;
+	private String companyName;
 
 	private String businessCard;
 

@@ -1,11 +1,21 @@
 package ai.rnt.crm.dto;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CompanyDto {
 
     private Integer companyId;
     
 	private String companyName;
+	
+	private String companyWebsite;
 }
