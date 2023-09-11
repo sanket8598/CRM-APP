@@ -56,4 +56,8 @@ public final class ApiConstants {
 
 	public static final String ALL_CITY = SEPERATOR + "allCity";
 
+	public static final String CALL = BASE + "call" + SEPERATOR;
+
+	public static final String ADD_CALL = SEPERATOR + "add" + SEPERATOR + "{leadId}";
+
 }
