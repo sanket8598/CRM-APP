@@ -53,16 +53,16 @@ public class Leads extends Auditable {
 	private String lastName;
 
 	@Column(name = "phoneNumber")
-	private Integer phoneNumber;
+	private String phoneNumber;
 
 	@Column(name = "topic")
 	private String topic;
 
 	@Column(name = "email")
 	private String email;
-	
+
 	@Column(name = "status")
-	private String status;	
+	private String status;
 
 	@JoinColumn(name = "assign_to")
 	@LazyCollection(LazyCollectionOption.TRUE)
@@ -92,7 +92,7 @@ public class Leads extends Auditable {
 	@JoinColumn(name = "service_falls_id")
 	private ServiceFallsMaster serviceFallsMaster;
 
-	@ManyToOne(cascade = ALL)
+	@ManyToOne(cascade = { MERGE, DETACH, REFRESH})
 	@JoinColumn(name = "company_id")
 	private CompanyMaster companyMaster;
 

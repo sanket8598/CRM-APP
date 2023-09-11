@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.entity.Leads;
@@ -14,5 +15,11 @@ public interface LeadDaoService extends CrudService<Leads, LeadDto> {
 	List<Leads> getAllLeads();
 
 	List<Leads> getLeadDashboardData();
+
+	@Override
+	 Optional<LeadDto> getById(Integer id);
+	
+	
+	
 
 }
