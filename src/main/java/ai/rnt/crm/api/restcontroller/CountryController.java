@@ -1,6 +1,7 @@
 package ai.rnt.crm.api.restcontroller;
 
 import static ai.rnt.crm.constants.ApiConstants.COUNTRY;
+import static ai.rnt.crm.constants.ApiConstants.ALL_COUNTRIES;
 
 import java.util.EnumMap;
 
@@ -22,7 +23,7 @@ public class CountryController {
 
 	private final CountryService countryService;
 
-	@GetMapping("/allCountries")
+	@GetMapping(ALL_COUNTRIES)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllCountry() {
 		return countryService.getAllCountry();
 	}

@@ -1,7 +1,7 @@
 package ai.rnt.crm.api.restcontroller;
 
-import static ai.rnt.crm.constants.ApiConstants.STATE;
-import static ai.rnt.crm.constants.ApiConstants.ALL_STATE;
+import static ai.rnt.crm.constants.ApiConstants.ALL_CITY;
+import static ai.rnt.crm.constants.ApiConstants.CITY;
 
 import java.util.EnumMap;
 
@@ -12,19 +12,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.enums.ApiResponse;
-import ai.rnt.crm.service.StateService;
+import ai.rnt.crm.service.CityService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping(STATE)
+@RequestMapping(CITY)
 @CrossOrigin("*")
 @RequiredArgsConstructor
-public class StateController {
+public class CityController {
 
-	private final StateService stateService;
+	private final CityService cityService;
 
-	@GetMapping(ALL_STATE)
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllState() {
-		return stateService.getAllState();
+	/**@author Nikhil Gaikwad 
+	 * @version 1.0
+	 * @since 11/09/2023.
+	 * @return city
+	 */
+	@GetMapping(ALL_CITY)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllCity() {
+		return cityService.getAllCity();
 	}
 }

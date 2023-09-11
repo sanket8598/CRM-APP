@@ -41,11 +41,19 @@ public final class ApiConstants {
 	public static final String DASHBOARD_ALL_LEADS = SEPERATOR + "dashboardAllLeads";
 
 	public static final String DASHBOARD_LEADS_BY_STATUS = SEPERATOR + "dashboardLeads" + SEPERATOR + "{leadsStatus}";
-	
+
 	public static final String COMPANY = BASE + "company" + SEPERATOR;
-	
+
 	public static final String COUNTRY = BASE + "country" + SEPERATOR;
-	
+
 	public static final String STATE = BASE + "state" + SEPERATOR;
+
+	public static final String CITY = BASE + "city" + SEPERATOR;
+
+	public static final String ALL_STATE = SEPERATOR + "allState";
+
+	public static final String ALL_COUNTRIES = SEPERATOR + "allCountries";
+
+	public static final String ALL_CITY = SEPERATOR + "allCity";
 
 }
