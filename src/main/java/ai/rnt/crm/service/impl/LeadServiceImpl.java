@@ -19,6 +19,7 @@ import static org.springframework.http.HttpStatus.FOUND;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -47,6 +48,7 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.LeadService;
+import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.ConvertDateFormatUtil;
 import ai.rnt.crm.util.LeadsCardUtil;
 import lombok.RequiredArgsConstructor;
@@ -63,6 +65,7 @@ public class LeadServiceImpl implements LeadService {
 	private final RoleMasterDaoService roleMasterDaoService;
 	private final AddCallDaoService addCallDaoService;
 	private final EmailDaoService emailDaoService;
+	private final AuditAwareUtil auditAwareUtil;
 
 	@Override
 	@Transactional
@@ -164,10 +167,29 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(String leadsStatus) {
 		EnumMap<ApiResponse, Object> leadsDataByStatus = new EnumMap<>(ApiResponse.class);
 		try {
-			if (nonNull(leadsStatus) && leadsStatus.equalsIgnoreCase("All"))
-				leadsDataByStatus.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadDashboardData()));
-			else
-				leadsDataByStatus.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
+			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
+			List<Leads> leadDashboardData = leadDaoService.getLeadDashboardData();
+			if (auditAwareUtil.isAdmin()) {
+				if (nonNull(leadsStatus) && leadsStatus.equalsIgnoreCase("All"))
+					leadsDataByStatus.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDashboardData));
+				else
+					leadsDataByStatus.put(DATA,
+							TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus).stream()
+									.collect(Collectors.toList())));
+			} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
+				if (nonNull(leadsStatus) && leadsStatus.equalsIgnoreCase("All"))
+					leadsDataByStatus.put(DATA,
+							TO_DASHBOARD_LEADDTOS.apply(leadDashboardData.stream()
+									.filter(d -> d.getEmployee().getStaffId().equals(loggedInStaffId))
+									.collect(Collectors.toList())));
+				else
+					leadsDataByStatus.put(DATA,
+							TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus).stream()
+									.filter(d -> d.getEmployee().getStaffId().equals(loggedInStaffId))
+									.collect(Collectors.toList())));
+			} else
+				leadsDataByStatus.put(DATA, Collections.emptyList());
+
 			leadsDataByStatus.put(SUCCESS, true);
 			return new ResponseEntity<>(leadsDataByStatus, FOUND);
 		} catch (Exception e) {
@@ -182,26 +204,30 @@ public class LeadServiceImpl implements LeadService {
 			DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
 			Map<String, Object> dataMap = new LinkedHashMap<>();
 			List<TimeLineAndActivityDto> timeline = addCallDaoService.getCallsByLeadId(leadId).stream()
-					.filter(call->nonNull(call.getUpdatedBy()))
+					.filter(call -> nonNull(call.getUpdatedBy()))
 					.map(call -> new TimeLineAndActivityDto("Call", call.getSubject(), call.getComment(),
-							LeadsCardUtil.shortName(call.getCallTo()), ConvertDateFormatUtil.convertDate(call.getCreatedDate())))
+							LeadsCardUtil.shortName(call.getCallTo()),
+							ConvertDateFormatUtil.convertDate(call.getCreatedDate())))
 					.collect(Collectors.toList());
 			timeline.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
-					.filter(email->nonNull(email.getUpdatedBy()))
+					.filter(email -> nonNull(email.getUpdatedBy()))
 					.map(email -> new TimeLineAndActivityDto("Email", email.getSubject(), email.getContent(),
-							LeadsCardUtil.shortName(email.getMailTo()), ConvertDateFormatUtil.convertDate(email.getCreatedDate())))
+							LeadsCardUtil.shortName(email.getMailTo()),
+							ConvertDateFormatUtil.convertDate(email.getCreatedDate())))
 					.collect(Collectors.toList()));
 			timeline.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), dateFormat)
 					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), dateFormat)));
 			List<TimeLineAndActivityDto> activity = addCallDaoService.getCallsByLeadId(leadId).stream()
-					.filter(call->nonNull(call.getCreatedBy())&& isNull(call.getUpdatedBy()) )
+					.filter(call -> nonNull(call.getCreatedBy()) && isNull(call.getUpdatedBy()))
 					.map(call -> new TimeLineAndActivityDto("Call", call.getSubject(), call.getComment(),
-							LeadsCardUtil.shortName(call.getCallTo()), ConvertDateFormatUtil.convertDate(call.getCreatedDate())))
+							LeadsCardUtil.shortName(call.getCallTo()),
+							ConvertDateFormatUtil.convertDate(call.getCreatedDate())))
 					.collect(Collectors.toList());
 			activity.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
-					.filter(email->nonNull(email.getCreatedBy())&& isNull(email.getUpdatedBy()))
+					.filter(email -> nonNull(email.getCreatedBy()) && isNull(email.getUpdatedBy()))
 					.map(email -> new TimeLineAndActivityDto("Email", email.getSubject(), email.getContent(),
-							LeadsCardUtil.shortName(email.getMailTo()), ConvertDateFormatUtil.convertDate(email.getCreatedDate())))
+							LeadsCardUtil.shortName(email.getMailTo()),
+							ConvertDateFormatUtil.convertDate(email.getCreatedDate())))
 					.collect(Collectors.toList()));
 			activity.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), dateFormat)
 					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), dateFormat)));

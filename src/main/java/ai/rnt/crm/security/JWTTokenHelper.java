@@ -1,14 +1,12 @@
 package ai.rnt.crm.security;
 
-import static ai.rnt.crm.util.RoleUtil.GET_ROLE;
-import static ai.rnt.crm.constants.RoleConstants.NO_ROLE;
-
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +15,7 @@ import org.springframework.stereotype.Component;
 import ai.rnt.crm.constants.EncryptionAlgoConstants;
 import ai.rnt.crm.dto.Role;
 import ai.rnt.crm.service.EmployeeService;
+import ai.rnt.crm.util.RoleUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -68,7 +67,7 @@ public class JWTTokenHelper {
 		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
 			claims.put("fullName", emp.getFirstName() + " " + emp.getLastName());
 			claims.put("Role",
-			 emp.getEmployeeRole().stream().map(Role::getRoleName).map(GET_ROLE).findFirst().orElse(NO_ROLE));
+			 RoleUtil.getSingleRole(emp.getEmployeeRole().stream().map(Role::getRoleName).collect(Collectors.toList())));
 		});
 		return createToken(claims, userDetails.getUsername());
 	}
