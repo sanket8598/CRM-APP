@@ -5,6 +5,7 @@ import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_CARDS_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
+import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
@@ -27,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ai.rnt.crm.dao.service.AddCallDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
@@ -34,9 +36,11 @@ import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.dto.TimeLineAndActivityDto;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
+import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.LeadService;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +55,7 @@ public class LeadServiceImpl implements LeadService {
 	private final CompanyMasterDaoService companyMasterDaoService;
 	private final EmployeeService employeeService;
 	private final RoleMasterDaoService roleMasterDaoService;
+	private final AddCallDaoService addCallDaoService;
 
 	@Override
 	@Transactional
@@ -167,8 +172,12 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editLead(Integer leadId) {
 		EnumMap<ApiResponse, Object> lead = new EnumMap<>(ApiResponse.class);
 		try {
+			Map<String, Object> dataMap = new HashMap<>();
+		List<TimeLineAndActivityDto> data=addCallDaoService.getCallsByLeadId(leadId).stream().map(call->new TimeLineAndActivityDto("Call",call.getSubject(),call.getComment(),call.getCallTo(),call.getCreatedDate().toString())).collect(Collectors.toList());
+			dataMap.put("Contact", TO_EDITLEAD_DTO.apply(leadDaoService.getLeadById(leadId).orElseThrow(()->new ResourceNotFoundException("Lead", "leadId", leadId))));
+			dataMap.put("TimeLine", data);
 			lead.put(SUCCESS, true);
-			lead.put(DATA,leadDaoService.getLeadById(leadId));
+			lead.put(DATA,dataMap);
 		return  new ResponseEntity<>(lead,FOUND);
 		}catch (Exception e) {
 			throw new CRMException(e);

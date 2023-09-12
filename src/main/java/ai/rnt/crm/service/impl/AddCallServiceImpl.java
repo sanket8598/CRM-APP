@@ -15,8 +15,10 @@ import ai.rnt.crm.dao.service.AddCallDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.AddCallDto;
 import ai.rnt.crm.entity.AddCall;
+import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
+import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.AddCallService;
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +39,8 @@ public class AddCallServiceImpl implements AddCallService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			AddCall addCall = TO_CALL.apply(dto).orElseThrow(null);
-			leadDaoService.getLeadById(leadsId).ifPresent(addCall::setLead);
+			Leads lead=leadDaoService.getLeadById(leadsId).orElseThrow(()->new ResourceNotFoundException("Lead", "leadId", leadsId));
+			addCall.setLead(lead);
 			if (nonNull(addCallDaoService.addCall(addCall)))
 				result.put(MESSAGE, "Call Added Successfully");
 			else

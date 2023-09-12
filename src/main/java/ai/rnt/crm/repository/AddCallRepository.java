@@ -1,5 +1,7 @@
 package ai.rnt.crm.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import ai.rnt.crm.entity.AddCall;
@@ -11,5 +13,7 @@ import ai.rnt.crm.entity.AddCall;
  *
  */
 public interface AddCallRepository extends JpaRepository<AddCall, Integer> {
+
+	List<AddCall> findByLeadLeadId(Integer leadId);
 
 }
