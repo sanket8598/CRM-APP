@@ -1,5 +1,7 @@
 package ai.rnt.crm.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import ai.rnt.crm.entity.AddEmail;
@@ -12,5 +14,7 @@ import ai.rnt.crm.entity.AddEmail;
  */
 
 public interface EmailRepository extends JpaRepository<AddEmail, Integer> {
+
+	List<AddEmail> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
 
 }

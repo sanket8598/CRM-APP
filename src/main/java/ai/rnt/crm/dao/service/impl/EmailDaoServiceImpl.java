@@ -1,5 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,5 +26,10 @@ public class EmailDaoServiceImpl implements EmailDaoService {
 	@Override
 	public AddEmail addEmail(AddEmail addEmail) {
 		return emailRepository.save(addEmail);
+	}
+
+	@Override
+	public List<AddEmail> getEmailByLeadId(Integer leadId) {
+		return emailRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
 	}
 }

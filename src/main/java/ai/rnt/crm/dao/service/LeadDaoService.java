@@ -3,7 +3,6 @@ package ai.rnt.crm.dao.service;
 import java.util.List;
 import java.util.Optional;
 
-import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.entity.Leads;
 

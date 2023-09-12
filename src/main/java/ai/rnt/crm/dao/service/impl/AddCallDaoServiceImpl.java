@@ -30,6 +30,6 @@ public class AddCallDaoServiceImpl implements AddCallDaoService {
 
 	@Override
 	public List<AddCall> getCallsByLeadId(Integer leadId) {
-		return addCallRepository.findByLeadLeadId(leadId);
+		return addCallRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
 	}
 }
