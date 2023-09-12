@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import java.util.Date;
+
 import lombok.Data;
 
 /**
@@ -25,5 +27,7 @@ public class AddCallDto {
 	private String comment;
 
 	private String duration;
+	
+	private Date dueDate;
 
 }

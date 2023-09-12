@@ -1,7 +1,5 @@
 package ai.rnt.crm.dao.service.impl;
 
-import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -9,9 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.LeadDaoService;
-import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.entity.Leads;
-import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.repository.LeadsRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -42,7 +38,7 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 	}
 
 	@Override
-	public Optional<EditLeadDto> getLeadById(Integer id) {
-		return TO_EDITLEAD_DTO.apply(leadsRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Lead","leadId",id)));
+	public Optional<Leads> getLeadById(Integer id) {
+		return leadsRepository.findById(id);
 	}
 }

@@ -2,6 +2,8 @@ package ai.rnt.crm.entity;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -57,6 +59,9 @@ public class AddCall extends Auditable {
 
 	@Column(name = "duration")
 	private String duration;
+	
+	@Column(name = "due_date")
+	private Date dueDate;
 
 	@ManyToOne
 	@JoinColumn(name="lead_id")

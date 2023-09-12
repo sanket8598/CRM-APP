@@ -1,7 +1,6 @@
 package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.AddCallDtoMapper.TO_CALL;
-import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.nonNull;
@@ -38,7 +37,7 @@ public class AddCallServiceImpl implements AddCallService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			AddCall addCall = TO_CALL.apply(dto).orElseThrow(null);
-			TO_LEAD.apply(leadDaoService.getById(leadsId).orElseThrow(null)).ifPresent(addCall::setLead);
+			leadDaoService.getLeadById(leadsId).ifPresent(addCall::setLead);
 			if (nonNull(addCallDaoService.addCall(addCall)))
 				result.put(MESSAGE, "Call Added Successfully");
 			else
