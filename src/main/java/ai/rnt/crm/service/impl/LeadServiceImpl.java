@@ -168,7 +168,7 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> lead = new EnumMap<>(ApiResponse.class);
 		try {
 			lead.put(SUCCESS, true);
-			lead.put(DATA,leadDaoService.getById(leadId));
+			lead.put(DATA,leadDaoService.getLeadById(leadId));
 		return  new ResponseEntity<>(lead,FOUND);
 		}catch (Exception e) {
 			throw new CRMException(e);

@@ -9,6 +9,8 @@ import ai.rnt.crm.entity.Leads;
 public interface LeadsRepository extends JpaRepository<Leads, Integer>{
 
 
-	List<Leads> findByStatus(String leadsStatus);
+	List<Leads> findByStatusOrderByCreatedDateDesc(String leadsStatus);
+
+	List<Leads> findByOrderByCreatedDateDesc();
 
 }

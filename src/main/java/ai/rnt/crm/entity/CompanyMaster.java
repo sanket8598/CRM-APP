@@ -31,7 +31,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "Crm_company_master")
+@Table(name = "crm_company_master")
 @Where(clause = "deleted_by is null")
 public class CompanyMaster extends Auditable {
 

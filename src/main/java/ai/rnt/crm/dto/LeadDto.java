@@ -32,6 +32,6 @@ public class LeadDto {
 	private Integer assignTo;
 	
 	private String status;
-
+	
 
 }

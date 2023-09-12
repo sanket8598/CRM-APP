@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.LeadDashboardDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadsCardDto;
@@ -77,4 +78,7 @@ public class LeadsDtoMapper {
 
 	public static final Function<Collection<Leads>, List<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTOS = e -> e.stream()
 			.map(dm -> TO_DASHBOARD_CARDS_LEADDTO.apply(dm).get()).collect(Collectors.toList());
+	
+	public static final Function<Leads, Optional<EditLeadDto>> TO_EDITLEAD_DTO = e ->evalMapper(e, EditLeadDto.class);
+	public static final Function<Collection<Leads>, List<EditLeadDto>> TO_EDITLEAD_DTOS = e -> e.stream().map(dm -> TO_EDITLEAD_DTO.apply(dm).get()).collect(Collectors.toList());
 }

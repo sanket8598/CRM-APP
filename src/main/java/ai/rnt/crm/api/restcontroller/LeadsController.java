@@ -2,7 +2,7 @@ package ai.rnt.crm.api.restcontroller;
 
 import static ai.rnt.crm.constants.ApiConstants.CREATE_LEAD;
 import static ai.rnt.crm.constants.ApiConstants.DASHBOARD_ALL_LEADS;
-import static ai.rnt.crm.constants.ApiConstants.DASHBOARD_LEADS_BY_Status;
+import static ai.rnt.crm.constants.ApiConstants.DASHBOARD_LEADS_BY_STATUS;
 import static ai.rnt.crm.constants.ApiConstants.GET_ALL_LEADS;
 import static ai.rnt.crm.constants.ApiConstants.GET_ALL_LEAD_SOURCE;
 import static ai.rnt.crm.constants.ApiConstants.GET_ALL_SERVICE_FALLS;
@@ -76,7 +76,7 @@ public class LeadsController {
 	}
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
-	@GetMapping(DASHBOARD_LEADS_BY_Status)
+	@GetMapping(DASHBOARD_LEADS_BY_STATUS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(@PathVariable String leadsStatus) {
 		return leadService.getLeadDashboardDataByStatus(leadsStatus);
 	}

@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
-import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTO;
+import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.LeadDaoService;
-import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.repository.LeadsRepository;
@@ -27,7 +28,7 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 
 	@Override
 	public List<Leads> getLeadsByStatus(String leadsStatus) {
-		return leadsRepository.findByStatus(leadsStatus);
+		return leadsRepository.findByStatusOrderByCreatedDateDesc(leadsStatus);
 	}
 
 	@Override
@@ -37,11 +38,11 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 
 	@Override
 	public List<Leads> getLeadDashboardData() {
-		return leadsRepository.findAll();
+		return leadsRepository.findByOrderByCreatedDateDesc();
 	}
 
 	@Override
-	public Optional<LeadDto> getById(Integer id) {
-		return TO_LEAD_DTO.apply(leadsRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Lead","leadId",id)));
+	public Optional<EditLeadDto> getLeadById(Integer id) {
+		return TO_EDITLEAD_DTO.apply(leadsRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Lead","leadId",id)));
 	}
 }
