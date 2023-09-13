@@ -20,6 +20,7 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.AddCallService;
+import ai.rnt.crm.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -33,14 +34,18 @@ public class AddCallServiceImpl implements AddCallService {
 
 	private final AddCallDaoService addCallDaoService;
 	private final LeadDaoService leadDaoService;
+	private final EmployeeService employeeService;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(AddCallDto dto, Integer leadsId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			AddCall addCall = TO_CALL.apply(dto).orElseThrow(null);
-			Leads lead=leadDaoService.getLeadById(leadsId).orElseThrow(()->new ResourceNotFoundException("Lead", "leadId", leadsId));
+			Leads lead = leadDaoService.getLeadById(leadsId)
+					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadsId));
 			addCall.setLead(lead);
+			addCall.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
+					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
 			if (nonNull(addCallDaoService.addCall(addCall)))
 				result.put(MESSAGE, "Call Added Successfully");
 			else

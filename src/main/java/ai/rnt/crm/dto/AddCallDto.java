@@ -14,7 +14,7 @@ public class AddCallDto {
 
 	private Integer addCallId;
 
-	private String callFrom;
+	private EmployeeDto callFrom;
 
 	private String callTo;
 

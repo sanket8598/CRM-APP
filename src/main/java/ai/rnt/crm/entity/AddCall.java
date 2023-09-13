@@ -40,8 +40,9 @@ public class AddCall extends Auditable {
 	@Column(name = "add_call_id")
 	private Integer addCallId;
 
-	@Column(name = "call_from")
-	private String callFrom;
+	@ManyToOne
+	@JoinColumn(name = "call_from",updatable = true,nullable = false)
+	private EmployeeMaster callFrom;
 
 	@Column(name = "call_to")
 	private String callTo;
