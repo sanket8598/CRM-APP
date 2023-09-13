@@ -1,6 +1,7 @@
 package ai.rnt.crm.service;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
@@ -25,5 +26,7 @@ public interface LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editLead(Integer leadId);
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(Integer leadId,QualifyLeadDto dto);
+
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(Map<String, Object> map);
 
 }

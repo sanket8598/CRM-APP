@@ -1,10 +1,5 @@
 package ai.rnt.crm.entity;
 
-import static javax.persistence.CascadeType.DETACH;
-import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.CascadeType.PERSIST;
-import static javax.persistence.CascadeType.REFRESH;
-import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -78,13 +73,13 @@ public class EmployeeMaster extends Auditable {
 	@Column(name = "date_of_departure")
 	private LocalDate departureDate;
 
-	@ManyToMany(fetch = EAGER, cascade = { PERSIST, MERGE, DETACH, REFRESH })
+	@ManyToMany(fetch = EAGER)
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), 
 	               inverseJoinColumns = @JoinColumn(name = "role_id"))
 	@Where(clause = "deleted_by is null")
 	private List<RoleMaster> employeeRole = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "employee",cascade =ALL)
+	@OneToMany(mappedBy = "employee")
 	private List<Leads> leads = new ArrayList<>();
 
 	public EmployeeMaster(Integer staffId, String firstName, String lastName, LocalDate departureDate) {

@@ -3,7 +3,6 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
-import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_CARDS_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
@@ -45,6 +44,7 @@ import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.TimeLineAndActivityDto;
+import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
@@ -55,9 +55,11 @@ import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.ConvertDateFormatUtil;
 import ai.rnt.crm.util.LeadsCardUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LeadServiceImpl implements LeadService {
 
 	private final LeadDaoService leadDaoService;
@@ -246,22 +248,21 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(Integer leadId,QualifyLeadDto dto) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(Integer leadId, QualifyLeadDto dto) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			 Optional<Leads> lead=leadDaoService.getLeadById(leadId);
+			Optional<Leads> lead = leadDaoService.getLeadById(leadId);
 			if (lead.isPresent()) {
 				lead.get().setCustomerNeed(dto.getCustomerNeed());
 				lead.get().setProposedSolution(dto.getProposedSolution());
-				lead.get()
-				.setServiceFallsMaster(
+				lead.get().setServiceFallsMaster(
 						serviceFallsDaoSevice.getById(dto.getServiceFallsMaster().getServiceFallsId())
-				.orElseThrow(() ->new ResourceNotFoundException("ServiceFallMaster", "serviceFallId",
-						dto.getServiceFallsMaster().getServiceFallsId())));
-				if(nonNull(leadDaoService.addLead(lead.get()))){
-				    result.put(MESSAGE, "Lead Qualified SuccessFully");
-				    result.put(SUCCESS, true);
-				}else {
+								.orElseThrow(() -> new ResourceNotFoundException("ServiceFallMaster", "serviceFallId",
+										dto.getServiceFallsMaster().getServiceFallsId())));
+				if (nonNull(leadDaoService.addLead(lead.get()))) {
+					result.put(MESSAGE, "Lead Qualified SuccessFully");
+					result.put(SUCCESS, true);
+				} else {
 					result.put(MESSAGE, "Lead Not Qualify");
 					result.put(SUCCESS, false);
 				}
@@ -270,6 +271,30 @@ public class LeadServiceImpl implements LeadService {
 				result.put(SUCCESS, false);
 			}
 			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(Map<String, Object> map) {
+		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		log.info("inside assign lead staffId: {} LeadId:{}", map.get("staffId"), map.get("leadId"));
+		try {
+			Leads leads = leadDaoService.getLeadById((Integer) map.get("leadId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", map.get("leadId")));
+			Integer staffId = (Integer) map.get("staffId");
+			EmployeeMaster employee = employeeService.getById(staffId)
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", staffId));
+			leads.setEmployee(employee);
+			if (nonNull(leadDaoService.addLead(leads))) {
+				resultMap.put(MESSAGE, "Lead Assigned SuccessFully");
+				resultMap.put(SUCCESS, true);
+			} else {
+				resultMap.put(MESSAGE, "Lead Not Assigned");
+				resultMap.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}

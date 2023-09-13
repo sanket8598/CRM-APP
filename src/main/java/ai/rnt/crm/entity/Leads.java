@@ -64,9 +64,9 @@ public class Leads extends Auditable {
 	@Column(name = "status")
 	private String status;
 
-	@JoinColumn(name = "assign_to")
+	@JoinColumn(name = "assign_to",updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
+	@ManyToOne
 	private EmployeeMaster employee;
 
 	@Column(name = "company_website")

@@ -12,6 +12,7 @@ import static ai.rnt.crm.constants.ApiConstants.LEAD;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -92,5 +93,10 @@ public class LeadsController {
 	@PutMapping("/qualify/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(@PathVariable Integer leadId,@RequestBody QualifyLeadDto dto) {
 		return leadService.qualifyLead(leadId,dto);
+	}
+
+	@PutMapping("/assignLead")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(@RequestBody Map<String,Object> map) {
+		return leadService.assignLead(map);
 	}
 }
