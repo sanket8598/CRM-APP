@@ -2,6 +2,8 @@ package ai.rnt.crm.dto;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 /**
@@ -28,6 +30,7 @@ public class AddCallDto {
 
 	private String duration;
 	
+	@JsonFormat(pattern="yyyy-MM-dd")
 	private Date dueDate;
 
 }

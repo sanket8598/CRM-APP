@@ -4,12 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.RoleMaster;
 
-@Repository
 public interface RoleMasterRepository extends JpaRepository<RoleMaster, Integer> {
 
 	@Query("SELECT new EmployeeMaster(em.staffId,em.firstName, em.lastName,em.departureDate) "
