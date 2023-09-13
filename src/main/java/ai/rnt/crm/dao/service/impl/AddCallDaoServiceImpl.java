@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,5 +32,10 @@ public class AddCallDaoServiceImpl implements AddCallDaoService {
 	@Override
 	public List<AddCall> getCallsByLeadId(Integer leadId) {
 		return addCallRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
+	}
+
+	@Override
+	public Optional<AddCall> getCallById(Integer callId) {
+		return addCallRepository.findById(callId);
 	}
 }
