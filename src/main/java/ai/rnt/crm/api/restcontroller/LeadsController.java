@@ -19,11 +19,13 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.service.ServiceFallsService;
@@ -80,11 +82,15 @@ public class LeadsController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(@PathVariable String leadsStatus) {
 		return leadService.getLeadDashboardDataByStatus(leadsStatus);
 	}
+
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping("/edit/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> edittLead(@PathVariable Integer leadId) {
 		return leadService.editLead(leadId);
 	}
-	
-	
+
+	@PutMapping("/qualify/{leadId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(@PathVariable Integer leadId,@RequestBody QualifyLeadDto dto) {
+		return leadService.qualifyLead(leadId,dto);
+	}
 }

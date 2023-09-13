@@ -3,6 +3,7 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
+import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_CARDS_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
@@ -16,6 +17,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,6 +43,7 @@ import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.TimeLineAndActivityDto;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
@@ -173,9 +176,8 @@ public class LeadServiceImpl implements LeadService {
 				if (nonNull(leadsStatus) && leadsStatus.equalsIgnoreCase("All"))
 					leadsDataByStatus.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDashboardData));
 				else
-					leadsDataByStatus.put(DATA,
-							TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus).stream()
-									.collect(Collectors.toList())));
+					leadsDataByStatus.put(DATA, TO_DASHBOARD_LEADDTOS
+							.apply(leadDaoService.getLeadsByStatus(leadsStatus).stream().collect(Collectors.toList())));
 			} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
 				if (nonNull(leadsStatus) && leadsStatus.equalsIgnoreCase("All"))
 					leadsDataByStatus.put(DATA,
@@ -238,6 +240,36 @@ public class LeadServiceImpl implements LeadService {
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);
 			return new ResponseEntity<>(lead, FOUND);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(Integer leadId,QualifyLeadDto dto) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			 Optional<Leads> lead=leadDaoService.getLeadById(leadId);
+			if (lead.isPresent()) {
+				lead.get().setCustomerNeed(dto.getCustomerNeed());
+				lead.get().setProposedSolution(dto.getProposedSolution());
+				lead.get()
+				.setServiceFallsMaster(
+						serviceFallsDaoSevice.getById(dto.getServiceFallsMaster().getServiceFallsId())
+				.orElseThrow(() ->new ResourceNotFoundException("ServiceFallMaster", "serviceFallId",
+						dto.getServiceFallsMaster().getServiceFallsId())));
+				if(nonNull(leadDaoService.addLead(lead.get()))){
+				    result.put(MESSAGE, "Lead Qualified SuccessFully");
+				    result.put(SUCCESS, true);
+				}else {
+					result.put(MESSAGE, "Lead Not Qualify");
+					result.put(SUCCESS, false);
+				}
+			} else {
+				result.put(MESSAGE, "Lead Not Qualify");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}
