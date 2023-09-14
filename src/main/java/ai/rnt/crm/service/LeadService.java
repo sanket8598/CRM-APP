@@ -27,7 +27,7 @@ public interface LeadService {
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(Integer leadId,QualifyLeadDto dto);
 
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(Map<String, Object> map);
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(Map<String, Integer> map);
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> disQualifyLead(Integer leadId, LeadDto dto);
 

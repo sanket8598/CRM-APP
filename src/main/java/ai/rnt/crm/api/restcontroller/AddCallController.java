@@ -40,7 +40,7 @@ public class AddCallController {
 	}
 	
 	@PutMapping("/assignCall")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(@RequestBody Map<String,Object> map) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(@RequestBody Map<String,Integer> map) {
 		return addCallService.assignCall(map);
 	}
 }

@@ -12,6 +12,6 @@ public interface AddCallService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> addCall(AddCallDto dto, Integer leadsId);
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Object> map);
+	ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Integer> map);
 
 }
