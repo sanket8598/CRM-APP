@@ -299,4 +299,30 @@ public class LeadServiceImpl implements LeadService {
 			throw new CRMException(e);
 		}
 	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> disQualifyLead(Integer leadId, LeadDto dto) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Optional<Leads> lead = leadDaoService.getLeadById(leadId);
+			if (lead.isPresent()) {
+				lead.get().setDisqualifyAs(dto.getDisqualifyAs());
+				lead.get().setDisqualifyReason(dto.getDisqualifyReason());
+				lead.get().setStatus("Close");
+				if (nonNull(leadDaoService.addLead(lead.get()))) {
+					result.put(MESSAGE, "Lead Disqualified SuccessFully");
+					result.put(SUCCESS, true);
+				} else {
+					result.put(MESSAGE, "Lead Not Disqualify");
+					result.put(SUCCESS, false);
+				}
+			} else {
+				result.put(MESSAGE, "Lead Not Disqualify");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
 }

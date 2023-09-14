@@ -91,12 +91,19 @@ public class LeadsController {
 	}
 
 	@PutMapping("/qualify/{leadId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(@PathVariable Integer leadId,@RequestBody QualifyLeadDto dto) {
-		return leadService.qualifyLead(leadId,dto);
+	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(@PathVariable Integer leadId,
+			@RequestBody QualifyLeadDto dto) {
+		return leadService.qualifyLead(leadId, dto);
 	}
 
 	@PutMapping("/assignLead")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(@RequestBody Map<String,Object> map) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(@RequestBody Map<String, Object> map) {
 		return leadService.assignLead(map);
+	}
+
+	@PutMapping("/disQualify/{leadId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> disQualifyLead(@PathVariable Integer leadId,
+			@RequestBody LeadDto dto) {
+		return leadService.disQualifyLead(leadId, dto);
 	}
 }
