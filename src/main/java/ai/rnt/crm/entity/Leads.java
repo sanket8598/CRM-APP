@@ -46,13 +46,13 @@ public class Leads extends Auditable {
 	@Column(name = "lead_id")
 	private Integer leadId;
 
-	@Column(name = "first_name")
+	@Column(name = "f_name")
 	private String firstName;
 
-	@Column(name = "last_name")
+	@Column(name = "l_name")
 	private String lastName;
 
-	@Column(name = "phoneNumber")
+	@Column(name = "phone_no")
 	private String phoneNumber;
 
 	@Column(name = "topic")
@@ -64,7 +64,7 @@ public class Leads extends Auditable {
 	@Column(name = "status")
 	private String status;
 
-	@JoinColumn(name = "assign_to",updatable = true)
+	@JoinColumn(name = "assign_to", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private EmployeeMaster employee;
@@ -75,7 +75,7 @@ public class Leads extends Auditable {
 	@Column(name = "budget_amount")
 	private Double budgetAmount;
 
-	@Column(name = "business_card", columnDefinition = "LONGTEXT")
+	@Column(name = "bussiness_card", columnDefinition = "LONGTEXT")
 	private String businessCard;
 
 	@Column(name = "customer_need")
@@ -83,10 +83,10 @@ public class Leads extends Auditable {
 
 	@Column(name = "proposed_solution")
 	private String proposedSolution;
-	
+
 	@Column(name = "disqualify_as")
-    private String disqualifyAs;
-	
+	private String disqualifyAs;
+
 	@Column(name = "disqualify_reason")
 	private String disqualifyReason;
 
@@ -98,7 +98,7 @@ public class Leads extends Auditable {
 	@JoinColumn(name = "service_falls_id")
 	private ServiceFallsMaster serviceFallsMaster;
 
-	@ManyToOne(cascade = { MERGE, DETACH, REFRESH})
+	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "company_id")
 	private CompanyMaster companyMaster;
 
@@ -107,5 +107,8 @@ public class Leads extends Auditable {
 
 	@OneToMany(mappedBy = "lead", cascade = ALL)
 	private List<AddCall> calls = new ArrayList<>();
+
+	@OneToMany(mappedBy = "lead", cascade = ALL)
+	private List<Visit> visit = new ArrayList<>();
 
 }
