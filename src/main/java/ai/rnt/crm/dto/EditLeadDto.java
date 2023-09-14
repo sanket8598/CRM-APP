@@ -17,11 +17,16 @@ public class EditLeadDto {
 	private String topic;
 
 	private String email;
+	
 	private Double budgetAmount;
 
 	private Integer assignTo;
 	
 	private String status;
+	
+	private String customerNeed;
+
+	private String proposedSolution;
 	
 	private ServiceFallsDto serviceFallsMaster;
 	

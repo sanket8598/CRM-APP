@@ -33,5 +33,9 @@ public class LeadDto {
 	
 	private String status;
 	
+	private String disqualifyAs;
+	
+	private String disqualifyReason;
+	
 
 }

@@ -2,8 +2,12 @@ package ai.rnt.crm.entity;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.util.Date;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -37,8 +41,9 @@ public class AddCall extends Auditable {
 	@Column(name = "add_call_id")
 	private Integer addCallId;
 
-	@Column(name = "call_from")
-	private String callFrom;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "call_from",updatable = true,nullable = false)
+	private EmployeeMaster callFrom;
 
 	@Column(name = "call_to")
 	private String callTo;
@@ -57,8 +62,11 @@ public class AddCall extends Auditable {
 
 	@Column(name = "duration")
 	private String duration;
+	
+	@Column(name = "due_date")
+	private Date dueDate;
 
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.MERGE)
 	@JoinColumn(name="lead_id")
 	private Leads lead;
 

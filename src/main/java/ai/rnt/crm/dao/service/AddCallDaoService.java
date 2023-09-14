@@ -1,5 +1,8 @@
 package ai.rnt.crm.dao.service;
 
+import java.util.List;
+import java.util.Optional;
+
 import ai.rnt.crm.dto.AddCallDto;
 import ai.rnt.crm.entity.AddCall;
 
@@ -11,6 +14,10 @@ import ai.rnt.crm.entity.AddCall;
  */
 public interface AddCallDaoService extends CrudService<AddCall, AddCallDto> {
 
-	Object addCall(AddCall addCall);
+	AddCall addCall(AddCall addCall);
+
+	List<AddCall> getCallsByLeadId(Integer leadId);
+
+	Optional<AddCall> getCallById(Integer callId);
 
 }

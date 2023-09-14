@@ -81,4 +81,6 @@ public class LeadsDtoMapper {
 	
 	public static final Function<Leads, Optional<EditLeadDto>> TO_EDITLEAD_DTO = e ->evalMapper(e, EditLeadDto.class);
 	public static final Function<Collection<Leads>, List<EditLeadDto>> TO_EDITLEAD_DTOS = e -> e.stream().map(dm -> TO_EDITLEAD_DTO.apply(dm).get()).collect(Collectors.toList());
+	
+	
 }

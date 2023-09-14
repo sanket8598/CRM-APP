@@ -64,9 +64,9 @@ public class Leads extends Auditable {
 	@Column(name = "status")
 	private String status;
 
-	@JoinColumn(name = "assign_to")
+	@JoinColumn(name = "assign_to",updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
-	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
+	@ManyToOne
 	private EmployeeMaster employee;
 
 	@Column(name = "company_website")
@@ -83,6 +83,12 @@ public class Leads extends Auditable {
 
 	@Column(name = "proposed_solution")
 	private String proposedSolution;
+	
+	@Column(name = "disqualify_as")
+    private String disqualifyAs;
+	
+	@Column(name = "disqualify_reason")
+	private String disqualifyReason;
 
 	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "lead_source_id")
