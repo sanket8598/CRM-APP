@@ -277,15 +277,14 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(Map<String, Object> map) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
-		log.info("inside assign lead staffId: {} LeadId:{}", map.get("staffId"), map.get("leadId"));
+		log.info("inside assign lead staffId: {} LeadId:{}", map.get("leadId"));
 		try {
-			Leads leads = leadDaoService.getLeadById((Integer) map.get("leadId"))
+			Leads leads = leadDaoService.getLeadById(map.get("leadId"))
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", map.get("leadId")));
-			Integer staffId = (Integer) map.get("staffId");
-			EmployeeMaster employee = employeeService.getById(staffId)
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", staffId));
+			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
 			leads.setEmployee(employee);
 			if (nonNull(leadDaoService.addLead(leads))) {
 				resultMap.put(MESSAGE, "Lead Assigned SuccessFully");

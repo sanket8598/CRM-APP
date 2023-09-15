@@ -6,8 +6,10 @@ import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
 import static ai.rnt.crm.util.HttpUtils.getURL;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 import java.security.InvalidKeyException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -108,7 +110,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		log.error("error occured while invalid request body...{}",ex);
+		log.error("error occured while invalid request body...{}", ex);
 		return new ResponseEntity<>(new ApiError(false, ex.getMessage()), HttpStatus.NOT_ACCEPTABLE);
 	}
 
@@ -121,40 +123,41 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			errors.add(fieldName + ": " + error.getDefaultMessage());
 		});
 		log.error("handleMethodArgumentNotValid api error: {}", exc);
-		return new ResponseEntity<>(new ApiError(BAD_REQUEST, ! errors.isEmpty() ? errors.get(0) : null, errors),BAD_REQUEST);
+		return new ResponseEntity<>(new ApiError(BAD_REQUEST, !errors.isEmpty() ? errors.get(0) : null, errors),
+				BAD_REQUEST);
 	}
-	
+
 	@ExceptionHandler(ResourceNotFoundException.class)
 	private ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException exc) {
-		log.info("handling ResourceNotFoundException....{}",exc.getLocalizedMessage());
-		return new ResponseEntity<>(new ApiError(false,exc.getMessage()),
-				HttpStatus.NOT_FOUND);
+		log.info("handling ResourceNotFoundException....{}", exc.getLocalizedMessage());
+		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(CRMException.class)
 	private ResponseEntity<ApiError> handleCRMException(CRMException exc) {
-		log.info("handling CRM Exception....{}",exc.getLocalizedMessage());
-		return new ResponseEntity<>(new ApiError(false,
-				exc.getException() instanceof BadCredentialsException ? BAD_CREDENTIALS
-						: exc.getMessage()),
+		log.info("handling CRM Exception....{}", exc.getLocalizedMessage());
+		return new ResponseEntity<>(
+				new ApiError(false,
+						exc.getException() instanceof BadCredentialsException ? BAD_CREDENTIALS : exc.getMessage()),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
 
 	@Override
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException exc, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
-		ApiError apiError = new ApiError(false, "No URL Found In The CRM with "+getURL(((ServletRequestAttributes) request).getRequest())+".");
-		return handleExceptionInternal(exc, apiError, headers,NOT_FOUND, request);
+		ApiError apiError = new ApiError(false,
+				"No URL Found In The CRM with " + getURL(((ServletRequestAttributes) request).getRequest()) + ".");
+		return handleExceptionInternal(exc, apiError, headers, NOT_FOUND, request);
 	}
-	
-	
+
 	/**
-	 * This method will handle exception which is occurred because request body contain invalid data
+	 * This method will handle exception which is occurred because request body
+	 * contain invalid data
 	 * 
 	 * @param ex
 	 * @param request
-	 * @return Create a {@code ResponseEntity} with status code 400 <i>(BAD_REQUEST)</i> and exception details
+	 * @return Create a {@code ResponseEntity} with status code 400
+	 *         <i>(BAD_REQUEST)</i> and exception details
 	 * @since version 1.0
 	 */
 	@ExceptionHandler({ UnsupportedOperationException.class, DTOConvertionException.class })
@@ -169,20 +172,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(AccessDeniedException.class)
 	private ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException exc) {
 		log.error("handle AccessDenied api error handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false, ACCESS_DENIED+""+exc.getMessage()),
+		return new ResponseEntity<>(new ApiError(false, ACCESS_DENIED + "" + exc.getMessage()),
 				HttpStatus.UNAUTHORIZED);
 	}
+
 	@ExceptionHandler(InvalidKeyException.class)
 	private ResponseEntity<ApiError> handleInvalidKeyException(InvalidKeyException exc) {
 		log.error("handle InvalidKeyException handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED),
-				HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), HttpStatus.UNAUTHORIZED);
+	}
+
+	@ExceptionHandler({ SQLException.class })
+	private ResponseEntity<ApiError> handleDBException(Exception exc) {
+		log.error("handle DB connection exception and api error handler: {}", exc.getMessage());
+		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.TOO_MANY_REQUESTS);
 	}
 
 	@ExceptionHandler(Exception.class)
 	private ResponseEntity<ApiError> handleAllException(Exception exc) {
 		log.error("inside All exception and api error handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false,exc.getMessage()),
-				HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+
 }

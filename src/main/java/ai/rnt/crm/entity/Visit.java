@@ -1,10 +1,8 @@
 package ai.rnt.crm.entity;
 
-import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
@@ -23,36 +20,27 @@ import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
+ * @since 14-09-2023.
  * @version 1.0
- * @since 23/08/2023.
- *
  */
+
 @Entity
+@Table(name = "crm_visit")
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "crm_add_email")
 @Where(clause = "deleted_by is null")
-public class AddEmail extends Auditable {
+public class Visit extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "add_mail_id")
-	private Integer addMailId;
+	@Column(name = "visit_id")
+	private Integer visitId;
 
-	@Column(name = "mail_from")
-	private String mailFrom;
-
-	@Column(name = "mail_to")
-	private String mailTo;
-
-	@Column(name = "cc_mail")
-	private String cc;
-
-	@Column(name = "bcc_mail")
-	private String bcc;
+	@Column(name = "location")
+	private String location;
 
 	@Column(name = "subject")
 	private String subject;
@@ -60,11 +48,17 @@ public class AddEmail extends Auditable {
 	@Column(name = "content")
 	private String content;
 
-	@ManyToOne
-	@JoinColumn(name="lead_id")
-	private Leads lead;
+	@Column(name = "comment")
+	private String comment;
+
+	@Column(name = "duration")
+	private String duration;
+
+	@Column(name = "due_date")
+	private Date dueDate;
 	
-	@OneToMany(mappedBy = "mail", cascade = ALL)
-	private List<Attachment> attachment = new ArrayList<>();
+	@ManyToOne
+	@JoinColumn(name= "lead_id")
+	private Leads lead;
 
 }

@@ -97,7 +97,7 @@ public class LeadsController {
 	}
 
 	@PutMapping("/assignLead")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(@RequestBody Map<String, Object> map) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(@RequestBody Map<String, Integer> map) {
 		return leadService.assignLead(map);
 	}
 

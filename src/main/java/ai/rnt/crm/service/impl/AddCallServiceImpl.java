@@ -63,15 +63,14 @@ public class AddCallServiceImpl implements AddCallService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Object> map) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign call staffId: {} callId:{}", map.get("staffId"), map.get("addCallId"));
 		try {
-			AddCall call = addCallDaoService.getCallById((Integer) map.get("addCallId"))
+			AddCall call = addCallDaoService.getCallById(map.get("addCallId"))
 					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", map.get("addCallId")));
-			Integer staffId = (Integer) map.get("staffId");
-			EmployeeMaster employee = employeeService.getById(staffId)
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", staffId));
+			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
 			call.setCallFrom(employee);
 			if (nonNull(addCallDaoService.addCall(call))) {
 				resultMap.put(MESSAGE, "Call Assigned SuccessFully");

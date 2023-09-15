@@ -61,5 +61,9 @@ public final class ApiConstants {
 	public static final String ADD_CALL = SEPERATOR + "add" + SEPERATOR + "{leadId}";
 	
 	public static final String EMAIL = BASE + "email" + SEPERATOR;
+	
+	public static final String VISIT = BASE + "visit" + SEPERATOR;
+	
+	public static final String ADD = SEPERATOR + "add";
 
 }
