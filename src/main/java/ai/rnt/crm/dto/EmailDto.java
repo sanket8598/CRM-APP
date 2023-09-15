@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import java.util.List;
+
 import lombok.Data;
 
 /**
@@ -24,5 +26,7 @@ public class EmailDto {
 	private String subject;
 
 	private String content;
+	
+	private List<AttachmentDto> attachment;
 
 }

@@ -26,14 +26,15 @@ public class EmailController {
 	private final EmailService emailService;
 
 	/**
-	 * @author Nikhil Gaikwad
+	 * This method is used to save and send the email.
+	 * @author Sanket Wakankar
 	 * @version 1.0
 	 * @since 12/09/2023.
 	 * @return mail
 	 */
-	@PostMapping("/addEmail/{leadId}")
+	@PostMapping("/addEmail/{leadId}/{status}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addEmail(@RequestBody EmailDto dto,
-			@PathVariable(name = "leadId") Integer leadId) {
-		return emailService.addEmail(dto, leadId);
+			@PathVariable(name = "leadId") Integer leadId,@PathVariable(name="status",required = false)String status) {
+		return emailService.addEmail(dto, leadId,status);
 	}
 }

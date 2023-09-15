@@ -1,5 +1,8 @@
 package ai.rnt.crm.dto;
 
+import javax.validation.constraints.Pattern;
+
+import ai.rnt.crm.validation.PhoneNumValid;
 import lombok.Data;
 
 @Data
@@ -11,6 +14,9 @@ public class LeadDto {
 
 	private String lastName;
 
+	@Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
+            message="Please Enter a valid Phone Number!!")
+	@PhoneNumValid
 	private String phoneNumber;
 
 	private String topic;

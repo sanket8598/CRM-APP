@@ -14,6 +14,8 @@ import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -44,7 +46,7 @@ public class LeadsController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping(CREATE_LEAD)
-	public ResponseEntity<EnumMap<ApiResponse, Object>> saveLead(@RequestBody LeadDto dto) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> saveLead(@RequestBody @Valid LeadDto dto) {
 		return leadService.createLead(dto);
 	}
 
