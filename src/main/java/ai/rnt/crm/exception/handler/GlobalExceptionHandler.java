@@ -146,6 +146,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@Override
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException exc, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
+		log.info("handling handler Not Found Exception....{}", exc.getLocalizedMessage());
 		ApiError apiError = new ApiError(false,
 				"No URL Found In The CRM with " + getURL(((ServletRequestAttributes) request).getRequest()) + ".");
 		return handleExceptionInternal(exc, apiError, headers, NOT_FOUND, request);
@@ -189,7 +190,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			String fieldName =  e.getPropertyPath().toString();
 			errors.add(fieldName + ": " + e.getMessage());
 		});
-		log.error("handle Contraint not valid api error: {}", exc);
+		log.error("handle Contraint not valid api error: {}", exc.getMessage());
 		return new ResponseEntity<>(new ApiError(BAD_REQUEST, !errors.isEmpty() ? errors.get(0) : null, errors),
 				BAD_REQUEST);
 	}
