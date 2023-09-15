@@ -133,13 +133,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		log.info("handling ResourceNotFoundException....{}", exc.getLocalizedMessage());
 		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.NOT_FOUND);
 	}
+	@ExceptionHandler(InvalidKeyException.class)
+	private ResponseEntity<ApiError> handleInvalidKeyException(InvalidKeyException exc) {
+		log.error("handle InvalidKeyException handler: {}", exc.getMessage());
+		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), HttpStatus.UNAUTHORIZED);
+	}
+
 
 	@ExceptionHandler(CRMException.class)
 	private ResponseEntity<ApiError> handleCRMException(CRMException exc) {
 		log.info("handling CRM Exception....{}", exc.getLocalizedMessage());
 		return new ResponseEntity<>(
 				new ApiError(false,
-						exc.getException() instanceof BadCredentialsException ? BAD_CREDENTIALS : exc.getMessage()),
+						exc.getException() instanceof BadCredentialsException ? BAD_CREDENTIALS :(exc.getException() instanceof InvalidKeyException?TOKEN_EXPIRED: exc.getMessage())),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
@@ -178,11 +184,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				HttpStatus.UNAUTHORIZED);
 	}
 
-	@ExceptionHandler(InvalidKeyException.class)
-	private ResponseEntity<ApiError> handleInvalidKeyException(InvalidKeyException exc) {
-		log.error("handle InvalidKeyException handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), HttpStatus.UNAUTHORIZED);
-	}
 	@ExceptionHandler(ConstraintViolationException.class)
 	private ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException exc) {
 		List<String> errors = new ArrayList<>();
