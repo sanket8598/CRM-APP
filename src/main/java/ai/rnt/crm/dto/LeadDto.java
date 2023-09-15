@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import ai.rnt.crm.validation.PhoneNumValid;
@@ -10,8 +12,10 @@ public class LeadDto {
 
 	private Integer leadId;
 
+	@NotBlank
 	private String firstName;
 
+	@NotBlank
 	private String lastName;
 
 	@Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
@@ -21,6 +25,7 @@ public class LeadDto {
 
 	private String topic;
 
+	@NotBlank
 	private String email;
 
 	private String companyWebsite;
@@ -35,6 +40,7 @@ public class LeadDto {
 
 	private Double budgetAmount;
 
+	@NotNull
 	private Integer assignTo;
 	
 	private String status;

@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PhoneNumberValidateApi {
 	
 	public Map<String,Object> checkPhoneNumberInfo(String number) {
-		log.info("Calling Phone Info By Number API...");
+		log.info("Calling Phone Info Number API...");
 		try {
 			Map<String,Object> responseMap=new HashMap<>();
 			String url="https://phonenumbervalidatefree.p.rapidapi.com/ts_PhoneNumberValidateTest.jsp?number="+number+"&country=IN";

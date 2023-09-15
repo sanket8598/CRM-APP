@@ -1,6 +1,6 @@
 package ai.rnt.crm.validation;
 
-import static java.util.Objects.nonNull;
+import static java.util.Objects.isNull;
 
 import java.util.Map;
 
@@ -17,14 +17,10 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumValid,S
 	@Override
 	public boolean isValid(String phoneNumber, ConstraintValidatorContext context) {
 		log.info("inside the is phone num valid annotation...{}",phoneNumber);
-		if(nonNull(phoneNumber))
+		if(isNull(phoneNumber))
 			return false;
 		Map<String, Object> mobMap = new PhoneNumberValidateApi().checkPhoneNumberInfo(phoneNumber);
-		if(("OK".equalsIgnoreCase((String)mobMap.get("Success")) && (boolean)mobMap.get("isValidNumber")))
-				return true;
-		else if("Error".equalsIgnoreCase((String)mobMap.get("Success"))) 
-		     return true;
-		return false;
+		return (("OK".equalsIgnoreCase((String)mobMap.get("Success")) && (boolean)mobMap.get("isValidNumber")) || "Error".equalsIgnoreCase((String)mobMap.get("Success")));
 	}
 
 }
