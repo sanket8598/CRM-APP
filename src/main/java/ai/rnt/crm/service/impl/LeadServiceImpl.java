@@ -216,7 +216,7 @@ public class LeadServiceImpl implements LeadService {
 			timeline.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
 					.filter(email -> nonNull(email.getUpdatedBy()))
 					.map(email -> new TimeLineAndActivityDto("Email", email.getSubject(), email.getContent(),
-							LeadsCardUtil.shortName(email.getMailTo()),
+							LeadsCardUtil.shortName(email.getMailFrom()),
 							ConvertDateFormatUtil.convertDate(email.getCreatedDate())))
 					.collect(Collectors.toList()));
 			timeline.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), dateFormat)
@@ -230,7 +230,7 @@ public class LeadServiceImpl implements LeadService {
 			activity.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
 					.filter(email -> nonNull(email.getCreatedBy()) && isNull(email.getUpdatedBy()))
 					.map(email -> new TimeLineAndActivityDto("Email", email.getSubject(), email.getContent(),
-							LeadsCardUtil.shortName(email.getMailTo()),
+							LeadsCardUtil.shortName(email.getMailFrom()),
 							ConvertDateFormatUtil.convertDate(email.getCreatedDate())))
 					.collect(Collectors.toList()));
 			activity.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), dateFormat)
