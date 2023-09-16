@@ -110,6 +110,8 @@ public class LoginController {
 			Map<String, Object> map = new LinkedHashMap<>();
 			map.put("fullName", json.get("fullName"));
 			map.put("role", json.get("Role"));
+			map.put("staffId", json.get("StaffId"));
+			map.put("emailId", json.get("EmailId"));
 			return ResponseEntity.ok(map);
 		} catch (Exception e) {
 			log.error("error occured while decoding the token.. {}", e.getLocalizedMessage());

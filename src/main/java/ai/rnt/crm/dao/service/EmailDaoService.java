@@ -17,4 +17,6 @@ public interface EmailDaoService extends CrudService<AddEmail, EmailDto> {
 
 	List<AddEmail> getEmailByLeadId(Integer leadId);
 
+	AddEmail findById(Integer addMailId);
+
 }

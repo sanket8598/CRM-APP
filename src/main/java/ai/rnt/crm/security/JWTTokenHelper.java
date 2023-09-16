@@ -66,6 +66,8 @@ public class JWTTokenHelper {
 		Map<String, Object> claims = new HashMap<>();
 		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
 			claims.put("fullName", emp.getFirstName() + " " + emp.getLastName());
+			claims.put("StaffId",emp.getStaffId());
+			claims.put("EmailId", emp.getEmailID());
 			claims.put("Role",
 			 RoleUtil.getSingleRole(emp.getEmployeeRole().stream().map(Role::getRoleName).collect(Collectors.toList())));
 		});
@@ -86,7 +88,7 @@ public class JWTTokenHelper {
 	public KeyPair getKeyPair() {
 		try {
 			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(EncryptionAlgoConstants.RSA);
-			keyPairGenerator.initialize(2048);
+			keyPairGenerator.initialize(4096);
 			return keyPairGenerator.generateKeyPair();
 		} catch (Exception e) {
 			log.error("error occured while getting the Keys.{} ", e.getMessage());
