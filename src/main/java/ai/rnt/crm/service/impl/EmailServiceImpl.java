@@ -8,6 +8,7 @@ import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 
 import java.util.EnumMap;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author Nikhil Gaikwad
+ * @author Sanket Wakankar
  * @version 1.0
  * @since 12/09/2023.
  */
@@ -46,6 +47,9 @@ public class EmailServiceImpl implements EmailService {
 		try {
 			boolean saveStatus=false;
 			AddEmail addEmail = TO_EMAIL.apply(dto).orElseThrow(ResourceNotFoundException::new);
+			addEmail.setToMail(dto.getMailTo().stream().collect(Collectors.joining(",")));
+			addEmail.setBccMail(dto.getBcc().stream().collect(Collectors.joining(",")));
+			addEmail.setCcMail(dto.getCc().stream().collect(Collectors.joining(",")));
 			leadDaoService.getLeadById(leadId).ifPresent(addEmail::setLead);
 			if(dto.getAttachment().isEmpty())
 				saveStatus=nonNull(emailDaoService.addEmail(addEmail));

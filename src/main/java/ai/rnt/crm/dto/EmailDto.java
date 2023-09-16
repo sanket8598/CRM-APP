@@ -17,11 +17,11 @@ public class EmailDto {
 
 	private String mailFrom;
 
-	private String mailTo;
+	private List<String> mailTo;
 
-	private String cc;
+	private List<String> cc;
 
-	private String bcc;
+	private List<String> bcc;
 
 	private String subject;
 

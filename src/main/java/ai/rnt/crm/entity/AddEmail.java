@@ -47,13 +47,13 @@ public class AddEmail extends Auditable {
 	private String mailFrom;
 
 	@Column(name = "mail_to")
-	private String mailTo;
+	private String toMail;
 
 	@Column(name = "cc_mail")
-	private String cc;
+	private String ccMail;
 
 	@Column(name = "bcc_mail")
-	private String bcc;
+	private String bccMail;
 
 	@Column(name = "subject")
 	private String subject;

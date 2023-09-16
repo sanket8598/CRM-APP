@@ -1,5 +1,6 @@
 package ai.rnt.crm.dto;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -12,20 +13,21 @@ public class LeadDto {
 
 	private Integer leadId;
 
-	@NotBlank
+	@NotBlank(message = "First Name should not be null or empty!!")
 	private String firstName;
 
-	@NotBlank
+	@NotBlank(message = "Last Name should not be null or empty!!")
 	private String lastName;
 
 	@Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
             message="Please Enter a valid Phone Number!!")
-	@PhoneNumValid
+	@PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
 	private String phoneNumber;
 
 	private String topic;
 
-	@NotBlank
+	@NotBlank(message = "Email Address should not be null or empty!!")
+	@Email(message="Please enter a valid Email Address")
 	private String email;
 
 	private String companyWebsite;
@@ -40,7 +42,7 @@ public class LeadDto {
 
 	private Double budgetAmount;
 
-	@NotNull
+	@NotNull(message = "Please select the Assign To!!")
 	private Integer assignTo;
 	
 	private String status;
