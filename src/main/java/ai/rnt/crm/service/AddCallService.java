@@ -14,4 +14,7 @@ public interface AddCallService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Integer> map);
 
+    ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(Integer callId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId);
 }

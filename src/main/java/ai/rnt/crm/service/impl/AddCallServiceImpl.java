@@ -6,7 +6,9 @@ import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -22,6 +24,7 @@ import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.service.AddCallService;
 import ai.rnt.crm.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
@@ -83,5 +86,40 @@ public class AddCallServiceImpl implements AddCallService {
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(Integer callId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
+		call.setUpdatedDate(LocalDateTime.now());
+		if (nonNull(addCallDaoService.addCall(call))) {
+			result.put(MESSAGE, "Call updated SuccessFully");
+			result.put(SUCCESS, true);
+		} else {
+			result.put(MESSAGE, "Call Not updated");
+			result.put(SUCCESS, false);
+		}
+		return new ResponseEntity<>(result, OK);
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
+		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
+				&& nonNull(getContext().getAuthentication().getDetails())) {
+			UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
+			call.setDeletedBy(details.getStaffId());
+			call.setDeletedDate(LocalDateTime.now());
+		}
+		if (nonNull(addCallDaoService.addCall(call))) {
+			result.put(MESSAGE, "Call deleted SuccessFully.");
+			result.put(SUCCESS, true);
+		} else {
+			result.put(MESSAGE, "Call Not delete.");
+			result.put(SUCCESS, false);
+		}
+		return new ResponseEntity<>(result, OK);
 	}
 }

@@ -19,5 +19,4 @@ public interface AddCallDaoService extends CrudService<AddCall, AddCallDto> {
 	List<AddCall> getCallsByLeadId(Integer leadId);
 
 	Optional<AddCall> getCallById(Integer callId);
-
 }
