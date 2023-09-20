@@ -10,11 +10,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TimeLineAndActivityDto {
-	
+
+	private Integer id;
 	private String type;
 	private String subject;
 	private String body;
 	private String shortName;
 	private String createdOn;
+	private String dueDate;
 
 }

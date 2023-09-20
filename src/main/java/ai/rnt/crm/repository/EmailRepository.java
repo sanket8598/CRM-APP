@@ -17,4 +17,6 @@ public interface EmailRepository extends JpaRepository<AddEmail, Integer> {
 
 	List<AddEmail> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
 
+	Boolean existsByAddMailIdAndLeadLeadId(Integer addMailId, Integer leadId);
+
 }

@@ -3,6 +3,7 @@ package ai.rnt.crm.dto_mapper;
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,4 +30,5 @@ public class AttachmentDtoMapper {
 	public static final Function<Collection<AttachmentDto>, Collection<Attachment>> TO_ATTACHMENTS = e ->e.stream().map(dm -> TO_ATTACHMENT.apply(dm).get()).collect(Collectors.toList());
 	
 	public static final Function<Attachment, Optional<AttachmentDto>> TO_ATTACHMENT_DTO = e -> evalMapper(e, AttachmentDto.class);
+	public static final Function<Collection<Attachment>, List<AttachmentDto>> TO_ATTACHMENT_DTOS = e -> e.stream().map(dm ->TO_ATTACHMENT_DTO.apply(dm).get()).collect(Collectors.toList());
 }

@@ -1,5 +1,6 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
@@ -18,8 +19,8 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -41,9 +42,11 @@ import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dto.CompanyDto;
+import ai.rnt.crm.dto.EditCallDto;
+import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
-import ai.rnt.crm.dto.TimeLineAndActivityDto;
+import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
@@ -53,7 +56,6 @@ import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.ConvertDateFormatUtil;
-import ai.rnt.crm.util.LeadsCardUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -205,39 +207,66 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editLead(Integer leadId) {
 		EnumMap<ApiResponse, Object> lead = new EnumMap<>(ApiResponse.class);
 		try {
-			DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
+			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			Map<String, Object> dataMap = new LinkedHashMap<>();
-			List<TimeLineAndActivityDto> timeline = addCallDaoService.getCallsByLeadId(leadId).stream()
+			List<TimeLineActivityDto> timeLine=new ArrayList<>();
+			 List<EditCallDto> list = addCallDaoService.getCallsByLeadId(leadId).stream()
 					.filter(call -> nonNull(call.getUpdatedBy()))
-					.map(call -> new TimeLineAndActivityDto("Call", call.getSubject(), call.getComment(),
-							LeadsCardUtil.shortName(call.getCallTo()),
-							ConvertDateFormatUtil.convertDate(call.getCreatedDate())))
-					.collect(Collectors.toList());
-			timeline.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
-					.filter(email -> nonNull(email.getUpdatedBy()))
-					.map(email -> new TimeLineAndActivityDto("Email", email.getSubject(), email.getContent(),
-							LeadsCardUtil.shortName(email.getMailFrom()),
-							ConvertDateFormatUtil.convertDate(email.getCreatedDate())))
-					.collect(Collectors.toList()));
-			timeline.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), dateFormat)
-					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), dateFormat)));
-			List<TimeLineAndActivityDto> activity = addCallDaoService.getCallsByLeadId(leadId).stream()
+					.map(call ->{
+					EditCallDto callDto=new EditCallDto();
+					callDto.setId(call.getAddCallId());
+					callDto.setSubject(call.getSubject());
+					callDto.setType("Call");
+					callDto.setBody(call.getComment());
+					callDto.setDueDate(dateFormat.format(call.getDueDate()));
+					callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
+					return callDto;	
+					}
+					).collect(Collectors.toList());
+			 timeLine.addAll(list);
+			 timeLine.addAll( emailDaoService.getEmailByLeadId(leadId).stream().filter(email -> nonNull(email.getUpdatedBy()))
+				.map(email ->{ 
+					EditEmailDto editEmailDto = new EditEmailDto();
+					editEmailDto.setId(email.getAddMailId());
+					editEmailDto.setType("Email");
+					editEmailDto.setSubject(email.getSubject());
+					editEmailDto.setBody(email.getContent());	
+					editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
+					editEmailDto.setCreatedOn(ConvertDateFormatUtil.convertDate(email.getCreatedDate()));
+					return editEmailDto;
+				})
+				.collect(Collectors.toList()));
+			 List<TimeLineActivityDto> activity=addCallDaoService.getCallsByLeadId(leadId).stream()
 					.filter(call -> nonNull(call.getCreatedBy()) && isNull(call.getUpdatedBy()))
-					.map(call -> new TimeLineAndActivityDto("Call", call.getSubject(), call.getComment(),
-							LeadsCardUtil.shortName(call.getCallTo()),
-							ConvertDateFormatUtil.convertDate(call.getCreatedDate())))
+					.map(call ->{
+						EditCallDto callDto=new EditCallDto();
+						callDto.setId(call.getAddCallId());
+						callDto.setSubject(call.getSubject());
+						callDto.setType("Call");
+						callDto.setBody(call.getComment());
+						callDto.setDueDate(dateFormat.format(call.getDueDate()));
+						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
+						return callDto;	
+						} )
 					.collect(Collectors.toList());
 			activity.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
 					.filter(email -> nonNull(email.getCreatedBy()) && isNull(email.getUpdatedBy()))
-					.map(email -> new TimeLineAndActivityDto("Email", email.getSubject(), email.getContent(),
-							LeadsCardUtil.shortName(email.getMailFrom()),
-							ConvertDateFormatUtil.convertDate(email.getCreatedDate())))
+					.map(email ->{ 
+						EditEmailDto editEmailDto = new EditEmailDto();
+						editEmailDto.setId(email.getAddMailId());
+						editEmailDto.setType("Email");
+						editEmailDto.setSubject(email.getSubject());
+						editEmailDto.setBody(email.getContent());	
+						editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
+						editEmailDto.setCreatedOn(ConvertDateFormatUtil.convertDate(email.getCreatedDate()));
+						return editEmailDto;
+					})
 					.collect(Collectors.toList()));
-			activity.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), dateFormat)
-					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), dateFormat)));
 			dataMap.put("Contact", TO_EDITLEAD_DTO.apply(leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId))));
-			dataMap.put("Timeline", timeline);
+			dataMap.put("serviceFalls", TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
+			dataMap.put("leadSource", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
+			dataMap.put("Timeline", timeLine);
 			dataMap.put("Activity", activity);
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);

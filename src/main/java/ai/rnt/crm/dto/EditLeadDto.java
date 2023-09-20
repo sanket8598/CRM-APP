@@ -33,4 +33,16 @@ public class EditLeadDto {
 	private LeadSourceDto leadSourceMaster;
 	
 	private CompanyDto companyMaster;
+	
+	private String fullName;
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		
+		this.fullName = getFirstName()+" "+getLastName();
+	}
+	
 }

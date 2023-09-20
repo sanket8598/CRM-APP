@@ -1,8 +1,9 @@
 package ai.rnt.crm.entity;
 
-import static javax.persistence.GenerationType.IDENTITY;
+import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
+import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,7 @@ public class AddEmail extends Auditable {
 	@Column(name = "content")
 	private String content;
 
-	@ManyToOne
+	@ManyToOne(cascade = {MERGE,REMOVE,REFRESH})
 	@JoinColumn(name="lead_id")
 	private Leads lead;
 	

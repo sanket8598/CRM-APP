@@ -9,6 +9,8 @@ import ai.rnt.crm.enums.ApiResponse;
 
 public interface EmailService {
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> addEmail(EmailDto dto, Integer leadId,String status);
+	ResponseEntity<EnumMap<ApiResponse, Object>> addEmail(EmailDto dto, Integer leadId, String status);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(Integer addMailId, Integer leadId);
 
 }

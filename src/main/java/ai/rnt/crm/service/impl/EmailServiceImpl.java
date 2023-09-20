@@ -2,8 +2,8 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
-import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
+import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -11,6 +11,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import java.util.EnumMap;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,5 +96,24 @@ public class EmailServiceImpl implements EmailService {
 			throw new CRMException(e);
 		}
 
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(Integer addMailId, Integer leadId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			if (Boolean.TRUE.equals(emailDaoService.emailPresentForLeadLeadId(addMailId, leadId))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "This email is already saved");
+				result.put(DATA, addMailId);
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "This email is not saved");
+			}
+		} catch (Exception e) {
+			log.error("error occured while checking add email for the Lead Id..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+		return new ResponseEntity<>(result, HttpStatus.OK);
 	}
 }

@@ -6,6 +6,7 @@ import java.util.EnumMap;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,4 +38,11 @@ public class EmailController {
 			@PathVariable(name = "leadId") Integer leadId,@PathVariable(name="status",required = false)String status) {
 		return emailService.addEmail(dto, leadId,status);
 	}
+	
+	@GetMapping("/getMailId/{addMailId}/{leadId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(@PathVariable Integer addMailId,
+			@PathVariable Integer leadId) {
+		return emailService.checkMailId(addMailId, leadId);
+	}
+
 }

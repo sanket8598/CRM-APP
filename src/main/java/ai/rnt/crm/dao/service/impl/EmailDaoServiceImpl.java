@@ -36,6 +36,12 @@ public class EmailDaoServiceImpl implements EmailDaoService {
 
 	@Override
 	public AddEmail findById(Integer addMailId) {
-		return emailRepository.findById(addMailId).orElseThrow(()->new ResourceNotFoundException("AddEmail","addMailId", addMailId));
+		return emailRepository.findById(addMailId)
+				.orElseThrow(() -> new ResourceNotFoundException("AddEmail", "addMailId", addMailId));
+	}
+
+	@Override
+	public Boolean emailPresentForLeadLeadId(Integer addMailId, Integer leadId) {
+		return emailRepository.existsByAddMailIdAndLeadLeadId(addMailId, leadId);
 	}
 }

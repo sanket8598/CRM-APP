@@ -26,7 +26,7 @@ public class EmailDto {
 	private String subject;
 
 	private String content;
-	
+
 	private List<AttachmentDto> attachment;
 
 }
