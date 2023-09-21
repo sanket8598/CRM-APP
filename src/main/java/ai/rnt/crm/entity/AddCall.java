@@ -55,7 +55,7 @@ public class AddCall extends Auditable {
 	private String direction;
 
 	@Column(name = "phone_no")
-	private Integer phoneNo;
+	private String phoneNo;
 
 	@Column(name = "comment")
 	private String comment;

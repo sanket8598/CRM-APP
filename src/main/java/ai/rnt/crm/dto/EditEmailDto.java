@@ -13,5 +13,6 @@ public class EditEmailDto implements TimeLineActivityDto{
 	private String subject;
 	private String body;
 	private List<AttachmentDto> attachments;
+	private String shortName;
 	private String createdOn;
 }

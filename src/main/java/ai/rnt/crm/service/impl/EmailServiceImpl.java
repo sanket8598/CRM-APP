@@ -62,7 +62,7 @@ public class EmailServiceImpl implements EmailService {
 			addEmail.setBccMail(dto.getBcc().stream().collect(Collectors.joining(",")));
 			addEmail.setCcMail(dto.getCc().stream().collect(Collectors.joining(",")));
 			leadDaoService.getLeadById(leadId).ifPresent(addEmail::setLead);
-			
+			addEmail.setAddMailId(null);
 			if (dto.getAttachment().isEmpty()) {
 				sendEmail = emailDaoService.addEmail(addEmail);
 				saveStatus = nonNull(sendEmail);
