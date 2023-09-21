@@ -3,11 +3,11 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
+import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_CARDS_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
-import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
@@ -42,9 +42,11 @@ import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
+import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
@@ -75,6 +77,7 @@ public class LeadServiceImpl implements LeadService {
 	private final AddCallDaoService addCallDaoService;
 	private final EmailDaoService emailDaoService;
 	private final AuditAwareUtil auditAwareUtil;
+	private final VisitDaoService visitDaoService;
 
 	@Override
 	@Transactional
@@ -211,40 +214,50 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			Map<String, Object> dataMap = new LinkedHashMap<>();
-			List<TimeLineActivityDto> timeLine=new ArrayList<>();
-			 List<EditCallDto> list = addCallDaoService.getCallsByLeadId(leadId).stream()
-					.filter(call -> nonNull(call.getUpdatedBy())|| nonNull(call.getUpdatedDate()))
-					.map(call ->{
-					EditCallDto callDto=new EditCallDto();
-					callDto.setId(call.getAddCallId());
-					callDto.setSubject(call.getSubject());
-					callDto.setType("Call");
-					callDto.setBody(call.getComment());
-					callDto.setDueDate(dateFormat.format(call.getDueDate()));
-					callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getUpdatedDate()));
-					callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
-					TO_Employee.apply(call.getCallFrom()).ifPresent(e->callDto.setCallFrom(e.getFirstName()+" "+e.getLastName()));
-					return callDto;	
-					}
-					).collect(Collectors.toList());
-			 timeLine.addAll(list);
-			 timeLine.addAll( emailDaoService.getEmailByLeadId(leadId).stream().filter(email -> nonNull(email.getUpdatedBy()) || nonNull(email.getUpdatedDate()))
-				.map(email ->{ 
-					EditEmailDto editEmailDto = new EditEmailDto();
-					editEmailDto.setId(email.getAddMailId());
-					editEmailDto.setType("Email");
-					editEmailDto.setSubject(email.getSubject());
-					editEmailDto.setBody(email.getContent());	
-					editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
-					editEmailDto.setCreatedOn(ConvertDateFormatUtil.convertDate(email.getUpdatedDate()));
-					editEmailDto.setShortName(LeadsCardUtil.shortName(email.getMailFrom()));
-					return editEmailDto;
-				})
-				.collect(Collectors.toList()));
-			 List<TimeLineActivityDto> activity=addCallDaoService.getCallsByLeadId(leadId).stream()
-					.filter(call -> nonNull(call.getCreatedBy()) && isNull(call.getUpdatedBy()))
-					.map(call ->{
-						EditCallDto callDto=new EditCallDto();
+			List<TimeLineActivityDto> timeLine = new ArrayList<>();
+			List<EditCallDto> list = addCallDaoService.getCallsByLeadId(leadId).stream()
+					.filter(call -> nonNull(call.getUpdatedBy()) || nonNull(call.getUpdatedDate())).map(call -> {
+						EditCallDto callDto = new EditCallDto();
+						callDto.setId(call.getAddCallId());
+						callDto.setSubject(call.getSubject());
+						callDto.setType("Call");
+						callDto.setBody(call.getComment());
+						callDto.setDueDate(dateFormat.format(call.getDueDate()));
+						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getUpdatedDate()));
+						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
+						TO_Employee.apply(call.getCallFrom())
+								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
+						return callDto;
+					}).collect(Collectors.toList());
+			timeLine.addAll(list);
+			timeLine.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
+					.filter(email -> nonNull(email.getUpdatedBy()) || nonNull(email.getUpdatedDate())).map(email -> {
+						EditEmailDto editEmailDto = new EditEmailDto();
+						editEmailDto.setId(email.getAddMailId());
+						editEmailDto.setType("Email");
+						editEmailDto.setSubject(email.getSubject());
+						editEmailDto.setBody(email.getContent());
+						editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
+						editEmailDto.setCreatedOn(ConvertDateFormatUtil.convertDate(email.getUpdatedDate()));
+						editEmailDto.setShortName(LeadsCardUtil.shortName(email.getMailFrom()));
+						return editEmailDto;
+					}).collect(Collectors.toList()));
+			timeLine.addAll(visitDaoService.getVisitsByLeadId(leadId).stream()
+					.filter(visit -> nonNull(visit.getUpdatedBy()) || nonNull(visit.getUpdatedDate())).map(visit -> {
+						EditVisitDto visitDto = new EditVisitDto();
+						visitDto.setId(visit.getVisitId());
+						visitDto.setLocation(visit.getLocation());
+						visitDto.setSubject(visit.getSubject());
+						visitDto.setType("Visit");
+						visitDto.setContent(visit.getContent());
+						visitDto.setDueDate(dateFormat.format(visit.getDueDate()));
+						EmployeeMaster byId = employeeService.getById(visit.getCreatedBy()).orElseThrow(null);
+						visitDto.setShortName(LeadsCardUtil.shortName(byId.getFirstName()+" "+byId.getLastName()));
+						return visitDto;
+					}).collect(Collectors.toList()));
+			List<TimeLineActivityDto> activity = addCallDaoService.getCallsByLeadId(leadId).stream()
+					.filter(call -> nonNull(call.getCreatedBy()) && isNull(call.getUpdatedBy())).map(call -> {
+						EditCallDto callDto = new EditCallDto();
 						callDto.setId(call.getAddCallId());
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
@@ -252,24 +265,35 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setDueDate(dateFormat.format(call.getDueDate()));
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
-						TO_Employee.apply(call.getCallFrom()).ifPresent(e->callDto.setCallFrom(e.getFirstName()+" "+e.getLastName()));
-						return callDto;	
-						} )
-					.collect(Collectors.toList());
+						TO_Employee.apply(call.getCallFrom())
+								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
+						return callDto;
+					}).collect(Collectors.toList());
 			activity.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
-					.filter(email -> nonNull(email.getCreatedBy()) && isNull(email.getUpdatedBy()))
-					.map(email ->{ 
+					.filter(email -> nonNull(email.getCreatedBy()) && isNull(email.getUpdatedBy())).map(email -> {
 						EditEmailDto editEmailDto = new EditEmailDto();
 						editEmailDto.setId(email.getAddMailId());
 						editEmailDto.setType("Email");
 						editEmailDto.setSubject(email.getSubject());
-						editEmailDto.setBody(email.getContent());	
+						editEmailDto.setBody(email.getContent());
 						editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
 						editEmailDto.setCreatedOn(ConvertDateFormatUtil.convertDate(email.getCreatedDate()));
 						editEmailDto.setShortName(LeadsCardUtil.shortName(email.getMailFrom()));
 						return editEmailDto;
-					})
-					.collect(Collectors.toList()));
+					}).collect(Collectors.toList()));
+			activity.addAll(visitDaoService.getVisitsByLeadId(leadId).stream()
+					.filter(visit -> nonNull(visit.getCreatedBy()) && isNull(visit.getUpdatedBy())).map(visit -> {
+						EditVisitDto editVisitDto = new EditVisitDto();
+						editVisitDto.setId(visit.getVisitId());
+						editVisitDto.setLocation(visit.getLocation());
+						editVisitDto.setSubject(visit.getSubject());
+						editVisitDto.setType("Visit");
+						editVisitDto.setContent(visit.getContent());
+						editVisitDto.setDueDate(dateFormat.format(visit.getDueDate()));
+						EmployeeMaster byId = employeeService.getById(visit.getCreatedBy()).orElseThrow(null);
+						editVisitDto.setShortName(LeadsCardUtil.shortName(byId.getFirstName()+" "+ byId.getLastName()));
+						return editVisitDto;
+					}).collect(Collectors.toList()));
 			dataMap.put("Contact", TO_EDITLEAD_DTO.apply(leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId))));
 			dataMap.put("serviceFalls", TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
