@@ -11,6 +11,7 @@ public class EditCallDto implements TimeLineActivityDto{
 	private String dueDate;
 	private String body;
 	private String shortName;
+	private String callFrom;
 	private String createdOn;
 
 }

@@ -2,11 +2,12 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
-import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
+import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_CARDS_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
+import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
@@ -222,6 +223,7 @@ public class LeadServiceImpl implements LeadService {
 					callDto.setDueDate(dateFormat.format(call.getDueDate()));
 					callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getUpdatedDate()));
 					callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
+					TO_Employee.apply(call.getCallFrom()).ifPresent(e->callDto.setCallFrom(e.getFirstName()+" "+e.getLastName()));
 					return callDto;	
 					}
 					).collect(Collectors.toList());
@@ -250,6 +252,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setDueDate(dateFormat.format(call.getDueDate()));
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
+						TO_Employee.apply(call.getCallFrom()).ifPresent(e->callDto.setCallFrom(e.getFirstName()+" "+e.getLastName()));
 						return callDto;	
 						} )
 					.collect(Collectors.toList());
