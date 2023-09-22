@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.AddCallDaoService;
+import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
@@ -46,6 +47,7 @@ import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
+import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
@@ -78,6 +80,7 @@ public class LeadServiceImpl implements LeadService {
 	private final EmailDaoService emailDaoService;
 	private final AuditAwareUtil auditAwareUtil;
 	private final VisitDaoService visitDaoService;
+	private final CityDaoService cityDaoService;
 
 	@Override
 	@Transactional
@@ -252,7 +255,7 @@ public class LeadServiceImpl implements LeadService {
 						visitDto.setContent(visit.getContent());
 						visitDto.setDueDate(dateFormat.format(visit.getDueDate()));
 						EmployeeMaster byId = employeeService.getById(visit.getCreatedBy()).orElseThrow(null);
-						visitDto.setShortName(LeadsCardUtil.shortName(byId.getFirstName()+" "+byId.getLastName()));
+						visitDto.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName()));
 						return visitDto;
 					}).collect(Collectors.toList()));
 			List<TimeLineActivityDto> activity = addCallDaoService.getCallsByLeadId(leadId).stream()
@@ -291,7 +294,8 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setContent(visit.getContent());
 						editVisitDto.setDueDate(dateFormat.format(visit.getDueDate()));
 						EmployeeMaster byId = employeeService.getById(visit.getCreatedBy()).orElseThrow(null);
-						editVisitDto.setShortName(LeadsCardUtil.shortName(byId.getFirstName()+" "+ byId.getLastName()));
+						editVisitDto
+								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName()));
 						return editVisitDto;
 					}).collect(Collectors.toList()));
 			dataMap.put("Contact", TO_EDITLEAD_DTO.apply(leadDaoService.getLeadById(leadId)
@@ -381,6 +385,44 @@ public class LeadServiceImpl implements LeadService {
 				result.put(SUCCESS, false);
 			}
 			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(Integer leadId, EditLeadDto dto) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Leads lead = leadDaoService.getLeadById(leadId).orElseThrow(null);
+			lead.setTopic(dto.getTopic());
+			lead.setFirstName(dto.getFirstName());
+			lead.setLastName(dto.getLastName());
+			lead.setPhoneNumber(dto.getPhoneNumber());
+			lead.setEmail(dto.getEmail());
+			lead.setBudgetAmount(dto.getBudgetAmount());
+			cityDaoService.getById(dto.getCompanyMaster().getCity().getCityId());
+			Optional<CompanyDto> existCompany = companyMasterDaoService
+					.findByCompanyName(dto.getCompanyMaster().getCompanyName());
+			if (existCompany.isPresent())
+				lead.setCompanyMaster(TO_COMPANY.apply(existCompany.orElseThrow(null)).orElseThrow(null));
+			else
+				lead.setCompanyMaster(
+						TO_COMPANY.apply(companyMasterDaoService.save(TO_COMPANY
+								.apply(CompanyDto.builder().companyName(dto.getCompanyMaster().getCompanyName())
+										.companyWebsite(dto.getCompanyMaster().getCompanyWebsite()).build())
+								.orElseThrow(null)).orElseThrow(null)).orElseThrow(null));
+			serviceFallsDaoSevice.getById(dto.getServiceFallsMaster().getServiceFallsId())
+					.ifPresent(lead::setServiceFallsMaster);
+			leadSourceDaoService.getById(dto.getLeadSourceMaster().getLeadSourceId())
+					.ifPresent(lead::setLeadSourceMaster);
+
+			if (nonNull(leadDaoService.addLead(lead)))
+				result.put(MESSAGE, "Leads Contact Updated Successfully");
+			else
+				result.put(MESSAGE, "Leads Contact Not Update.");
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}
