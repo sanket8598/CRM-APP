@@ -38,22 +38,28 @@ import org.springframework.transaction.annotation.Transactional;
 import ai.rnt.crm.dao.service.AddCallDaoService;
 import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
+import ai.rnt.crm.dao.service.CountryDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
-import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
+import ai.rnt.crm.dto.UpdateLeadDto;
+import ai.rnt.crm.entity.CityMaster;
+import ai.rnt.crm.entity.CompanyMaster;
+import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
+import ai.rnt.crm.entity.StateMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
@@ -81,6 +87,8 @@ public class LeadServiceImpl implements LeadService {
 	private final AuditAwareUtil auditAwareUtil;
 	private final VisitDaoService visitDaoService;
 	private final CityDaoService cityDaoService;
+	private final StateDaoService stateDaoService;
+	private final CountryDaoService countryDaoService;
 
 	@Override
 	@Transactional
@@ -252,7 +260,7 @@ public class LeadServiceImpl implements LeadService {
 						visitDto.setLocation(visit.getLocation());
 						visitDto.setSubject(visit.getSubject());
 						visitDto.setType("Visit");
-						visitDto.setContent(visit.getContent());
+						visitDto.setBody(visit.getContent());
 						visitDto.setDueDate(dateFormat.format(visit.getDueDate()));
 						EmployeeMaster byId = employeeService.getById(visit.getCreatedBy()).orElseThrow(null);
 						visitDto.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName()));
@@ -291,7 +299,7 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setLocation(visit.getLocation());
 						editVisitDto.setSubject(visit.getSubject());
 						editVisitDto.setType("Visit");
-						editVisitDto.setContent(visit.getContent());
+						editVisitDto.setBody(visit.getContent());
 						editVisitDto.setDueDate(dateFormat.format(visit.getDueDate()));
 						EmployeeMaster byId = employeeService.getById(visit.getCreatedBy()).orElseThrow(null);
 						editVisitDto
@@ -391,7 +399,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(Integer leadId, EditLeadDto dto) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(Integer leadId, UpdateLeadDto dto) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId).orElseThrow(null);
@@ -401,26 +409,37 @@ public class LeadServiceImpl implements LeadService {
 			lead.setPhoneNumber(dto.getPhoneNumber());
 			lead.setEmail(dto.getEmail());
 			lead.setBudgetAmount(dto.getBudgetAmount());
-			cityDaoService.getById(dto.getCompanyMaster().getCity().getCityId());
-			Optional<CompanyDto> existCompany = companyMasterDaoService
-					.findByCompanyName(dto.getCompanyMaster().getCompanyName());
-			if (existCompany.isPresent())
-				lead.setCompanyMaster(TO_COMPANY.apply(existCompany.orElseThrow(null)).orElseThrow(null));
-			else
-				lead.setCompanyMaster(
-						TO_COMPANY.apply(companyMasterDaoService.save(TO_COMPANY
-								.apply(CompanyDto.builder().companyName(dto.getCompanyMaster().getCompanyName())
-										.companyWebsite(dto.getCompanyMaster().getCompanyWebsite()).build())
-								.orElseThrow(null)).orElseThrow(null)).orElseThrow(null));
-			serviceFallsDaoSevice.getById(dto.getServiceFallsMaster().getServiceFallsId())
-					.ifPresent(lead::setServiceFallsMaster);
-			leadSourceDaoService.getById(dto.getLeadSourceMaster().getLeadSourceId())
-					.ifPresent(lead::setLeadSourceMaster);
+			Optional<CityMaster> existCityByName = cityDaoService.existCityByName(dto.getCity());
+			Optional<StateMaster> findBystate = stateDaoService.findBystate(dto.getState());
+			Optional<CountryMaster> findByCountryName = countryDaoService.findByCountryName(dto.getCountry());
+			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
+			if (existCompany.isPresent()) {
+				CompanyMaster companyMaster = TO_COMPANY.apply(existCompany.orElseThrow(null)).orElseThrow(null);
+				existCityByName.ifPresent(companyMaster::setCity);
+				findByCountryName.ifPresent(companyMaster::setCountry);
+				findBystate.ifPresent(companyMaster::setState);
+				companyMaster.setZipCode(dto.getZipCode());
+				companyMaster.setAddressLineOne(dto.getAddressLineOne());
+				TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(null))
+						.ifPresent(lead::setCompanyMaster);
+			} else {
+				CompanyMaster companyMaster = TO_COMPANY.apply(CompanyDto.builder().companyName(dto.getCompanyName())
+						.companyWebsite(dto.getCompanyWebsite()).build()).orElseThrow(null);
+				existCityByName.ifPresent(companyMaster::setCity);
+				findByCountryName.ifPresent(companyMaster::setCountry);
+				findBystate.ifPresent(companyMaster::setState);
+				companyMaster.setZipCode(dto.getZipCode());
+				companyMaster.setAddressLineOne(dto.getAddressLineOne());
+				TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(null))
+						.ifPresent(lead::setCompanyMaster);
+			}
+			serviceFallsDaoSevice.getById(dto.getServiceFallsId()).ifPresent(lead::setServiceFallsMaster);
+			leadSourceDaoService.getById(dto.getLeadSourceId()).ifPresent(lead::setLeadSourceMaster);
 
 			if (nonNull(leadDaoService.addLead(lead)))
 				result.put(MESSAGE, "Leads Contact Updated Successfully");
 			else
-				result.put(MESSAGE, "Leads Contact Not Update.");
+				result.put(MESSAGE, "Leads Contact Not Updated.");
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {

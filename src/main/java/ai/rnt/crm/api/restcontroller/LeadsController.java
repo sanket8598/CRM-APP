@@ -27,10 +27,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ai.rnt.crm.dto.EditLeadDto;
-import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
+import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.service.ServiceFallsService;
@@ -114,7 +113,7 @@ public class LeadsController {
 	
 	@PutMapping("/updateLeadContact/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(@PathVariable Integer leadId,
-			@RequestBody EditLeadDto dto) {
+			@RequestBody UpdateLeadDto dto) {
 		return leadService.updateLeadContact(leadId, dto);
 	}
 }

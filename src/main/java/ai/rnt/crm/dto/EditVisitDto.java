@@ -17,7 +17,7 @@ public class EditVisitDto implements TimeLineActivityDto {
 
 	private String subject;
 
-	private String content;
+	private String body;
 
 	private String dueDate;
 

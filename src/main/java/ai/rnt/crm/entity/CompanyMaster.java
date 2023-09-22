@@ -51,15 +51,15 @@ public class CompanyMaster extends Auditable {
 	@Column(name = "address_line1")
 	private String addressLineOne;
 
-	@ManyToOne(cascade =ALL)
+	@ManyToOne
 	@JoinColumn(name = "country_id")
 	private CountryMaster country;
 
 	@JoinColumn(name = "state_id")
-	@ManyToOne(cascade =ALL)
+	@ManyToOne
 	private StateMaster state;
 
-	@ManyToOne(cascade =ALL)
+	@ManyToOne
 	@JoinColumn(name = "city_id")
 	private CityMaster city;
 

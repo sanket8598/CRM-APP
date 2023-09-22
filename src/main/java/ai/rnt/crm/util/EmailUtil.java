@@ -1,11 +1,15 @@
 package ai.rnt.crm.util;
 
 
+import static java.util.Objects.nonNull;
+
 import java.io.IOException;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.activation.DataHandler;
 import javax.mail.Authenticator;
@@ -25,10 +29,8 @@ import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.entity.AddEmail;
 import ai.rnt.crm.entity.Attachment;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@RequiredArgsConstructor
 @Slf4j
 @Component
 public class EmailUtil {
@@ -49,6 +51,9 @@ public class EmailUtil {
 
 	    try {
 
+	    	List<String> collect = Stream.of(sendEmail.getToMail().split(","))
+	    	  .map(String::trim)
+	    	  .collect(Collectors.toList());
 	      // create a message with headers
 	      Message msg = new MimeMessage(getSession());
 	      msg.setFrom(new InternetAddress(sendEmail.getMailFrom()));
@@ -94,11 +99,13 @@ public class EmailUtil {
 		  MimeBodyPart messageBodyPart = new MimeBodyPart();
 		  MimeMultipart multipart = new MimeMultipart();
 			for(Attachment data:list) {
+				if(nonNull(data.getAttachmentData())) {
 			MimeBodyPart attachemntBodyPart = new MimeBodyPart();
 			attachemntBodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(Base64.getDecoder().decode(data.getAttachmentData().split(",")[1]), data.getAttachType())));
 			attachemntBodyPart.setDisposition(Part.ATTACHMENT);
 			attachemntBodyPart.setFileName(data.getAttachName());
 			multipart.addBodyPart(attachemntBodyPart);
+				}
 			}
 			messageBodyPart.setContent(content, "text/html");
 			multipart.addBodyPart(messageBodyPart);
