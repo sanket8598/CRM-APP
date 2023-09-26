@@ -404,8 +404,8 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId).orElseThrow(null);
 			lead.setTopic(dto.getTopic());
-			lead.setFirstName(dto.getFirstName());
-			lead.setLastName(dto.getLastName());
+			lead.setFirstName(dto.getFullName().split(" ")[0]);
+			lead.setLastName(dto.getFullName().split(" ")[1]);
 			lead.setPhoneNumber(dto.getPhoneNumber());
 			lead.setEmail(dto.getEmail());
 			lead.setBudgetAmount(dto.getBudgetAmount());

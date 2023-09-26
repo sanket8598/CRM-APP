@@ -27,4 +27,5 @@ public class UpdateLeadDto {
 	private String city;
 	private String zipCode;
 	private String addressLineOne;
+	private String fullName;
 }
