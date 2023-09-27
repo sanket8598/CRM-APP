@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,5 +32,10 @@ public class VisitDaoServiceImpl implements VisitDaoService {
 	@Override
 	public List<Visit> getVisitsByLeadId(Integer leadId) {
 		return visitRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
+	}
+
+	@Override
+	public Optional<Visit> getVisitsByVisitId(Integer visitId) {
+		return visitRepository.findById(visitId);
 	}
 }

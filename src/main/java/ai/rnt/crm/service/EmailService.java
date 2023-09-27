@@ -13,4 +13,6 @@ public interface EmailService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(Integer addMailId, Integer leadId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteEmail(Integer mailId);
+
 }

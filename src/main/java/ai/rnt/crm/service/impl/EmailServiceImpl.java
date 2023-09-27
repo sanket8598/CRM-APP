@@ -7,8 +7,12 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import java.time.LocalDateTime;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -26,6 +30,7 @@ import ai.rnt.crm.entity.Attachment;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.service.EmailService;
 import ai.rnt.crm.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
@@ -52,42 +57,42 @@ public class EmailServiceImpl implements EmailService {
 		try {
 			boolean saveStatus = false;
 			AddEmail sendEmail = null;
-			
+
 			AddEmail addEmail = TO_EMAIL.apply(dto).orElseThrow(ResourceNotFoundException::new);
-			Integer addEmailId=dto.getAddMailId();
+			Integer addEmailId = dto.getAddMailId();
 			if ("send".equalsIgnoreCase(status) && nonNull(addEmailId))
-				sendEmail =emailDaoService.findById(addEmail.getAddMailId());
+				sendEmail = emailDaoService.findById(addEmail.getAddMailId());
 			else {
-			addEmail.setToMail(dto.getMailTo().stream().collect(Collectors.joining(",")));
-			addEmail.setBccMail(dto.getBcc().stream().collect(Collectors.joining(",")));
-			addEmail.setCcMail(dto.getCc().stream().collect(Collectors.joining(",")));
-			leadDaoService.getLeadById(leadId).ifPresent(addEmail::setLead);
-			addEmail.setAddMailId(null);
-			if (dto.getAttachment().isEmpty()) {
-				sendEmail = emailDaoService.addEmail(addEmail);
-				saveStatus = nonNull(sendEmail);
-			} else {
-				for (AttachmentDto attach : dto.getAttachment()) {
-					Attachment attachment = TO_ATTACHMENT.apply(attach).orElseThrow(ResourceNotFoundException::new);
-					attachment.setMail(addEmail);
-					Attachment addAttachment = attachmentDaoService.addAttachment(attachment);
-					sendEmail = addAttachment.getMail();
-					saveStatus = nonNull(addAttachment);
+				addEmail.setToMail(dto.getMailTo().stream().collect(Collectors.joining(",")));
+				addEmail.setBccMail(dto.getBcc().stream().collect(Collectors.joining(",")));
+				addEmail.setCcMail(dto.getCc().stream().collect(Collectors.joining(",")));
+				leadDaoService.getLeadById(leadId).ifPresent(addEmail::setLead);
+				addEmail.setAddMailId(null);
+				if (dto.getAttachment().isEmpty()) {
+					sendEmail = emailDaoService.addEmail(addEmail);
+					saveStatus = nonNull(sendEmail);
+				} else {
+					for (AttachmentDto attach : dto.getAttachment()) {
+						Attachment attachment = TO_ATTACHMENT.apply(attach).orElseThrow(ResourceNotFoundException::new);
+						attachment.setMail(addEmail);
+						Attachment addAttachment = attachmentDaoService.addAttachment(attachment);
+						sendEmail = addAttachment.getMail();
+						saveStatus = nonNull(addAttachment);
+					}
 				}
-			}
 			}
 			if (saveStatus && "save".equalsIgnoreCase(status)) {
 				result.put(MESSAGE, "Email Added Successfully");
 				result.put(DATA, sendEmail.getAddMailId());
 			} else if ("send".equalsIgnoreCase(status)) {
 				boolean sendEmailStatus = EmailUtil.sendEmail(sendEmail);
-				if(nonNull(addEmailId) && sendEmailStatus)
+				if (nonNull(addEmailId) && sendEmailStatus)
 					result.put(MESSAGE, "Email Sent Successfully!!");
-				else if(saveStatus && sendEmailStatus)
+				else if (saveStatus && sendEmailStatus)
 					result.put(MESSAGE, "Email Saved and Sent Successfully!!");
-				else 
+				else
 					result.put(MESSAGE, "Problem while Sending Email!!");
-			}else
+			} else
 				result.put(MESSAGE, "Email Not Added");
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
@@ -115,5 +120,42 @@ public class EmailServiceImpl implements EmailService {
 			throw new CRMException(e);
 		}
 		return new ResponseEntity<>(result, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteEmail(Integer mailId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		AddEmail updatedEmail = null;
+
+		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
+				&& nonNull(getContext().getAuthentication().getDetails())) {
+			UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
+
+			AddEmail mail = emailDaoService.findById(mailId);
+			List<Attachment> attachment = mail.getAttachment();
+			if (nonNull(attachment)) {
+				for (Attachment e : attachment) {
+					e.setDeletedBy(details.getStaffId());
+					e.setDeletedDate(LocalDateTime.now());
+					e.getMail().setDeletedBy(details.getStaffId());
+					e.getMail().setDeletedDate(LocalDateTime.now());
+					Attachment addAttachment = attachmentDaoService.addAttachment(e);
+					emailDaoService.addEmail(mail);
+					updatedEmail = addAttachment.getMail();
+				}
+			} else {
+				mail.setDeletedBy(details.getStaffId());
+				mail.setDeletedDate(LocalDateTime.now());
+				updatedEmail = emailDaoService.addEmail(mail);
+			}
+		}
+		if (nonNull(updatedEmail)) {
+			result.put(MESSAGE, "Email deleted SuccessFully.");
+			result.put(SUCCESS, true);
+		} else {
+			result.put(MESSAGE, "Email Not deleted.");
+			result.put(SUCCESS, false);
+		}
+		return new ResponseEntity<>(result, OK);
 	}
 }

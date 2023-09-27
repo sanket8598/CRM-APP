@@ -16,7 +16,4 @@ public class AttachmentDaoServiceImpl implements AttachmentDaoService {
 	public Attachment addAttachment(Attachment entity) {
 		return attachmentRepository.save(entity);
 	}
-	
-	
-
 }

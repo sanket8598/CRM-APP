@@ -11,4 +11,6 @@ public interface VisitService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> saveVisit(VisitDto dto);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(Integer visitId);
+
 }

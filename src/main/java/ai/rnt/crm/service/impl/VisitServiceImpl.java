@@ -5,7 +5,10 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import java.time.LocalDateTime;
 import java.util.EnumMap;
 
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,7 @@ import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.service.VisitService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,5 +60,25 @@ public class VisitServiceImpl implements VisitService {
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(Integer visitId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		Visit visit = visitDaoService.getVisitsByVisitId(visitId).orElseThrow(null);
+		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
+				&& nonNull(getContext().getAuthentication().getDetails())) {
+			UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
+			visit.setDeletedBy(details.getStaffId());
+			visit.setDeletedDate(LocalDateTime.now());
+		}
+		if (nonNull(visitDaoService.saveVisit(visit))) {
+			result.put(MESSAGE, "Visit deleted SuccessFully.");
+			result.put(SUCCESS, true);
+		} else {
+			result.put(MESSAGE, "Visit Not delete.");
+			result.put(SUCCESS, false);
+		}
+		return new ResponseEntity<>(result, OK);
 	}
 }

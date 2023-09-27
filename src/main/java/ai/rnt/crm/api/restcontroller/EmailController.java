@@ -6,6 +6,7 @@ import java.util.EnumMap;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,7 @@ public class EmailController {
 
 	/**
 	 * This method is used to save and send the email.
+	 * 
 	 * @author Sanket Wakankar
 	 * @version 1.0
 	 * @since 12/09/2023.
@@ -35,14 +37,19 @@ public class EmailController {
 	 */
 	@PostMapping("/addEmail/{leadId}/{status}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addEmail(@RequestBody EmailDto dto,
-			@PathVariable(name = "leadId") Integer leadId,@PathVariable(name="status",required = false)String status) {
-		return emailService.addEmail(dto, leadId,status);
+			@PathVariable(name = "leadId") Integer leadId,
+			@PathVariable(name = "status", required = false) String status) {
+		return emailService.addEmail(dto, leadId, status);
 	}
-	
+
 	@GetMapping("/getMailId/{addMailId}/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(@PathVariable Integer addMailId,
 			@PathVariable Integer leadId) {
 		return emailService.checkMailId(addMailId, leadId);
 	}
 
+	@DeleteMapping("/deleteEmail/{mailId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteEmail(@PathVariable Integer mailId) {
+		return emailService.deleteEmail(mailId);
+	}
 }
