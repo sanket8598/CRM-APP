@@ -82,19 +82,25 @@ public class EmailServiceImpl implements EmailService {
 				}
 			}
 			if (saveStatus && "save".equalsIgnoreCase(status)) {
+				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Added Successfully");
 				result.put(DATA, sendEmail.getAddMailId());
 			} else if ("send".equalsIgnoreCase(status)) {
 				boolean sendEmailStatus = EmailUtil.sendEmail(sendEmail);
-				if (nonNull(addEmailId) && sendEmailStatus)
+				if (nonNull(addEmailId) && sendEmailStatus) {
+					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Sent Successfully!!");
-				else if (saveStatus && sendEmailStatus)
+				} else if (saveStatus && sendEmailStatus) {
+					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Saved and Sent Successfully!!");
-				else
+				} else {
 					result.put(MESSAGE, "Problem while Sending Email!!");
-			} else
+					result.put(SUCCESS, false);
+				}
+			} else {
+				result.put(SUCCESS, false);
 				result.put(MESSAGE, "Email Not Added");
-			result.put(SUCCESS, true);
+			}
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while sending and saving add email for the Lead Api..{}", e.getMessage());
