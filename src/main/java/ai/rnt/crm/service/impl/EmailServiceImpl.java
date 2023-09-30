@@ -13,6 +13,7 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -27,11 +28,13 @@ import ai.rnt.crm.dto.AttachmentDto;
 import ai.rnt.crm.dto.EmailDto;
 import ai.rnt.crm.entity.AddEmail;
 import ai.rnt.crm.entity.Attachment;
+import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.service.EmailService;
+import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +52,7 @@ public class EmailServiceImpl implements EmailService {
 	private final EmailDaoService emailDaoService;
 	private final LeadDaoService leadDaoService;
 	private final AttachmentDaoService attachmentDaoService;
+	private final EmployeeService employeeService;
 
 	@Override
 	@Transactional
@@ -163,5 +167,27 @@ public class EmailServiceImpl implements EmailService {
 			result.put(SUCCESS, false);
 		}
 		return new ResponseEntity<>(result, OK);
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignEmail(Map<String, Integer> map) {
+		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		log.info("inside assign Email staffId: {} addMailId:{}", map.get("staffId"), map.get("addMailId"));
+		try {
+			AddEmail email = emailDaoService.findById(map.get("addMailId"));
+			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			email.setMailFrom(employee.getEmailId());
+			if (nonNull(emailDaoService.addEmail(email))) {
+				resultMap.put(MESSAGE, "Email Assigned SuccessFully");
+				resultMap.put(SUCCESS, true);
+			} else {
+				resultMap.put(MESSAGE, "Email Not Assigned");
+				resultMap.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(resultMap, OK);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
 	}
 }

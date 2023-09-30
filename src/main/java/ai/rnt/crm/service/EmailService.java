@@ -1,6 +1,7 @@
 package ai.rnt.crm.service;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
@@ -14,5 +15,7 @@ public interface EmailService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(Integer addMailId, Integer leadId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> deleteEmail(Integer mailId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> assignEmail(Map<String, Integer> map);
 
 }
