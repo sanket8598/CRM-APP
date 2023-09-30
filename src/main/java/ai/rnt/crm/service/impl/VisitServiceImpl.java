@@ -81,4 +81,19 @@ public class VisitServiceImpl implements VisitService {
 		}
 		return new ResponseEntity<>(result, OK);
 	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> visitMarkAsCompleted(Integer visitId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		Visit visit = visitDaoService.getVisitsByVisitId(visitId).orElseThrow(null);
+		visit.setUpdatedDate(LocalDateTime.now());
+		if (nonNull(visitDaoService.saveVisit(visit))) {
+			result.put(MESSAGE, "Visit updated SuccessFully");
+			result.put(SUCCESS, true);
+		} else {
+			result.put(MESSAGE, "Visit Not updated");
+			result.put(SUCCESS, false);
+		}
+		return new ResponseEntity<>(result, OK);
+	}
 }

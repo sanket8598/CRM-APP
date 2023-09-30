@@ -13,4 +13,6 @@ public interface VisitService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(Integer visitId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> visitMarkAsCompleted(Integer visitId);
+
 }
