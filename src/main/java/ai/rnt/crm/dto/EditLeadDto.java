@@ -35,25 +35,14 @@ public class EditLeadDto {
 	
 	private CompanyDto companyMaster;
 	
-	private String fullName;
+	private String message;
 	
-	private String shortName;
-
 	public String getShortName() {
 		return LeadsCardUtil.shortName(getFirstName(), getLastName());
-	}
-
-	public void setShortName(String shortName) {
-		this.shortName = shortName;
 	}
 
 	public String getFullName() {
 		return getFirstName()+" "+getLastName();
 	}
 
-	public void setFullName(String fullName) {
-		
-		this.fullName = fullName;
-	}
-	
 }

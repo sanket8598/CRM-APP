@@ -143,15 +143,17 @@ public class EmailServiceImpl implements EmailService {
 
 			AddEmail mail = emailDaoService.findById(mailId);
 			List<Attachment> attachment = mail.getAttachment();
-			if (nonNull(attachment)) {
-				for (Attachment e : attachment) {
-					e.setDeletedBy(details.getStaffId());
-					e.setDeletedDate(LocalDateTime.now());
-					e.getMail().setDeletedBy(details.getStaffId());
-					e.getMail().setDeletedDate(LocalDateTime.now());
-					Attachment addAttachment = attachmentDaoService.addAttachment(e);
-					emailDaoService.addEmail(mail);
-					updatedEmail = addAttachment.getMail();
+			if (nonNull(attachment)&& !attachment.isEmpty()) {
+				List<Attachment> attach = attachment.stream().map(e->{e.setDeletedBy(details.getStaffId());
+				e.setDeletedDate(LocalDateTime.now());
+				e.getMail().setDeletedBy(details.getStaffId());
+				e.getMail().setDeletedDate(LocalDateTime.now());
+				e.setMail(e.getMail());
+				return e;
+				}).collect(Collectors.toList());
+				for(Attachment e:attach)  {
+					attachmentDaoService.addAttachment(e);
+					updatedEmail = emailDaoService.addEmail(mail);
 				}
 			} else {
 				mail.setDeletedBy(details.getStaffId());
