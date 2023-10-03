@@ -4,6 +4,7 @@ import static ai.rnt.crm.constants.ApiConstants.ADD;
 import static ai.rnt.crm.constants.ApiConstants.VISIT;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,5 +48,10 @@ public class VisitController {
 	@PutMapping("/updateVisit/{visitId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> visitMarkAsCompleted(@PathVariable Integer visitId) {
 		return visitService.visitMarkAsCompleted(visitId);
+	}
+
+	@PutMapping("/assignVisit")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(@RequestBody Map<String, Integer> map) {
+		return visitService.assignVisit(map);
 	}
 }

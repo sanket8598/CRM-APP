@@ -28,5 +28,7 @@ public class VisitDto {
 	private Date dueDate;
 	
 	private Integer leadId;
+	
+	private Integer visitBy;
 
 }

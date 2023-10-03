@@ -91,35 +91,43 @@ public class AddCallServiceImpl implements AddCallService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(Integer callId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
-		call.setUpdatedDate(LocalDateTime.now());
-		if (nonNull(addCallDaoService.addCall(call))) {
-			result.put(MESSAGE, "Call updated SuccessFully");
-			result.put(SUCCESS, true);
-		} else {
-			result.put(MESSAGE, "Call Not updated");
-			result.put(SUCCESS, false);
+		try {
+			AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
+			call.setUpdatedDate(LocalDateTime.now());
+			if (nonNull(addCallDaoService.addCall(call))) {
+				result.put(MESSAGE, "Call updated SuccessFully");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Call Not updated");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			throw new CRMException(e);
 		}
-		return new ResponseEntity<>(result, OK);
 	}
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
-		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
-				&& nonNull(getContext().getAuthentication().getDetails())) {
-			UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
-			call.setDeletedBy(details.getStaffId());
-			call.setDeletedDate(LocalDateTime.now());
+		try {
+			AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
+			if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
+					&& nonNull(getContext().getAuthentication().getDetails())) {
+				UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
+				call.setDeletedBy(details.getStaffId());
+				call.setDeletedDate(LocalDateTime.now());
+			}
+			if (nonNull(addCallDaoService.addCall(call))) {
+				result.put(MESSAGE, "Call deleted SuccessFully.");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Call Not delete.");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			throw new CRMException(e);
 		}
-		if (nonNull(addCallDaoService.addCall(call))) {
-			result.put(MESSAGE, "Call deleted SuccessFully.");
-			result.put(SUCCESS, true);
-		} else {
-			result.put(MESSAGE, "Call Not delete.");
-			result.put(SUCCESS, false);
-		}
-		return new ResponseEntity<>(result, OK);
 	}
 }
