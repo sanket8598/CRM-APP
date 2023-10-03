@@ -28,4 +28,6 @@ public class UpdateLeadDto {
 	private String zipCode;
 	private String addressLineOne;
 	private String fullName;
+	private String leadRequirements;
+
 }

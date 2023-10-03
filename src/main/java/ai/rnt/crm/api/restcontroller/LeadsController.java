@@ -89,7 +89,7 @@ public class LeadsController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping("/edit/{leadId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> edittLead(@PathVariable Integer leadId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editLead(@PathVariable Integer leadId) {
 		return leadService.editLead(leadId);
 	}
 

@@ -239,7 +239,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getUpdatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
 						TO_Employee.apply(call.getCallFrom())
-						.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
+								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 						return callDto;
 					}).collect(Collectors.toList());
 			timeLine.addAll(list);
@@ -264,7 +264,7 @@ public class LeadServiceImpl implements LeadService {
 						visitDto.setType("Visit");
 						visitDto.setBody(visit.getContent());
 						visitDto.setDueDate(dateFormat.format(visit.getDueDate()));
-						employeeService.getById(visit.getCreatedBy()).ifPresent(byId->visitDto
+						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> visitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						visitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
 						return visitDto;
@@ -280,7 +280,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
 						TO_Employee.apply(call.getCallFrom())
-						.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
+								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 						return callDto;
 					}).collect(Collectors.toList());
 			activity.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
@@ -304,15 +304,20 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setType("Visit");
 						editVisitDto.setBody(visit.getContent());
 						editVisitDto.setDueDate(dateFormat.format(visit.getDueDate()));
-						employeeService.getById(visit.getCreatedBy()).ifPresent(byId->editVisitDto
-						.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
+						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> editVisitDto
+								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						editVisitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
 						return editVisitDto;
 					}).collect(Collectors.toList()));
-			Leads leadById=leadDaoService.getLeadById(leadId)
+			Leads leadById = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
-			Optional<EditLeadDto> dto=TO_EDITLEAD_DTO.apply(leadById);
-			dto.ifPresent(e->e.setMessage("Assigned To "+leadById.getEmployee().getFirstName()+" "+leadById.getEmployee().getLastName()));
+			Optional<EditLeadDto> dto = TO_EDITLEAD_DTO.apply(leadById);
+			dto.ifPresent(e -> {
+				e.setMessage("Assigned To " + leadById.getEmployee().getFirstName() + " "
+						+ leadById.getEmployee().getLastName());
+				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy()).orElseThrow(null);
+				e.setGeneratedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
+			});
 			dataMap.put("Contact", dto);
 			dataMap.put("serviceFalls", TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put("leadSource", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
@@ -336,8 +341,8 @@ public class LeadServiceImpl implements LeadService {
 				lead.get().setProposedSolution(dto.getProposedSolution());
 				lead.get().setServiceFallsMaster(
 						serviceFallsDaoSevice.getById(dto.getServiceFallsMaster().getServiceFallsId())
-						.orElseThrow(() -> new ResourceNotFoundException("ServiceFallMaster", "serviceFallId",
-								dto.getServiceFallsMaster().getServiceFallsId())));
+								.orElseThrow(() -> new ResourceNotFoundException("ServiceFallMaster", "serviceFallId",
+										dto.getServiceFallsMaster().getServiceFallsId())));
 				if (nonNull(leadDaoService.addLead(lead.get()))) {
 					result.put(MESSAGE, "Lead Qualified SuccessFully");
 					result.put(SUCCESS, true);
@@ -415,6 +420,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.setPhoneNumber(dto.getPhoneNumber());
 			lead.setEmail(dto.getEmail());
 			lead.setBudgetAmount(dto.getBudgetAmount());
+			lead.setLeadRequirements(dto.getLeadRequirements());
 			Optional<CityMaster> existCityByName = cityDaoService.existCityByName(dto.getCity());
 			Optional<StateMaster> findBystate = stateDaoService.findBystate(dto.getState());
 			Optional<CountryMaster> findByCountryName = countryDaoService.findByCountryName(dto.getCountry());
@@ -427,7 +433,7 @@ public class LeadServiceImpl implements LeadService {
 				companyMaster.setZipCode(dto.getZipCode());
 				companyMaster.setAddressLineOne(dto.getAddressLineOne());
 				TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(null))
-				.ifPresent(lead::setCompanyMaster);
+						.ifPresent(lead::setCompanyMaster);
 			} else {
 				CompanyMaster companyMaster = TO_COMPANY.apply(CompanyDto.builder().companyName(dto.getCompanyName())
 						.companyWebsite(dto.getCompanyWebsite()).build()).orElseThrow(null);
@@ -437,7 +443,7 @@ public class LeadServiceImpl implements LeadService {
 				companyMaster.setZipCode(dto.getZipCode());
 				companyMaster.setAddressLineOne(dto.getAddressLineOne());
 				TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(null))
-				.ifPresent(lead::setCompanyMaster);
+						.ifPresent(lead::setCompanyMaster);
 			}
 			serviceFallsDaoSevice.getById(dto.getServiceFallsId()).ifPresent(lead::setServiceFallsMaster);
 			leadSourceDaoService.getById(dto.getLeadSourceId()).ifPresent(lead::setLeadSourceMaster);
