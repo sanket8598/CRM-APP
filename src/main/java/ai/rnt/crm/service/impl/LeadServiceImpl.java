@@ -264,8 +264,9 @@ public class LeadServiceImpl implements LeadService {
 						visitDto.setType("Visit");
 						visitDto.setBody(visit.getContent());
 						visitDto.setDueDate(dateFormat.format(visit.getDueDate()));
-						EmployeeMaster byId = employeeService.getById(visit.getCreatedBy()).orElseThrow(null);
-						visitDto.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName()));
+						employeeService.getById(visit.getCreatedBy()).ifPresent(byId->visitDto
+								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
+						visitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
 						return visitDto;
 					}).collect(Collectors.toList()));
 			List<TimeLineActivityDto> activity = addCallDaoService.getCallsByLeadId(leadId).stream()
@@ -303,9 +304,9 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setType("Visit");
 						editVisitDto.setBody(visit.getContent());
 						editVisitDto.setDueDate(dateFormat.format(visit.getDueDate()));
-						EmployeeMaster byId = employeeService.getById(visit.getCreatedBy()).orElseThrow(null);
-						editVisitDto
-						.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName()));
+						employeeService.getById(visit.getCreatedBy()).ifPresent(byId->editVisitDto
+						.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
+						editVisitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
 						return editVisitDto;
 					}).collect(Collectors.toList()));
 			Leads leadById=leadDaoService.getLeadById(leadId)

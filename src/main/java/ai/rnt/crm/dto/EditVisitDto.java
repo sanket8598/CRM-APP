@@ -24,4 +24,6 @@ public class EditVisitDto implements TimeLineActivityDto {
 	private String type;
 	
 	private String shortName;
+	
+	private String createdOn;
 }
