@@ -18,4 +18,6 @@ public interface EmailService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> assignEmail(Map<String, Integer> map);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> getEmail(Integer mailId);
+
 }

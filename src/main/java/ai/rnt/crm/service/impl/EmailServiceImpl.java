@@ -2,6 +2,7 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
+import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
@@ -14,7 +15,9 @@ import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -187,6 +190,25 @@ public class EmailServiceImpl implements EmailService {
 				resultMap.put(MESSAGE, "Email Not Assigned");
 				resultMap.put(SUCCESS, false);
 			}
+			return new ResponseEntity<>(resultMap, OK);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getEmail(Integer mailId) {
+		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		try {
+			AddEmail addEmail = emailDaoService.findById(mailId);
+			Optional<EmailDto> mailDto = TO_EMAIL_DTO.apply(addEmail);
+			mailDto.ifPresent(e -> {
+				e.setBcc(Stream.of(addEmail.getBccMail().split(",")).map(String::trim).collect(Collectors.toList()));
+				e.setCc(Stream.of(addEmail.getCcMail().split(",")).map(String::trim).collect(Collectors.toList()));
+				e.setMailTo(Stream.of(addEmail.getToMail().split(",")).map(String::trim).collect(Collectors.toList()));
+			});
+			resultMap.put(DATA, mailDto);
+			resultMap.put(SUCCESS, true);
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
 			throw new CRMException(e);

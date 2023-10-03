@@ -59,4 +59,9 @@ public class EmailController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignEmail(@RequestBody Map<String, Integer> map) {
 		return emailService.assignEmail(map);
 	}
+
+	@GetMapping("/{mailId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getEmail(@PathVariable Integer mailId) {
+		return emailService.getEmail(mailId);
+	}
 }
