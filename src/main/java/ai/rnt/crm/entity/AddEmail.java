@@ -1,6 +1,7 @@
 package ai.rnt.crm.entity;
 
-import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.REFRESH;
+import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -46,13 +48,13 @@ public class AddEmail extends Auditable {
 	private String mailFrom;
 
 	@Column(name = "mail_to")
-	private String mailTo;
+	private String toMail;
 
 	@Column(name = "cc_mail")
-	private String cc;
+	private String ccMail;
 
 	@Column(name = "bcc_mail")
-	private String bcc;
+	private String bccMail;
 
 	@Column(name = "subject")
 	private String subject;
@@ -60,11 +62,11 @@ public class AddEmail extends Auditable {
 	@Column(name = "content")
 	private String content;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="lead_id")
 	private Leads lead;
 	
-	@OneToMany(mappedBy = "mail", cascade = ALL)
+	@OneToMany(mappedBy = "mail",cascade = {REMOVE,REFRESH},orphanRemoval = true)
 	private List<Attachment> attachment = new ArrayList<>();
 
 }

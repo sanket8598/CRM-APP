@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
+import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.enums.ApiResponse;
 
 public interface LeadService {
@@ -30,5 +31,7 @@ public interface LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(Map<String, Integer> map);
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> disQualifyLead(Integer leadId, LeadDto dto);
+
+    public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(Integer leadId, UpdateLeadDto dto);
 
 }

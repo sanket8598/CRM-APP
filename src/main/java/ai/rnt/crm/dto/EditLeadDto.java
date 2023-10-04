@@ -1,5 +1,6 @@
 package ai.rnt.crm.dto;
 
+import ai.rnt.crm.util.LeadsCardUtil;
 import lombok.Data;
 
 @Data
@@ -33,4 +34,20 @@ public class EditLeadDto {
 	private LeadSourceDto leadSourceMaster;
 	
 	private CompanyDto companyMaster;
+	
+	private String message;
+	
+	private String generatedBy;
+	
+	private String leadRequirements;
+	
+	
+	public String getShortName() {
+		return LeadsCardUtil.shortName(getFirstName(), getLastName());
+	}
+
+	public String getFullName() {
+		return getFirstName()+" "+getLastName();
+	}
+
 }

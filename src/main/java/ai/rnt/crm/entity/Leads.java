@@ -17,6 +17,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Pattern;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -53,6 +54,8 @@ public class Leads extends Auditable {
 	private String lastName;
 
 	@Column(name = "phone_no")
+	@Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
+    message="Please Enter a valid Phone Number!!")
 	private String phoneNumber;
 
 	@Column(name = "topic")
@@ -89,6 +92,9 @@ public class Leads extends Auditable {
 
 	@Column(name = "disqualify_reason")
 	private String disqualifyReason;
+	
+	@Column(name = "lead_requirements")
+	private String leadRequirements;
 
 	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "lead_source_id")

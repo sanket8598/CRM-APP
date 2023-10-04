@@ -16,6 +16,7 @@ import javax.persistence.PreUpdate;
 
 import ai.rnt.crm.security.UserDetail;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This Abstract Class used to give the fields which we used in every entity.
@@ -28,6 +29,7 @@ import lombok.Getter;
 @Embeddable
 @MappedSuperclass
 @Getter
+@Setter
 public abstract class Auditable implements Serializable{
 	
 

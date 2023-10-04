@@ -6,13 +6,14 @@ import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
 import static ai.rnt.crm.util.HttpUtils.getURL;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 
 import java.security.InvalidKeyException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.validation.ConstraintViolationException;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -122,7 +123,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			String fieldName = ((FieldError) error).getField();
 			errors.add(fieldName + ": " + error.getDefaultMessage());
 		});
-		log.error("handleMethodArgumentNotValid api error: {}", exc);
+		log.error("handleMethodArgumentNotValid api error: {}", exc.getLocalizedMessage());
 		return new ResponseEntity<>(new ApiError(BAD_REQUEST, !errors.isEmpty() ? errors.get(0) : null, errors),
 				BAD_REQUEST);
 	}
@@ -132,19 +133,26 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		log.info("handling ResourceNotFoundException....{}", exc.getLocalizedMessage());
 		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.NOT_FOUND);
 	}
+	@ExceptionHandler(InvalidKeyException.class)
+	private ResponseEntity<ApiError> handleInvalidKeyException(InvalidKeyException exc) {
+		log.error("handle InvalidKeyException handler: {}", exc.getMessage());
+		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), HttpStatus.UNAUTHORIZED);
+	}
+
 
 	@ExceptionHandler(CRMException.class)
 	private ResponseEntity<ApiError> handleCRMException(CRMException exc) {
 		log.info("handling CRM Exception....{}", exc.getLocalizedMessage());
 		return new ResponseEntity<>(
 				new ApiError(false,
-						exc.getException() instanceof BadCredentialsException ? BAD_CREDENTIALS : exc.getMessage()),
+						exc.getException() instanceof BadCredentialsException ? BAD_CREDENTIALS :(exc.getException() instanceof InvalidKeyException?TOKEN_EXPIRED: exc.getMessage())),
 				HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@Override
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException exc, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
+		log.info("handling handler Not Found Exception....{}", exc.getLocalizedMessage());
 		ApiError apiError = new ApiError(false,
 				"No URL Found In The CRM with " + getURL(((ServletRequestAttributes) request).getRequest()) + ".");
 		return handleExceptionInternal(exc, apiError, headers, NOT_FOUND, request);
@@ -176,10 +184,16 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 				HttpStatus.UNAUTHORIZED);
 	}
 
-	@ExceptionHandler(InvalidKeyException.class)
-	private ResponseEntity<ApiError> handleInvalidKeyException(InvalidKeyException exc) {
-		log.error("handle InvalidKeyException handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), HttpStatus.UNAUTHORIZED);
+	@ExceptionHandler(ConstraintViolationException.class)
+	private ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException exc) {
+		List<String> errors = new ArrayList<>();
+		exc.getConstraintViolations().forEach(e->{
+			String fieldName =  e.getPropertyPath().toString();
+			errors.add(fieldName + ": " + e.getMessage());
+		});
+		log.error("handle Contraint not valid api error: {}", exc.getMessage());
+		return new ResponseEntity<>(new ApiError(BAD_REQUEST, !errors.isEmpty() ? errors.get(0) : null, errors),
+				BAD_REQUEST);
 	}
 
 	@ExceptionHandler({ SQLException.class })

@@ -1,5 +1,10 @@
 package ai.rnt.crm.dto;
 
+import java.util.List;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 import lombok.Data;
 
 /**
@@ -15,14 +20,16 @@ public class EmailDto {
 
 	private String mailFrom;
 
-	private String mailTo;
+	private List<@NotBlank(message = "Email Address should not be null or empty!!") @Email(message="Please enter a valid Email Address") String> mailTo;
 
-	private String cc;
+	private List<String> cc;
 
-	private String bcc;
+	private List<String> bcc;
 
 	private String subject;
 
 	private String content;
+
+	private List<AttachmentDto> attachment;
 
 }

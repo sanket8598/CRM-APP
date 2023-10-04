@@ -5,6 +5,8 @@ import static ai.rnt.crm.constants.ApiConstants.GET_ADMIN_AND_USER;
 import static ai.rnt.crm.constants.ApiConstants.LOGIN;
 import static ai.rnt.crm.constants.ApiConstants.TOKENPARSE;
 import static ai.rnt.crm.constants.EncryptionAlgoConstants.RSA;
+import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 import java.security.KeyPair;
@@ -17,16 +19,20 @@ import java.util.Map;
 
 import javax.crypto.Cipher;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,7 +47,6 @@ import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.JwtTokenDecoder;
 import ai.rnt.crm.util.RSAToJwtDecoder;
 import ai.rnt.crm.util.Sha1Encryptor;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,10 +54,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping(AUTH)
 @Slf4j
 @RequiredArgsConstructor
+@Validated
 public class LoginController {
 
 	private final AuthenticationManager authenticationManager;
-	
+
 	private final EmployeeService employeeService;
 
 	private final CustomUserDetails customUserDetails;
@@ -88,15 +94,24 @@ public class LoginController {
 	}
 
 	@PostMapping(TOKENPARSE)
-	public ResponseEntity<Map<String, Object>> tokenDecode(@RequestBody @NonNull Map<String,String> token) {
+	public ResponseEntity<Map<String, Object>> tokenDecode(
+			@RequestBody @NotEmpty(message = "body should not be empty!!") Map<String, String> token) {
 		try {
-			log.info("token inside tokenParse...{}",token.get("token"));
+			log.info("token inside tokenParse...{}", token.get("token"));
+
+			if (isNull(token.get("token")))
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "token cannot be null");
+			if (token.get("token").trim().length() <= 0)
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "token cannot be empty");
+
 			String rsaToJwtDecoder = RSAToJwtDecoder.rsaToJwtDecoder(token.get("token"));
-			log.info("token after RSA inside tokenParse...{}",rsaToJwtDecoder);
+			log.info("token after RSA inside tokenParse...{}", rsaToJwtDecoder);
 			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(rsaToJwtDecoder));
 			Map<String, Object> map = new LinkedHashMap<>();
 			map.put("fullName", json.get("fullName"));
 			map.put("role", json.get("Role"));
+			map.put("staffId", json.get("StaffId"));
+			map.put("emailId", json.get("EmailId"));
 			return ResponseEntity.ok(map);
 		} catch (Exception e) {
 			log.error("error occured while decoding the token.. {}", e.getLocalizedMessage());
@@ -105,6 +120,7 @@ public class LoginController {
 	}
 
 	@GetMapping(GET_ADMIN_AND_USER)
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser() {
 		return employeeService.getAdminAndUser();
 	}

@@ -53,7 +53,7 @@ public class CustomUserDetails implements UserDetailsService {
 				return new UserDetail(
 						user.getUserID(), user.getPassword(), true, true, true, true, user.getEmployeeRole().stream()
 								.map(Role::getRoleName).map(SimpleGrantedAuthority::new).collect(Collectors.toList()),
-						user.getStaffId());
+						user.getStaffId(),user.getEmailID());
 		} catch (Exception e) {
 			log.error("Exception occurred while loading user by name... {}", userId, e);
 		}

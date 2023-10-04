@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,11 @@ public class CountryDaoServiceImpl implements CountryDaoService {
 	@Override
 	public List<CountryMaster> getAllCountry() {
 		return countryMasterRepository.findAll();
+	}
+
+	@Override
+	public Optional<CountryMaster> findByCountryName(String countryName) {
+		return countryMasterRepository.findByCountry(countryName);
 	}
 
 }

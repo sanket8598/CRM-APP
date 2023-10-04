@@ -14,6 +14,8 @@ import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
+import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.service.ServiceFallsService;
@@ -44,7 +47,7 @@ public class LeadsController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping(CREATE_LEAD)
-	public ResponseEntity<EnumMap<ApiResponse, Object>> saveLead(@RequestBody LeadDto dto) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> saveLead(@RequestBody @Valid LeadDto dto) {
 		return leadService.createLead(dto);
 	}
 
@@ -86,7 +89,7 @@ public class LeadsController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping("/edit/{leadId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> edittLead(@PathVariable Integer leadId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editLead(@PathVariable Integer leadId) {
 		return leadService.editLead(leadId);
 	}
 
@@ -105,5 +108,12 @@ public class LeadsController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> disQualifyLead(@PathVariable Integer leadId,
 			@RequestBody LeadDto dto) {
 		return leadService.disQualifyLead(leadId, dto);
+	}
+	
+	
+	@PutMapping("/updateLeadContact/{leadId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(@PathVariable Integer leadId,
+			@RequestBody UpdateLeadDto dto) {
+		return leadService.updateLeadContact(leadId, dto);
 	}
 }

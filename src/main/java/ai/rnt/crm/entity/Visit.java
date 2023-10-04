@@ -6,6 +6,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -56,6 +57,10 @@ public class Visit extends Auditable {
 
 	@Column(name = "due_date")
 	private Date dueDate;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "visit_by",updatable = true,nullable = false)
+	private EmployeeMaster visitBy;
 	
 	@ManyToOne
 	@JoinColumn(name= "lead_id")

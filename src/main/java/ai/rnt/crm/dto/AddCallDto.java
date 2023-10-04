@@ -24,7 +24,7 @@ public class AddCallDto {
 
 	private String direction;
 
-	private Integer phoneNo;
+	private String phoneNo;
 
 	private String comment;
 

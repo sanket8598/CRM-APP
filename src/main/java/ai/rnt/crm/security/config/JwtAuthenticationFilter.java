@@ -1,6 +1,5 @@
 package ai.rnt.crm.security.config;
 
-import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
 import static ai.rnt.crm.constants.SecurityConstant.TOKEN_PREFIX_BEARER;
 import static ai.rnt.crm.security.AuthenticationUtil.ALLOW_URL;
 import static java.util.Objects.isNull;
@@ -9,7 +8,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.io.IOException;
-import java.security.InvalidKeyException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -78,10 +76,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			}
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
-			log.error("Got Excetion while checking request authorizations. Request: {}",
-					request.getHeader(AUTHORIZATION), e.getMessage());
-			if(e instanceof InvalidKeyException)
-				throw new CRMException(TOKEN_EXPIRED);
+			log.error("Got Excetion while checking request authorizations. Request: {} {} {}",
+					request.getHeader(AUTHORIZATION),e.getClass(), e.getMessage());
+				throw new CRMException(e);
 					
 		}
 	}

@@ -19,7 +19,8 @@ public class EmployeeToDtoMapper {
 	 * <b>This function will return null if passed EmployeeMaster is null</b>
 	 * <br><b>Param</b> EmployeeMaster 
 	 * <br><b>Return</b> EmployeeDto
-	 * @since version 1.0 
+	 * @since 15-09-2023
+	 * @version 1.0 
 	 */
 	public static final Function<EmployeeMaster, Optional<EmployeeDto>> TO_Employee = e -> {
 		EmployeeDto employee = evalMapper(e, EmployeeDto.class).get();
@@ -27,7 +28,7 @@ public class EmployeeToDtoMapper {
 		return Optional.of(employee);
 		};
 	/**
-	 * @since 21-08-2023
+	 * @since 15-09-2023
 	 * @version 1.0
 	 *
 	 */

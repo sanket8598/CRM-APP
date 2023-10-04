@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,5 +21,10 @@ public class StateDaoServiceImpl implements StateDaoService {
 	@Override
 	public List<StateMaster> getAllState() {
 		return stateMasterRepository.findAll();
+	}
+
+	@Override
+	public Optional<StateMaster> findBystate(String state) {
+		return stateMasterRepository.findByState(state);
 	}
 }

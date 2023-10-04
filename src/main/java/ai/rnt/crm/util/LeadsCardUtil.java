@@ -35,20 +35,25 @@ public class LeadsCardUtil {
 	}
 
 	public static String shortName(String fullName) {
+		Matcher firstNameMatcher = null;
+		Matcher lastNameMatcher = null;
+		Pattern pattern = Pattern.compile("^.");
 		try {
 			if (Objects.nonNull(fullName) && fullName.trim().contains(" ")) {
 				String[] result = fullName.split(" ");
-				Pattern pattern = Pattern.compile("^.");
-				Matcher firstNameMatcher = pattern.matcher(result[0]);
-				Matcher lastNameMatcher = pattern.matcher(result[1]);
+				firstNameMatcher = pattern.matcher(result[0]);
+				lastNameMatcher = pattern.matcher(result[1]);
 				if (firstNameMatcher.find() && lastNameMatcher.find())
 					return (firstNameMatcher.group() + lastNameMatcher.group()).toUpperCase();
+			} else {
+				firstNameMatcher = pattern.matcher(fullName.charAt(0) + "");
+				if (firstNameMatcher.find())
+					return (firstNameMatcher.group()).toUpperCase();
 			}
 			return null;
 		} catch (Exception e) {
 			log.error("Got exception while concating the fname and lname");
 			throw new CRMException(e);
 		}
-
 	}
 }

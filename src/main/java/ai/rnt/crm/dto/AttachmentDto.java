@@ -17,4 +17,5 @@ public class AttachmentDto {
 	private String attachType;
 
 	private String attachName;
+	
 }
