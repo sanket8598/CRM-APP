@@ -113,7 +113,6 @@ public class EmailServiceImpl implements EmailService {
 			log.error("error occured while sending and saving add email for the Lead Api..{}", e.getMessage());
 			throw new CRMException(e);
 		}
-
 	}
 
 	@Override
@@ -211,6 +210,63 @@ public class EmailServiceImpl implements EmailService {
 			resultMap.put(SUCCESS, true);
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editEmail(EmailDto dto, Integer leadId, String status,
+			Integer mailId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			boolean saveStatus = false;
+			AddEmail sendEmail = null;
+
+			AddEmail addEmail = TO_EMAIL.apply(dto).orElseThrow(ResourceNotFoundException::new);
+			Integer addEmailId = mailId;
+			if ("send".equalsIgnoreCase(status))
+				sendEmail = emailDaoService.findById(mailId);
+			else {
+				addEmail.setToMail(dto.getMailTo().stream().collect(Collectors.joining(",")));
+				addEmail.setBccMail(dto.getBcc().stream().collect(Collectors.joining(",")));
+				addEmail.setCcMail(dto.getCc().stream().collect(Collectors.joining(",")));
+				leadDaoService.getLeadById(leadId).ifPresent(addEmail::setLead);
+				addEmail.setUpdatedDate(LocalDateTime.now());
+				if (dto.getAttachment().isEmpty()) {
+					sendEmail = emailDaoService.addEmail(addEmail);
+					saveStatus = nonNull(sendEmail);
+				} else {
+					for (AttachmentDto attach : dto.getAttachment()) {
+						Attachment attachment = TO_ATTACHMENT.apply(attach).orElseThrow(ResourceNotFoundException::new);
+						attachment.setMail(addEmail);
+						Attachment addAttachment = attachmentDaoService.addAttachment(attachment);
+						sendEmail = addAttachment.getMail();
+						saveStatus = nonNull(addAttachment);
+					}
+				}
+			}
+			if (saveStatus && "save".equalsIgnoreCase(status)) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Email Updated Successfully");
+			} else if ("send".equalsIgnoreCase(status)) {
+				boolean sendEmailStatus = EmailUtil.sendEmail(sendEmail);
+				if (nonNull(addEmailId) && sendEmailStatus) {
+					result.put(SUCCESS, true);
+					result.put(MESSAGE, "Email Sent Successfully!!");
+				} else if (saveStatus && sendEmailStatus) {
+					result.put(SUCCESS, true);
+					result.put(MESSAGE, "Email Updated and Sent Successfully!!");
+				} else {
+					result.put(MESSAGE, "Problem while Sending Email!!");
+					result.put(SUCCESS, false);
+				}
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Email Not Updated");
+			}
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("error occured while sending and saving add email for the Lead Api..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

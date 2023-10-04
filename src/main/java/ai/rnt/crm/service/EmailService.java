@@ -20,4 +20,6 @@ public interface EmailService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getEmail(Integer mailId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> editEmail(EmailDto dto, Integer leadId, String status, Integer mailId);
+
 }

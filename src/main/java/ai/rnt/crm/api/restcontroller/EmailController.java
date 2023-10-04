@@ -64,4 +64,12 @@ public class EmailController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getEmail(@PathVariable Integer mailId) {
 		return emailService.getEmail(mailId);
 	}
+
+	@PutMapping("/editEmail/{leadId}/{status}/{mailId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editEmail(@RequestBody EmailDto dto,
+			@PathVariable(name = "leadId") Integer leadId,
+			@PathVariable(name = "status", required = false) String status,
+			@PathVariable(name = "mailId") Integer mailId) {
+		return emailService.editEmail(dto, leadId, status,mailId);
+	}
 }
