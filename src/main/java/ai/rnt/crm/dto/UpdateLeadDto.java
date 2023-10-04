@@ -29,5 +29,6 @@ public class UpdateLeadDto {
 	private String addressLineOne;
 	private String fullName;
 	private String leadRequirements;
+	private String customerNeed;
 
 }

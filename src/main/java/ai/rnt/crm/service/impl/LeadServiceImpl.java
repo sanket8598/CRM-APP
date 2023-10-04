@@ -415,12 +415,11 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId).orElseThrow(null);
 			lead.setTopic(dto.getTopic());
-			lead.setFirstName(dto.getFullName().split(" ")[0]);
-			lead.setLastName(dto.getFullName().split(" ")[1]);
 			lead.setPhoneNumber(dto.getPhoneNumber());
 			lead.setEmail(dto.getEmail());
 			lead.setBudgetAmount(dto.getBudgetAmount());
 			lead.setLeadRequirements(dto.getLeadRequirements());
+			lead.setCustomerNeed(dto.getCustomerNeed());;
 			Optional<CityMaster> existCityByName = cityDaoService.existCityByName(dto.getCity());
 			Optional<StateMaster> findBystate = stateDaoService.findBystate(dto.getState());
 			Optional<CountryMaster> findByCountryName = countryDaoService.findByCountryName(dto.getCountry());
