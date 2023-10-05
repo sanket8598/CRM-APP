@@ -65,11 +65,10 @@ public class EmailController {
 		return emailService.getEmail(mailId);
 	}
 
-	@PutMapping("/editEmail/{leadId}/{status}/{mailId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> editEmail(@RequestBody EmailDto dto,
-			@PathVariable(name = "leadId") Integer leadId,
+	@PutMapping("/update/{mailId}/{status}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateEmail(@RequestBody EmailDto dto,
 			@PathVariable(name = "status", required = false) String status,
 			@PathVariable(name = "mailId") Integer mailId) {
-		return emailService.editEmail(dto, leadId, status,mailId);
+		return emailService.updateEmail(dto, status,mailId);
 	}
 }

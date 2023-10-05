@@ -244,7 +244,7 @@ public class LeadServiceImpl implements LeadService {
 					}).collect(Collectors.toList());
 			timeLine.addAll(list);
 			timeLine.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
-					.filter(email -> nonNull(email.getUpdatedBy()) || nonNull(email.getUpdatedDate())).map(email -> {
+					.filter(email ->nonNull(email.getStatus()) && email.getStatus().equalsIgnoreCase("send")).map(email -> {
 						EditEmailDto editEmailDto = new EditEmailDto();
 						editEmailDto.setId(email.getAddMailId());
 						editEmailDto.setType("Email");
@@ -284,7 +284,7 @@ public class LeadServiceImpl implements LeadService {
 						return callDto;
 					}).collect(Collectors.toList());
 			activity.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
-					.filter(email -> nonNull(email.getCreatedBy()) && isNull(email.getUpdatedBy())).map(email -> {
+					.filter(email ->isNull(email.getStatus()) || email.getStatus().equalsIgnoreCase("save")).map(email -> {
 						EditEmailDto editEmailDto = new EditEmailDto();
 						editEmailDto.setId(email.getAddMailId());
 						editEmailDto.setType("Email");
@@ -418,7 +418,6 @@ public class LeadServiceImpl implements LeadService {
 			lead.setPhoneNumber(dto.getPhoneNumber());
 			lead.setEmail(dto.getEmail());
 			lead.setBudgetAmount(dto.getBudgetAmount());
-			lead.setLeadRequirements(dto.getLeadRequirements());
 			lead.setCustomerNeed(dto.getCustomerNeed());
 			lead.setProposedSolution(dto.getProposedSolution());
 			Optional<CityMaster> existCityByName = cityDaoService.existCityByName(dto.getCity());
