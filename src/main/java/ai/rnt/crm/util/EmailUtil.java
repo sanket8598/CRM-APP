@@ -42,8 +42,8 @@ public class EmailUtil {
 	static {
 		PROPERTIES.put("mail.smtp.host", HOST);
 		PROPERTIES.put("mail.smtp.port", "587");
-		PROPERTIES.put("mail.smtp.auth", "true");
-		PROPERTIES.put("mail.smtp.starttls.enable", "true");
+		PROPERTIES.put("mail.smtp.auth", true);
+		PROPERTIES.put("mail.smtp.starttls.enable",true);
 	}
 
 	public static boolean sendEmail(AddEmail sendEmail) throws AddressException {
@@ -52,7 +52,7 @@ public class EmailUtil {
 
 			// create a message with headers
 			Message msg = new MimeMessage(getSession());
-			msg.setFrom(new InternetAddress(sendEmail.getMailFrom()));
+			msg.setFrom(new InternetAddress(USERNAME));//change it to mail from.
 
 			List<String> recipientList = Stream.of(sendEmail.getToMail().split(",")).map(String::trim)
 					.collect(Collectors.toList());

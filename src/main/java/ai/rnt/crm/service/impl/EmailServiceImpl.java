@@ -93,8 +93,11 @@ public class EmailServiceImpl implements EmailService {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Saved and Sent Successfully!!");
 			} else {
-				result.put(MESSAGE, "Problem while Sending Email!!");
-				result.put(SUCCESS, false);
+				result.put(SUCCESS, true);
+			    if(saveStatus && !sendEmailStatus)
+				    result.put(MESSAGE, "Email Saved but Problem while Sending Email!!");
+			    else 
+			        result.put(MESSAGE, "Problem Occured while saving the Email");
 			}
 		} else {
 			result.put(SUCCESS, false);
@@ -243,8 +246,11 @@ public ResponseEntity<EnumMap<ApiResponse, Object>> updateEmail(EmailDto dto, St
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Updated and Sent Successfully!!");
 			} else {
-				result.put(MESSAGE, "Problem while Sending Email!!");
 				result.put(SUCCESS, false);
+				if(saveStatus && !sendEmailStatus)
+				    result.put(MESSAGE, "Email Updated but Problem while Sending Email!!");
+				else
+				result.put(MESSAGE, "Problem while Sending Email!!");
 			}
 		} else {
 			result.put(SUCCESS, false);
