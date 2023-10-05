@@ -61,6 +61,8 @@ public class AddEmail extends Auditable {
 
 	@Column(name = "content")
 	private String content;
+	
+	private String status;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="lead_id")
