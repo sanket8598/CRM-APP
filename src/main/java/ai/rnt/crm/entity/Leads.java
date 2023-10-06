@@ -93,6 +93,9 @@ public class Leads extends Auditable {
 	@Column(name = "disqualify_reason")
 	private String disqualifyReason;
 	
+	@Column(name = "designation")
+	private String designation;
+	
 	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "lead_source_id")
 	private LeadSourceMaster leadSourceMaster;

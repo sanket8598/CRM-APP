@@ -25,6 +25,6 @@ public class StateDaoServiceImpl implements StateDaoService {
 
 	@Override
 	public Optional<StateMaster> findBystate(String state) {
-		return stateMasterRepository.findByState(state);
+		return stateMasterRepository.findTopByState(state);
 	}
 }

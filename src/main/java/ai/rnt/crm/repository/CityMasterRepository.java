@@ -8,6 +8,6 @@ import ai.rnt.crm.entity.CityMaster;
 
 public interface CityMasterRepository extends JpaRepository<CityMaster, Integer> {
 
-	Optional<CityMaster> findByCity(String cityName);
+	Optional<CityMaster> findTopByCity(String cityName);
 
 }

@@ -8,6 +8,6 @@ import ai.rnt.crm.entity.CountryMaster;
 
 public interface CountryMasterRepository extends JpaRepository<CountryMaster, Integer> {
 
-	Optional<CountryMaster> findByCountry(String countryName);
+	Optional<CountryMaster> findTopByCountry(String countryName);
 
 }

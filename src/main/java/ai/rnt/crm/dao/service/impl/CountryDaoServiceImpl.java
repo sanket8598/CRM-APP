@@ -25,7 +25,7 @@ public class CountryDaoServiceImpl implements CountryDaoService {
 
 	@Override
 	public Optional<CountryMaster> findByCountryName(String countryName) {
-		return countryMasterRepository.findByCountry(countryName);
+		return countryMasterRepository.findTopByCountry(countryName);
 	}
 
 }

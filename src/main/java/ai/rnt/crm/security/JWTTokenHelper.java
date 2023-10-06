@@ -39,7 +39,7 @@ public class JWTTokenHelper {
 	@Value("${jwt.secret.key}")
 	private String secret;
 
-	public static final long JWT_TOKEN_VALIDITY = 1000 * 60 * 60;
+	public static final long JWT_TOKEN_VALIDITY = 20000 * 60 * 60;
 
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
