@@ -25,6 +25,6 @@ public class CityDaoServiceImpl implements CityDaoService {
 
 	@Override
 	public Optional<CityMaster> existCityByName(String cityName) {
-		return cityMasterRepository.findByCity(cityName);
+		return cityMasterRepository.findTopByCity(cityName);
 	}
 }

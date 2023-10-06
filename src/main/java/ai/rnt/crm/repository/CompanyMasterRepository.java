@@ -6,6 +6,6 @@ import ai.rnt.crm.entity.CompanyMaster;
 
 public interface CompanyMasterRepository extends JpaRepository<CompanyMaster,Integer>{
 
-	CompanyMaster findByCompanyName(String companyName);
+	CompanyMaster findDistinctByCompanyName(String companyName);
 
 }

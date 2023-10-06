@@ -30,7 +30,7 @@ public class CompanyMasterServiceImpl implements CompanyMasterDaoService{
 
 	@Override
 	public Optional<CompanyDto> findByCompanyName(String companyName) {
-		return TO_COMPANY_DTO.apply(companyMasterRepository.findByCompanyName(companyName));
+		return TO_COMPANY_DTO.apply(companyMasterRepository.findDistinctByCompanyName(companyName));
 	}
 
 }
