@@ -21,6 +21,8 @@ import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -226,6 +228,7 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> lead = new EnumMap<>(ApiResponse.class);
 		try {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
 			Map<String, Object> dataMap = new LinkedHashMap<>();
 			List<TimeLineActivityDto> timeLine = new ArrayList<>();
 			List<EditCallDto> list = addCallDaoService.getCallsByLeadId(leadId).stream()
@@ -244,7 +247,8 @@ public class LeadServiceImpl implements LeadService {
 					}).collect(Collectors.toList());
 			timeLine.addAll(list);
 			timeLine.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
-					.filter(email ->nonNull(email.getStatus()) && email.getStatus().equalsIgnoreCase("send")).map(email -> {
+					.filter(email -> nonNull(email.getStatus()) && email.getStatus().equalsIgnoreCase("send"))
+					.map(email -> {
 						EditEmailDto editEmailDto = new EditEmailDto();
 						editEmailDto.setId(email.getAddMailId());
 						editEmailDto.setType("Email");
@@ -269,6 +273,8 @@ public class LeadServiceImpl implements LeadService {
 						visitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
 						return visitDto;
 					}).collect(Collectors.toList()));
+			timeLine.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), formatter)
+					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), formatter)));
 			List<TimeLineActivityDto> activity = addCallDaoService.getCallsByLeadId(leadId).stream()
 					.filter(call -> nonNull(call.getCreatedBy()) && isNull(call.getUpdatedBy())).map(call -> {
 						EditCallDto callDto = new EditCallDto();
@@ -284,7 +290,8 @@ public class LeadServiceImpl implements LeadService {
 						return callDto;
 					}).collect(Collectors.toList());
 			activity.addAll(emailDaoService.getEmailByLeadId(leadId).stream()
-					.filter(email ->isNull(email.getStatus()) || email.getStatus().equalsIgnoreCase("save")).map(email -> {
+					.filter(email -> isNull(email.getStatus()) || email.getStatus().equalsIgnoreCase("save"))
+					.map(email -> {
 						EditEmailDto editEmailDto = new EditEmailDto();
 						editEmailDto.setId(email.getAddMailId());
 						editEmailDto.setType("Email");
@@ -309,6 +316,8 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
 						return editVisitDto;
 					}).collect(Collectors.toList()));
+			timeLine.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), formatter)
+					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), formatter)));
 			Leads leadById = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
 			Optional<EditLeadDto> dto = TO_EDITLEAD_DTO.apply(leadById);
