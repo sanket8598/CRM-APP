@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,5 +54,16 @@ public class VisitController {
 	@PutMapping("/assignVisit")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(@RequestBody Map<String, Integer> map) {
 		return visitService.assignVisit(map);
+	}
+
+	@GetMapping("/edit/{visitId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editVisit(@PathVariable Integer visitId) {
+		return visitService.editVisit(visitId);
+	}
+
+	@PutMapping("/update/{visitId}/{status}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisit(@RequestBody VisitDto dto,
+			@PathVariable(name = "visitId") Integer visitId, @PathVariable(name = "status") String status) {
+		return visitService.updateVisit(dto, visitId, status);
 	}
 }

@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.AddCallDto;
+import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.entity.AddCall;
 
 public class AddCallDtoMapper {
@@ -19,7 +20,7 @@ public class AddCallDtoMapper {
 
 	/**
 	 * This function will convert AddCallDto into optional AddCall Entity. <b>This
-	 * function will return null if passed CountryDto is null</b> <br>
+	 * function will return null if passed AddCallDto is null</b> <br>
 	 * <b>Param</b> AddCallDto <br>
 	 * <b>Return</b> AddCall
 	 * 
@@ -37,7 +38,7 @@ public class AddCallDtoMapper {
 
 	/**
 	 * This function will convert AddCall Entity into optional AddCallDto . <b>This
-	 * function will return null if passed Company is null</b> <br>
+	 * function will return null if passed AddCall is null</b> <br>
 	 * <b>Param</b> AddCall <br>
 	 * <b>Return</b> AddCallDto
 	 * 
@@ -53,5 +54,25 @@ public class AddCallDtoMapper {
 	 */
 	public static final Function<Collection<AddCall>, List<AddCallDto>> TO_CALL_DTOS = e -> e.stream()
 			.map(dm -> TO_CALL_DTO.apply(dm).get()).collect(Collectors.toList());
+
+	
+	/**
+	 * This function will convert AddCall Entity into optional AddCallDto . <b>This
+	 * function will return null if passed AddCall is null</b> <br>
+	 * <b>Param</b> AddCall <br>
+	 * <b>Return</b> AddCallDto
+	 * 
+	 * @since 11-09-2023
+	 * @Version 1.0
+	 */
+	public static final Function<AddCall, Optional<EditCallDto>> TO_EDIT_CALL_DTO = e -> evalMapper(e, EditCallDto.class);
+
+	/**
+	 * @since 11-09-2023
+	 * @version 1.0
+	 *
+	 */
+	public static final Function<Collection<AddCall>, List<EditCallDto>> TO_EDIT_CALL_DTOS = e -> e.stream()
+			.map(dm -> TO_EDIT_CALL_DTO.apply(dm).get()).collect(Collectors.toList());
 
 }

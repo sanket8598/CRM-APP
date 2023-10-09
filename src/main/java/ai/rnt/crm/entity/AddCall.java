@@ -14,7 +14,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,6 +46,8 @@ public class AddCall extends Auditable {
 	private Integer addCallId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@JsonIgnore
 	@JoinColumn(name = "call_from",updatable = true,nullable = false)
 	private EmployeeMaster callFrom;
 
@@ -65,8 +71,11 @@ public class AddCall extends Auditable {
 	
 	@Column(name = "due_date")
 	private Date dueDate;
+	
+	@Column(name = "status")
+	private String status;
 
-	@ManyToOne(cascade = CascadeType.MERGE)
+	@ManyToOne(cascade = CascadeType.MERGE,fetch = FetchType.LAZY)
 	@JoinColumn(name="lead_id")
 	private Leads lead;
 

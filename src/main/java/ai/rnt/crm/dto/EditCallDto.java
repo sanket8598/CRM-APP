@@ -14,6 +14,11 @@ public class EditCallDto extends TimeLineActivityDto{
 	private String body;
 	private String shortName;
 	private String callFrom;
+	private String callTo;
+	private String direction;
+	private String phoneNo;
+	private String comment;
+	private String duration;
 	
 
 }
