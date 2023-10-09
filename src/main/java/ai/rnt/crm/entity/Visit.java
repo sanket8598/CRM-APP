@@ -57,13 +57,16 @@ public class Visit extends Auditable {
 
 	@Column(name = "due_date")
 	private Date dueDate;
-	
+
+	@Column(name = "status")
+	private String status;
+
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "visit_by",updatable = true,nullable = false)
+	@JoinColumn(name = "visit_by", updatable = true, nullable = false)
 	private EmployeeMaster visitBy;
-	
+
 	@ManyToOne
-	@JoinColumn(name= "lead_id")
+	@JoinColumn(name = "lead_id")
 	private Leads lead;
 
 }

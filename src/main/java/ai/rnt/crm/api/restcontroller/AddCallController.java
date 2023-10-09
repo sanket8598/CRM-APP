@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,5 +54,16 @@ public class AddCallController {
 	@DeleteMapping("/deleteCall/{callId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(@PathVariable Integer callId) {
 		return addCallService.deleteCall(callId);
+	}
+
+	@GetMapping("/edit/{callId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(@PathVariable Integer callId) {
+		return addCallService.editCall(callId);
+	}
+
+	@PutMapping("/update/{callId}/{status}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(@RequestBody AddCallDto dto,
+			@PathVariable(name = "callId") Integer callId, @PathVariable(name = "status") String status) {
+		return addCallService.updateCall(dto, callId, status);
 	}
 }

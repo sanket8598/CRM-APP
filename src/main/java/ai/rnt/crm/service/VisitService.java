@@ -18,4 +18,8 @@ public interface VisitService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(Map<String, Integer> map);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> editVisit(Integer visitId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> updateVisit(VisitDto dto, Integer visitId, String status);
+
 }

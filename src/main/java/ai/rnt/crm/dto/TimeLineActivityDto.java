@@ -1,4 +1,8 @@
 package ai.rnt.crm.dto;
 
-public interface TimeLineActivityDto {
+import lombok.Data;
+
+@Data
+public abstract class TimeLineActivityDto {
+	private String createdOn;
 }

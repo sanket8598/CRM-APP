@@ -43,7 +43,7 @@ public class EmailUtil {
 		PROPERTIES.put("mail.smtp.host", HOST);
 		PROPERTIES.put("mail.smtp.port", "587");
 		PROPERTIES.put("mail.smtp.auth", true);
-		PROPERTIES.put("mail.smtp.starttls.enable",true);
+		PROPERTIES.put("mail.smtp.starttls.enable", true);
 	}
 
 	public static boolean sendEmail(AddEmail sendEmail) throws AddressException {
@@ -52,7 +52,7 @@ public class EmailUtil {
 
 			// create a message with headers
 			Message msg = new MimeMessage(getSession());
-			msg.setFrom(new InternetAddress(USERNAME));//change it to mail from.
+			msg.setFrom(new InternetAddress(USERNAME));// change it to mail from.
 
 			List<String> recipientList = Stream.of(sendEmail.getToMail().split(",")).map(String::trim)
 					.collect(Collectors.toList());
@@ -62,22 +62,24 @@ public class EmailUtil {
 				recipientAddress[counter++] = new InternetAddress(recipient.trim());
 			msg.setRecipients(Message.RecipientType.TO, recipientAddress);
 
-			List<String> ccAddresses = Stream.of(sendEmail.getCcMail().split(",")).map(String::trim)
-					.collect(Collectors.toList());
-			InternetAddress[] ccAddressList = new InternetAddress[ccAddresses.size()];
-			int count = 0;
-			for (String cc : ccAddresses)
-				ccAddressList[count++] = new InternetAddress(cc.trim());
-			msg.setRecipients(Message.RecipientType.CC, ccAddressList);
-
-			List<String> bccAddress = Stream.of(sendEmail.getBccMail().split(",")).map(String::trim)
-					.collect(Collectors.toList());
-			InternetAddress[] bccAddressList = new InternetAddress[bccAddress.size()];
-			int index = 0;
-			for (String bcc : bccAddress)
-				bccAddressList[index++] = new InternetAddress(bcc.trim());
-			msg.setRecipients(Message.RecipientType.BCC, bccAddressList);
-
+			if (nonNull(sendEmail.getCcMail()) && !sendEmail.getCcMail().isEmpty()) {
+				List<String> ccAddresses = Stream.of(sendEmail.getCcMail().split(",")).map(String::trim)
+						.collect(Collectors.toList());
+				InternetAddress[] ccAddressList = new InternetAddress[ccAddresses.size()];
+				int count = 0;
+				for (String cc : ccAddresses)
+					ccAddressList[count++] = new InternetAddress(cc.trim());
+				msg.setRecipients(Message.RecipientType.CC, ccAddressList);
+			}
+			if (nonNull(sendEmail.getBccMail()) && !sendEmail.getBccMail().isEmpty()) {
+				List<String> bccAddress = Stream.of(sendEmail.getBccMail().split(",")).map(String::trim)
+						.collect(Collectors.toList());
+				InternetAddress[] bccAddressList = new InternetAddress[bccAddress.size()];
+				int index = 0;
+				for (String bcc : bccAddress)
+					bccAddressList[index++] = new InternetAddress(bcc.trim());
+				msg.setRecipients(Message.RecipientType.BCC, bccAddressList);
+			}
 			msg.setSubject(sendEmail.getSubject());
 			msg.setSentDate(new Date());
 

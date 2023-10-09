@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author Nikhil Gaikwad
@@ -9,7 +10,8 @@ import lombok.Data;
  *
  */
 @Data
-public class EditVisitDto implements TimeLineActivityDto {
+@EqualsAndHashCode(callSuper = false)
+public class EditVisitDto extends TimeLineActivityDto {
 
 	private Integer id;
 
@@ -24,6 +26,4 @@ public class EditVisitDto implements TimeLineActivityDto {
 	private String type;
 	
 	private String shortName;
-	
-	private String createdOn;
 }

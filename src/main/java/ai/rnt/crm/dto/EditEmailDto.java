@@ -3,9 +3,11 @@ package ai.rnt.crm.dto;
 import java.util.List;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class EditEmailDto implements TimeLineActivityDto{
+@EqualsAndHashCode(callSuper = false)
+public class EditEmailDto extends TimeLineActivityDto{
 
 	
 	private Integer id;

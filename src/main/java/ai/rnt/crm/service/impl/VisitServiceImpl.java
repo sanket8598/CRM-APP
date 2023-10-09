@@ -1,10 +1,12 @@
 package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_VISIT;
+import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
@@ -60,6 +62,7 @@ public class VisitServiceImpl implements VisitService {
 			EmployeeMaster employee = employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", auditAwareUtil.getLoggedInStaffId()));
 			visit.setVisitBy(employee);
+			visit.setStatus("Save");
 			if (nonNull(visitDaoService.saveVisit(visit)))
 				result.put(MESSAGE, "Visit Added Successfully");
 			else
@@ -132,6 +135,45 @@ public class VisitServiceImpl implements VisitService {
 				resultMap.put(SUCCESS, false);
 			}
 			return new ResponseEntity<>(resultMap, OK);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editVisit(Integer visitId) {
+		EnumMap<ApiResponse, Object> visit = new EnumMap<>(ApiResponse.class);
+		try {
+			visit.put(SUCCESS, true);
+			visit.put(DATA, visitDaoService.getVisitsByVisitId(visitId));
+			return new ResponseEntity<>(visit, FOUND);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisit(VisitDto dto, Integer visitId, String status) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Visit visit = visitDaoService.getVisitsByVisitId(visitId).orElseThrow(null);
+			visit.setLocation(dto.getLocation());
+			visit.setSubject(dto.getSubject());
+			visit.setContent(dto.getContent());
+			visit.setComment(dto.getComment());
+			visit.setDuration(dto.getDuration());
+			visit.setDueDate(dto.getDueDate());
+			visit.setStatus(status);
+			visit.setUpdatedDate(LocalDateTime.now());
+			if (nonNull(visitDaoService.saveVisit(visit))) {
+				if (status.equalsIgnoreCase("Save"))
+					result.put(MESSAGE, "Visit Updated Successfully");
+				else
+					result.put(MESSAGE, "Visit Updated And Completed Successfully");
+			} else
+				result.put(MESSAGE, "Visit Not Updated");
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}

@@ -1,10 +1,13 @@
 package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.AddCallDtoMapper.TO_CALL;
+import static ai.rnt.crm.dto_mapper.AddCallDtoMapper.TO_EDIT_CALL_DTO;
+import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
@@ -54,6 +57,7 @@ public class AddCallServiceImpl implements AddCallService {
 			addCall.setLead(lead);
 			addCall.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
+			addCall.setStatus("Save");
 			if (nonNull(addCallDaoService.addCall(addCall)))
 				result.put(MESSAGE, "Call Added Successfully");
 			else
@@ -126,6 +130,48 @@ public class AddCallServiceImpl implements AddCallService {
 				result.put(SUCCESS, false);
 			}
 			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(Integer callId) {
+		EnumMap<ApiResponse, Object> call = new EnumMap<>(ApiResponse.class);
+		try {
+			call.put(DATA, TO_EDIT_CALL_DTO.apply(addCallDaoService.getCallById(callId).orElseThrow(null)));
+			call.put(SUCCESS, true);
+			return new ResponseEntity<>(call, FOUND);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(AddCallDto dto, Integer callId, String status) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
+			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
+					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
+			call.setCallTo(dto.getCallTo());
+			call.setSubject(dto.getSubject());
+			call.setDirection(dto.getDirection());
+			call.setPhoneNo(dto.getPhoneNo());
+			call.setComment(dto.getComment());
+			call.setDuration(dto.getDuration());
+			call.setDueDate(dto.getDueDate());
+			call.setStatus(status);
+			call.setUpdatedDate(LocalDateTime.now());
+			if (nonNull(addCallDaoService.addCall(call))) {
+				if (status.equalsIgnoreCase("Save"))
+					result.put(MESSAGE, "Call Updated Successfully");
+				else
+					result.put(MESSAGE, "Call Updated And Completed Successfully");
+			} else
+				result.put(MESSAGE, "Call Not Updated");
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			throw new CRMException(e);
 		}
