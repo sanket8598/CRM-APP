@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
- * @author Nikhil Gaikwad
+ * @author Sanket Wakankar
  * @version 1.0
  * @since 12/09/2023.
  */

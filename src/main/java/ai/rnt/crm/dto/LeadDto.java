@@ -42,7 +42,7 @@ public class LeadDto {
 
 	private String businessCard;
 
-	private Double budgetAmount;
+	private String budgetAmount;
 
 	@NotNull(message = "Please select the Assign To!!")
 	private Integer assignTo;

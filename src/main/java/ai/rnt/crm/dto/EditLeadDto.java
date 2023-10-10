@@ -19,7 +19,7 @@ public class EditLeadDto {
 
 	private String email;
 	
-	private Double budgetAmount;
+	private String budgetAmount;
 
 	private Integer assignTo;
 	
