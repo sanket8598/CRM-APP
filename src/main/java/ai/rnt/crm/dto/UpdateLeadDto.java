@@ -30,5 +30,6 @@ public class UpdateLeadDto {
 	private String fullName;
 	private String customerNeed;
 	private String proposedSolution;
+	private String pseudoName;
 
 }

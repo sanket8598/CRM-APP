@@ -96,6 +96,9 @@ public class Leads extends Auditable {
 	@Column(name = "designation")
 	private String designation;
 	
+	@Column(name = "pseudo_name")
+	private String pseudoName;
+	
 	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "lead_source_id")
 	private LeadSourceMaster leadSourceMaster;

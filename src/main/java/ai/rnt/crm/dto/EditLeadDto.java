@@ -41,6 +41,8 @@ public class EditLeadDto {
 	
 	private String leadRequirements;
 	
+	private String pseudoName;
+	
 	
 	public String getShortName() {
 		return LeadsCardUtil.shortName(getFirstName(), getLastName());

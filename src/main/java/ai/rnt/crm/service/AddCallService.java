@@ -6,7 +6,6 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dto.AddCallDto;
-import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.enums.ApiResponse;
 
 public interface AddCallService {

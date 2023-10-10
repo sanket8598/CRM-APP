@@ -53,5 +53,7 @@ public class LeadDto {
 	
 	private String designation;
 	
+	private String pseudoName;
+	
 
 }
