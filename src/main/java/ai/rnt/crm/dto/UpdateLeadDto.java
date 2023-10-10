@@ -15,7 +15,7 @@ public class UpdateLeadDto {
 
 	private String email;
 	
-	private Double budgetAmount;
+	private String budgetAmount;
 	
 	private Integer serviceFallsId;
 	

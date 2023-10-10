@@ -76,7 +76,7 @@ public class Leads extends Auditable {
 	private String companyWebsite;
 
 	@Column(name = "budget_amount")
-	private Double budgetAmount;
+	private String budgetAmount;
 
 	@Column(name = "bussiness_card", columnDefinition = "LONGTEXT")
 	private String businessCard;

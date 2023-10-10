@@ -4,14 +4,13 @@ import java.util.List;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
 /**
- * @author Nikhil Gaikwad
+ * @author Sanket Wakankar
  * @version 1.0
  * @since 12/09/2023.
  */
@@ -23,7 +22,7 @@ public class EmailDto {
 
 	private String mailFrom;
 
-	@NotEmpty(message = "Please enter email address!!")
+	@NotBlank(message = "Please enter email address!!")
 	private List<@NotBlank(message = "Email Address should not be null or empty!!") @Email(message="Please enter a valid Email Address") String> mailTo;
 
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
