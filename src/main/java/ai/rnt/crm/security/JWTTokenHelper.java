@@ -1,5 +1,7 @@
 package ai.rnt.crm.security;
 
+import  static java.util.Objects.nonNull;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Date;
@@ -94,5 +96,9 @@ public class JWTTokenHelper {
 			log.error("error occured while getting the Keys.{} ", e.getMessage());
 		}
 		return null;
+	}
+	
+	public String getfullNameOfLoggedInUser(String token) {
+		return nonNull(this.extractAllClaims(token))?this.extractAllClaims(token).get("fullName").toString():null;
 	}
 }

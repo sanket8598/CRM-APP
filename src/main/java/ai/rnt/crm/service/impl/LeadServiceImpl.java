@@ -100,22 +100,33 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			Leads leads = TO_LEAD.apply(leadDto).orElseThrow(null);
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
-			if (existCompany.isPresent())
-				leads.setCompanyMaster(TO_COMPANY.apply(existCompany.orElseThrow(null)).orElseThrow(null));
-			else
-				leads.setCompanyMaster(TO_COMPANY.apply(companyMasterDaoService
-						.save(TO_COMPANY.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
-								.companyWebsite(leadDto.getCompanyWebsite()).build()).orElseThrow(null))
-						.orElseThrow(null)).orElseThrow(null));
+			if (existCompany.isPresent()) {
+				existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
+				leads.setCompanyMaster(TO_COMPANY
+						.apply(companyMasterDaoService
+								.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
+										.orElseThrow(ResourceNotFoundException::new))
+								.orElseThrow(ResourceNotFoundException::new))
+						.orElseThrow(ResourceNotFoundException::new));
+			} else
+				leads.setCompanyMaster(TO_COMPANY
+						.apply(companyMasterDaoService
+								.save(TO_COMPANY
+										.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
+												.companyWebsite(leadDto.getCompanyWebsite()).build())
+										.orElseThrow(ResourceNotFoundException::new))
+								.orElseThrow(ResourceNotFoundException::new))
+						.orElseThrow(ResourceNotFoundException::new));
 			leads.setStatus("Open");
+			leads.setDisqualifyAs("Open");
 			leads.setPseudoName(auditAwareUtil.getLoggedInUserName());
 			serviceFallsDaoSevice.getById(leadDto.getServiceFallsId()).ifPresent(leads::setServiceFallsMaster);
 			leadSourceDaoService.getById(leadDto.getLeadSourceId()).ifPresent(leads::setLeadSourceMaster);
 			employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
 			if (nonNull(leadDaoService.addLead(leads)))
-				createMap.put(MESSAGE, "Lead Added Successfully");
+				createMap.put(MESSAGE, "Lead Added Successfully !!");
 			else
-				createMap.put(MESSAGE, "Lead Not Added");
+				createMap.put(MESSAGE, "Lead Not Added !!");
 			createMap.put(SUCCESS, true);
 			return new ResponseEntity<>(createMap, CREATED);
 		} catch (Exception e) {
@@ -130,17 +141,34 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			if (isNull(leadsStatus)) {
 				Map<String, Object> dataMap = new HashMap<>();
+				Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 				List<Leads> allLeads = leadDaoService.getAllLeads();
-				dataMap.put("allLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads));
-				dataMap.put("openLead",
-						TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(l.getStatus())
-								&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
-								.collect(Collectors.toList())));
-				dataMap.put("closeLead",
-						TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream()
-								.filter(l -> nonNull(l.getStatus()) && (l.getStatus().equalsIgnoreCase("close")
-										|| l.getStatus().equalsIgnoreCase("disqualify")))
-								.collect(Collectors.toList())));
+				if (auditAwareUtil.isAdmin()) {
+					dataMap.put("allLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads));
+					dataMap.put("openLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(
+							l.getStatus())
+							&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
+							.collect(Collectors.toList())));
+					dataMap.put("closeLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream()
+							.filter(l -> !l.getStatus().equalsIgnoreCase("open")).collect(Collectors.toList())));
+				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
+					dataMap.put("allLead",
+							TO_DASHBOARD_CARDS_LEADDTOS.apply(
+									allLeads.stream().filter(l -> l.getEmployee().getStaffId().equals(loggedInStaffId))
+											.collect(Collectors.toList())));
+					dataMap.put("openLead",
+							TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream()
+									.filter(l -> (nonNull(l.getStatus()) && (l.getStatus().equalsIgnoreCase("new")
+											|| l.getStatus().equalsIgnoreCase("open")))
+											&& l.getEmployee().getStaffId().equals(loggedInStaffId))
+									.collect(Collectors.toList())));
+					dataMap.put("closeLead",
+							TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream()
+									.filter(l -> !l.getStatus().equalsIgnoreCase("open")
+											&& l.getEmployee().getStaffId().equals(loggedInStaffId))
+									.collect(Collectors.toList())));
+				} else
+					dataMap.put("Data", Collections.emptyList());
 				getAllLeads.put(DATA, dataMap);
 			} else
 				getAllLeads.put(DATA, TO_LEAD_DTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
@@ -232,7 +260,8 @@ public class LeadServiceImpl implements LeadService {
 			Map<String, Object> dataMap = new LinkedHashMap<>();
 			List<TimeLineActivityDto> timeLine = new ArrayList<>();
 			List<EditCallDto> list = addCallDaoService.getCallsByLeadId(leadId).stream()
-					.filter(call -> nonNull(call.getUpdatedBy()) || nonNull(call.getUpdatedDate())).map(call -> {
+					.filter(call -> nonNull(call.getStatus()) && call.getStatus().equalsIgnoreCase("complete"))
+					.map(call -> {
 						EditCallDto callDto = new EditCallDto();
 						callDto.setId(call.getAddCallId());
 						callDto.setSubject(call.getSubject());
@@ -260,7 +289,8 @@ public class LeadServiceImpl implements LeadService {
 						return editEmailDto;
 					}).collect(Collectors.toList()));
 			timeLine.addAll(visitDaoService.getVisitsByLeadId(leadId).stream()
-					.filter(visit -> nonNull(visit.getUpdatedBy()) || nonNull(visit.getUpdatedDate())).map(visit -> {
+					.filter(visit -> nonNull(visit.getStatus()) && visit.getStatus().equalsIgnoreCase("complete"))
+					.map(visit -> {
 						EditVisitDto visitDto = new EditVisitDto();
 						visitDto.setId(visit.getVisitId());
 						visitDto.setLocation(visit.getLocation());
@@ -276,7 +306,7 @@ public class LeadServiceImpl implements LeadService {
 			timeLine.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), formatter)
 					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), formatter)));
 			List<TimeLineActivityDto> activity = addCallDaoService.getCallsByLeadId(leadId).stream()
-					.filter(call -> nonNull(call.getCreatedBy()) && isNull(call.getUpdatedBy())).map(call -> {
+					.filter(call -> isNull(call.getStatus()) || call.getStatus().equalsIgnoreCase("save")).map(call -> {
 						EditCallDto callDto = new EditCallDto();
 						callDto.setId(call.getAddCallId());
 						callDto.setSubject(call.getSubject());
@@ -303,7 +333,8 @@ public class LeadServiceImpl implements LeadService {
 						return editEmailDto;
 					}).collect(Collectors.toList()));
 			activity.addAll(visitDaoService.getVisitsByLeadId(leadId).stream()
-					.filter(visit -> nonNull(visit.getCreatedBy()) && isNull(visit.getUpdatedBy())).map(visit -> {
+					.filter(visit -> isNull(visit.getStatus()) || visit.getStatus().equalsIgnoreCase("save"))
+					.map(visit -> {
 						EditVisitDto editVisitDto = new EditVisitDto();
 						editVisitDto.setId(visit.getVisitId());
 						editVisitDto.setLocation(visit.getLocation());
@@ -324,7 +355,8 @@ public class LeadServiceImpl implements LeadService {
 			dto.ifPresent(e -> {
 				e.setMessage("Assigned To " + leadById.getEmployee().getFirstName() + " "
 						+ leadById.getEmployee().getLastName());
-				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy()).orElseThrow(null);
+				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy()).orElseThrow(
+						() -> new ResourceNotFoundException("Employee", "staffId", leadById.getCreatedBy()));
 				e.setGeneratedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
 			});
 			dataMap.put("Contact", dto);

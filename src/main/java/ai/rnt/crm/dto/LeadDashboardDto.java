@@ -13,7 +13,7 @@ public class LeadDashboardDto {
 
 	private String topic;
 
-	private String status;
+	private String disqualifyAs;
 
 	private String createdOn;
 
