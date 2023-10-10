@@ -490,9 +490,9 @@ public class LeadServiceImpl implements LeadService {
 			leadSourceDaoService.getById(dto.getLeadSourceId()).ifPresent(lead::setLeadSourceMaster);
 
 			if (nonNull(leadDaoService.addLead(lead)))
-				result.put(MESSAGE, "Leads Contact Updated Successfully");
+				result.put(MESSAGE, "Leads Contact Updated Successfully !!");
 			else
-				result.put(MESSAGE, "Leads Contact Not Updated.");
+				result.put(MESSAGE, "Leads Contact Not Updated !!");
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
