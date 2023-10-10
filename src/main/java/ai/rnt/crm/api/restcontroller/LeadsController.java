@@ -42,7 +42,6 @@ import lombok.RequiredArgsConstructor;
 public class LeadsController {
 
 	private final LeadService leadService;
-
 	private final ServiceFallsService serviceFallsService;
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
@@ -109,8 +108,7 @@ public class LeadsController {
 			@RequestBody LeadDto dto) {
 		return leadService.disQualifyLead(leadId, dto);
 	}
-	
-	
+
 	@PutMapping("/updateLeadContact/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(@PathVariable Integer leadId,
 			@RequestBody UpdateLeadDto dto) {

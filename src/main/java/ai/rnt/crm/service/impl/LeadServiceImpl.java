@@ -108,7 +108,7 @@ public class LeadServiceImpl implements LeadService {
 								.companyWebsite(leadDto.getCompanyWebsite()).build()).orElseThrow(null))
 						.orElseThrow(null)).orElseThrow(null));
 			leads.setStatus("Open");
-
+			leads.setPseudoName(auditAwareUtil.getLoggedInUserName());
 			serviceFallsDaoSevice.getById(leadDto.getServiceFallsId()).ifPresent(leads::setServiceFallsMaster);
 			leadSourceDaoService.getById(leadDto.getLeadSourceId()).ifPresent(leads::setLeadSourceMaster);
 			employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
@@ -429,6 +429,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.setBudgetAmount(dto.getBudgetAmount());
 			lead.setCustomerNeed(dto.getCustomerNeed());
 			lead.setProposedSolution(dto.getProposedSolution());
+			lead.setPseudoName(dto.getPseudoName());
 			Optional<CityMaster> existCityByName = cityDaoService.existCityByName(dto.getCity());
 			Optional<StateMaster> findBystate = stateDaoService.findBystate(dto.getState());
 			Optional<CountryMaster> findByCountryName = countryDaoService.findByCountryName(dto.getCountry());

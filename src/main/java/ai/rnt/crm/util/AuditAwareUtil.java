@@ -29,16 +29,27 @@ public class AuditAwareUtil {
 		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
 				&& nonNull(getContext().getAuthentication().getDetails())) {
 			UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
-			return RoleUtil.getSingleRole(details.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+			return RoleUtil.getSingleRole(
+					details.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
 		}
 		return NO_ROLE;
 	}
-	
+
+	public String getLoggedInUserName() {
+		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
+				&& nonNull(getContext().getAuthentication().getDetails())) {
+			UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
+			return details.getUsername();
+		}
+		return null;
+	}
+
 	public boolean isAdmin() {
 		return CHECK_ADMIN.test(getLoggedInUserRole());
 	}
+
 	public boolean isUser() {
 		return CHECK_USER.test(getLoggedInUserRole());
 	}
-	
+
 }
