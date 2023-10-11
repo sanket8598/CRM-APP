@@ -54,8 +54,8 @@ public class Leads extends Auditable {
 	private String lastName;
 
 	@Column(name = "phone_no")
-	@Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
-    message="Please Enter a valid Phone Number!!")
+	//@Pattern(regexp="^\\(?(\\d{3})\\)?[- ]?(\\d{3})[- ]?(\\d{4})$",
+   // message="Please Enter a valid Phone Number!!")
 	private String phoneNumber;
 
 	@Column(name = "topic")
