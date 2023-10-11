@@ -258,6 +258,18 @@ public class LeadServiceImpl implements LeadService {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
 			Map<String, Object> dataMap = new LinkedHashMap<>();
+			
+			Leads leadById = leadDaoService.getLeadById(leadId)
+					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
+			Optional<EditLeadDto> dto = TO_EDITLEAD_DTO.apply(leadById);
+			dto.ifPresent(e -> {
+				e.setMessage("Assigned To " + leadById.getEmployee().getFirstName() + " "
+						+ leadById.getEmployee().getLastName());
+				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy()).orElseThrow(
+						() -> new ResourceNotFoundException("Employee", "staffId", leadById.getCreatedBy()));
+				e.setGeneratedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
+			});
+			
 			List<TimeLineActivityDto> timeLine = new ArrayList<>();
 			List<EditCallDto> list = addCallDaoService.getCallsByLeadId(leadId).stream()
 					.filter(call -> nonNull(call.getStatus()) && call.getStatus().equalsIgnoreCase("complete"))
@@ -349,16 +361,6 @@ public class LeadServiceImpl implements LeadService {
 					}).collect(Collectors.toList()));
 			timeLine.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), formatter)
 					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), formatter)));
-			Leads leadById = leadDaoService.getLeadById(leadId)
-					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
-			Optional<EditLeadDto> dto = TO_EDITLEAD_DTO.apply(leadById);
-			dto.ifPresent(e -> {
-				e.setMessage("Assigned To " + leadById.getEmployee().getFirstName() + " "
-						+ leadById.getEmployee().getLastName());
-				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy()).orElseThrow(
-						() -> new ResourceNotFoundException("Employee", "staffId", leadById.getCreatedBy()));
-				e.setGeneratedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
-			});
 			dataMap.put("Contact", dto);
 			dataMap.put("serviceFalls", TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put("leadSource", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
