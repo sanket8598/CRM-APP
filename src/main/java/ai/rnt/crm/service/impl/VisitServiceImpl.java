@@ -104,6 +104,7 @@ public class VisitServiceImpl implements VisitService {
 		try {
 			Visit visit = visitDaoService.getVisitsByVisitId(visitId).orElseThrow(null);
 			visit.setUpdatedDate(LocalDateTime.now());
+			visit.setStatus("complete");
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit updated SuccessFully");
 				result.put(SUCCESS, true);
