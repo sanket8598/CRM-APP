@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,6 +23,7 @@ public class EditVisitDto extends TimeLineActivityDto {
 
 	private String body;
 
+	@JsonFormat(pattern="dd-MM-yyyy")
 	private String dueDate;
 
 	private String type;
