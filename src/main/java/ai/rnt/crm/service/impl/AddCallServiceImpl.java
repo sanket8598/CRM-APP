@@ -98,6 +98,7 @@ public class AddCallServiceImpl implements AddCallService {
 		try {
 			AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
 			call.setUpdatedDate(LocalDateTime.now());
+			call.setStatus("complete");
 			if (nonNull(addCallDaoService.addCall(call))) {
 				result.put(MESSAGE, "Call updated SuccessFully");
 				result.put(SUCCESS, true);
