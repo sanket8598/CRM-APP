@@ -2,6 +2,8 @@ package ai.rnt.crm.dto;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Data;
 
 /**
@@ -25,10 +27,11 @@ public class VisitDto {
 
 	private String duration;
 
+	@JsonFormat(pattern="dd-MM-yyyy")
 	private Date dueDate;
-	
+
 	private Integer leadId;
-	
+
 	private Integer visitBy;
 
 }

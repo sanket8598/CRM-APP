@@ -30,7 +30,7 @@ public class AddCallDto {
 
 	private String duration;
 	
-	@JsonFormat(pattern="yyyy-MM-dd")
+	@JsonFormat(pattern="dd-MM-yyyy")
 	private Date dueDate;
 
 }
