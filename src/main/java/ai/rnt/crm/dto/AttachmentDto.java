@@ -1,7 +1,9 @@
 package ai.rnt.crm.dto;
 
-import lombok.Data;
+import static java.util.Objects.nonNull;
 
+import ai.rnt.crm.util.ContentTypeUtil;
+import lombok.Data;
 /**
  * @author Nikhil Gaikwad
  * @version 1.0
@@ -17,5 +19,11 @@ public class AttachmentDto {
 	private String attachType;
 
 	private String attachName;
+	
+	public String getType() {
+		return nonNull(getAttachType())?ContentTypeUtil.getContentTypeName(getAttachType()):"OTHER";
+	}
+
+	
 	
 }
