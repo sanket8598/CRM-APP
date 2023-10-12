@@ -279,7 +279,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
-						callDto.setDueDate(dateFormat.format(call.getDueDate()));
+						callDto.setDueDate(nonNull(call.getDueDate())?dateFormat.format(call.getDueDate()):null);
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getUpdatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
 						TO_Employee.apply(call.getCallFrom())
@@ -309,7 +309,7 @@ public class LeadServiceImpl implements LeadService {
 						visitDto.setSubject(visit.getSubject());
 						visitDto.setType("Visit");
 						visitDto.setBody(visit.getContent());
-						visitDto.setDueDate(dateFormat.format(visit.getDueDate()));
+						visitDto.setDueDate(nonNull(visit.getDueDate())?dateFormat.format(visit.getDueDate()):null);
 						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> visitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						visitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
@@ -324,7 +324,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
-						callDto.setDueDate(dateFormat.format(call.getDueDate()));
+						callDto.setDueDate(nonNull(call.getDueDate())?dateFormat.format(call.getDueDate()):null);
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
 						TO_Employee.apply(call.getCallFrom())
@@ -353,7 +353,7 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setSubject(visit.getSubject());
 						editVisitDto.setType("Visit");
 						editVisitDto.setBody(visit.getContent());
-						editVisitDto.setDueDate(dateFormat.format(visit.getDueDate()));
+						editVisitDto.setDueDate(nonNull(visit.getDueDate())?dateFormat.format(visit.getDueDate()):null);
 						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> editVisitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						editVisitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
