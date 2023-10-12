@@ -3,7 +3,7 @@ package ai.rnt.crm.dto;
 import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -12,7 +12,7 @@ import ai.rnt.crm.validation.PhoneNumValid;
 import lombok.Data;
 
 /**
- * @author Nikhil Gaikwad
+ * @author Sanket Wakankar
  * @version 1.0
  * @since 11/09/2023.
  */
@@ -30,6 +30,7 @@ public class AddCallDto {
 
 	private String direction;
 	
+	@NotBlank(message = "Phone Number should not be null or empty!!")
 	@Size(min = 10, max = 13)
 	//@Pattern(regexp = "^(\\+\\d{1,2}\\s?)?(\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4})$", message = "Please Enter a valid Phone Number!!")
 	@PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
@@ -39,7 +40,7 @@ public class AddCallDto {
 
 	private String duration;
 	
-	@NotBlank(message = "Due Date should not be null or empty!!")
+	@NotNull(message = "Due Date should not be null!!")
 	@JsonFormat(pattern="dd-MM-yyyy")
 	private Date dueDate;
 

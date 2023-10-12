@@ -6,6 +6,8 @@ import static ai.rnt.crm.constants.ApiConstants.VISIT;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,7 +39,7 @@ public class VisitController {
 	private final VisitService visitService;
 
 	@PostMapping(ADD)
-	public ResponseEntity<EnumMap<ApiResponse, Object>> saveVisit(@RequestBody VisitDto dto) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> saveVisit(@RequestBody @Valid VisitDto dto) {
 		return visitService.saveVisit(dto);
 	}
 
