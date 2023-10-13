@@ -41,10 +41,10 @@ public class LeadDto {
 
 	private String businessCard;
 
-	@Pattern(regexp = "^[0-9,\\.]+$", message = "Please Enter Valid Budget Amount!!")
+	//@Pattern(regexp = "^[0-9,\\.]+$", message = "Please Enter Valid Budget Amount!!")
 	private String budgetAmount;
 
-	@NotNull(message = "Please select the Assign To!!")
+	//@NotNull(message = "Please select the Assign To!!")
 	private Integer assignTo;
 
 	private String status;

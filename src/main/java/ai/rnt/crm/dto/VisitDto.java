@@ -2,6 +2,8 @@ package ai.rnt.crm.dto;
 
 import java.util.Date;
 
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
@@ -27,6 +29,8 @@ public class VisitDto {
 
 	private String duration;
 
+	
+	@NotNull(message = "Due Date should not be null!!")
 	@JsonFormat(pattern="dd-MM-yyyy")
 	private Date dueDate;
 

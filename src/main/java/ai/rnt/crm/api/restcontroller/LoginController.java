@@ -97,13 +97,13 @@ public class LoginController {
 	public ResponseEntity<Map<String, Object>> tokenDecode(
 			@RequestBody @NotEmpty(message = "body should not be empty!!") Map<String, String> token) {
 		try {
-			log.info("token inside tokenParse...{}", token.get("token"));
 
 			if (isNull(token.get("token")))
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "token cannot be null");
 			if (token.get("token").trim().length() <= 0)
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "token cannot be empty");
 
+			log.info("token inside tokenParse...{}", token.get("token"));
 			String rsaToJwtDecoder = RSAToJwtDecoder.rsaToJwtDecoder(token.get("token"));
 			log.info("token after RSA inside tokenParse...{}", rsaToJwtDecoder);
 			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(rsaToJwtDecoder));

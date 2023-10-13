@@ -47,9 +47,7 @@ public class EmailUtil {
 	}
 
 	public static boolean sendEmail(AddEmail sendEmail) throws AddressException {
-
 		try {
-
 			// create a message with headers
 			Message msg = new MimeMessage(getSession());
 			msg.setFrom(new InternetAddress(USERNAME));// change it to mail from.
@@ -85,10 +83,13 @@ public class EmailUtil {
 
 			// create body of the mail
 			StringBuilder content = new StringBuilder()
-					.append(String.format("Hi %s,",
-							sendEmail.getLead().getFirstName() + " " + sendEmail.getLead().getLastName()))
+					/*
+					 * .append(String.format("Hi %s,", sendEmail.getLead().getFirstName() + " " +
+					 * sendEmail.getLead().getLastName()))
+					 */
 					.append("<br>").append(String.format("%s", sendEmail.getContent())).append("<br><br>")
-					.append("Regards,").append("<br>").append("RNT Team");
+					.append("Regards,").append("<br>")
+					.append(sendEmail.getLead().getFirstName() + " " + sendEmail.getLead().getLastName());
 			if (sendEmail.getAttachment().isEmpty())
 				msg = sendAsPlainText(msg, content.toString());
 			else
