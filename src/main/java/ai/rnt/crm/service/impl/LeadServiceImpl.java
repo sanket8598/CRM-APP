@@ -122,7 +122,10 @@ public class LeadServiceImpl implements LeadService {
 			leads.setPseudoName(auditAwareUtil.getLoggedInUserName());
 			serviceFallsDaoSevice.getById(leadDto.getServiceFallsId()).ifPresent(leads::setServiceFallsMaster);
 			leadSourceDaoService.getById(leadDto.getLeadSourceId()).ifPresent(leads::setLeadSourceMaster);
-			employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
+			if (nonNull(leadDto.getAssignTo()))
+				employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
+			else
+				employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leads::setEmployee);
 			if (nonNull(leadDaoService.addLead(leads)))
 				createMap.put(MESSAGE, "Lead Added Successfully !!");
 			else
@@ -258,7 +261,7 @@ public class LeadServiceImpl implements LeadService {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
 			Map<String, Object> dataMap = new LinkedHashMap<>();
-			
+
 			Leads leadById = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
 			Optional<EditLeadDto> dto = TO_EDITLEAD_DTO.apply(leadById);
@@ -269,7 +272,7 @@ public class LeadServiceImpl implements LeadService {
 						() -> new ResourceNotFoundException("Employee", "staffId", leadById.getCreatedBy()));
 				e.setGeneratedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
 			});
-			
+
 			List<TimeLineActivityDto> timeLine = new ArrayList<>();
 			List<EditCallDto> list = addCallDaoService.getCallsByLeadId(leadId).stream()
 					.filter(call -> nonNull(call.getStatus()) && call.getStatus().equalsIgnoreCase("complete"))
@@ -279,7 +282,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
-						callDto.setDueDate(nonNull(call.getDueDate())?dateFormat.format(call.getDueDate()):null);
+						callDto.setDueDate(nonNull(call.getDueDate()) ? dateFormat.format(call.getDueDate()) : null);
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getUpdatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
 						TO_Employee.apply(call.getCallFrom())
@@ -309,7 +312,7 @@ public class LeadServiceImpl implements LeadService {
 						visitDto.setSubject(visit.getSubject());
 						visitDto.setType("Visit");
 						visitDto.setBody(visit.getContent());
-						visitDto.setDueDate(nonNull(visit.getDueDate())?dateFormat.format(visit.getDueDate()):null);
+						visitDto.setDueDate(nonNull(visit.getDueDate()) ? dateFormat.format(visit.getDueDate()) : null);
 						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> visitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						visitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
@@ -324,7 +327,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
-						callDto.setDueDate(nonNull(call.getDueDate())?dateFormat.format(call.getDueDate()):null);
+						callDto.setDueDate(nonNull(call.getDueDate()) ? dateFormat.format(call.getDueDate()) : null);
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
 						TO_Employee.apply(call.getCallFrom())
@@ -353,7 +356,8 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setSubject(visit.getSubject());
 						editVisitDto.setType("Visit");
 						editVisitDto.setBody(visit.getContent());
-						editVisitDto.setDueDate(nonNull(visit.getDueDate())?dateFormat.format(visit.getDueDate()):null);
+						editVisitDto
+								.setDueDate(nonNull(visit.getDueDate()) ? dateFormat.format(visit.getDueDate()) : null);
 						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> editVisitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						editVisitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
