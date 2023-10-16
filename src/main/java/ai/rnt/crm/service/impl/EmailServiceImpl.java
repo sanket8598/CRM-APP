@@ -38,6 +38,7 @@ import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.service.EmailService;
 import ai.rnt.crm.service.EmployeeService;
+import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +57,7 @@ public class EmailServiceImpl implements EmailService {
 	private final LeadDaoService leadDaoService;
 	private final AttachmentDaoService attachmentDaoService;
 	private final EmployeeService employeeService;
+	private final AuditAwareUtil auditAwareUtil;
 
 	@Override
 	@Transactional
@@ -234,6 +236,17 @@ public class EmailServiceImpl implements EmailService {
 				saveStatus = nonNull(sendEmail);
 			} else {
 				for (AttachmentDto attach : dto.getAttachment()) {
+					List<Integer> newIds = dto.getAttachment().stream().map(AttachmentDto::getEmailAttchId)
+							.collect(Collectors.toList());
+					for (Attachment existingAttachment : email.getAttachment()) {
+						if (!newIds.contains(existingAttachment.getEmailAttchId())) {
+							Attachment data = attachmentDaoService.findById(existingAttachment.getEmailAttchId())
+									.orElse(null);
+							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+							data.setDeletedDate(LocalDateTime.now());
+							attachmentDaoService.save(data);
+						}
+					}
 					Attachment attachment = TO_ATTACHMENT.apply(attach).orElseThrow(ResourceNotFoundException::new);
 					attachment.setMail(email);
 					Attachment addAttachment = attachmentDaoService.addAttachment(attachment);
