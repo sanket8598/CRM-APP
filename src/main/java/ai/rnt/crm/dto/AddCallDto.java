@@ -21,7 +21,7 @@ public class AddCallDto {
 
 	private Integer addCallId;
 
-	@NotBlank(message = "Call From should not be null or empty!!")
+	//@NotBlank(message = "Call From should not be null or empty!!")
 	private EmployeeDto callFrom;
 
 	private String callTo;
