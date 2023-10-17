@@ -12,4 +12,6 @@ public interface StateDaoService extends CrudService<StateMaster, StateDto> {
 	
 	Optional<StateMaster> findBystate(String state);
 
+	StateMaster addState(StateMaster state);
+
 }

@@ -12,4 +12,6 @@ public interface CityDaoService extends CrudService<CityMaster, CityDto> {
 	
 	Optional<CityMaster> existCityByName(String cityName);
 
+	CityMaster addCity(CityMaster city);
+
 }

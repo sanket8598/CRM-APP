@@ -27,4 +27,9 @@ public class CityDaoServiceImpl implements CityDaoService {
 	public Optional<CityMaster> existCityByName(String cityName) {
 		return cityMasterRepository.findTopByCity(cityName);
 	}
+
+	@Override
+	public CityMaster addCity(CityMaster city) {
+		return cityMasterRepository.save(city);
+	}
 }
