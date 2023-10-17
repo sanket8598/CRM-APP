@@ -28,4 +28,9 @@ public class CountryDaoServiceImpl implements CountryDaoService {
 		return countryMasterRepository.findTopByCountry(countryName);
 	}
 
+	@Override
+	public CountryMaster addCountry(CountryMaster country) {
+		return countryMasterRepository.save(country);	
+	}
+
 }

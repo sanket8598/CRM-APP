@@ -99,7 +99,7 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> createMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads leads = TO_LEAD.apply(leadDto).orElseThrow(null);
-			
+
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
 			if (existCompany.isPresent()) {
 				existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
@@ -127,13 +127,14 @@ public class LeadServiceImpl implements LeadService {
 				employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
 			else
 				employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leads::setEmployee);
-			if(LeadsCardUtil.checkDuplicateLead(leadDaoService.getAllLeads(),leads))
+			createMap.put(SUCCESS, true);
+			if (LeadsCardUtil.checkDuplicateLead(leadDaoService.getAllLeads(), leads)) {
 				createMap.put(MESSAGE, "Lead Already Exists !!");
-			else if (nonNull(leadDaoService.addLead(leads)))
+				createMap.put(SUCCESS, false);
+			} else if (nonNull(leadDaoService.addLead(leads)))
 				createMap.put(MESSAGE, "Lead Added Successfully !!");
 			else
 				createMap.put(MESSAGE, "Lead Not Added !!");
-			createMap.put(SUCCESS, true);
 			return new ResponseEntity<>(createMap, CREATED);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -463,6 +464,9 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(Integer leadId, UpdateLeadDto dto) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		CountryMaster country = new CountryMaster();
+		StateMaster state = new StateMaster();
+		CityMaster city = new CityMaster();
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId).orElseThrow(null);
 			lead.setTopic(dto.getTopic());
@@ -478,9 +482,31 @@ public class LeadServiceImpl implements LeadService {
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
 			if (existCompany.isPresent()) {
 				CompanyMaster companyMaster = TO_COMPANY.apply(existCompany.orElseThrow(null)).orElseThrow(null);
-				existCityByName.ifPresent(companyMaster::setCity);
-				findByCountryName.ifPresent(companyMaster::setCountry);
-				findBystate.ifPresent(companyMaster::setState);
+				companyMaster.setCompanyWebsite(dto.getCompanyWebsite());
+				if (findByCountryName.isPresent())
+					findByCountryName.ifPresent(companyMaster::setCountry);
+				else {
+					country = new CountryMaster();
+					country.setCountry(dto.getCountry());
+					Optional<CountryMaster> newFindByCountryName = Optional.of(countryDaoService.addCountry(country));
+					newFindByCountryName.ifPresent(companyMaster::setCountry);
+				}
+				if (findBystate.isPresent())
+					findBystate.ifPresent(companyMaster::setState);
+				else {
+					state = new StateMaster();
+					state.setState(dto.getState());
+					Optional<StateMaster> newFindBystate = Optional.of(stateDaoService.addState(state));
+					newFindBystate.ifPresent(companyMaster::setState);
+				}
+				if (existCityByName.isPresent())
+					existCityByName.ifPresent(companyMaster::setCity);
+				else {
+					city = new CityMaster();
+					city.setCity(dto.getCity());
+					Optional<CityMaster> newExistCityByName = Optional.of(cityDaoService.addCity(city));
+					newExistCityByName.ifPresent(companyMaster::setCity);
+				}
 				companyMaster.setZipCode(dto.getZipCode());
 				companyMaster.setAddressLineOne(dto.getAddressLineOne());
 				TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(null))
@@ -488,9 +514,30 @@ public class LeadServiceImpl implements LeadService {
 			} else {
 				CompanyMaster companyMaster = TO_COMPANY.apply(CompanyDto.builder().companyName(dto.getCompanyName())
 						.companyWebsite(dto.getCompanyWebsite()).build()).orElseThrow(null);
-				existCityByName.ifPresent(companyMaster::setCity);
-				findByCountryName.ifPresent(companyMaster::setCountry);
-				findBystate.ifPresent(companyMaster::setState);
+				if (findByCountryName.isPresent())
+					findByCountryName.ifPresent(companyMaster::setCountry);
+				else {
+					country = new CountryMaster();
+					country.setCountry(dto.getCountry());
+					Optional<CountryMaster> newFindByCountryName = Optional.of(countryDaoService.addCountry(country));
+					newFindByCountryName.ifPresent(companyMaster::setCountry);
+				}
+				if (findBystate.isPresent())
+					findBystate.ifPresent(companyMaster::setState);
+				else {
+					state = new StateMaster();
+					state.setState(dto.getState());
+					Optional<StateMaster> newFindBystate = Optional.of(stateDaoService.addState(state));
+					newFindBystate.ifPresent(companyMaster::setState);
+				}
+				if (existCityByName.isPresent())
+					existCityByName.ifPresent(companyMaster::setCity);
+				else {
+					city = new CityMaster();
+					city.setCity(dto.getCity());
+					Optional<CityMaster> newExistCityByName = Optional.of(cityDaoService.addCity(city));
+					newExistCityByName.ifPresent(companyMaster::setCity);
+				}
 				companyMaster.setZipCode(dto.getZipCode());
 				companyMaster.setAddressLineOne(dto.getAddressLineOne());
 				TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(null))
