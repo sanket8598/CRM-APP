@@ -99,6 +99,7 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> createMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads leads = TO_LEAD.apply(leadDto).orElseThrow(null);
+			
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
 			if (existCompany.isPresent()) {
 				existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
@@ -126,13 +127,16 @@ public class LeadServiceImpl implements LeadService {
 				employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
 			else
 				employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leads::setEmployee);
-			if (nonNull(leadDaoService.addLead(leads)))
+			if(LeadsCardUtil.checkDuplicateLead(leadDaoService.getAllLeads(),leads))
+				createMap.put(MESSAGE, "Lead Already Exists !!");
+			else if (nonNull(leadDaoService.addLead(leads)))
 				createMap.put(MESSAGE, "Lead Added Successfully !!");
 			else
 				createMap.put(MESSAGE, "Lead Not Added !!");
 			createMap.put(SUCCESS, true);
 			return new ResponseEntity<>(createMap, CREATED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new CRMException(e);
 		}
 	}
