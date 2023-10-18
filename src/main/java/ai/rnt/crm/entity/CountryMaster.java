@@ -45,5 +45,8 @@ public class CountryMaster extends Auditable {
 	
 	@OneToMany(cascade =ALL,mappedBy = "country")
 	private List<CompanyMaster> contacts=new ArrayList<>();
+	
+	@OneToMany(cascade =ALL,mappedBy = "country")
+	private List<StateMaster> states=new ArrayList<>();
 
 }
