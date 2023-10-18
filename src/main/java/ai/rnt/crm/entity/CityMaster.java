@@ -10,6 +10,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -39,14 +41,16 @@ public class CityMaster extends Auditable {
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "city_id")
 	private Integer cityId;
-
-	@Column(name = "state_id")
-	private Integer stateId;
+	
+	@ManyToOne
+	@JoinColumn(name = "state_id")
+	private StateMaster state;
 
 	@Column(name = "city")
 	private String city;
 	
 	@OneToMany(cascade =ALL,mappedBy = "city")
 	private List<CompanyMaster> contacts=new ArrayList<>();
+	
 
 }
