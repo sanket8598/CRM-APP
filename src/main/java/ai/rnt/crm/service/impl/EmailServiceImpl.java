@@ -244,7 +244,7 @@ public class EmailServiceImpl implements EmailService {
 									.orElse(null);
 							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
 							data.setDeletedDate(LocalDateTime.now());
-							attachmentDaoService.save(data);
+							attachmentDaoService.addAttachment(data);
 						}
 					}
 					Attachment attachment = TO_ATTACHMENT.apply(attach).orElseThrow(ResourceNotFoundException::new);
