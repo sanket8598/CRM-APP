@@ -87,7 +87,7 @@ public class LeadsCardUtil {
 							|| leads.getCustomerNeed().equals(newLead.getCustomerNeed()))
 					&& ((isNull(leads.getDesignation()) && isNull(newLead.getDesignation()))
 							|| leads.getDesignation().equals(newLead.getDesignation()))
-					&& leads.getEmail().equals(newLead.getEmail())
+					&& leads.getEmail().equals(newLead.getEmail()) && leads.getPhoneNumber().equals(newLead.getPhoneNumber())
 					&& ((isNull(leads.getProposedSolution()) && isNull(newLead.getProposedSolution()))
 							|| leads.getProposedSolution().equals(newLead.getProposedSolution()))
 					&& ((isNull(leads.getTopic()) && isNull(newLead.getTopic()))
