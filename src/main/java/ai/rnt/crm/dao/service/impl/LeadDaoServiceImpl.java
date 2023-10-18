@@ -29,7 +29,7 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 
 	@Override
 	public List<Leads> getAllLeads() {
-		return leadsRepository.findAll();
+		return leadsRepository.findByOrderByCreatedDateDesc();
 	}
 
 	@Override
