@@ -14,5 +14,9 @@ public class LeadsCardDto {
 	private String topic;
 	
 	private String shortName;
+	
+	private String disqualifyAs;
+	
+	private String status;
 
 }
