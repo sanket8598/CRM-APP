@@ -391,6 +391,8 @@ public class LeadServiceImpl implements LeadService {
 			if (lead.isPresent()) {
 				lead.get().setCustomerNeed(dto.getCustomerNeed());
 				lead.get().setProposedSolution(dto.getProposedSolution());
+				lead.get().setStatus("Qualify");
+				lead.get().setDisqualifyAs("Qualify");
 				lead.get().setServiceFallsMaster(
 						serviceFallsDaoSevice.getById(dto.getServiceFallsMaster().getServiceFallsId())
 								.orElseThrow(() -> new ResourceNotFoundException("ServiceFallMaster", "serviceFallId",
