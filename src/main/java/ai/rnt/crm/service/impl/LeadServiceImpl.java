@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -151,6 +152,11 @@ public class LeadServiceImpl implements LeadService {
 				Map<String, Object> dataMap = new HashMap<>();
 				Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 				List<Leads> allLeads = leadDaoService.getAllLeads();
+				Comparator<Leads> importantLeads = (l1, l2) -> l2.getImportant().compareTo(l1.getImportant());
+				Comparator<Leads> createdDate = (l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate());
+				Comparator<Leads> newSort = importantLeads.thenComparing(createdDate);
+				allLeads.sort(newSort);
+				;
 				if (auditAwareUtil.isAdmin()) {
 					dataMap.put("allLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads));
 					dataMap.put("openLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(
@@ -552,6 +558,23 @@ public class LeadServiceImpl implements LeadService {
 				result.put(MESSAGE, "Leads Contact Updated Successfully !!");
 			else
 				result.put(MESSAGE, "Leads Contact Not Updated !!");
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(Integer leadId, boolean status) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Leads lead = leadDaoService.getLeadById(leadId).orElseThrow(null);
+			lead.setImportant(status);
+			if (nonNull(leadDaoService.addLead(lead)))
+				result.put(MESSAGE, "Set Leads Important Successfully !!");
+			else
+				result.put(MESSAGE, "Leads Not Important !!");
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {

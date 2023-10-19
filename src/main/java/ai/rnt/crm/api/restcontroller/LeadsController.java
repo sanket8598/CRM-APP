@@ -114,4 +114,10 @@ public class LeadsController {
 			@RequestBody UpdateLeadDto dto) {
 		return leadService.updateLeadContact(leadId, dto);
 	}
+
+	@PutMapping("/important/{leadId}/{status}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(@PathVariable Integer leadId,
+			@PathVariable boolean status) {
+		return leadService.importantLead(leadId, status);
+	}
 }
