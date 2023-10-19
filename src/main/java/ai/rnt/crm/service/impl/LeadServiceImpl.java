@@ -156,7 +156,6 @@ public class LeadServiceImpl implements LeadService {
 				Comparator<Leads> createdDate = (l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate());
 				Comparator<Leads> newSort = importantLeads.thenComparing(createdDate);
 				allLeads.sort(newSort);
-				;
 				if (auditAwareUtil.isAdmin()) {
 					dataMap.put("allLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads));
 					dataMap.put("openLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(
@@ -569,15 +568,16 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(Integer leadId, boolean status) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			Leads lead = leadDaoService.getLeadById(leadId).orElseThrow(null);
+			Leads lead = leadDaoService.getLeadById(leadId).orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId",leadId));
 			lead.setImportant(status);
 			if (nonNull(leadDaoService.addLead(lead)))
-				result.put(MESSAGE, "Set Leads Important Successfully !!");
+				result.put(MESSAGE, "Leads marked as Important !!");
 			else
-				result.put(MESSAGE, "Leads Not Important !!");
+				result.put(MESSAGE, "Problem Occurred While Making Lead Important !!");
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
+			log.error("error occured while updating the Lead in ImportandLead API... {}",e.getMessage());		
 			throw new CRMException(e);
 		}
 	}
