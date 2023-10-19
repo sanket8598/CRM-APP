@@ -34,4 +34,6 @@ public interface LeadService {
 
     public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(Integer leadId, UpdateLeadDto dto);
 
+	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(Integer leadId, boolean status);
+
 }

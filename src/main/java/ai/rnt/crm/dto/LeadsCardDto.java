@@ -18,5 +18,7 @@ public class LeadsCardDto {
 	private String disqualifyAs;
 	
 	private String status;
+	
+	private boolean important;
 
 }

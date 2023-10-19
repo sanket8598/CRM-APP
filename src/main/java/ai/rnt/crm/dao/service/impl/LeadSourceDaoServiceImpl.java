@@ -3,6 +3,7 @@ package ai.rnt.crm.dao.service.impl;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
@@ -17,11 +18,13 @@ public class LeadSourceDaoServiceImpl implements LeadSourceDaoService {
 	private final LeadSourceMasterRepository leadSourceMasterRepository;
 
 	@Override
+	@Cacheable(value = "leadSource",key = "#leadSourceId")
 	public Optional<LeadSourceMaster> getById(Integer leadSourceId) {
 		return leadSourceMasterRepository.findById(leadSourceId);
 	}
 
 	@Override
+	@Cacheable(value = "leadSources")
 	public List<LeadSourceMaster> getAllLeadSource() {
 		return leadSourceMasterRepository.findAll();
 	}

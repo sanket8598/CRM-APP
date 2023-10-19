@@ -64,6 +64,9 @@ public class Leads extends Auditable {
 
 	@Column(name = "status")
 	private String status;
+	
+	@Column(name = "important",columnDefinition= "boolean default false")
+	private Boolean important;
 
 	@JoinColumn(name = "assign_to", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
