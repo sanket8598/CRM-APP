@@ -8,7 +8,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,6 +18,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -64,9 +65,6 @@ public class Leads extends Auditable {
 
 	@Column(name = "status")
 	private String status;
-	
-	@Column(name = "important",columnDefinition= "boolean default false")
-	private Boolean important;
 
 	@JoinColumn(name = "assign_to", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
@@ -93,13 +91,13 @@ public class Leads extends Auditable {
 
 	@Column(name = "disqualify_reason")
 	private String disqualifyReason;
-	
+
 	@Column(name = "designation")
 	private String designation;
-	
+
 	@Column(name = "pseudo_name")
 	private String pseudoName;
-	
+
 	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "lead_source_id")
 	private LeadSourceMaster leadSourceMaster;
@@ -120,5 +118,11 @@ public class Leads extends Auditable {
 
 	@OneToMany(mappedBy = "lead", cascade = ALL)
 	private List<Visit> visit = new ArrayList<>();
+
+	@OneToMany(mappedBy = "lead")
+	Set<LeadImportant> impLead;
+
+	@Transient
+	private Boolean important = false;
 
 }

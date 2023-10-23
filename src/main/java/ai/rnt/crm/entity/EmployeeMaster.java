@@ -6,6 +6,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -81,6 +82,9 @@ public class EmployeeMaster extends Auditable {
 	
 	@OneToMany(mappedBy = "employee")
 	private List<Leads> leads = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "employee")
+	 Set<LeadImportant> impLead;
 
 	public EmployeeMaster(Integer staffId, String firstName, String lastName, LocalDate departureDate) {
 		super();
