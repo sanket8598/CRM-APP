@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +63,7 @@ import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.EmployeeMaster;
+import ai.rnt.crm.entity.LeadImportant;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.StateMaster;
 import ai.rnt.crm.enums.ApiResponse;
@@ -151,12 +153,21 @@ public class LeadServiceImpl implements LeadService {
 			if (isNull(leadsStatus)) {
 				Map<String, Object> dataMap = new HashMap<>();
 				Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
+				List<Leads> impLeads = leadDaoService.findLeadByEmployeeStaffId(loggedInStaffId).stream()
+						.map(LeadImportant::getLead)
+						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate()))
+						.collect(Collectors.toList());
 				List<Leads> allLeads = leadDaoService.getAllLeads();
+				allLeads.stream().forEach(lead -> {
+					if (impLeads.contains(lead))
+						lead.setImportant(true);
+				});
 				Comparator<Leads> importantLeads = (l1, l2) -> l2.getImportant().compareTo(l1.getImportant());
-				Comparator<Leads> createdDate = (l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate());
-				Comparator<Leads> newSort = importantLeads.thenComparing(createdDate);
-				allLeads.sort(newSort);
+				allLeads.sort(
+						importantLeads.thenComparing((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())));
+
 				if (auditAwareUtil.isAdmin()) {
+
 					dataMap.put("allLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads));
 					dataMap.put("openLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(
 							l.getStatus())
@@ -567,18 +578,30 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(Integer leadId, boolean status) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		result.put(SUCCESS, true);
 		try {
-			Leads lead = leadDaoService.getLeadById(leadId).orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId",leadId));
-			lead.setImportant(status);
-			if (nonNull(leadDaoService.addLead(lead)))
-				result.put(MESSAGE, "Leads marked as Important !!");
-			else
+			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
+			if (status) {
+				LeadImportant importantLead = new LeadImportant();
+				importantLead.setLead(leadDaoService.getLeadById(leadId)
+						.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId)));
+				importantLead.setEmployee(employeeService.getById(loggedInStaffId)
+						.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", loggedInStaffId)));
 				result.put(MESSAGE, "Problem Occurred While Making Lead Important !!");
-			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, CREATED);
+				if (leadDaoService.addImportantLead(importantLead).isPresent())
+					result.put(MESSAGE, "Lead marked as Important !!");
+			} else {
+				result.put(MESSAGE, "Lead not found as important !!");
+				if (leadDaoService.deleteImportantLead(leadId, loggedInStaffId))
+					result.put(MESSAGE, "Lead marked as Unimportant !!");
+			}
 		} catch (Exception e) {
-			log.error("error occured while updating the Lead in ImportandLead API... {}",e.getMessage());		
-			throw new CRMException(e);
+			log.error("error occured while updating the Lead in ImportandLead API... {}", e.getMessage());
+			if (e instanceof DataIntegrityViolationException)
+				result.put(MESSAGE, "Lead already marked as important !!");
+			else
+				throw new CRMException(e);
 		}
+		return new ResponseEntity<>(result, CREATED);
 	}
 }

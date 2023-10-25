@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.entity.LeadImportant;
 import ai.rnt.crm.entity.Leads;
 
 public interface LeadDaoService extends CrudService<Leads, LeadDto> {
@@ -18,7 +19,10 @@ public interface LeadDaoService extends CrudService<Leads, LeadDto> {
 
 	Optional<Leads> getLeadById(Integer leadId);
 	
+	Optional<LeadImportant> addImportantLead(LeadImportant leadImportant);
 	
-	
+	boolean deleteImportantLead(Integer leadId,Integer staffId);
+
+	List<LeadImportant> findLeadByEmployeeStaffId(Integer loggedInStaffId);
 
 }
