@@ -1,5 +1,6 @@
 package ai.rnt.crm.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,6 +32,7 @@ public class LeadImportant extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name="important_lead_id")
     Integer id;
 	
 	@ManyToOne
