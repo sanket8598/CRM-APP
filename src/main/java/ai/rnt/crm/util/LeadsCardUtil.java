@@ -1,6 +1,7 @@
 package ai.rnt.crm.util;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +31,7 @@ public class LeadsCardUtil {
 			Matcher firstNameMatcher = pattern.matcher(fName);
 			Matcher lastNameMatcher = pattern.matcher(lName);
 			if (firstNameMatcher.find() && lastNameMatcher.find())
-				return (firstNameMatcher.group() + lastNameMatcher.group()).toUpperCase();
+				return (nonNull(firstNameMatcher.group() + lastNameMatcher.group())?(firstNameMatcher.group() + lastNameMatcher.group()).toUpperCase():null);
 			return null;
 		} catch (Exception e) {
 			log.error("Got exception while concating the fname and lname");
@@ -48,11 +49,11 @@ public class LeadsCardUtil {
 				firstNameMatcher = pattern.matcher(result[0]);
 				lastNameMatcher = pattern.matcher(result[1]);
 				if (firstNameMatcher.find() && lastNameMatcher.find())
-					return (firstNameMatcher.group() + lastNameMatcher.group()).toUpperCase();
+					return (nonNull(firstNameMatcher.group() + lastNameMatcher.group())?firstNameMatcher.group() + lastNameMatcher.group().toUpperCase():null);
 			} else {
 				firstNameMatcher = pattern.matcher(fullName.charAt(0) + "");
 				if (firstNameMatcher.find())
-					return (firstNameMatcher.group()).toUpperCase();
+					return (nonNull(firstNameMatcher.group())?firstNameMatcher.group().toUpperCase():null);
 			}
 			return null;
 		} catch (Exception e) {
