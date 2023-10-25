@@ -56,7 +56,7 @@ public class LeadsCardUtil {
 			}
 			return null;
 		} catch (Exception e) {
-			log.error("Got exception while concating the fname and lname");
+			log.error("Got exception while concating the firstName and lastName");
 			throw new CRMException(e);
 		}
 	}
