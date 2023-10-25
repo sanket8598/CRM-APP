@@ -120,7 +120,7 @@ public class Leads extends Auditable {
 	private List<Visit> visit = new ArrayList<>();
 
 	@OneToMany(mappedBy = "lead")
-	Set<LeadImportant> impLead;
+	private Set<LeadImportant> impLead;
 
 	@Transient
 	private Boolean important = false;
