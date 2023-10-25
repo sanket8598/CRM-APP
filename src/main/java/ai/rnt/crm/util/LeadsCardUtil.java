@@ -31,10 +31,10 @@ public class LeadsCardUtil {
 			Matcher firstNameMatcher = pattern.matcher(fName);
 			Matcher lastNameMatcher = pattern.matcher(lName);
 			if (firstNameMatcher.find() && lastNameMatcher.find())
-				return (nonNull(firstNameMatcher.group() + lastNameMatcher.group())?(firstNameMatcher.group() + lastNameMatcher.group()).toUpperCase():null);
+				return nonNull(firstNameMatcher.group() + lastNameMatcher.group())?(firstNameMatcher.group() + lastNameMatcher.group()).toUpperCase():null;
 			return null;
 		} catch (Exception e) {
-			log.error("Got exception while concating the fname and lname");
+			log.error("Got exception while concating the fname and lname",e.getMessage());
 			throw new CRMException(e);
 		}
 	}
