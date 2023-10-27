@@ -614,4 +614,31 @@ public class LeadServiceImpl implements LeadService {
 		}
 		return new ResponseEntity<>(result, CREATED);
 	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(Integer leadId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Optional<Leads> lead = leadDaoService.getLeadById(leadId);
+			if (lead.isPresent()) {
+				lead.get().setDisqualifyAs("Open");
+				lead.get().setDisqualifyReason(null);
+				lead.get().setStatus("Open");
+				if (nonNull(leadDaoService.addLead(lead.get()))) {
+					result.put(MESSAGE, "Lead Reactivate SuccessFully");
+					result.put(SUCCESS, true);
+				} else {
+					result.put(MESSAGE, "Lead Not Reactivate");
+					result.put(SUCCESS, false);
+				}
+			} else {
+				result.put(MESSAGE, "Lead Not Reactivate");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while reactivating the lead..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
 }
