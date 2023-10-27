@@ -8,7 +8,6 @@ import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.time.LocalDateTime;
 import java.util.EnumMap;
@@ -26,7 +25,6 @@ import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
-import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.VisitService;
 import ai.rnt.crm.util.AuditAwareUtil;
@@ -70,6 +68,7 @@ public class VisitServiceImpl implements VisitService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
+			log.info("Got Exception while adding the visit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -78,13 +77,10 @@ public class VisitServiceImpl implements VisitService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(Integer visitId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			Visit visit = visitDaoService.getVisitsByVisitId(visitId).orElseThrow(null);
-			if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
-					&& nonNull(getContext().getAuthentication().getDetails())) {
-				UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
-				visit.setDeletedBy(details.getStaffId());
-				visit.setDeletedDate(LocalDateTime.now());
-			}
+			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
+					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
+			visit.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			visit.setDeletedDate(LocalDateTime.now());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit deleted SuccessFully.");
 				result.put(SUCCESS, true);
@@ -94,6 +90,7 @@ public class VisitServiceImpl implements VisitService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
+			log.info("Got Exception while deleting the visit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -102,7 +99,8 @@ public class VisitServiceImpl implements VisitService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> visitMarkAsCompleted(Integer visitId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			Visit visit = visitDaoService.getVisitsByVisitId(visitId).orElseThrow(null);
+			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
+					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
 			visit.setUpdatedDate(LocalDateTime.now());
 			visit.setStatus("complete");
 			if (nonNull(visitDaoService.saveVisit(visit))) {
@@ -114,6 +112,7 @@ public class VisitServiceImpl implements VisitService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
+			log.info("Got Exception while visitMarkAsCompleted..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -137,6 +136,7 @@ public class VisitServiceImpl implements VisitService {
 			}
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
+			log.info("Got Exception while assign the visit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -146,9 +146,11 @@ public class VisitServiceImpl implements VisitService {
 		EnumMap<ApiResponse, Object> visit = new EnumMap<>(ApiResponse.class);
 		try {
 			visit.put(SUCCESS, true);
-			visit.put(DATA, visitDaoService.getVisitsByVisitId(visitId));
+			visit.put(DATA, visitDaoService.getVisitsByVisitId(visitId)
+					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId)));
 			return new ResponseEntity<>(visit, FOUND);
 		} catch (Exception e) {
+			log.info("Got Exception while get visit for edit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -157,7 +159,8 @@ public class VisitServiceImpl implements VisitService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisit(VisitDto dto, Integer visitId, String status) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			Visit visit = visitDaoService.getVisitsByVisitId(visitId).orElseThrow(null);
+			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
+					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
 			visit.setLocation(dto.getLocation());
 			visit.setSubject(dto.getSubject());
 			visit.setContent(dto.getContent());
@@ -176,6 +179,7 @@ public class VisitServiceImpl implements VisitService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
+			log.info("Got Exception while update the visit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

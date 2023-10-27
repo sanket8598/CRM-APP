@@ -15,9 +15,11 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.service.StateService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StateServiceImpl implements StateService {
 
 	private final StateDaoService stateDaoService;
@@ -30,6 +32,7 @@ public class StateServiceImpl implements StateService {
 			allState.put(DATA, TO_STATE_DTOS.apply(stateDaoService.getAllState()));
 			return new ResponseEntity<>(allState, FOUND);
 		} catch (Exception e) {
+		log.info("Got Exception while getting the state..{}",e.getMessage());
 			throw new CRMException(e);
 		}
 	}

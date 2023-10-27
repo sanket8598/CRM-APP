@@ -141,7 +141,7 @@ public class LeadServiceImpl implements LeadService {
 			return new ResponseEntity<>(createMap, CREATED);
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.info("Got Exception while creating new lead", e.getMessage());
+			log.info("Got Exception while creating new lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -198,7 +198,7 @@ public class LeadServiceImpl implements LeadService {
 				getAllLeads.put(DATA, TO_LEAD_DTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
 			return new ResponseEntity<>(getAllLeads, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting leads dashboard data +++++++++++", e.getMessage());
+			log.info("Got Exception while getting leads dashboard data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -211,7 +211,7 @@ public class LeadServiceImpl implements LeadService {
 			resultMap.put(DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			return new ResponseEntity<>(resultMap, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting lead source", e.getMessage());
+			log.info("Got Exception while getting lead source..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -228,7 +228,7 @@ public class LeadServiceImpl implements LeadService {
 			resultMap.put(DATA, dataMap);
 			return new ResponseEntity<>(resultMap, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting all dropdown data", e.getMessage());
+			log.info("Got Exception while getting all dropdown data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -241,7 +241,7 @@ public class LeadServiceImpl implements LeadService {
 			leadsDashboardData.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadDashboardData()));
 			return new ResponseEntity<>(leadsDashboardData, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting lead DashboardData", e.getMessage());
+			log.info("Got Exception while getting lead DashboardData..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -275,7 +275,7 @@ public class LeadServiceImpl implements LeadService {
 			leadsDataByStatus.put(SUCCESS, true);
 			return new ResponseEntity<>(leadsDataByStatus, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting LeadDashboardDataByStatus", e.getMessage());
+			log.info("Got Exception while getting LeadDashboardDataByStatus..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -400,7 +400,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.put(DATA, dataMap);
 			return new ResponseEntity<>(lead, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while editing the lead data", e.getMessage());
+			log.info("Got Exception while editing the lead data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -432,7 +432,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while qualifying the lead ", e.getMessage());
+			log.info("Got Exception while qualifying the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -456,7 +456,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while assigning the lead ", e.getMessage());
+			log.info("Got Exception while assigning the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -483,7 +483,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while disQualifyLead the lead ", e.getMessage());
+			log.info("Got Exception while disQualifyLead the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -580,7 +580,7 @@ public class LeadServiceImpl implements LeadService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
-			log.info("Got Exception while updateLeadContact", e.getMessage());
+			log.info("Got Exception while updateLeadContact..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
