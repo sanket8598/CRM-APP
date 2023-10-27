@@ -13,9 +13,11 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.service.ServiceFallsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ServiceFallsServiceImpl implements ServiceFallsService {
 
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
@@ -34,6 +36,7 @@ public class ServiceFallsServiceImpl implements ServiceFallsService {
 					TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
 		} catch (Exception e) {
+			log.info("Got Exception while getting the service falls data..{}" ,e.getMessage());
 			throw new CRMException(e);
 		}
 	}

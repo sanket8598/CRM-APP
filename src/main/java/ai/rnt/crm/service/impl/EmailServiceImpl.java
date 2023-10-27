@@ -139,40 +139,44 @@ public class EmailServiceImpl implements EmailService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteEmail(Integer mailId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		AddEmail updatedEmail = null;
+		try {
+			if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
+					&& nonNull(getContext().getAuthentication().getDetails())) {
+				UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
 
-		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
-				&& nonNull(getContext().getAuthentication().getDetails())) {
-			UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
-
-			AddEmail mail = emailDaoService.findById(mailId);
-			List<Attachment> attachment = mail.getAttachment();
-			if (nonNull(attachment) && !attachment.isEmpty()) {
-				List<Attachment> attach = attachment.stream().map(e -> {
-					e.setDeletedBy(details.getStaffId());
-					e.setDeletedDate(LocalDateTime.now());
-					e.getMail().setDeletedBy(details.getStaffId());
-					e.getMail().setDeletedDate(LocalDateTime.now());
-					e.setMail(e.getMail());
-					return e;
-				}).collect(Collectors.toList());
-				for (Attachment e : attach) {
-					attachmentDaoService.addAttachment(e);
+				AddEmail mail = emailDaoService.findById(mailId);
+				List<Attachment> attachment = mail.getAttachment();
+				if (nonNull(attachment) && !attachment.isEmpty()) {
+					List<Attachment> attach = attachment.stream().map(e -> {
+						e.setDeletedBy(details.getStaffId());
+						e.setDeletedDate(LocalDateTime.now());
+						e.getMail().setDeletedBy(details.getStaffId());
+						e.getMail().setDeletedDate(LocalDateTime.now());
+						e.setMail(e.getMail());
+						return e;
+					}).collect(Collectors.toList());
+					for (Attachment e : attach) {
+						attachmentDaoService.addAttachment(e);
+						updatedEmail = emailDaoService.addEmail(mail);
+					}
+				} else {
+					mail.setDeletedBy(details.getStaffId());
+					mail.setDeletedDate(LocalDateTime.now());
 					updatedEmail = emailDaoService.addEmail(mail);
 				}
-			} else {
-				mail.setDeletedBy(details.getStaffId());
-				mail.setDeletedDate(LocalDateTime.now());
-				updatedEmail = emailDaoService.addEmail(mail);
 			}
+			if (nonNull(updatedEmail)) {
+				result.put(MESSAGE, "Email deleted SuccessFully.");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Email Not deleted.");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while deleting the mail..{}", e.getMessage());
+			throw new CRMException(e);
 		}
-		if (nonNull(updatedEmail)) {
-			result.put(MESSAGE, "Email deleted SuccessFully.");
-			result.put(SUCCESS, true);
-		} else {
-			result.put(MESSAGE, "Email Not deleted.");
-			result.put(SUCCESS, false);
-		}
-		return new ResponseEntity<>(result, OK);
 	}
 
 	@Override
@@ -193,6 +197,7 @@ public class EmailServiceImpl implements EmailService {
 			}
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
+			log.info("Got Exception while assign the mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -212,6 +217,7 @@ public class EmailServiceImpl implements EmailService {
 			resultMap.put(SUCCESS, true);
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
+			log.info("Got Exception while getting mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

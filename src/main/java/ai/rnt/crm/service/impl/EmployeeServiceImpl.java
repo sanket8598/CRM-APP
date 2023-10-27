@@ -20,6 +20,7 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 // @// @formatter:off
 
@@ -34,6 +35,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmployeeServiceImpl implements EmployeeService {
 
 	private final EmployeeDaoService employeeDaoService;
@@ -50,6 +52,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 		try {
 			return TO_EmployeeMaster.apply(employeeDaoService.getById(assignTo).get());
 		} catch (Exception e) {
+			log.info("Got Exception while getting the user..{}" ,e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -62,6 +65,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			resultMap.put(ApiResponse.DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
 			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
 		}catch (Exception e) {
+			log.info("Got Exception while getting admin and user..{}" ,e.getMessage());
 			throw new CRMException(e);
 		}
 	}

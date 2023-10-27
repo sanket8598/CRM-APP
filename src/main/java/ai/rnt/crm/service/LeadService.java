@@ -36,4 +36,6 @@ public interface LeadService {
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(Integer leadId, boolean status);
 
+	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(Integer leadId);
+
 }

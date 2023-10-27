@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.entity.AddEmail;
 import ai.rnt.crm.entity.Attachment;
+import ai.rnt.crm.exception.CRMException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -115,23 +116,27 @@ public class EmailUtil {
 
 	public static Message sendWithAttachments(Message msg, String content, List<Attachment> list)
 			throws MessagingException {
-		MimeBodyPart messageBodyPart = new MimeBodyPart();
-		MimeMultipart multipart = new MimeMultipart();
-		for (Attachment data : list) {
-			if (nonNull(data.getAttachmentData())) {
-				MimeBodyPart attachemntBodyPart = new MimeBodyPart();
-				attachemntBodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(
-						Base64.getDecoder().decode(data.getAttachmentData().split(",")[1]), data.getAttachType())));
-				attachemntBodyPart.setDisposition(Part.ATTACHMENT);
-				attachemntBodyPart.setFileName(data.getAttachName());
-				multipart.addBodyPart(attachemntBodyPart);
+		try {
+			MimeBodyPart messageBodyPart = new MimeBodyPart();
+			MimeMultipart multipart = new MimeMultipart();
+			for (Attachment data : list) {
+				if (nonNull(data.getAttachmentData())) {
+					MimeBodyPart attachemntBodyPart = new MimeBodyPart();
+					attachemntBodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(
+							Base64.getDecoder().decode(data.getAttachmentData().split(",")[1]), data.getAttachType())));
+					attachemntBodyPart.setDisposition(Part.ATTACHMENT);
+					attachemntBodyPart.setFileName(data.getAttachName());
+					multipart.addBodyPart(attachemntBodyPart);
+				}
 			}
+			messageBodyPart.setContent(content, "text/html");
+			multipart.addBodyPart(messageBodyPart);
+			msg.setContent(multipart);
+			return msg;
+		} catch (Exception e) {
+			log.info("Got Exception while sendWithAttachments the mail..{}", e.getMessage());
+			throw new CRMException(e);
 		}
-		messageBodyPart.setContent(content, "text/html");
-		multipart.addBodyPart(messageBodyPart);
-		msg.setContent(multipart);
-		return msg;
-
 	}
 
 	public static Message sendAsPlainText(Message msg, String content) throws MessagingException {

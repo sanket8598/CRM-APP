@@ -120,4 +120,9 @@ public class LeadsController {
 			@PathVariable boolean status) {
 		return leadService.importantLead(leadId, status);
 	}
+	
+	@PutMapping("/reactive/{leadId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(@PathVariable Integer leadId) {
+		return leadService.reactiveLead(leadId);
+	}
 }

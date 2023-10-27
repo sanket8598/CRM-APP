@@ -9,7 +9,6 @@ import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.time.LocalDateTime;
 import java.util.EnumMap;
@@ -27,9 +26,9 @@ import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
-import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.service.AddCallService;
 import ai.rnt.crm.service.EmployeeService;
+import ai.rnt.crm.util.AuditAwareUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,12 +45,14 @@ public class AddCallServiceImpl implements AddCallService {
 	private final AddCallDaoService addCallDaoService;
 	private final LeadDaoService leadDaoService;
 	private final EmployeeService employeeService;
+	private final AuditAwareUtil auditAwareUtil;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(AddCallDto dto, Integer leadsId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			AddCall addCall = TO_CALL.apply(dto).orElseThrow(null);
+			AddCall addCall = TO_CALL.apply(dto)
+					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", dto.getAddCallId()));
 			Leads lead = leadDaoService.getLeadById(leadsId)
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadsId));
 			addCall.setLead(lead);
@@ -65,6 +66,7 @@ public class AddCallServiceImpl implements AddCallService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
+			log.info("Got Exception while adding the call..{}",e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -88,6 +90,7 @@ public class AddCallServiceImpl implements AddCallService {
 			}
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
+			log.info("Got Exception while assign the call..{}" ,e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -96,7 +99,8 @@ public class AddCallServiceImpl implements AddCallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(Integer callId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
+			AddCall call = addCallDaoService.getCallById(callId)
+					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", callId));
 			call.setUpdatedDate(LocalDateTime.now());
 			call.setStatus("complete");
 			if (nonNull(addCallDaoService.addCall(call))) {
@@ -108,6 +112,7 @@ public class AddCallServiceImpl implements AddCallService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
+			log.info("Got Exception while markAsCompleted the call..{}" ,e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -116,13 +121,10 @@ public class AddCallServiceImpl implements AddCallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
-			if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
-					&& nonNull(getContext().getAuthentication().getDetails())) {
-				UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
-				call.setDeletedBy(details.getStaffId());
-				call.setDeletedDate(LocalDateTime.now());
-			}
+			AddCall call = addCallDaoService.getCallById(callId)
+					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", callId));
+			call.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			call.setDeletedDate(LocalDateTime.now());
 			if (nonNull(addCallDaoService.addCall(call))) {
 				result.put(MESSAGE, "Call deleted SuccessFully.");
 				result.put(SUCCESS, true);
@@ -132,6 +134,7 @@ public class AddCallServiceImpl implements AddCallService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
+			log.info("Got Exception while delete the call..{}" ,e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -140,10 +143,12 @@ public class AddCallServiceImpl implements AddCallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(Integer callId) {
 		EnumMap<ApiResponse, Object> call = new EnumMap<>(ApiResponse.class);
 		try {
-			call.put(DATA, TO_EDIT_CALL_DTO.apply(addCallDaoService.getCallById(callId).orElseThrow(null)));
+			call.put(DATA, TO_EDIT_CALL_DTO.apply(addCallDaoService.getCallById(callId)
+					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", callId))));
 			call.put(SUCCESS, true);
 			return new ResponseEntity<>(call, FOUND);
 		} catch (Exception e) {
+			log.info("Got exception while get call data for edit..{}",e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -152,7 +157,8 @@ public class AddCallServiceImpl implements AddCallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(AddCallDto dto, Integer callId, String status) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			AddCall call = addCallDaoService.getCallById(callId).orElseThrow(null);
+			AddCall call = addCallDaoService.getCallById(callId)
+					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", dto.getAddCallId()));
 			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
 			call.setCallTo(dto.getCallTo());
@@ -174,6 +180,7 @@ public class AddCallServiceImpl implements AddCallService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
+			log.info("Got exception while update call..{}" ,e.getMessage());
 			throw new CRMException(e);
 		}
 	}

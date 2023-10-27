@@ -15,14 +15,16 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.service.CityService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Nikhil Gaikwad
- *@version 1.0
- *@since 11/09/2023.
+ * @version 1.0
+ * @since 11/09/2023.
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CityServiceImpl implements CityService {
 
 	private final CityDaoService cityDaoService;
@@ -35,6 +37,7 @@ public class CityServiceImpl implements CityService {
 			allCity.put(DATA, TO_CITY_DTOS.apply(cityDaoService.getAllCity()));
 			return new ResponseEntity<>(allCity, FOUND);
 		} catch (Exception e) {
+			log.info("Got Exception while getting the City..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

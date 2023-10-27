@@ -15,9 +15,11 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.service.CountryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CountryServiceImpl implements CountryService {
 
 	private final CountryDaoService countryDaoService;
@@ -30,6 +32,7 @@ public class CountryServiceImpl implements CountryService {
 			allCountry.put(DATA, TO_COUNTRY_DTOS.apply(countryDaoService.getAllCountry()));
 			return new ResponseEntity<>(allCountry, FOUND);
 		} catch (Exception e) {
+			log.info("Got Exception while getting the Country..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
