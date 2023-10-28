@@ -413,8 +413,8 @@ public class LeadServiceImpl implements LeadService {
 			if (lead.isPresent()) {
 				lead.get().setCustomerNeed(dto.getCustomerNeed());
 				lead.get().setProposedSolution(dto.getProposedSolution());
-				lead.get().setStatus("Qualify");
-				lead.get().setDisqualifyAs("Qualify");
+				lead.get().setStatus("CloseAsQualified");
+				lead.get().setDisqualifyAs("Qualified");
 				lead.get().setServiceFallsMaster(
 						serviceFallsDaoSevice.getById(dto.getServiceFallsMaster().getServiceFallsId())
 								.orElseThrow(() -> new ResourceNotFoundException("ServiceFallMaster", "serviceFallId",
@@ -469,7 +469,7 @@ public class LeadServiceImpl implements LeadService {
 			if (lead.isPresent()) {
 				lead.get().setDisqualifyAs(dto.getDisqualifyAs());
 				lead.get().setDisqualifyReason(dto.getDisqualifyReason());
-				lead.get().setStatus("Close");
+				lead.get().setStatus("CloseAsDisqualified");
 				if (nonNull(leadDaoService.addLead(lead.get()))) {
 					result.put(MESSAGE, "Lead Disqualified SuccessFully");
 					result.put(SUCCESS, true);
