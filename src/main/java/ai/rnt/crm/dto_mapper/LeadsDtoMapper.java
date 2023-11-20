@@ -31,7 +31,7 @@ public class LeadsDtoMapper {
 	 * @version 1.0
 	 */
 	public static final Function<LeadDto, Optional<Leads>> TO_LEAD = e -> evalMapper(e, Leads.class);
-		;
+		
 	/**
 	 * @since 04-09-2023
 	 * @version 1.0

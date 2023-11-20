@@ -56,15 +56,9 @@ public class RoleUtil {
 	};
 
 	public static final String getSingleRole(List<String> roles) {
-		for (String s : roles) {
-			if (CRM_ADMIN.equalsIgnoreCase(s))
-				return CRM_ADMIN;
-		}
-		for (String s : roles) {
-			if (CRM_USER.equalsIgnoreCase(s))
-				return CRM_USER;
-		}
-		return NO_ROLE;
+		return roles.stream().filter(CHECK_ADMIN).findFirst()
+				.orElse(roles.stream().filter(CHECK_USER).findFirst()
+				.orElse(NO_ROLE));
 	}
 
 }

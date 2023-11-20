@@ -10,6 +10,7 @@ import static ai.rnt.crm.constants.ApiConstants.GET_DROP_DOWN_DATA;
 import static ai.rnt.crm.constants.ApiConstants.GET_LEADS_BY_STATUS;
 import static ai.rnt.crm.constants.ApiConstants.LEAD;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
+import static ai.rnt.crm.constants.RoleConstants.CHECK_USER_ACCESS;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.dto.LeadSortFilterDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.enums.ApiResponse;
@@ -50,6 +52,7 @@ public class LeadsController {
 		return leadService.createLead(dto);
 	}
 
+	//for the DashBoard Leads Data...
 	@GetMapping(value = { GET_LEADS_BY_STATUS, GET_ALL_LEADS })
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(
 			@PathVariable(name = "leadsStatus", required = false) String leadsStatus) {
@@ -74,7 +77,9 @@ public class LeadsController {
 		return leadService.getAllDropDownData();
 	}
 
-	@PreAuthorize(CHECK_BOTH_ACCESS)
+	
+	//for the open views table data
+	@PreAuthorize(CHECK_USER_ACCESS)
 	@GetMapping(DASHBOARD_ALL_LEADS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardData() {
 		return leadService.getLeadDashboardData();
@@ -124,5 +129,10 @@ public class LeadsController {
 	@PutMapping("/reactive/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(@PathVariable Integer leadId) {
 		return leadService.reactiveLead(leadId);
+	}
+	
+	@PostMapping("/addSortFilter")	
+	public ResponseEntity<EnumMap<ApiResponse,Object>> addSortFilterToLeads(@RequestBody LeadSortFilterDto sortFilter){
+		return leadService.addSortFilterForLeads(sortFilter);
 	}
 }
