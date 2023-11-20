@@ -4,8 +4,8 @@ import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
+import static ai.rnt.crm.dto_mapper.LeadSortFilterDtoMapper.TO_LEAD_SORT_FILTER;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
-import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_CARDS_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
@@ -45,6 +45,7 @@ import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
+import ai.rnt.crm.dao.service.LeadSortFilterDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
@@ -56,6 +57,7 @@ import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.dto.LeadSortFilterDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
@@ -95,6 +97,7 @@ public class LeadServiceImpl implements LeadService {
 	private final CityDaoService cityDaoService;
 	private final StateDaoService stateDaoService;
 	private final CountryDaoService countryDaoService;
+	private final LeadSortFilterDaoService leadSortFilterDaoService;
 
 	@Override
 	@Transactional
@@ -166,31 +169,51 @@ public class LeadServiceImpl implements LeadService {
 				Comparator<Leads> importantLeads = (l1, l2) -> l2.getImportant().compareTo(l1.getImportant());
 				allLeads.sort(
 						importantLeads.thenComparing((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())));
-
+				Map<String, Object> filterMap = new HashMap<>();
+				filterMap.put("PrimaryField", "Lead Name");
+				filterMap.put("SecondaryField", "Topic");
+				leadSortFilterDaoService.findSortFilterByEmployeeStaffId(loggedInStaffId).ifPresent(sortFilter -> {
+					filterMap.put("PrimaryField", sortFilter.getPrimaryFilter());
+					filterMap.put("SecondaryField", sortFilter.getSecondaryFilter());
+				});
 				if (auditAwareUtil.isAdmin()) {
-					dataMap.put("allLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads));
-					dataMap.put("openLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream().filter(l -> nonNull(
-							l.getStatus())
+					dataMap.put("allLead", allLeads.stream().map(lead -> {
+						return LeadsCardUtil.sendDataToLeadCardDto(lead, filterMap.get("PrimaryField").toString(),
+								filterMap.get("SecondaryField").toString());
+					}).collect(Collectors.toList()));
+					dataMap.put("openLead", allLeads.stream().filter(l -> nonNull(l.getStatus())
 							&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
-							.collect(Collectors.toList())));
-					dataMap.put("closeLead", TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream()
-							.filter(l -> !l.getStatus().equalsIgnoreCase("open")).collect(Collectors.toList())));
-				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
-					dataMap.put("allLead",
-							TO_DASHBOARD_CARDS_LEADDTOS.apply(
-									allLeads.stream().filter(l -> l.getEmployee().getStaffId().equals(loggedInStaffId))
-											.collect(Collectors.toList())));
-					dataMap.put("openLead",
-							TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream()
-									.filter(l -> (nonNull(l.getStatus()) && (l.getStatus().equalsIgnoreCase("new")
-											|| l.getStatus().equalsIgnoreCase("open")))
-											&& l.getEmployee().getStaffId().equals(loggedInStaffId))
-									.collect(Collectors.toList())));
+							.map(lead -> {
+								return LeadsCardUtil.sendDataToLeadCardDto(lead,
+										filterMap.get("PrimaryField").toString(),
+										filterMap.get("SecondaryField").toString());
+							}).collect(Collectors.toList()));
 					dataMap.put("closeLead",
-							TO_DASHBOARD_CARDS_LEADDTOS.apply(allLeads.stream()
-									.filter(l -> !l.getStatus().equalsIgnoreCase("open")
-											&& l.getEmployee().getStaffId().equals(loggedInStaffId))
-									.collect(Collectors.toList())));
+							allLeads.stream().filter(l -> !l.getStatus().equalsIgnoreCase("open")).map(lead -> {
+								return LeadsCardUtil.sendDataToLeadCardDto(lead,
+										filterMap.get("PrimaryField").toString(),
+										filterMap.get("SecondaryField").toString());
+							}).collect(Collectors.toList()));
+				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
+					dataMap.put("allLead", allLeads.stream()
+							.filter(l -> l.getEmployee().getStaffId().equals(loggedInStaffId)).map(lead -> {
+								return LeadsCardUtil.sendDataToLeadCardDto(lead,
+										filterMap.get("PrimaryField").toString(),
+										filterMap.get("SecondaryField").toString());
+							}).collect(Collectors.toList()));
+					dataMap.put("openLead", allLeads.stream().filter(l -> (nonNull(l.getStatus())
+							&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
+							&& l.getEmployee().getStaffId().equals(loggedInStaffId)).map(lead -> {
+								return LeadsCardUtil.sendDataToLeadCardDto(lead,
+										filterMap.get("PrimaryField").toString(),
+										filterMap.get("SecondaryField").toString());
+							}).collect(Collectors.toList()));
+					dataMap.put("closeLead", allLeads.stream().filter(l -> !l.getStatus().equalsIgnoreCase("open")
+							&& l.getEmployee().getStaffId().equals(loggedInStaffId)).map(lead -> {
+								return LeadsCardUtil.sendDataToLeadCardDto(lead,
+										filterMap.get("PrimaryField").toString(),
+										filterMap.get("SecondaryField").toString());
+							}).collect(Collectors.toList()));
 				} else
 					dataMap.put("Data", Collections.emptyList());
 				getAllLeads.put(DATA, dataMap);
@@ -638,6 +661,29 @@ public class LeadServiceImpl implements LeadService {
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
 			log.info("Got Exception while reactivating the lead..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addSortFilterForLeads(LeadSortFilterDto sortFilter) {
+		try {
+			EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
+			sortFilter.setEmployee(TO_Employee
+					.apply(employeeService.getById(loggedInStaffId)
+							.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", loggedInStaffId)))
+					.orElseThrow(null));
+			if (nonNull(leadSortFilterDaoService.save(TO_LEAD_SORT_FILTER.apply(sortFilter).orElse(null)))) {
+				result.put(MESSAGE, "Lead Sort Filter Added Successfully!!");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Lead Sort Filter Not Added!!");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.info("Got Exception while adding the sort filter for lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

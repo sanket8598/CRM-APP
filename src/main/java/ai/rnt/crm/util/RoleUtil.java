@@ -56,8 +56,8 @@ public class RoleUtil {
 	};
 
 	public static final String getSingleRole(List<String> roles) {
-		return roles.stream().filter(CRM_ADMIN::equalsIgnoreCase).findFirst()
-				.orElse(roles.stream().filter(CRM_USER::equalsIgnoreCase).findFirst()
+		return roles.stream().filter(CHECK_ADMIN).findFirst()
+				.orElse(roles.stream().filter(CHECK_USER).findFirst()
 				.orElse(NO_ROLE));
 	}
 

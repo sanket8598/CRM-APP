@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.dto.LeadSortFilterDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.enums.ApiResponse;
@@ -37,5 +38,7 @@ public interface LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(Integer leadId, boolean status);
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(Integer leadId);
+
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addSortFilterForLeads(LeadSortFilterDto sortFilter);
 
 }
