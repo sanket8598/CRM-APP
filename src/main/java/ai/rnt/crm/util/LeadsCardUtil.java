@@ -7,11 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ai.rnt.crm.dto.LeadsCardDto;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.exception.CRMException;
 import lombok.extern.slf4j.Slf4j;
@@ -139,63 +137,5 @@ public class LeadsCardUtil {
 		}
 	}
 	
-	public static String leadCardFieldName(String field) {
-		if(fieldMap.containsKey(field))
-		  return fieldMap.get(field);
-	return field;
-	}
 	
-	Function<String, Integer> func = x -> x.length();
-	public static LeadsCardDto sendDataToLeadCardDto(Leads lead, String primayField, String secondaryField) {
-		LeadsCardDto leadsCardDto = new LeadsCardDto();
-		leadsCardDto.setLeadId(lead.getLeadId());
-		leadsCardDto.setDisqualifyAs(lead.getDisqualifyAs());
-		leadsCardDto.setStatus(lead.getStatus());
-		leadsCardDto.setImportant(lead.getImportant());
-		switch(primayField) {
-		case "Lead Name":
-			leadsCardDto.setPrimaryField(lead.getFirstName() + " " + lead.getLastName());
-			leadsCardDto.setShortName(LeadsCardUtil.shortName(lead.getFirstName(), lead.getLastName()));
-			break;
-		case "Company Name":
-			leadsCardDto.setPrimaryField(lead.getCompanyMaster().getCompanyName());
-			leadsCardDto.setShortName(LeadsCardUtil.shortName(lead.getCompanyMaster().getCompanyName()));
-			break;
-		default:
-			leadsCardDto.setPrimaryField(lead.getFirstName() + " " + lead.getLastName());
-			leadsCardDto.setShortName(LeadsCardUtil.shortName(lead.getFirstName(), lead.getLastName()));
-			break;
-		}
-		
-		switch (secondaryField) {
-		case "Lead Name":
-			leadsCardDto.setSecondaryField(lead.getFirstName() + " " + lead.getLastName());
-			break;
-		case "Topic":
-			leadsCardDto.setSecondaryField(lead.getTopic());
-			break;
-		case "Company Name":
-			leadsCardDto.setSecondaryField(lead.getCompanyMaster().getCompanyName());
-			break;
-		case "Designation":
-			leadsCardDto.setSecondaryField(lead.getDesignation());
-			break;
-		case "Budget Amount":
-			leadsCardDto.setSecondaryField(lead.getBudgetAmount());
-			break;
-		case "Service Falls Into":
-			leadsCardDto.setSecondaryField(lead.getServiceFallsMaster().getServiceName());
-			break;
-		case "Lead Source":
-			leadsCardDto.setSecondaryField(lead.getLeadSourceMaster().getSourceName());
-			break;
-		case "Lead Assign Username":
-			leadsCardDto.setSecondaryField(lead.getEmployee().getFirstName() + " " + lead.getEmployee().getLastName());
-			break;
-		default:
-			leadsCardDto.setSecondaryField(lead.getTopic());
-			break;
-		}
-		return leadsCardDto;
-	}
 }
