@@ -29,4 +29,9 @@ public class LeadSourceDaoServiceImpl implements LeadSourceDaoService {
 		return leadSourceMasterRepository.findAll();
 	}
 
+	@Override
+	public Optional<LeadSourceMaster> getByName(String leadSource) {
+		return leadSourceMasterRepository.findBySourceName(leadSource);
+	}
+
 }

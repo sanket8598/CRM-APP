@@ -17,10 +17,10 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class EmployeeDaoServiceImpl implements EmployeeDaoService{
+public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 
 	private final EmployeeMasterRepository employeeMasterRepository;
-	
+
 	@Override
 	public Optional<EmployeeMaster> getEmployeebyUserId(String userId) {
 		return employeeMasterRepository.findByUserId(userId);
@@ -28,8 +28,13 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService{
 
 	@Override
 	public Optional<EmployeeDto> getById(Integer assignTo) {
-		return TO_Employee.apply(employeeMasterRepository.findById(assignTo).orElseThrow(()->new ResourceNotFoundException("Employee", "staffId", assignTo)));
+		return TO_Employee.apply(employeeMasterRepository.findById(assignTo)
+				.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", assignTo)));
 	}
 
+	@Override
+	public Optional<EmployeeMaster> findByName(String firstName, String lastName) {
+		return employeeMasterRepository.findByFirstNameAndLastName(firstName,lastName);
+	}
 
 }

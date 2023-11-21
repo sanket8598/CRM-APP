@@ -29,4 +29,9 @@ public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice{
 		return serviceFallRepository.findAll();
 	}
 
+	@Override
+	public Optional<ServiceFallsMaster> findByName(String serviceFalls) {
+		return serviceFallRepository.findByServiceName(serviceFalls);
+	}
+
 }
