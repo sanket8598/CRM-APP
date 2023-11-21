@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="crm_lead_sortFilter")
+@Table(name="crm_lead_sort_filter")
 @Setter
 @Getter
 @NoArgsConstructor
@@ -31,7 +31,7 @@ public class LeadSortFilter extends Auditable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="lead_filter_id")
+	@Column(name="lead_sort_filt_id")
     private Integer leadSortFilterId;
 	
 	@Column(name="primary_field")
