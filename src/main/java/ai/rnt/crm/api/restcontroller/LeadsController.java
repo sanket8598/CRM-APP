@@ -16,10 +16,11 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,12 +38,13 @@ import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.service.ServiceFallsService;
+import ai.rnt.crm.validation.ValidFile;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(LEAD)
-@CrossOrigin("*")
 @RequiredArgsConstructor
+@Validated
 public class LeadsController {
 
 	private final LeadService leadService;
@@ -98,48 +100,57 @@ public class LeadsController {
 		return leadService.editLead(leadId);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/qualify/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(@PathVariable Integer leadId,
 			@RequestBody QualifyLeadDto dto) {
 		return leadService.qualifyLead(leadId, dto);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/assignLead")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(@RequestBody Map<String, Integer> map) {
 		return leadService.assignLead(map);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/disQualify/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> disQualifyLead(@PathVariable Integer leadId,
 			@RequestBody LeadDto dto) {
 		return leadService.disQualifyLead(leadId, dto);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/updateLeadContact/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(@PathVariable Integer leadId,
 			@RequestBody UpdateLeadDto dto) {
 		return leadService.updateLeadContact(leadId, dto);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/important/{leadId}/{status}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(@PathVariable Integer leadId,
 			@PathVariable boolean status) {
 		return leadService.importantLead(leadId, status);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/reactive/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(@PathVariable Integer leadId) {
 		return leadService.reactiveLead(leadId);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping("/addSortFilter")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addSortFilterToLeads(
 			@RequestBody LeadSortFilterDto sortFilter) {
 		return leadService.addSortFilterForLeads(sortFilter);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping("/uploadExcel")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(@RequestParam("file") MultipartFile file) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(
+			@NotNull(message = "Please Select The File!!") @ValidFile(message = "Only Excel File is Allowed!!") @RequestParam("file") MultipartFile file) {
 		return leadService.uploadExcel(file);
 	}
 }
