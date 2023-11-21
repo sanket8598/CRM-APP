@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="crm_lead_sort_filter")
+@Table(name="crm_lead_card_sort")
 @Setter
 @Getter
 @NoArgsConstructor
