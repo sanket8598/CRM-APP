@@ -1,6 +1,7 @@
 package ai.rnt.crm.security.config;
 
 import static ai.rnt.crm.security.AuthenticationUtil.PUBLIC_URLS;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +40,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.cors();
+        http.cors(withDefaults());
 		http.csrf(csrf -> {
 			try {
 				csrf.disable().authorizeHttpRequests()

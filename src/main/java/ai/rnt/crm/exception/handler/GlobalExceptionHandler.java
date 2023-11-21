@@ -192,7 +192,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			errors.add(fieldName + ": " + e.getMessage());
 		});
 		log.error("handle Contraint not valid api error: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(BAD_REQUEST, !errors.isEmpty() ? errors.get(0) : null, errors),
+		return new ResponseEntity<>(new ApiError(BAD_REQUEST, !errors.isEmpty() ? errors.get(0).split(":")[1] : null, errors),
 				BAD_REQUEST);
 	}
 
