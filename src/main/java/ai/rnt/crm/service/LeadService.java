@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
@@ -40,5 +41,7 @@ public interface LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(Integer leadId);
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addSortFilterForLeads(LeadSortFilterDto sortFilter);
+
+	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file);
 
 }

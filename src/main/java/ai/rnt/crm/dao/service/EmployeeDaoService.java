@@ -11,5 +11,6 @@ public interface EmployeeDaoService extends CrudService<EmployeeMaster, Employee
 
 	Optional<EmployeeDto> getById(Integer assignTo);
 
+	Optional<EmployeeMaster> findByName(String firstName, String lastName);
 
 }

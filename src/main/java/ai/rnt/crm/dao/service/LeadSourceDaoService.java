@@ -11,4 +11,6 @@ public interface LeadSourceDaoService {
 
 	List<LeadSourceMaster> getAllLeadSource();
 
+	Optional<LeadSourceMaster> getByName(String leadSource);
+
 }

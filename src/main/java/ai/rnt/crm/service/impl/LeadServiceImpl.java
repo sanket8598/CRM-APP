@@ -38,6 +38,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import ai.rnt.crm.dao.service.AddCallDaoService;
 import ai.rnt.crm.dao.service.CityDaoService;
@@ -77,6 +78,7 @@ import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.ConvertDateFormatUtil;
 import ai.rnt.crm.util.LeadsCardUtil;
+import ai.rnt.crm.util.ReadExcelUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -688,6 +690,84 @@ public class LeadServiceImpl implements LeadService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.info("Got Exception while adding the sort filter for lead..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		ArrayList<ArrayList<String>> excelData = new ArrayList<ArrayList<String>>();
+		boolean status = false;
+		try {
+			excelData = ReadExcelUtil.getLeadFromExcelFile(file);
+			for (ArrayList<String> data : excelData) {
+				LeadDto dto = new LeadDto();
+				status = false;
+				dto.setFirstName(data.get(0));
+				dto.setLastName(data.get(1));
+				dto.setEmail(data.get(2));
+				dto.setPhoneNumber(data.get(3));
+				dto.setDesignation(data.get(4));
+				dto.setTopic(data.get(5));
+				dto.setCompanyName(data.get(6));
+				dto.setCompanyWebsite(data.get(7));
+				dto.setBudgetAmount(data.get(8));
+				dto.setStatus("Open");
+				dto.setDisqualifyAs("Open");
+				Leads leads = TO_LEAD.apply(dto).orElseThrow(null);
+				Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
+				if (existCompany.isPresent()) {
+					existCompany.get().setCompanyWebsite(dto.getCompanyWebsite());
+					leads.setCompanyMaster(TO_COMPANY
+							.apply(companyMasterDaoService
+									.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
+											.orElseThrow(ResourceNotFoundException::new))
+									.orElseThrow(ResourceNotFoundException::new))
+							.orElseThrow(ResourceNotFoundException::new));
+				} else
+					leads.setCompanyMaster(TO_COMPANY
+							.apply(companyMasterDaoService
+									.save(TO_COMPANY
+											.apply(CompanyDto.builder().companyName(dto.getCompanyName())
+													.companyWebsite(dto.getCompanyWebsite()).build())
+											.orElseThrow(ResourceNotFoundException::new))
+									.orElseThrow(ResourceNotFoundException::new))
+							.orElseThrow(ResourceNotFoundException::new));
+				serviceFallsDaoSevice.findByName(data.get(9)).ifPresent(leads::setServiceFallsMaster);
+				leadSourceDaoService.getByName(data.get(10)).ifPresent(leads::setLeadSourceMaster);
+				String[] split;
+				String firstName;
+				String lastName = null;
+				if (data.size() > 11) {
+					split = data.get(11).split(" ");
+					if (split.length > 1) {
+						firstName = split[0];
+						lastName = split[1];
+					} else {
+						firstName = split[0];
+					}
+					employeeService.findByName(firstName, lastName).ifPresent(leads::setEmployee);
+				} else {
+					split = auditAwareUtil.getLoggedInUserName().split(" ");
+					if (split.length > 1) {
+						firstName = split[0];
+						lastName = split[1];
+					} else {
+						firstName = split[0];
+					}
+					employeeService.findByName(firstName, lastName).ifPresent(leads::setEmployee);
+				}
+				if (nonNull(leadDaoService.addLead(leads)))
+					status = true;
+			}
+			if (status)
+				result.put(MESSAGE, "Leads Added Successfully !!");
+			else
+				result.put(MESSAGE, "Leads Not Added !!");
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.info("Got Exception while uploading the Excel of lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

@@ -26,7 +26,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
@@ -52,7 +54,7 @@ public class LeadsController {
 		return leadService.createLead(dto);
 	}
 
-	//for the DashBoard Leads Data...
+	// for the DashBoard Leads Data...
 	@GetMapping(value = { GET_LEADS_BY_STATUS, GET_ALL_LEADS })
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(
 			@PathVariable(name = "leadsStatus", required = false) String leadsStatus) {
@@ -77,8 +79,7 @@ public class LeadsController {
 		return leadService.getAllDropDownData();
 	}
 
-	
-	//for the open views table data
+	// for the open views table data
 	@PreAuthorize(CHECK_USER_ACCESS)
 	@GetMapping(DASHBOARD_ALL_LEADS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardData() {
@@ -125,14 +126,20 @@ public class LeadsController {
 			@PathVariable boolean status) {
 		return leadService.importantLead(leadId, status);
 	}
-	
+
 	@PutMapping("/reactive/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(@PathVariable Integer leadId) {
 		return leadService.reactiveLead(leadId);
 	}
-	
-	@PostMapping("/addSortFilter")	
-	public ResponseEntity<EnumMap<ApiResponse,Object>> addSortFilterToLeads(@RequestBody LeadSortFilterDto sortFilter){
+
+	@PostMapping("/addSortFilter")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addSortFilterToLeads(
+			@RequestBody LeadSortFilterDto sortFilter) {
 		return leadService.addSortFilterForLeads(sortFilter);
+	}
+
+	@PostMapping("/uploadExcel")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(@RequestParam("file") MultipartFile file) {
+		return leadService.uploadExcel(file);
 	}
 }

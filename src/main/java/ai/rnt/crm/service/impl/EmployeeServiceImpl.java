@@ -70,5 +70,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 		}
 	}
 
+	@Override
+	public Optional<EmployeeMaster> findByName(String firstName, String lastName) {
+		return employeeDaoService.findByName(firstName,lastName);
+	}
+
 }
 //@formatter:on

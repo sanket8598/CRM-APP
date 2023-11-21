@@ -11,4 +11,6 @@ public interface ServiceFallsDaoSevice {
 
 	List<ServiceFallsMaster> getAllSerciveFalls();
 
+	Optional <ServiceFallsMaster> findByName(String serviceFalls);
+
 }
