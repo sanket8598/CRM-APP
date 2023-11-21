@@ -10,14 +10,15 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 @Documented
-@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, ElementType.PARAMETER, ElementType.TYPE_USE})
+@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
+		ElementType.PARAMETER, ElementType.TYPE_USE })
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {ExcelFileValidator.class})
+@Constraint(validatedBy = { ExcelFileValidator.class })
 public @interface ValidFile {
 
-	 String message() default "Only Excel files are allowed";
+	String message() default "Only Excel files are allowed";
 
-	    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-	    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
 }
