@@ -59,6 +59,7 @@ import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
+import ai.rnt.crm.dto.LeadsCardDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
@@ -155,6 +156,7 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(String leadsStatus) {
 		EnumMap<ApiResponse, Object> getAllLeads = new EnumMap<>(ApiResponse.class);
+		Map<String, Object> countMap = new HashMap<>();
 		getAllLeads.put(SUCCESS, true);
 		try {
 			if (isNull(leadsStatus)) {
@@ -180,46 +182,100 @@ public class LeadServiceImpl implements LeadService {
 					filterMap.put("SecondaryField", sortFilter.getSecondaryFilter());
 				});
 				if (auditAwareUtil.isAdmin()) {
-					dataMap.put("allLead",
-							allLeads.stream()
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get("PrimaryField").toString(),
-											filterMap.get("SecondaryField").toString()))
-									.collect(Collectors.toList()));
-					dataMap.put("openLead", allLeads.stream().filter(l -> nonNull(l.getStatus())
-							&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
+					List<LeadsCardDto> allLead = allLeads.stream()
 							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
 									filterMap.get("PrimaryField").toString(),
 									filterMap.get("SecondaryField").toString()))
-							.collect(Collectors.toList()));
-					dataMap.put("closeLead",
-							allLeads.stream().filter(l -> !l.getStatus().equalsIgnoreCase("open"))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get("PrimaryField").toString(),
-											filterMap.get("SecondaryField").toString()))
-									.collect(Collectors.toList()));
+							.collect(Collectors.toList());
+
+					List<LeadsCardDto> openLead = allLeads.stream()
+							.filter(l -> nonNull(l.getStatus()) && l.getStatus().equalsIgnoreCase("Open"))
+							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
+									filterMap.get("PrimaryField").toString(),
+									filterMap.get("SecondaryField").toString()))
+							.collect(Collectors.toList());
+
+					List<LeadsCardDto> qualifiedLead = allLeads.stream()
+							.filter(l -> nonNull(l.getStatus()) && !l.getStatus().equalsIgnoreCase("Open")
+									&& l.getStatus().equalsIgnoreCase("CloseAsQualified")
+									&& (l.getDisqualifyAs().equalsIgnoreCase("Qualified")
+											|| l.getDisqualifyAs().equalsIgnoreCase("Follow-Up")))
+							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
+									filterMap.get("PrimaryField").toString(),
+									filterMap.get("SecondaryField").toString()))
+							.collect(Collectors.toList());
+
+					List<LeadsCardDto> disQualifiedLead = allLeads.stream()
+							.filter(l -> nonNull(l.getStatus()) && !l.getStatus().equalsIgnoreCase("Open")
+									&& l.getStatus().equalsIgnoreCase("CloseAsDisqualified")
+									&& (l.getDisqualifyAs().equalsIgnoreCase("Lost")
+											|| l.getDisqualifyAs().equalsIgnoreCase("Cannot Contact")
+											|| l.getDisqualifyAs().equalsIgnoreCase("No Longer Interested")
+											|| l.getDisqualifyAs().equalsIgnoreCase("Canceled")))
+							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
+									filterMap.get("PrimaryField").toString(),
+									filterMap.get("SecondaryField").toString()))
+							.collect(Collectors.toList());
+					dataMap.put("allLead", allLead);
+					dataMap.put("openLead", openLead);
+					dataMap.put("qualifiedLead", qualifiedLead);
+					dataMap.put("disQualifiedLead", disQualifiedLead);
+
+					countMap.put("allLead", allLead.stream().count());
+					countMap.put("openLead", openLead.stream().count());
+					countMap.put("qualifiedLead", qualifiedLead.stream().count());
+					countMap.put("disQualifiedLead", disQualifiedLead.stream().count());
+					dataMap.put("countByStatus", countMap);
 				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
-					dataMap.put("allLead",
-							allLeads.stream().filter(l -> l.getEmployee().getStaffId().equals(loggedInStaffId))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get("PrimaryField").toString(),
-											filterMap.get("SecondaryField").toString()))
-									.collect(Collectors.toList()));
-					dataMap.put("openLead", allLeads.stream().filter(l -> (nonNull(l.getStatus())
-							&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
-							&& l.getEmployee().getStaffId().equals(loggedInStaffId))
+					List<LeadsCardDto> allLead = allLeads.stream()
+							.filter(l -> l.getEmployee().getStaffId().equals(loggedInStaffId))
 							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
 									filterMap.get("PrimaryField").toString(),
 									filterMap.get("SecondaryField").toString()))
-							.collect(Collectors.toList()));
-					dataMap.put("closeLead",
-							allLeads.stream()
-									.filter(l -> !l.getStatus().equalsIgnoreCase("open")
-											&& l.getEmployee().getStaffId().equals(loggedInStaffId))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get("PrimaryField").toString(),
-											filterMap.get("SecondaryField").toString()))
-									.collect(Collectors.toList()));
+							.collect(Collectors.toList());
+
+					List<LeadsCardDto> openLead = allLeads.stream()
+							.filter(l -> (nonNull(l.getStatus()) && l.getStatus().equalsIgnoreCase("Open"))
+									&& l.getEmployee().getStaffId().equals(loggedInStaffId))
+							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
+									filterMap.get("PrimaryField").toString(),
+									filterMap.get("SecondaryField").toString()))
+							.collect(Collectors.toList());
+
+					List<LeadsCardDto> qualifiedLead = allLeads.stream()
+							.filter(l -> nonNull(l.getStatus()) && !l.getStatus().equalsIgnoreCase("Open")
+									&& l.getStatus().equalsIgnoreCase("CloseAsQualified")
+									&& (l.getDisqualifyAs().equalsIgnoreCase("Qualified")
+											|| l.getDisqualifyAs().equalsIgnoreCase("Follow-Up"))
+									&& l.getEmployee().getStaffId().equals(loggedInStaffId))
+							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
+									filterMap.get("PrimaryField").toString(),
+									filterMap.get("SecondaryField").toString()))
+							.collect(Collectors.toList());
+
+					List<LeadsCardDto> disQualifiedLead = allLeads.stream()
+							.filter(l -> nonNull(l.getStatus()) && !l.getStatus().equalsIgnoreCase("Open")
+									&& l.getStatus().equalsIgnoreCase("CloseAsDisqualified")
+									&& (l.getDisqualifyAs().equalsIgnoreCase("Lost")
+											|| l.getDisqualifyAs().equalsIgnoreCase("Cannot Contact")
+											|| l.getDisqualifyAs().equalsIgnoreCase("No Longer Interested")
+											|| l.getDisqualifyAs().equalsIgnoreCase("Canceled"))
+									&& l.getEmployee().getStaffId().equals(loggedInStaffId))
+							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
+									filterMap.get("PrimaryField").toString(),
+									filterMap.get("SecondaryField").toString()))
+							.collect(Collectors.toList());
+					dataMap.put("allLead", allLead);
+					dataMap.put("openLead", openLead);
+					dataMap.put("qualifiedLead", qualifiedLead);
+					dataMap.put("disQualifiedLead", disQualifiedLead);
+
+					countMap.put("allLead", allLead.stream().count());
+					countMap.put("openLead", openLead.stream().count());
+					countMap.put("qualifiedLead", qualifiedLead.stream().count());
+					countMap.put("disQualifiedLead", disQualifiedLead.stream().count());
+					dataMap.put("countByStatus", countMap);
+
 				} else
 					dataMap.put("Data", Collections.emptyList());
 				getAllLeads.put(DATA, dataMap);
