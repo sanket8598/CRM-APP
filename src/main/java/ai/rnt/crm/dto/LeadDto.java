@@ -38,6 +38,10 @@ public class LeadDto {
 	private String companyName;
 
 	private String businessCard;
+	
+	private String businessCardName;
+	
+	private String businessCardType;
 
 	//@Pattern(regexp = "^[0-9,\\.]+$", message = "Please Enter Valid Budget Amount!!")
 	private String budgetAmount;

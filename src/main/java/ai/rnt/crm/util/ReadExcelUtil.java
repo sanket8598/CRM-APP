@@ -62,7 +62,7 @@ public class ReadExcelUtil {
 			workbook.close();
 			return record;
 		} catch (Exception e) {
-			log.info("Got Exception while reactivating data from excel file..{}", e.getMessage());
+			log.info("Got Exception while getting data from excel file..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
