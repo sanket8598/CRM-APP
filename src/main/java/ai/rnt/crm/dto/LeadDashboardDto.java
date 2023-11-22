@@ -30,6 +30,10 @@ public class LeadDashboardDto {
 	
 	private String businessCard;
 	
+	private String businessCardName;
+	
+	private String businessCardType;
+	
 	private String designation;
 	
 	@JsonProperty("serviceFallsInto")
