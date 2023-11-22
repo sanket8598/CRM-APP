@@ -88,6 +88,7 @@ public class LeadsController {
 		return leadService.getLeadDashboardData();
 	}
 
+	// for dashboard leads by status.(All,Open,Qualified and Disqualified)
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping(DASHBOARD_LEADS_BY_STATUS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(@PathVariable String leadsStatus) {
