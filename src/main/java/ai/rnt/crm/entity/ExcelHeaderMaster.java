@@ -31,10 +31,10 @@ public class ExcelHeaderMaster extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "header_id")
+	@Column(name = "exc_header_id")
 	private Integer headerId;
 
-	@Column(name = "header_name")
+	@Column(name = "exc_header_name")
 	private String headerName;
 
 }
