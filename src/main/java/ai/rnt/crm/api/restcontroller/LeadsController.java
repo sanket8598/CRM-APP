@@ -39,11 +39,13 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.service.ServiceFallsService;
 import ai.rnt.crm.validation.ValidFile;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(LEAD)
 @RequiredArgsConstructor
+@Tag(name = "Lead",description = "This Section Gives Us The API Endpoint Related To The Lead")
 @Validated
 public class LeadsController {
 

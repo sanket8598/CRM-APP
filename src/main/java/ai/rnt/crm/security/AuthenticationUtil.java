@@ -34,8 +34,12 @@ public class AuthenticationUtil {
 		api.add("/api/v1/auth/login"); 
 		api.add("/api/v1/auth/tokenparse"); 
 		api.add("/v3/api-docs"); 
-		api.add("swagger-resources/**"); 
-		api.add("swagger-ui/**"); 
+		api.add("swagger-resources/"); 
+		api.add("/swagger-ui/index.html"); 
+		api.add("/swagger-ui.html"); 
+		api.add("swagger-resources/"); 
+		api.add("swagger-ui/index.html"); 
+		api.add("swagger-ui.html"); 
 		api.add("/webjars/**"); 
 		return api;
 		
