@@ -16,10 +16,12 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +36,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -45,6 +50,7 @@ import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
+import ai.rnt.crm.dao.service.ExcelHeaderDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSortFilterDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
@@ -101,6 +107,8 @@ public class LeadServiceImpl implements LeadService {
 	private final StateDaoService stateDaoService;
 	private final CountryDaoService countryDaoService;
 	private final LeadSortFilterDaoService leadSortFilterDaoService;
+	private final ReadExcelUtil readExcelUtil;
+	private final ExcelHeaderDaoService excelHeaderDaoService;
 
 	@Override
 	@Transactional
@@ -743,36 +751,74 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		ArrayList<ArrayList<String>> excelData = new ArrayList<ArrayList<String>>();
-		boolean status = false;
+		List<List<String>> excelData = new ArrayList<>();
 		try {
-			excelData = ReadExcelUtil.getLeadFromExcelFile(file);
-			for (ArrayList<String> data : excelData) {
-				LeadDto dto = new LeadDto();
-				status = false;
-				dto.setFirstName(data.get(0));
-				dto.setLastName(data.get(1));
-				dto.setEmail(data.get(2));
-				dto.setPhoneNumber(data.get(3));
-				dto.setDesignation(data.get(4));
-				dto.setTopic(data.get(5));
-				dto.setCompanyName(data.get(6));
-				dto.setCompanyWebsite(data.get(7));
-				dto.setBudgetAmount(data.get(8));
-				dto.setStatus("Open");
-				dto.setDisqualifyAs("Open");
-				Leads leads = TO_LEAD.apply(dto).orElseThrow(null);
-				Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
-				if (existCompany.isPresent()) {
-					existCompany.get().setCompanyWebsite(dto.getCompanyWebsite());
-					leads.setCompanyMaster(TO_COMPANY
+			Workbook workbook = WorkbookFactory.create(file.getInputStream());
+			Sheet sheet = workbook.getSheetAt(0);
+			if(isValidExcel(sheet)) {
+				excelData = readExcelUtil.getLeadFromExcelFile(workbook, sheet);
+				int saveLeadCount = 0;
+				int duplicateLead = 0;
+				for (List<String> data : excelData) {
+					Leads leads = buildLeadObj(data);
+
+					if (data.size() > 11)
+						setAssignToNameForTheLead(leads, data.get(11).split(" "));
+					else
+						setAssignToNameForTheLead(leads, auditAwareUtil.getLoggedInUserName().split(" "));
+					if (LeadsCardUtil.checkDuplicateLead(leadDaoService.getAllLeads(), leads))
+						duplicateLead++;
+					else if(nonNull(leadDaoService.addLead(leads)))
+							saveLeadCount++;
+				}
+				if (duplicateLead == 0 && saveLeadCount == 0)
+					result.put(MESSAGE, "Leads Not Added !!");
+				else
+					result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
+				return new ResponseEntity<>(result, CREATED);
+			} else {
+				result.put(MESSAGE, "Invalid Excel Format!!");
+				return new ResponseEntity<>(result, BAD_REQUEST);
+			}
+		} catch (Exception e) {
+			log.info("Got Exception while uploading the Excel of lead..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public boolean isValidExcel(Sheet sheet) throws IOException {
+		List<String> allHeaders = readExcelUtil.getAllHeaders(sheet);
+		return excelHeaderDaoService.getAllExcelHeaders().stream()
+				.allMatch(e -> allHeaders.contains(e.getHeaderName()));
+	}
+
+	public Leads buildLeadObj(List<String> data) {
+		LeadDto dto = new LeadDto();
+		dto.setFirstName(data.get(0));
+		dto.setLastName(data.get(1));
+		dto.setEmail(data.get(2));
+		dto.setPhoneNumber(data.get(3));
+		dto.setDesignation(data.get(4));
+		dto.setTopic(data.get(5));
+		dto.setCompanyName(data.get(6));
+		dto.setCompanyWebsite(data.get(7));
+		dto.setBudgetAmount(data.get(8));
+		dto.setStatus("Open");
+		dto.setDisqualifyAs("Open");
+		Leads leads = TO_LEAD.apply(dto).orElseThrow(null);
+		Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
+		if (existCompany.isPresent()) {
+			existCompany.get().setCompanyWebsite(dto.getCompanyWebsite());
+			leads.setCompanyMaster(
+					TO_COMPANY
 							.apply(companyMasterDaoService
 									.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
 											.orElseThrow(ResourceNotFoundException::new))
 									.orElseThrow(ResourceNotFoundException::new))
 							.orElseThrow(ResourceNotFoundException::new));
-				} else
-					leads.setCompanyMaster(TO_COMPANY
+		} else
+			leads.setCompanyMaster(
+					TO_COMPANY
 							.apply(companyMasterDaoService
 									.save(TO_COMPANY
 											.apply(CompanyDto.builder().companyName(dto.getCompanyName())
@@ -780,41 +826,19 @@ public class LeadServiceImpl implements LeadService {
 											.orElseThrow(ResourceNotFoundException::new))
 									.orElseThrow(ResourceNotFoundException::new))
 							.orElseThrow(ResourceNotFoundException::new));
-				serviceFallsDaoSevice.findByName(data.get(9)).ifPresent(leads::setServiceFallsMaster);
-				leadSourceDaoService.getByName(data.get(10)).ifPresent(leads::setLeadSourceMaster);
-				String[] split;
-				String firstName;
-				String lastName = null;
-				if (data.size() > 11) {
-					split = data.get(11).split(" ");
-					if (split.length > 1) {
-						firstName = split[0];
-						lastName = split[1];
-					} else {
-						firstName = split[0];
-					}
-					employeeService.findByName(firstName, lastName).ifPresent(leads::setEmployee);
-				} else {
-					split = auditAwareUtil.getLoggedInUserName().split(" ");
-					if (split.length > 1) {
-						firstName = split[0];
-						lastName = split[1];
-					} else {
-						firstName = split[0];
-					}
-					employeeService.findByName(firstName, lastName).ifPresent(leads::setEmployee);
-				}
-				if (nonNull(leadDaoService.addLead(leads)))
-					status = true;
-			}
-			if (status)
-				result.put(MESSAGE, "Leads Added Successfully !!");
-			else
-				result.put(MESSAGE, "Leads Not Added !!");
-			return new ResponseEntity<>(result, CREATED);
-		} catch (Exception e) {
-			log.info("Got Exception while uploading the Excel of lead..{}", e.getMessage());
-			throw new CRMException(e);
-		}
+		serviceFallsDaoSevice.findByName(data.get(9)).ifPresent(leads::setServiceFallsMaster);
+		leadSourceDaoService.getByName(data.get(10)).ifPresent(leads::setLeadSourceMaster);
+		return leads;
+	}
+
+	public void setAssignToNameForTheLead(Leads leads, String[] split) {
+		String firstName;
+		String lastName = null;
+		if (split.length > 1) {
+			firstName = split[0];
+			lastName = split[1];
+		} else
+			firstName = split[0];
+		employeeService.findByName(firstName, lastName).ifPresent(leads::setEmployee);
 	}
 }
