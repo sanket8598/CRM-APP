@@ -753,6 +753,7 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		List<List<String>> excelData = new ArrayList<>();
 		try {
+			result.put(SUCCESS, false);
 			Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
 			if(isValidExcel(sheet)) {
@@ -775,6 +776,7 @@ public class LeadServiceImpl implements LeadService {
 					result.put(MESSAGE, "Leads Not Added !!");
 				else
 					result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
+				result.put(SUCCESS, true);
 				return new ResponseEntity<>(result, CREATED);
 			} else {
 				result.put(MESSAGE, "Invalid Excel Format!!");
