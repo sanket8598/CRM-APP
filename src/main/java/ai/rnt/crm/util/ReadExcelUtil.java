@@ -33,7 +33,7 @@ public class ReadExcelUtil {
 
 	public static ArrayList<ArrayList<String>> getLeadFromExcelFile(MultipartFile file)
 			throws EncryptedDocumentException, InvalidFormatException, IOException {
-		ArrayList<ArrayList<String>> record = new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> record = new ArrayList<>();
 		try {
 			Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
