@@ -23,6 +23,12 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.AddCallService;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * @author Nikhil Gaikwad
+ * @since 11/09/2023
+ * @version 1.0
+ *
+ */
 @RestController
 @RequestMapping(CALL)
 @CrossOrigin("*")
@@ -31,12 +37,6 @@ public class AddCallController {
 
 	private final AddCallService addCallService;
 
-	/**
-	 * @author Nikhil Gaikwad
-	 * @version 1.0
-	 * @since 11/09/2023.
-	 * @return city
-	 */
 	@PostMapping("/add/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(@RequestBody @Valid AddCallDto dto,
 			@PathVariable(name = "leadId") Integer leadsId) {
