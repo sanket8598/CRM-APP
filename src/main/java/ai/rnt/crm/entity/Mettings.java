@@ -20,7 +20,6 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
 
-import ai.rnt.crm.enums.MettingMode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

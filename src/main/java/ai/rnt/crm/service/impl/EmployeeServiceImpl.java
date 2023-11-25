@@ -5,7 +5,9 @@ import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EmployeeMaster;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 
 import java.util.EnumMap;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,11 +60,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser() {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser(String email) {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try{
 			resultMap.put(ApiResponse.SUCCESS, true);
-			resultMap.put(ApiResponse.DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
+			if(Objects.nonNull(email))
+			  resultMap.put(ApiResponse.DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()).stream().collect(Collectors.toMap(e->e.getEmailID(), e->e.getFirstName()+" "+e.getLastName())));
+			else
+			 resultMap.put(ApiResponse.DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
 			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
 		}catch (Exception e) {
 			log.info("Got Exception while getting admin and user..{}" ,e.getMessage());

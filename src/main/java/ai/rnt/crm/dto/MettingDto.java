@@ -5,8 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import ai.rnt.crm.entity.MettingAttachments;
-import ai.rnt.crm.enums.MettingMode;
 import lombok.Data;
 
 /**

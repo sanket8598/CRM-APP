@@ -124,7 +124,7 @@ public class LoginController {
 	@GetMapping(value = {GET_ADMIN_AND_USER,GET_ALL_MAIL_ID})
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser(
-	@PathVariable(name = "mail", required = false) String mail) {
+	@PathVariable(name = "email", required = false) String mail) {
 		return employeeService.getAdminAndUser(mail);
 	}
 }
