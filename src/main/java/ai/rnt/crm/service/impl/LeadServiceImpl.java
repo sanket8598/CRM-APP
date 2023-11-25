@@ -72,6 +72,7 @@ import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.EmployeeMaster;
+import ai.rnt.crm.entity.ExcelHeaderMaster;
 import ai.rnt.crm.entity.LeadImportant;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.StateMaster;
@@ -774,9 +775,10 @@ public class LeadServiceImpl implements LeadService {
 				}
 				if (duplicateLead == 0 && saveLeadCount == 0)
 					result.put(MESSAGE, "Leads Not Added !!");
-				else
+				else {
+					result.put(SUCCESS, true);
 					result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
-				result.put(SUCCESS, true);
+				}
 				return new ResponseEntity<>(result, CREATED);
 			} else {
 				result.put(MESSAGE, "Invalid Excel Format!!");
@@ -789,9 +791,13 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public boolean isValidExcel(Sheet sheet) throws IOException {
-		List<String> allHeaders = readExcelUtil.getAllHeaders(sheet);
-		return excelHeaderDaoService.getAllExcelHeaders().stream()
-				.allMatch(e -> allHeaders.contains(e.getHeaderName()));
+		List<String> dbHeaderNames = excelHeaderDaoService.getAllExcelHeaders().stream()
+				.map(ExcelHeaderMaster::getHeaderName).collect(Collectors.toList());
+		List<String> excelHeader = readExcelUtil.getAllHeaders(sheet);
+		return (nonNull(excelHeader) && !excelHeader.isEmpty())
+				&& (nonNull(dbHeaderNames) && !dbHeaderNames.isEmpty())
+				&& excelHeader.stream().allMatch(dbHeaderNames::contains) 
+				&& excelHeader.containsAll(dbHeaderNames);
 	}
 
 	public Leads buildLeadObj(List<String> data) {
