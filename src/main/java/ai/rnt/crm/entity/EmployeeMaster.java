@@ -86,12 +86,13 @@ public class EmployeeMaster extends Auditable {
 	@OneToMany(mappedBy = "employee")
 	 Set<LeadImportant> impLead;
 
-	public EmployeeMaster(Integer staffId, String firstName, String lastName, LocalDate departureDate) {
+	public EmployeeMaster(Integer staffId, String firstName, String lastName, LocalDate departureDate,String emailId) {
 		super();
 		this.staffId = staffId;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.departureDate = departureDate;
+		this.emailId = emailId;
 	}
 	
 	
