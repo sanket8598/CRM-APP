@@ -1,7 +1,7 @@
 package ai.rnt.crm.entity;
 
-import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -39,7 +39,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "crm_add_call")
+@Table(name = "crm_call")
 @Where(clause = "deleted_by is null")
 public class Call extends Auditable {
 
@@ -47,8 +47,8 @@ public class Call extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "add_call_id")
-	private Integer addCallId;
+	@Column(name = "call_id")
+	private Integer callId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@LazyCollection(LazyCollectionOption.TRUE)

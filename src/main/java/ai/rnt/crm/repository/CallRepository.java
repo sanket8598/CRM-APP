@@ -12,7 +12,7 @@ import ai.rnt.crm.entity.Call;
  * @since 11/09/2023.
  *
  */
-public interface AddCallRepository extends JpaRepository<Call, Integer> {
+public interface CallRepository extends JpaRepository<Call, Integer> {
 
 	List<Call> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
 

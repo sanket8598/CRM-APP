@@ -1,6 +1,6 @@
 package ai.rnt.crm.api.restcontroller;
 
-import static ai.rnt.crm.constants.ApiConstants.METTING;
+import static ai.rnt.crm.constants.ApiConstants.MEETING;
 
 import java.util.EnumMap;
 
@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ai.rnt.crm.dto.MettingDto;
+import ai.rnt.crm.dto.MeetingDto;
+import ai.rnt.crm.dto.MeetingTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
-import ai.rnt.crm.service.MettingService;
+import ai.rnt.crm.service.MeetingService;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -26,16 +27,22 @@ import lombok.RequiredArgsConstructor;
  * @return metting data
  */
 @RestController
-@RequestMapping(METTING)
+@RequestMapping(MEETING)
 @CrossOrigin("*")
 @RequiredArgsConstructor
-public class MettingController {
+public class MeetingController {
 
-	private final MettingService mettingService;
+	private final MeetingService meetingService;
 
 	@PostMapping("/add/{leadId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addMetting(@RequestBody @Valid MettingDto dto,
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeeting(@RequestBody @Valid MeetingDto dto,
 			@PathVariable(name = "leadId") Integer leadsId) {
-		return mettingService.addMetting(dto, leadsId);
+		return meetingService.addMeeting(dto, leadsId);
+	}
+
+	@PostMapping("/addTask/{leadId}/{meetingId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@RequestBody @Valid MeetingTaskDto dto,
+			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "meetingId") Integer meetingId) {
+		return meetingService.addMeetingTask(dto, leadsId, meetingId);
 	}
 }

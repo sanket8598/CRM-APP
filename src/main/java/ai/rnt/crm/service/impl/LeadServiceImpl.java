@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import ai.rnt.crm.dao.service.AddCallDaoService;
+import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
@@ -100,7 +100,7 @@ public class LeadServiceImpl implements LeadService {
 	private final CompanyMasterDaoService companyMasterDaoService;
 	private final EmployeeService employeeService;
 	private final RoleMasterDaoService roleMasterDaoService;
-	private final AddCallDaoService addCallDaoService;
+	private final CallDaoService callDaoService;
 	private final EmailDaoService emailDaoService;
 	private final AuditAwareUtil auditAwareUtil;
 	private final VisitDaoService visitDaoService;
@@ -384,11 +384,11 @@ public class LeadServiceImpl implements LeadService {
 			});
 
 			List<TimeLineActivityDto> timeLine = new ArrayList<>();
-			List<EditCallDto> list = addCallDaoService.getCallsByLeadId(leadId).stream()
+			List<EditCallDto> list = callDaoService.getCallsByLeadId(leadId).stream()
 					.filter(call -> nonNull(call.getStatus()) && call.getStatus().equalsIgnoreCase("complete"))
 					.map(call -> {
 						EditCallDto callDto = new EditCallDto();
-						callDto.setId(call.getAddCallId());
+						callDto.setId(call.getCallId());
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
@@ -404,7 +404,7 @@ public class LeadServiceImpl implements LeadService {
 					.filter(email -> nonNull(email.getStatus()) && email.getStatus().equalsIgnoreCase("send"))
 					.map(email -> {
 						EditEmailDto editEmailDto = new EditEmailDto();
-						editEmailDto.setId(email.getAddMailId());
+						editEmailDto.setId(email.getMailId());
 						editEmailDto.setType("Email");
 						editEmailDto.setSubject(email.getSubject());
 						editEmailDto.setBody(email.getContent());
@@ -430,10 +430,10 @@ public class LeadServiceImpl implements LeadService {
 					}).collect(Collectors.toList()));
 			timeLine.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), formatter)
 					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), formatter)));
-			List<TimeLineActivityDto> activity = addCallDaoService.getCallsByLeadId(leadId).stream()
+			List<TimeLineActivityDto> activity = callDaoService.getCallsByLeadId(leadId).stream()
 					.filter(call -> isNull(call.getStatus()) || call.getStatus().equalsIgnoreCase("save")).map(call -> {
 						EditCallDto callDto = new EditCallDto();
-						callDto.setId(call.getAddCallId());
+						callDto.setId(call.getCallId());
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
@@ -448,7 +448,7 @@ public class LeadServiceImpl implements LeadService {
 					.filter(email -> isNull(email.getStatus()) || email.getStatus().equalsIgnoreCase("save"))
 					.map(email -> {
 						EditEmailDto editEmailDto = new EditEmailDto();
-						editEmailDto.setId(email.getAddMailId());
+						editEmailDto.setId(email.getMailId());
 						editEmailDto.setType("Email");
 						editEmailDto.setSubject(email.getSubject());
 						editEmailDto.setBody(email.getContent());

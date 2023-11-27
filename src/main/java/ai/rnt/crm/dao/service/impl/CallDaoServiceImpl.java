@@ -6,9 +6,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ai.rnt.crm.dao.service.AddCallDaoService;
+import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.entity.Call;
-import ai.rnt.crm.repository.AddCallRepository;
+import ai.rnt.crm.repository.CallRepository;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -20,22 +20,22 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class AddCallDaoServiceImpl implements AddCallDaoService {
+public class CallDaoServiceImpl implements CallDaoService {
 
-	private final AddCallRepository addCallRepository;
+	private final CallRepository callRepository;
 
 	@Override
 	public Call call(Call call) {
-		return addCallRepository.save(call);
+		return callRepository.save(call);
 	}
 
 	@Override
 	public List<Call> getCallsByLeadId(Integer leadId) {
-		return addCallRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
+		return callRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
 	}
 
 	@Override
 	public Optional<Call> getCallById(Integer callId) {
-		return addCallRepository.findById(callId);
+		return callRepository.findById(callId);
 	}
 }

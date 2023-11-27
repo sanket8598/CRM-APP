@@ -33,7 +33,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "crm_add_email")
+@Table(name = "crm_email")
 @Where(clause = "deleted_by is null")
 public class Email extends Auditable {
 
@@ -41,8 +41,8 @@ public class Email extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "add_mail_id")
-	private Integer addMailId;
+	@Column(name = "email_id")
+	private Integer mailId;
 
 	@Column(name = "mail_from")
 	private String mailFrom;

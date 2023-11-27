@@ -2,9 +2,7 @@ package ai.rnt.crm.entity;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
-import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,15 +21,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="crm_meeting_task")
+@Table(name = "crm_meeting_task")
 @Getter
 @Setter
 @NoArgsConstructor
 @Where(clause = "deleted_by is null")
-public class MeetingTask extends Auditable{
-	
+public class MeetingTask extends Auditable {
+
 	private static final long serialVersionUID = -3854915649423434269L;
-	
+
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "mtng_task_id")
@@ -39,39 +37,40 @@ public class MeetingTask extends Auditable{
 
 	@Column(name = "subject")
 	private String subject;
-	
+
 	@Column(name = "task_status")
 	private String status;
-	
+
 	@Column(name = "task_priority")
 	private String priority;
-	
+
 	@Column(name = "task_due_date")
-	private LocalDateTime dueDate;
-	
+	private Date dueDate;
+
 	@Column(name = "task_desc")
 	private String description;
 
-	@Column(name="remainder",columnDefinition = "boolean default false")
+	@Column(name = "remainder", columnDefinition = "boolean default false")
 	private boolean remainderOn;
-	
-	@Column(name="remainder_via")
+
+	@Column(name = "remainder_via")
 	private String remainderVia;
-	
-	@Column(name="remainder_due_at")
-	private Time remainderDueAt;
-	
-	@Column(name="remainder_due_on")
-	private LocalDate remainderDueOn;
-	
-	@JoinColumn(name = "meeting_id", updatable = true)
+
+	@Column(name = "remainder_due_at")
+	// @Temporal(TIME)
+	private String remainderDueAt;
+
+	@Column(name = "remainder_due_on")
+	private Date remainderDueOn;
+
+	@JoinColumn(name = "mtng_id", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private Meetings meetings;
-	
+
 	@JoinColumn(name = "task_assign_to", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private EmployeeMaster assignTo;
-	
+
 }

@@ -26,7 +26,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "crm_metting_attachment")
+@Table(name = "crm_meeting_attachment")
 @Where(clause = "deleted_by is null")
 public class MeetingAttachments extends Auditable {
 
@@ -34,19 +34,19 @@ public class MeetingAttachments extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "metting_attch_id")
-	private Integer mettingAttchId;
+	@Column(name = "mtng_attch_id")
+	private Integer meetingAttchId;
 
-	@Column(name = "metting_attachment")
-	private String mettingAttachmentData;
+	@Column(name = "mtng_attachment")
+	private String meetingAttachmentData;
 
-	@Column(name = "metting_attach_type")
-	private String mettingAttachType;
+	@Column(name = "mtng_attach_type")
+	private String meetingAttachType;
 
-	@Column(name = "metting_attach_name")
-	private String mettingAttachName;
+	@Column(name = "mtng_attach_name")
+	private String meetingAttachName;
 
 	@ManyToOne(cascade = PERSIST)
-	@JoinColumn(name = "metting_id")
+	@JoinColumn(name = "mtng_id")
 	private Meetings meetings;
 }

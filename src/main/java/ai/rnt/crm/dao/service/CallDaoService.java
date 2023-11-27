@@ -3,7 +3,7 @@ package ai.rnt.crm.dao.service;
 import java.util.List;
 import java.util.Optional;
 
-import ai.rnt.crm.dto.AddCallDto;
+import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.entity.Call;
 
 /**
@@ -12,7 +12,7 @@ import ai.rnt.crm.entity.Call;
  * @since 11/09/2023.
  *
  */
-public interface AddCallDaoService extends CrudService<Call, AddCallDto> {
+public interface CallDaoService extends CrudService<Call, CallDto> {
 
 	Call call(Call call);
 

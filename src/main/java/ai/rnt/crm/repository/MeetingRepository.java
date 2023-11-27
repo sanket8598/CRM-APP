@@ -10,6 +10,6 @@ import ai.rnt.crm.entity.Meetings;
  * @since 25/11/2023.
  *
  */
-public interface MettingRepository extends JpaRepository<Meetings, Integer> {
+public interface MeetingRepository extends JpaRepository<Meetings, Integer> {
 
 }

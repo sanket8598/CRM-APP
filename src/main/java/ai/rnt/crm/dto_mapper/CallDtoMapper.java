@@ -8,13 +8,13 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import ai.rnt.crm.dto.AddCallDto;
+import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.entity.Call;
 
-public class AddCallDtoMapper {
+public class CallDtoMapper {
 
-	AddCallDtoMapper() {
+	CallDtoMapper() {
 
 	}
 
@@ -27,13 +27,13 @@ public class AddCallDtoMapper {
 	 * @since 11-09-2023
 	 * @version 1.0
 	 */
-	public static final Function<AddCallDto, Optional<Call>> TO_CALL = e -> evalMapper(e, Call.class);
+	public static final Function<CallDto, Optional<Call>> TO_CALL = e -> evalMapper(e, Call.class);
 	/**
 	 * @since 11-09-2023
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<AddCallDto>, List<Call>> TO_CALLS = e -> e.stream()
+	public static final Function<Collection<CallDto>, List<Call>> TO_CALLS = e -> e.stream()
 			.map(dm -> TO_CALL.apply(dm).get()).collect(Collectors.toList());
 
 	/**
@@ -45,14 +45,14 @@ public class AddCallDtoMapper {
 	 * @since 11-09-2023
 	 * @Version 1.0
 	 */
-	public static final Function<Call, Optional<AddCallDto>> TO_CALL_DTO = e -> evalMapper(e, AddCallDto.class);
+	public static final Function<Call, Optional<CallDto>> TO_CALL_DTO = e -> evalMapper(e, CallDto.class);
 
 	/**
 	 * @since 11-09-2023
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<Call>, List<AddCallDto>> TO_CALL_DTOS = e -> e.stream()
+	public static final Function<Collection<Call>, List<CallDto>> TO_CALL_DTOS = e -> e.stream()
 			.map(dm -> TO_CALL_DTO.apply(dm).get()).collect(Collectors.toList());
 
 	

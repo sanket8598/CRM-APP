@@ -8,12 +8,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import ai.rnt.crm.dto.MettingDto;
+import ai.rnt.crm.dto.MeetingDto;
 import ai.rnt.crm.entity.Meetings;
 
-public class MettingDtoMapper {
+public class MeetingDtoMapper {
 
-	private MettingDtoMapper() {
+	private MeetingDtoMapper() {
 
 	}
 
@@ -27,14 +27,14 @@ public class MettingDtoMapper {
 	 * @since 25-11-2023
 	 * @version 1.0
 	 */
-	public static final Function<MettingDto, Optional<Meetings>> TO_METTING = e -> evalMapper(e, Meetings.class);
+	public static final Function<MeetingDto, Optional<Meetings>> TO_MEETING = e -> evalMapper(e, Meetings.class);
 	/**
 	 * @since 25-11-2023
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<MettingDto>, List<Meetings>> TO_METTINGS = e -> e.stream()
-			.map(dm -> TO_METTING.apply(dm).get()).collect(Collectors.toList());
+	public static final Function<Collection<MeetingDto>, List<Meetings>> TO_MEETINGS = e -> e.stream()
+			.map(dm -> TO_MEETING.apply(dm).get()).collect(Collectors.toList());
 
 	/**
 	 * This function will convert Mettings Entity into optional MettingDto . <b>This
@@ -45,14 +45,14 @@ public class MettingDtoMapper {
 	 * @since 25-11-2023
 	 * @Version 1.0
 	 */
-	public static final Function<Meetings, Optional<MettingDto>> TO_METTING_DTO = e -> evalMapper(e, MettingDto.class);
+	public static final Function<Meetings, Optional<MeetingDto>> TO_MEETING_DTO = e -> evalMapper(e, MeetingDto.class);
 
 	/**
 	 * @since 25-11-2023
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<Meetings>, List<MettingDto>> TO_METTING_DTOS = e -> e.stream()
-			.map(dm -> TO_METTING_DTO.apply(dm).get()).collect(Collectors.toList());
+	public static final Function<Collection<Meetings>, List<MeetingDto>> TO_MEETING_DTOS = e -> e.stream()
+			.map(dm -> TO_MEETING_DTO.apply(dm).get()).collect(Collectors.toList());
 
 }

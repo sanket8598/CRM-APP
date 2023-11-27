@@ -18,7 +18,7 @@ import lombok.Data;
 @Data
 public class EmailDto {
 
-	private Integer addMailId;
+	private Integer mailId;
 
 	private String mailFrom;
 

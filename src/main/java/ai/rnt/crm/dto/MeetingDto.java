@@ -13,11 +13,11 @@ import lombok.Data;
  * @version 1.0
  */
 @Data
-public class MettingDto {
+public class MeetingDto {
 
-	private Integer mettingId;
+	private Integer meetingId;
 
-	private String mettingTitle;
+	private String meetingTitle;
 
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 	private List<String> participates;
@@ -38,8 +38,8 @@ public class MettingDto {
 
 	private String description;
 
-	private String mettingMode;
+	private String meetingMode;
 
-	private List<MettingAttachmentsDto> mettingAttachments;
+	private List<MeetingAttachmentsDto> meetingAttachments;
 
 }

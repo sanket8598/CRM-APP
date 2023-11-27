@@ -5,12 +5,12 @@ import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
-import ai.rnt.crm.dto.AddCallDto;
+import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.enums.ApiResponse;
 
-public interface AddCallService {
+public interface CallService {
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> addCall(AddCallDto dto, Integer leadsId);
+	ResponseEntity<EnumMap<ApiResponse, Object>> addCall(CallDto dto, Integer leadsId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Integer> map);
 
@@ -20,5 +20,5 @@ public interface AddCallService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> editCall(Integer callId);
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(AddCallDto dto, Integer callId, String status);
+	ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(CallDto dto, Integer callId, String status);
 }

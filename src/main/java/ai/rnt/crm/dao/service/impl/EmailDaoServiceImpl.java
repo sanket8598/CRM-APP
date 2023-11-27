@@ -42,6 +42,6 @@ public class EmailDaoServiceImpl implements EmailDaoService {
 
 	@Override
 	public Boolean emailPresentForLeadLeadId(Integer addMailId, Integer leadId) {
-		return emailRepository.existsByAddMailIdAndLeadLeadId(addMailId, leadId);
+		return emailRepository.existsByMailIdAndLeadLeadId(addMailId, leadId);
 	}
 }

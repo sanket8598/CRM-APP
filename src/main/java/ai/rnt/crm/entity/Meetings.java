@@ -35,7 +35,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "crm_metting")
+@Table(name = "crm_meeting")
 @Where(clause = "deleted_by is null")
 public class Meetings extends Auditable {
 
@@ -43,37 +43,37 @@ public class Meetings extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "metting_id")
-	private Integer mettingId;
+	@Column(name = "mtng_id")
+	private Integer meetingId;
 
-	@Column(name = "metting_title")
-	private String mettingTitle;
+	@Column(name = "mtng_title")
+	private String meetingTitle;
 
 	@Column(name = "participates")
 	private String participates;
 
-	@Column(name = "metting_start_date")
+	@Column(name = "mtng_start_date")
 	private Date startDate;
 
-	@Column(name = "metting_end_date")
+	@Column(name = "mtng_end_date")
 	private Date endDate;
 
-	@Column(name = "metting_start_time")
+	@Column(name = "mtng_start_time")
 	private String startTime;
 
-	@Column(name = "metting_end_time")
+	@Column(name = "mtng_end_time")
 	private String endTime;
 
 	@Column(name = "all_day")
 	private boolean allDay;
 
-	@Column(name = "metting_location")
+	@Column(name = "mtng_location")
 	private String location;
 
-	@Column(name = "metting_description")
+	@Column(name = "mtng_description")
 	private String description;
 
-	@Column(name = "metting_mode")
+	@Column(name = "mtng_mode")
 	private String mettingMode;
 
 	@ManyToOne(fetch = FetchType.LAZY)
