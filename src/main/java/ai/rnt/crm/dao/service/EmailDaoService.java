@@ -3,7 +3,7 @@ package ai.rnt.crm.dao.service;
 import java.util.List;
 
 import ai.rnt.crm.dto.EmailDto;
-import ai.rnt.crm.entity.AddEmail;
+import ai.rnt.crm.entity.Email;
 
 /**
  * @author Nikhil Gaikwad
@@ -11,13 +11,13 @@ import ai.rnt.crm.entity.AddEmail;
  * @since 12/09/2023.
  *
  */
-public interface EmailDaoService extends CrudService<AddEmail, EmailDto> {
+public interface EmailDaoService extends CrudService<Email, EmailDto> {
 
-	AddEmail addEmail(AddEmail addEmail);
+	Email email(Email email);
 
-	List<AddEmail> getEmailByLeadId(Integer leadId);
+	List<Email> getEmailByLeadId(Integer leadId);
 
-	AddEmail findById(Integer addMailId);
+	Email findById(Integer addMailId);
 
 	Boolean emailPresentForLeadLeadId(Integer addMailId, Integer leadId);
 

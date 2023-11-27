@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import ai.rnt.crm.dao.service.AddCallDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.AddCallDto;
-import ai.rnt.crm.entity.AddCall;
+import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
@@ -51,15 +51,15 @@ public class AddCallServiceImpl implements AddCallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(AddCallDto dto, Integer leadsId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			AddCall addCall = TO_CALL.apply(dto)
+			Call call = TO_CALL.apply(dto)
 					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", dto.getAddCallId()));
 			Leads lead = leadDaoService.getLeadById(leadsId)
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadsId));
-			addCall.setLead(lead);
-			addCall.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
+			call.setLead(lead);
+			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
-			addCall.setStatus("Save");
-			if (nonNull(addCallDaoService.addCall(addCall)))
+			call.setStatus("Save");
+			if (nonNull(addCallDaoService.call(call)))
 				result.put(MESSAGE, "Call Added Successfully");
 			else
 				result.put(MESSAGE, "Call Not Added");
@@ -76,12 +76,12 @@ public class AddCallServiceImpl implements AddCallService {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign call staffId: {} callId:{}", map.get("staffId"), map.get("addCallId"));
 		try {
-			AddCall call = addCallDaoService.getCallById(map.get("addCallId"))
+			Call call = addCallDaoService.getCallById(map.get("addCallId"))
 					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", map.get("addCallId")));
 			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
 					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
 			call.setCallFrom(employee);
-			if (nonNull(addCallDaoService.addCall(call))) {
+			if (nonNull(addCallDaoService.call(call))) {
 				resultMap.put(MESSAGE, "Call Assigned SuccessFully");
 				resultMap.put(SUCCESS, true);
 			} else {
@@ -99,11 +99,11 @@ public class AddCallServiceImpl implements AddCallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(Integer callId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			AddCall call = addCallDaoService.getCallById(callId)
+			Call call = addCallDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", callId));
 			call.setUpdatedDate(LocalDateTime.now());
 			call.setStatus("complete");
-			if (nonNull(addCallDaoService.addCall(call))) {
+			if (nonNull(addCallDaoService.call(call))) {
 				result.put(MESSAGE, "Call updated SuccessFully");
 				result.put(SUCCESS, true);
 			} else {
@@ -121,11 +121,11 @@ public class AddCallServiceImpl implements AddCallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			AddCall call = addCallDaoService.getCallById(callId)
+			Call call = addCallDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", callId));
 			call.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
 			call.setDeletedDate(LocalDateTime.now());
-			if (nonNull(addCallDaoService.addCall(call))) {
+			if (nonNull(addCallDaoService.call(call))) {
 				result.put(MESSAGE, "Call deleted SuccessFully.");
 				result.put(SUCCESS, true);
 			} else {
@@ -157,7 +157,7 @@ public class AddCallServiceImpl implements AddCallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(AddCallDto dto, Integer callId, String status) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			AddCall call = addCallDaoService.getCallById(callId)
+			Call call = addCallDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", dto.getAddCallId()));
 			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
@@ -170,7 +170,7 @@ public class AddCallServiceImpl implements AddCallService {
 			call.setDueDate(dto.getDueDate());
 			call.setStatus(status);
 			call.setUpdatedDate(LocalDateTime.now());
-			if (nonNull(addCallDaoService.addCall(call))) {
+			if (nonNull(addCallDaoService.call(call))) {
 				if (status.equalsIgnoreCase("Save"))
 					result.put(MESSAGE, "Call Updated Successfully");
 				else

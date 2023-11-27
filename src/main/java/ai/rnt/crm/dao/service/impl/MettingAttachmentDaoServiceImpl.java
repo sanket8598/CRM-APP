@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.MettingAttachmentDaoService;
-import ai.rnt.crm.entity.MettingAttachments;
+import ai.rnt.crm.entity.MeetingAttachments;
 import ai.rnt.crm.repository.MettingAttachmentRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -22,8 +22,8 @@ public class MettingAttachmentDaoServiceImpl implements MettingAttachmentDaoServ
 	private final MettingAttachmentRepository mettingAttachmentRepository;
 
 	@Override
-	public MettingAttachments addMettingAttachment(MettingAttachments mettingAttachments) {
-		return mettingAttachmentRepository.save(mettingAttachments);
+	public MeetingAttachments addMettingAttachment(MeetingAttachments meetingAttachments) {
+		return mettingAttachmentRepository.save(meetingAttachments);
 	}
 
 }

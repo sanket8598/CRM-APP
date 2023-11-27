@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.EmailDaoService;
-import ai.rnt.crm.entity.AddEmail;
+import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.repository.EmailRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +25,17 @@ public class EmailDaoServiceImpl implements EmailDaoService {
 	private final EmailRepository emailRepository;
 
 	@Override
-	public AddEmail addEmail(AddEmail addEmail) {
-		return emailRepository.save(addEmail);
+	public Email email(Email email) {
+		return emailRepository.save(email);
 	}
 
 	@Override
-	public List<AddEmail> getEmailByLeadId(Integer leadId) {
+	public List<Email> getEmailByLeadId(Integer leadId) {
 		return emailRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
 	}
 
 	@Override
-	public AddEmail findById(Integer addMailId) {
+	public Email findById(Integer addMailId) {
 		return emailRepository.findById(addMailId)
 				.orElseThrow(() -> new ResourceNotFoundException("AddEmail", "addMailId", addMailId));
 	}

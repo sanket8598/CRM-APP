@@ -117,10 +117,10 @@ public class Leads extends Auditable {
 	private CompanyMaster companyMaster;
 
 	@OneToMany(mappedBy = "lead", cascade = ALL)
-	private List<AddEmail> emails = new ArrayList<>();
+	private List<Email> emails = new ArrayList<>();
 
 	@OneToMany(mappedBy = "lead", cascade = ALL)
-	private List<AddCall> calls = new ArrayList<>();
+	private List<Call> calls = new ArrayList<>();
 
 	@OneToMany(mappedBy = "lead", cascade = ALL)
 	private List<Visit> visit = new ArrayList<>();

@@ -35,7 +35,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "crm_add_email")
 @Where(clause = "deleted_by is null")
-public class AddEmail extends Auditable {
+public class Email extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 

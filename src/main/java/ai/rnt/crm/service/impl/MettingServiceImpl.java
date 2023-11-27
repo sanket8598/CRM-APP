@@ -21,8 +21,8 @@ import ai.rnt.crm.dao.service.MettingAttachmentDaoService;
 import ai.rnt.crm.dao.service.MettingDaoService;
 import ai.rnt.crm.dto.MettingAttachmentsDto;
 import ai.rnt.crm.dto.MettingDto;
-import ai.rnt.crm.entity.MettingAttachments;
-import ai.rnt.crm.entity.Mettings;
+import ai.rnt.crm.entity.MeetingAttachments;
+import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
@@ -51,7 +51,7 @@ public class MettingServiceImpl implements MettingService {
 		try {
 			boolean saveStatus = false;
 
-			Mettings metting = TO_METTING.apply(dto).orElseThrow(ResourceNotFoundException::new);
+			Meetings metting = TO_METTING.apply(dto).orElseThrow(ResourceNotFoundException::new);
 			metting.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			leadDaoService.getLeadById(leadsId).ifPresent(metting::setLead);
 			if (isNull(dto.getMettingAttachments()) || dto.getMettingAttachments().isEmpty()) {
@@ -59,10 +59,10 @@ public class MettingServiceImpl implements MettingService {
 					saveStatus = true;
 			} else {
 				for (MettingAttachmentsDto attach : dto.getMettingAttachments()) {
-					MettingAttachments mettingAttachments = TO_METTING_ATTACHMENT.apply(attach)
+					MeetingAttachments meetingAttachments = TO_METTING_ATTACHMENT.apply(attach)
 							.orElseThrow(ResourceNotFoundException::new);
-					mettingAttachments.setMettings(metting);
-					if (nonNull(mettingAttachmetDaoService.addMettingAttachment(mettingAttachments)))
+					meetingAttachments.setMeetings(metting);
+					if (nonNull(mettingAttachmetDaoService.addMettingAttachment(meetingAttachments)))
 						saveStatus = true;
 				}
 			}

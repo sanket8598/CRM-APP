@@ -2,6 +2,7 @@ package ai.rnt.crm.entity;
 
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "crm_metting")
 @Where(clause = "deleted_by is null")
-public class Mettings extends Auditable {
+public class Meetings extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -79,7 +80,10 @@ public class Mettings extends Auditable {
 	@JoinColumn(name = "lead_id")
 	private Leads lead;
 
-	@OneToMany(mappedBy = "mettings", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
-	private List<MettingAttachments> mettingAttachments = new ArrayList<>();
+	@OneToMany(mappedBy = "meetings", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
+	private List<MeetingAttachments> meetingAttachments = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "meetings", cascade = ALL, orphanRemoval = true)
+	private List<MeetingTask> meetingTasks = new ArrayList<>();
 
 }

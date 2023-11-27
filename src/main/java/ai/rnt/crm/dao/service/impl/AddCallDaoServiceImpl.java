@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.AddCallDaoService;
-import ai.rnt.crm.entity.AddCall;
+import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.repository.AddCallRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -25,17 +25,17 @@ public class AddCallDaoServiceImpl implements AddCallDaoService {
 	private final AddCallRepository addCallRepository;
 
 	@Override
-	public AddCall addCall(AddCall addCall) {
-		return addCallRepository.save(addCall);
+	public Call call(Call call) {
+		return addCallRepository.save(call);
 	}
 
 	@Override
-	public List<AddCall> getCallsByLeadId(Integer leadId) {
+	public List<Call> getCallsByLeadId(Integer leadId) {
 		return addCallRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
 	}
 
 	@Override
-	public Optional<AddCall> getCallById(Integer callId) {
+	public Optional<Call> getCallById(Integer callId) {
 		return addCallRepository.findById(callId);
 	}
 }

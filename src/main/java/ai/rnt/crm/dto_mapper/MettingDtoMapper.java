@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.MettingDto;
-import ai.rnt.crm.entity.Mettings;
+import ai.rnt.crm.entity.Meetings;
 
 public class MettingDtoMapper {
 
@@ -27,13 +27,13 @@ public class MettingDtoMapper {
 	 * @since 25-11-2023
 	 * @version 1.0
 	 */
-	public static final Function<MettingDto, Optional<Mettings>> TO_METTING = e -> evalMapper(e, Mettings.class);
+	public static final Function<MettingDto, Optional<Meetings>> TO_METTING = e -> evalMapper(e, Meetings.class);
 	/**
 	 * @since 25-11-2023
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<MettingDto>, List<Mettings>> TO_METTINGS = e -> e.stream()
+	public static final Function<Collection<MettingDto>, List<Meetings>> TO_METTINGS = e -> e.stream()
 			.map(dm -> TO_METTING.apply(dm).get()).collect(Collectors.toList());
 
 	/**
@@ -45,14 +45,14 @@ public class MettingDtoMapper {
 	 * @since 25-11-2023
 	 * @Version 1.0
 	 */
-	public static final Function<Mettings, Optional<MettingDto>> TO_METTING_DTO = e -> evalMapper(e, MettingDto.class);
+	public static final Function<Meetings, Optional<MettingDto>> TO_METTING_DTO = e -> evalMapper(e, MettingDto.class);
 
 	/**
 	 * @since 25-11-2023
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<Mettings>, List<MettingDto>> TO_METTING_DTOS = e -> e.stream()
+	public static final Function<Collection<Meetings>, List<MettingDto>> TO_METTING_DTOS = e -> e.stream()
 			.map(dm -> TO_METTING_DTO.apply(dm).get()).collect(Collectors.toList());
 
 }

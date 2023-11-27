@@ -49,5 +49,5 @@ public class Attachment extends Auditable {
 
 	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "add_mail_id")
-	private AddEmail mail;
+	private Email mail;
 }

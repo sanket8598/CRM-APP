@@ -1,7 +1,7 @@
 package ai.rnt.crm.dao.service;
 
 import ai.rnt.crm.dto.MettingDto;
-import ai.rnt.crm.entity.Mettings;
+import ai.rnt.crm.entity.Meetings;
 
 /**
  * @author Nikhil Gaikwad
@@ -9,8 +9,8 @@ import ai.rnt.crm.entity.Mettings;
  * @version 1.0
  *
  */
-public interface MettingDaoService extends CrudService<Mettings, MettingDto> {
+public interface MettingDaoService extends CrudService<Meetings, MettingDto> {
 
-	Mettings addMetting(Mettings metting);
+	Meetings addMetting(Meetings metting);
 
 }

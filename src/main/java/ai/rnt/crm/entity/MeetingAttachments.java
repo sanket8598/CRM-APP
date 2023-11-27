@@ -28,7 +28,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "crm_metting_attachment")
 @Where(clause = "deleted_by is null")
-public class MettingAttachments extends Auditable {
+public class MeetingAttachments extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -48,5 +48,5 @@ public class MettingAttachments extends Auditable {
 
 	@ManyToOne(cascade = PERSIST)
 	@JoinColumn(name = "metting_id")
-	private Mettings mettings;
+	private Meetings meetings;
 }

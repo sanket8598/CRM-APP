@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import ai.rnt.crm.dto.AddCallDto;
-import ai.rnt.crm.entity.AddCall;
+import ai.rnt.crm.entity.Call;
 
 /**
  * @author Nikhil Gaikwad
@@ -12,11 +12,11 @@ import ai.rnt.crm.entity.AddCall;
  * @since 11/09/2023.
  *
  */
-public interface AddCallDaoService extends CrudService<AddCall, AddCallDto> {
+public interface AddCallDaoService extends CrudService<Call, AddCallDto> {
 
-	AddCall addCall(AddCall addCall);
+	Call call(Call call);
 
-	List<AddCall> getCallsByLeadId(Integer leadId);
+	List<Call> getCallsByLeadId(Integer leadId);
 
-	Optional<AddCall> getCallById(Integer callId);
+	Optional<Call> getCallById(Integer callId);
 }

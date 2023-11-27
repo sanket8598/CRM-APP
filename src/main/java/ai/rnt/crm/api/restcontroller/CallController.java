@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(CALL)
 @CrossOrigin("*")
 @RequiredArgsConstructor
-public class AddCallController {
+public class CallController {
 
 	private final AddCallService addCallService;
 
