@@ -32,7 +32,7 @@ public class MeetingTask extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "mtng_task_id")
+	@Column(name = "mtg_task_id")
 	private Integer meetingTaskId;
 
 	@Column(name = "subject")
@@ -47,7 +47,7 @@ public class MeetingTask extends Auditable {
 	@Column(name = "task_due_date")
 	private Date dueDate;
 
-	@Column(name = "task_desc")
+	@Column(name = "task_description")
 	private String description;
 
 	@Column(name = "remainder", columnDefinition = "boolean default false")
@@ -63,7 +63,7 @@ public class MeetingTask extends Auditable {
 	@Column(name = "remainder_due_on")
 	private Date remainderDueOn;
 
-	@JoinColumn(name = "mtng_id", updatable = true)
+	@JoinColumn(name = "crm_mtg_id", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private Meetings meetings;

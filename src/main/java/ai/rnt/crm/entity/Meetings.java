@@ -43,10 +43,10 @@ public class Meetings extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "mtng_id")
+	@Column(name = "crm_mtg_id")
 	private Integer meetingId;
 
-	@Column(name = "mtng_title")
+	@Column(name = "mtg_title")
 	private String meetingTitle;
 
 	@Column(name = "participates")
@@ -55,25 +55,25 @@ public class Meetings extends Auditable {
 	@Column(name = "mtng_start_date")
 	private Date startDate;
 
-	@Column(name = "mtng_end_date")
+	@Column(name = "mtg_end_date")
 	private Date endDate;
 
-	@Column(name = "mtng_start_time")
+	@Column(name = "mtg_start_time")
 	private String startTime;
 
-	@Column(name = "mtng_end_time")
+	@Column(name = "mtg_end_time")
 	private String endTime;
 
 	@Column(name = "all_day")
 	private boolean allDay;
 
-	@Column(name = "mtng_location")
+	@Column(name = "mtg_location")
 	private String location;
 
-	@Column(name = "mtng_description")
+	@Column(name = "mtg_description")
 	private String description;
 
-	@Column(name = "mtng_mode")
+	@Column(name = "mtg_mode")
 	private String mettingMode;
 
 	@ManyToOne(fetch = FetchType.LAZY)

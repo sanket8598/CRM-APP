@@ -34,19 +34,19 @@ public class MeetingAttachments extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "mtng_attch_id")
+	@Column(name = "mtg_attch_id")
 	private Integer meetingAttchId;
 
-	@Column(name = "mtng_attachment")
+	@Column(name = "mtg_attachment")
 	private String meetingAttachmentData;
 
-	@Column(name = "mtng_attach_type")
+	@Column(name = "mtg_attach_type")
 	private String meetingAttachType;
 
-	@Column(name = "mtng_attach_name")
+	@Column(name = "mtg_attach_name")
 	private String meetingAttachName;
 
 	@ManyToOne(cascade = PERSIST)
-	@JoinColumn(name = "mtng_id")
+	@JoinColumn(name = "crm_mtg_id")
 	private Meetings meetings;
 }
