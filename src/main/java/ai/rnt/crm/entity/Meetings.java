@@ -52,7 +52,7 @@ public class Meetings extends Auditable {
 	@Column(name = "participates")
 	private String participates;
 
-	@Column(name = "mtng_start_date")
+	@Column(name = "mtg_start_date")
 	private Date startDate;
 
 	@Column(name = "mtg_end_date")
