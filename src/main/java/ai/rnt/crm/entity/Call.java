@@ -1,10 +1,14 @@
 package ai.rnt.crm.entity;
 
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,6 +16,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.LazyCollection;
@@ -34,16 +39,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "crm_add_call")
+@Table(name = "crm_call")
 @Where(clause = "deleted_by is null")
-public class AddCall extends Auditable {
+public class Call extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "add_call_id")
-	private Integer addCallId;
+	@Column(name = "call_id")
+	private Integer callId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@LazyCollection(LazyCollectionOption.TRUE)
@@ -75,8 +80,11 @@ public class AddCall extends Auditable {
 	@Column(name = "status")
 	private String status;
 
-	@ManyToOne(cascade = CascadeType.MERGE,fetch = FetchType.LAZY)
+	@ManyToOne(cascade = MERGE,fetch =LAZY)
 	@JoinColumn(name="lead_id")
 	private Leads lead;
+	
+	@OneToMany(mappedBy = "call", cascade = ALL, orphanRemoval = true)
+	private List<PhoneCallTask> meetingTasks = new ArrayList<>();
 
 }

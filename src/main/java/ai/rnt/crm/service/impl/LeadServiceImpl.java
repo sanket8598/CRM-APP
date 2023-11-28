@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import ai.rnt.crm.dao.service.AddCallDaoService;
+import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
@@ -72,6 +72,7 @@ import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.EmployeeMaster;
+import ai.rnt.crm.entity.ExcelHeaderMaster;
 import ai.rnt.crm.entity.LeadImportant;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.StateMaster;
@@ -99,7 +100,7 @@ public class LeadServiceImpl implements LeadService {
 	private final CompanyMasterDaoService companyMasterDaoService;
 	private final EmployeeService employeeService;
 	private final RoleMasterDaoService roleMasterDaoService;
-	private final AddCallDaoService addCallDaoService;
+	private final CallDaoService callDaoService;
 	private final EmailDaoService emailDaoService;
 	private final AuditAwareUtil auditAwareUtil;
 	private final VisitDaoService visitDaoService;
@@ -383,11 +384,11 @@ public class LeadServiceImpl implements LeadService {
 			});
 
 			List<TimeLineActivityDto> timeLine = new ArrayList<>();
-			List<EditCallDto> list = addCallDaoService.getCallsByLeadId(leadId).stream()
+			List<EditCallDto> list = callDaoService.getCallsByLeadId(leadId).stream()
 					.filter(call -> nonNull(call.getStatus()) && call.getStatus().equalsIgnoreCase("complete"))
 					.map(call -> {
 						EditCallDto callDto = new EditCallDto();
-						callDto.setId(call.getAddCallId());
+						callDto.setId(call.getCallId());
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
@@ -403,7 +404,7 @@ public class LeadServiceImpl implements LeadService {
 					.filter(email -> nonNull(email.getStatus()) && email.getStatus().equalsIgnoreCase("send"))
 					.map(email -> {
 						EditEmailDto editEmailDto = new EditEmailDto();
-						editEmailDto.setId(email.getAddMailId());
+						editEmailDto.setId(email.getMailId());
 						editEmailDto.setType("Email");
 						editEmailDto.setSubject(email.getSubject());
 						editEmailDto.setBody(email.getContent());
@@ -429,10 +430,10 @@ public class LeadServiceImpl implements LeadService {
 					}).collect(Collectors.toList()));
 			timeLine.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), formatter)
 					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), formatter)));
-			List<TimeLineActivityDto> activity = addCallDaoService.getCallsByLeadId(leadId).stream()
+			List<TimeLineActivityDto> activity = callDaoService.getCallsByLeadId(leadId).stream()
 					.filter(call -> isNull(call.getStatus()) || call.getStatus().equalsIgnoreCase("save")).map(call -> {
 						EditCallDto callDto = new EditCallDto();
-						callDto.setId(call.getAddCallId());
+						callDto.setId(call.getCallId());
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
@@ -447,7 +448,7 @@ public class LeadServiceImpl implements LeadService {
 					.filter(email -> isNull(email.getStatus()) || email.getStatus().equalsIgnoreCase("save"))
 					.map(email -> {
 						EditEmailDto editEmailDto = new EditEmailDto();
-						editEmailDto.setId(email.getAddMailId());
+						editEmailDto.setId(email.getMailId());
 						editEmailDto.setType("Email");
 						editEmailDto.setSubject(email.getSubject());
 						editEmailDto.setBody(email.getContent());
@@ -774,9 +775,10 @@ public class LeadServiceImpl implements LeadService {
 				}
 				if (duplicateLead == 0 && saveLeadCount == 0)
 					result.put(MESSAGE, "Leads Not Added !!");
-				else
+				else {
+					result.put(SUCCESS, true);
 					result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
-				result.put(SUCCESS, true);
+				}
 				return new ResponseEntity<>(result, CREATED);
 			} else {
 				result.put(MESSAGE, "Invalid Excel Format!!");
@@ -789,9 +791,13 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public boolean isValidExcel(Sheet sheet) throws IOException {
-		List<String> allHeaders = readExcelUtil.getAllHeaders(sheet);
-		return excelHeaderDaoService.getAllExcelHeaders().stream()
-				.allMatch(e -> allHeaders.contains(e.getHeaderName()));
+		List<String> dbHeaderNames = excelHeaderDaoService.getAllExcelHeaders().stream()
+				.map(ExcelHeaderMaster::getHeaderName).collect(Collectors.toList());
+		List<String> excelHeader = readExcelUtil.getAllHeaders(sheet);
+		return (nonNull(excelHeader) && !excelHeader.isEmpty())
+				&& (nonNull(dbHeaderNames) && !dbHeaderNames.isEmpty())
+				&& excelHeader.stream().allMatch(dbHeaderNames::contains) 
+				&& excelHeader.containsAll(dbHeaderNames);
 	}
 
 	public Leads buildLeadObj(List<String> data) {

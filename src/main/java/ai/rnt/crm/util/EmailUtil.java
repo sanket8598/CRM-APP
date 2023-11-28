@@ -26,7 +26,7 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.springframework.stereotype.Component;
 
-import ai.rnt.crm.entity.AddEmail;
+import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.Attachment;
 import ai.rnt.crm.exception.CRMException;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class EmailUtil {
 		PROPERTIES.put("mail.smtp.starttls.enable", true);
 	}
 
-	public static boolean sendEmail(AddEmail sendEmail) throws AddressException {
+	public static boolean sendEmail(Email sendEmail) throws AddressException {
 		try {
 			// create a message with headers
 			Message msg = new MimeMessage(getSession());

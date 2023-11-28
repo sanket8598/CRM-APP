@@ -18,54 +18,54 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ai.rnt.crm.dto.AddCallDto;
+import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.enums.ApiResponse;
-import ai.rnt.crm.service.AddCallService;
+import ai.rnt.crm.service.CallService;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * @author Nikhil Gaikwad
+ * @since 11/09/2023
+ * @version 1.0
+ *
+ */
 @RestController
 @RequestMapping(CALL)
 @CrossOrigin("*")
 @RequiredArgsConstructor
-public class AddCallController {
+public class CallController {
 
-	private final AddCallService addCallService;
+	private final CallService callService;
 
-	/**
-	 * @author Nikhil Gaikwad
-	 * @version 1.0
-	 * @since 11/09/2023.
-	 * @return city
-	 */
 	@PostMapping("/add/{leadId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(@RequestBody @Valid AddCallDto dto,
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(@RequestBody @Valid CallDto dto,
 			@PathVariable(name = "leadId") Integer leadsId) {
-		return addCallService.addCall(dto, leadsId);
+		return callService.addCall(dto, leadsId);
 	}
 
 	@PutMapping("/assignCall")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(@RequestBody Map<String, Integer> map) {
-		return addCallService.assignCall(map);
+		return callService.assignCall(map);
 	}
 
 	@PutMapping("/updateCall/{callId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(@PathVariable Integer callId) {
-		return addCallService.markAsCompleted(callId);
+		return callService.markAsCompleted(callId);
 	}
 
 	@DeleteMapping("/deleteCall/{callId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(@PathVariable Integer callId) {
-		return addCallService.deleteCall(callId);
+		return callService.deleteCall(callId);
 	}
 
 	@GetMapping("/edit/{callId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(@PathVariable Integer callId) {
-		return addCallService.editCall(callId);
+		return callService.editCall(callId);
 	}
 
 	@PutMapping("/update/{callId}/{status}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(@RequestBody AddCallDto dto,
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(@RequestBody CallDto dto,
 			@PathVariable(name = "callId") Integer callId, @PathVariable(name = "status") String status) {
-		return addCallService.updateCall(dto, callId, status);
+		return callService.updateCall(dto, callId, status);
 	}
 }

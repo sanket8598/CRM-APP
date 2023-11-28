@@ -15,7 +15,7 @@ public interface EmployeeService {
 
 	Optional<EmployeeMaster> getById(Integer assignTo);
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser();
+	ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser(String mail);
 
 	Optional<EmployeeMaster> findByName(String firstName, String lastName);
 }

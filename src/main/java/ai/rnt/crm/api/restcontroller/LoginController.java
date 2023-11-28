@@ -2,6 +2,7 @@ package ai.rnt.crm.api.restcontroller;
 
 import static ai.rnt.crm.constants.ApiConstants.AUTH;
 import static ai.rnt.crm.constants.ApiConstants.GET_ADMIN_AND_USER;
+import static ai.rnt.crm.constants.ApiConstants.GET_ALL_MAIL_ID;
 import static ai.rnt.crm.constants.ApiConstants.LOGIN;
 import static ai.rnt.crm.constants.ApiConstants.TOKENPARSE;
 import static ai.rnt.crm.constants.EncryptionAlgoConstants.RSA;
@@ -28,6 +29,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -119,9 +121,10 @@ public class LoginController {
 		}
 	}
 
-	@GetMapping(GET_ADMIN_AND_USER)
+	@GetMapping(value = {GET_ADMIN_AND_USER,GET_ALL_MAIL_ID})
 	@PreAuthorize(CHECK_BOTH_ACCESS)
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser() {
-		return employeeService.getAdminAndUser();
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser(
+	@PathVariable(name = "email", required = false) String mail) {
+		return employeeService.getAdminAndUser(mail);
 	}
 }

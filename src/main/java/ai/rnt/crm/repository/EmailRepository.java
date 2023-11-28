@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import ai.rnt.crm.entity.AddEmail;
+import ai.rnt.crm.entity.Email;
 
 /**
  * @author Nikhil Gaikwad
@@ -13,10 +13,10 @@ import ai.rnt.crm.entity.AddEmail;
  *
  */
 
-public interface EmailRepository extends JpaRepository<AddEmail, Integer> {
+public interface EmailRepository extends JpaRepository<Email, Integer> {
 
-	List<AddEmail> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
+	List<Email> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
 
-	Boolean existsByAddMailIdAndLeadLeadId(Integer addMailId, Integer leadId);
+	Boolean existsByMailIdAndLeadLeadId(Integer addMailId, Integer leadId);
 
 }

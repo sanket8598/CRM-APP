@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import ai.rnt.crm.entity.AddCall;
+import ai.rnt.crm.entity.Call;
 
 /**
  * @author Nikhil Gaikwad
@@ -12,8 +12,8 @@ import ai.rnt.crm.entity.AddCall;
  * @since 11/09/2023.
  *
  */
-public interface AddCallRepository extends JpaRepository<AddCall, Integer> {
+public interface CallRepository extends JpaRepository<Call, Integer> {
 
-	List<AddCall> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
+	List<Call> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
 
 }

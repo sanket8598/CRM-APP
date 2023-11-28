@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.EmailDto;
-import ai.rnt.crm.entity.AddEmail;
+import ai.rnt.crm.entity.Email;
 
 public class EmailDtoMapper {
 
@@ -27,13 +27,13 @@ public class EmailDtoMapper {
 	 * @since 12-09-2023
 	 * @version 1.0
 	 */
-	public static final Function<EmailDto, Optional<AddEmail>> TO_EMAIL = e -> evalMapper(e, AddEmail.class);
+	public static final Function<EmailDto, Optional<Email>> TO_EMAIL = e -> evalMapper(e, Email.class);
 	/**
 	 * @since 12-09-2023
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<EmailDto>, List<AddEmail>> TO_EMAILS = e -> e.stream()
+	public static final Function<Collection<EmailDto>, List<Email>> TO_EMAILS = e -> e.stream()
 			.map(dm -> TO_EMAIL.apply(dm).get()).collect(Collectors.toList());
 
 	/**
@@ -45,14 +45,14 @@ public class EmailDtoMapper {
 	 * @since 12-09-2023
 	 * @Version 1.0
 	 */
-	public static final Function<AddEmail, Optional<EmailDto>> TO_EMAIL_DTO = e -> evalMapper(e, EmailDto.class);
+	public static final Function<Email, Optional<EmailDto>> TO_EMAIL_DTO = e -> evalMapper(e, EmailDto.class);
 
 	/**
 	 * @since 12-09-2023
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<AddEmail>, List<EmailDto>> TO_EMAIL_DTOS = e -> e.stream()
+	public static final Function<Collection<Email>, List<EmailDto>> TO_EMAIL_DTOS = e -> e.stream()
 			.map(dm -> TO_EMAIL_DTO.apply(dm).get()).collect(Collectors.toList());
 
 }

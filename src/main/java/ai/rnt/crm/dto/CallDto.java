@@ -17,9 +17,9 @@ import lombok.Data;
  * @since 11/09/2023.
  */
 @Data
-public class AddCallDto {
+public class CallDto {
 
-	private Integer addCallId;
+	private Integer callId;
 
 	//@NotBlank(message = "Call From should not be null or empty!!")
 	private EmployeeDto callFrom;

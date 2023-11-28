@@ -1,0 +1,41 @@
+package ai.rnt.crm.dao.service.impl;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import ai.rnt.crm.dao.service.CallDaoService;
+import ai.rnt.crm.entity.Call;
+import ai.rnt.crm.repository.CallRepository;
+import lombok.RequiredArgsConstructor;
+
+/**
+ * @author Nikhil Gaikwad
+ * @version 1.0
+ * @since 11/09/2023.
+ *
+ */
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class CallDaoServiceImpl implements CallDaoService {
+
+	private final CallRepository callRepository;
+
+	@Override
+	public Call call(Call call) {
+		return callRepository.save(call);
+	}
+
+	@Override
+	public List<Call> getCallsByLeadId(Integer leadId) {
+		return callRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
+	}
+
+	@Override
+	public Optional<Call> getCallById(Integer callId) {
+		return callRepository.findById(callId);
+	}
+}

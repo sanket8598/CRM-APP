@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan("ai.rnt.crm*")
+@ComponentScan("ai.rnt.crm.*")
 @EnableJpaRepositories
 @EnableCaching
 public class CrmApplication {

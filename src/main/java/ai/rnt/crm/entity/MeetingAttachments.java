@@ -1,6 +1,6 @@
 package ai.rnt.crm.entity;
 
-import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.PERSIST;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import javax.persistence.Column;
@@ -19,35 +19,34 @@ import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
+ * @since 25/11/2023
  * @version 1.0
- * @since 12/09/2023.
- *
  */
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "crm_email_attachment")
+@Table(name = "crm_meeting_attachment")
 @Where(clause = "deleted_by is null")
-public class Attachment extends Auditable {
+public class MeetingAttachments extends Auditable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "email_attch_id")
-	private Integer emailAttchId;
+	@Column(name = "mtg_attch_id")
+	private Integer meetingAttchId;
 
-	@Column(name = "attachment")
-	private String attachmentData;
+	@Column(name = "mtg_attachment")
+	private String meetingAttachmentData;
 
-	@Column(name = "attach_type")
-	private String attachType;
+	@Column(name = "mtg_attach_type")
+	private String meetingAttachType;
 
-	@Column(name = "attach_name")
-	private String attachName;
+	@Column(name = "mtg_attach_name")
+	private String meetingAttachName;
 
-	@ManyToOne(cascade = ALL)
-	@JoinColumn(name = "add_mail_id")
-	private Email mail;
+	@ManyToOne(cascade = PERSIST)
+	@JoinColumn(name = "crm_mtg_id")
+	private Meetings meetings;
 }
