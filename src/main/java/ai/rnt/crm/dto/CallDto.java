@@ -21,7 +21,7 @@ public class CallDto {
 
 	private Integer callId;
 
-	//@NotBlank(message = "Call From should not be null or empty!!")
+	// @NotBlank(message = "Call From should not be null or empty!!")
 	private EmployeeDto callFrom;
 
 	private String callTo;
@@ -29,19 +29,30 @@ public class CallDto {
 	private String subject;
 
 	private String direction;
-	
+
 	@NotBlank(message = "Phone Number should not be null or empty!!")
 	@Size(min = 10, max = 14)
-	//@Pattern(regexp = "^(\\+\\d{1,2}\\s?)?(\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4})$", message = "Please Enter a valid Phone Number!!")
+	// @Pattern(regexp =
+	// "^(\\+\\d{1,2}\\s?)?(\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4})$", message =
+	// "Please Enter a valid Phone Number!!")
 	@PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
 	private String phoneNo;
 
 	private String comment;
 
 	private String duration;
-	
-	@NotNull(message = "Due Date should not be null!!")
-	@JsonFormat(pattern="dd-MM-yyyy")
-	private Date dueDate;
+
+	@NotNull(message = "Start Date should not be null!!")
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private Date startDate;
+
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private Date endDate;
+
+	private String startTime;
+
+	private String endTime;
+
+	private boolean allDay;
 
 }

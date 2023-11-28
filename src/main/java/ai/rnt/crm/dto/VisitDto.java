@@ -29,10 +29,18 @@ public class VisitDto {
 
 	private String duration;
 
-	
-	@NotNull(message = "Due Date should not be null!!")
-	@JsonFormat(pattern="dd-MM-yyyy")
-	private Date dueDate;
+	@NotNull(message = "Start Date should not be null!!")
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private Date startDate;
+
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private Date endDate;
+
+	private String startTime;
+
+	private String endTime;
+
+	private boolean allDay;
 
 	private Integer leadId;
 
