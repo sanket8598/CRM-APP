@@ -21,8 +21,6 @@ public class EditVisitDto extends TimeLineActivityDto {
 
 	private String body;
 
-	private String dueDate;
-
 	private String type;
 
 	private String shortName;

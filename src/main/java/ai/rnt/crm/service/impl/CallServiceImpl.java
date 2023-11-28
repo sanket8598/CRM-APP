@@ -173,7 +173,6 @@ public class CallServiceImpl implements CallService {
 			call.setPhoneNo(dto.getPhoneNo());
 			call.setComment(dto.getComment());
 			call.setDuration(dto.getDuration());
-			call.setDueDate(dto.getDueDate());
 			call.setStatus(status);
 			call.setUpdatedDate(LocalDateTime.now());
 			if (nonNull(callDaoService.call(call))) {
