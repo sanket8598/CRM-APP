@@ -59,8 +59,20 @@ public class Visit extends Auditable {
 	@Column(name = "duration")
 	private String duration;
 
-	@Column(name = "due_date")
-	private Date dueDate;
+	@Column(name = "start_date")
+	private Date startDate;
+	
+	@Column(name = "end_date")
+	private Date endDate;
+	
+	@Column(name = "start_time")
+	private String startTime;
+
+	@Column(name = "end_time")
+	private String endTime;
+
+	@Column(name = "all_day")
+	private boolean allDay;
 
 	@Column(name = "status")
 	private String status;

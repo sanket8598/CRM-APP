@@ -392,7 +392,6 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
-						callDto.setDueDate(nonNull(call.getDueDate()) ? dateFormat.format(call.getDueDate()) : null);
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getUpdatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
 						TO_Employee.apply(call.getCallFrom())
@@ -422,7 +421,6 @@ public class LeadServiceImpl implements LeadService {
 						visitDto.setSubject(visit.getSubject());
 						visitDto.setType("Visit");
 						visitDto.setBody(visit.getContent());
-						visitDto.setDueDate(nonNull(visit.getDueDate()) ? dateFormat.format(visit.getDueDate()) : null);
 						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> visitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						visitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
@@ -437,7 +435,6 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setSubject(call.getSubject());
 						callDto.setType("Call");
 						callDto.setBody(call.getComment());
-						callDto.setDueDate(nonNull(call.getDueDate()) ? dateFormat.format(call.getDueDate()) : null);
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
 						TO_Employee.apply(call.getCallFrom())
@@ -466,8 +463,6 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setSubject(visit.getSubject());
 						editVisitDto.setType("Visit");
 						editVisitDto.setBody(visit.getContent());
-						editVisitDto
-								.setDueDate(nonNull(visit.getDueDate()) ? dateFormat.format(visit.getDueDate()) : null);
 						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> editVisitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						editVisitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
@@ -757,7 +752,7 @@ public class LeadServiceImpl implements LeadService {
 			result.put(SUCCESS, false);
 			Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
-			if(isValidExcel(sheet)) {
+			if (isValidExcel(sheet)) {
 				excelData = readExcelUtil.getLeadFromExcelFile(workbook, sheet);
 				int saveLeadCount = 0;
 				int duplicateLead = 0;
@@ -770,8 +765,8 @@ public class LeadServiceImpl implements LeadService {
 						setAssignToNameForTheLead(leads, auditAwareUtil.getLoggedInUserName().split(" "));
 					if (LeadsCardUtil.checkDuplicateLead(leadDaoService.getAllLeads(), leads))
 						duplicateLead++;
-					else if(nonNull(leadDaoService.addLead(leads)))
-							saveLeadCount++;
+					else if (nonNull(leadDaoService.addLead(leads)))
+						saveLeadCount++;
 				}
 				if (duplicateLead == 0 && saveLeadCount == 0)
 					result.put(MESSAGE, "Leads Not Added !!");
@@ -794,10 +789,8 @@ public class LeadServiceImpl implements LeadService {
 		List<String> dbHeaderNames = excelHeaderDaoService.getAllExcelHeaders().stream()
 				.map(ExcelHeaderMaster::getHeaderName).collect(Collectors.toList());
 		List<String> excelHeader = readExcelUtil.getAllHeaders(sheet);
-		return (nonNull(excelHeader) && !excelHeader.isEmpty())
-				&& (nonNull(dbHeaderNames) && !dbHeaderNames.isEmpty())
-				&& excelHeader.stream().allMatch(dbHeaderNames::contains) 
-				&& excelHeader.containsAll(dbHeaderNames);
+		return (nonNull(excelHeader) && !excelHeader.isEmpty()) && (nonNull(dbHeaderNames) && !dbHeaderNames.isEmpty())
+				&& excelHeader.stream().allMatch(dbHeaderNames::contains) && excelHeader.containsAll(dbHeaderNames);
 	}
 
 	public Leads buildLeadObj(List<String> data) {

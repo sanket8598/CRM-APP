@@ -173,7 +173,6 @@ public class VisitServiceImpl implements VisitService {
 			visit.setContent(dto.getContent());
 			visit.setComment(dto.getComment());
 			visit.setDuration(dto.getDuration());
-			visit.setDueDate(dto.getDueDate());
 			visit.setStatus(status);
 			visit.setUpdatedDate(LocalDateTime.now());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
