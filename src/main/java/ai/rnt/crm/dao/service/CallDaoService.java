@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.entity.Call;
+import ai.rnt.crm.entity.PhoneCallTask;
 
 /**
  * @author Nikhil Gaikwad
@@ -19,4 +20,6 @@ public interface CallDaoService extends CrudService<Call, CallDto> {
 	List<Call> getCallsByLeadId(Integer leadId);
 
 	Optional<Call> getCallById(Integer callId);
+
+	PhoneCallTask addCallTask(PhoneCallTask phoneCallTask);
 }

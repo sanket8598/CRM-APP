@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.entity.Visit;
+import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.repository.VisitRepository;
+import ai.rnt.crm.repository.VisitTaskRepository;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class VisitDaoServiceImpl implements VisitDaoService {
 
 	private final VisitRepository visitRepository;
+	private final VisitTaskRepository visitTaskRepository;
 
 	@Override
 	public Visit saveVisit(Visit visit) {
@@ -37,5 +40,10 @@ public class VisitDaoServiceImpl implements VisitDaoService {
 	@Override
 	public Optional<Visit> getVisitsByVisitId(Integer visitId) {
 		return visitRepository.findById(visitId);
+	}
+
+	@Override
+	public VisitTask addVisitTask(VisitTask visitTask) {
+		return visitTaskRepository.save(visitTask);
 	}
 }

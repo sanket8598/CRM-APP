@@ -4,18 +4,19 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import ai.rnt.crm.entity.EmployeeMaster;
 import lombok.Data;
 
 /**
  * @author Nikhil Gaikwad
+ * @since 28/11/2023
  * @version 1.0
- * @since 27/11/2023.
  *
  */
 @Data
-public class MeetingTaskDto {
+public class CallTaskDto {
 
-	private Integer meetingTaskId;
+	private Integer callTaskId;
 
 	private String subject;
 
@@ -32,9 +33,11 @@ public class MeetingTaskDto {
 
 	private String remainderVia;
 
-//	@JsonFormat(pattern = "hh:mm aa")
 	private String remainderDueAt;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date remainderDueOn;
+
+	private EmployeeMaster assignTo;
+
 }
