@@ -5,9 +5,10 @@ import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EmployeeMaster;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,9 +65,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try{
 			resultMap.put(ApiResponse.SUCCESS, true);
-			if(Objects.nonNull(email))
-			  resultMap.put(ApiResponse.DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()).stream().collect(Collectors.toMap(e->e.getEmailID(), e->e.getFirstName()+" "+e.getLastName())));
-			else
+			if(Objects.nonNull(email)) {
+				Map<String,Object> emailMap=new HashMap<>();
+				emailMap.put("Emails", employeeDaoService.activeEmployeeEmailIds());
+			  resultMap.put(ApiResponse.DATA, emailMap);
+			}else
 			 resultMap.put(ApiResponse.DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
 			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
 		}catch (Exception e) {
