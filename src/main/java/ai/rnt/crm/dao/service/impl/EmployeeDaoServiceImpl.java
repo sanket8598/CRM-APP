@@ -1,8 +1,13 @@
 package ai.rnt.crm.dao.service.impl;
 
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
+import static java.util.Objects.nonNull;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +16,7 @@ import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dto.EmployeeDto;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.projection.EmailIdProjection;
 import ai.rnt.crm.repository.EmployeeMasterRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +41,11 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 	@Override
 	public Optional<EmployeeMaster> findByName(String firstName, String lastName) {
 		return employeeMasterRepository.findByFirstNameAndLastName(firstName,lastName);
+	}
+
+	@Override
+	public List<String> activeEmployeeEmailIds() {
+		return employeeMasterRepository.findEmailIdByDepartureDateIsNullOrDepartureDateBefore(LocalDate.now()).stream().filter(e->nonNull(e) && nonNull(e.getEmailId())).map(EmailIdProjection::getEmailId).collect(Collectors.toList());
 	}
 
 }
