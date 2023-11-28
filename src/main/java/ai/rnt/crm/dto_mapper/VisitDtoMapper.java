@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.VisitDto;
 import ai.rnt.crm.entity.Visit;
 
@@ -55,4 +56,23 @@ public class VisitDtoMapper {
 	public static final Function<Collection<Visit>, List<VisitDto>> TO_VISIT_DTOS = e -> e.stream()
 			.map(dm -> TO_VISIT_DTO.apply(dm).get()).collect(Collectors.toList());
 
+	/**
+	 * This function will convert Visit Entity into optional EditVisitDto . <b>This
+	 * function will return null if passed Visit is null</b> <br>
+	 * <b>Param</b> Visit <br>
+	 * <b>Return</b> EditVisitDto
+	 * 
+	 * @since 27-10-2023
+	 * @Version 1.0
+	 */
+	public static final Function<Visit, Optional<EditVisitDto>> TO_EDIT_VISIT_DTO = e -> evalMapper(e,
+			EditVisitDto.class);
+
+	/**
+	 * @since 27-10-2023
+	 * @version 1.0
+	 *
+	 */
+	public static final Function<Collection<Visit>, List<EditVisitDto>> TO_EDIT_VISIT_DTOS = e -> e.stream()
+			.map(dm -> TO_EDIT_VISIT_DTO.apply(dm).get()).collect(Collectors.toList());
 }

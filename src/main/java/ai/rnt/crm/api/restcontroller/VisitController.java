@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.dto.VisitDto;
+import ai.rnt.crm.dto.VisitTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.VisitService;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +68,11 @@ public class VisitController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisit(@RequestBody VisitDto dto,
 			@PathVariable(name = "visitId") Integer visitId, @PathVariable(name = "status") String status) {
 		return visitService.updateVisit(dto, visitId, status);
+	}
+
+	@PostMapping("/addTask/{leadId}/{visitId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addVisitTask(@RequestBody @Valid VisitTaskDto dto,
+			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "visitId") Integer visitId) {
+		return visitService.addVisitTask(dto, leadsId, visitId);
 	}
 }

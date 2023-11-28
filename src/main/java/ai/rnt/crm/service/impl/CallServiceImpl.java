@@ -2,6 +2,7 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_CALL;
 import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_EDIT_CALL_DTO;
+import static ai.rnt.crm.dto_mapper.CallTaskDtoMapper.TO_CALL_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
@@ -13,6 +14,9 @@ import static org.springframework.http.HttpStatus.OK;
 import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,9 +24,11 @@ import org.springframework.stereotype.Service;
 import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.CallDto;
+import ai.rnt.crm.dto.CallTaskDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
+import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
@@ -66,7 +72,7 @@ public class CallServiceImpl implements CallService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
-			log.info("Got Exception while adding the call..{}",e.getMessage());
+			log.info("Got Exception while adding the call..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -90,7 +96,7 @@ public class CallServiceImpl implements CallService {
 			}
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while assign the call..{}" ,e.getMessage());
+			log.info("Got Exception while assign the call..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -112,7 +118,7 @@ public class CallServiceImpl implements CallService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while markAsCompleted the call..{}" ,e.getMessage());
+			log.info("Got Exception while markAsCompleted the call..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -134,7 +140,7 @@ public class CallServiceImpl implements CallService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while delete the call..{}" ,e.getMessage());
+			log.info("Got Exception while delete the call..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -148,7 +154,7 @@ public class CallServiceImpl implements CallService {
 			call.put(SUCCESS, true);
 			return new ResponseEntity<>(call, FOUND);
 		} catch (Exception e) {
-			log.info("Got exception while get call data for edit..{}",e.getMessage());
+			log.info("Got exception while get call data for edit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -180,7 +186,31 @@ public class CallServiceImpl implements CallService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
-			log.info("Got exception while update call..{}" ,e.getMessage());
+			log.info("Got exception while update call..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@Valid CallTaskDto dto, Integer leadsId,
+			Integer callId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			PhoneCallTask phoneCallTask = TO_CALL_TASK.apply(dto).orElseThrow(ResourceNotFoundException::new);
+			Optional<Leads> lead = leadDaoService.getLeadById(leadsId);
+			if (lead.isPresent())
+				phoneCallTask.setAssignTo(lead.get().getEmployee());
+			callDaoService.getCallById(callId).ifPresent(phoneCallTask::setCall);
+			if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Added Successfully..!!");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Added");
+			}
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("error occured while adding phone call tasks..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

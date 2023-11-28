@@ -1,6 +1,8 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_EDIT_VISIT_DTO;
 import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_VISIT;
+import static ai.rnt.crm.dto_mapper.VisitTaskDtoMapper.TO_VISIT_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
@@ -12,6 +14,9 @@ import static org.springframework.http.HttpStatus.OK;
 import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,9 +24,11 @@ import org.springframework.stereotype.Service;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.VisitDto;
+import ai.rnt.crm.dto.VisitTaskDto;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Visit;
+import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
@@ -146,8 +153,8 @@ public class VisitServiceImpl implements VisitService {
 		EnumMap<ApiResponse, Object> visit = new EnumMap<>(ApiResponse.class);
 		try {
 			visit.put(SUCCESS, true);
-			visit.put(DATA, visitDaoService.getVisitsByVisitId(visitId)
-					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId)));
+			visit.put(DATA, TO_EDIT_VISIT_DTO.apply(visitDaoService.getVisitsByVisitId(visitId)
+					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId))));
 			return new ResponseEntity<>(visit, FOUND);
 		} catch (Exception e) {
 			log.info("Got Exception while get visit for edit..{}", e.getMessage());
@@ -180,6 +187,30 @@ public class VisitServiceImpl implements VisitService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.info("Got Exception while update the visit..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addVisitTask(@Valid VisitTaskDto dto, Integer leadsId,
+			Integer visitId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			VisitTask visitTask = TO_VISIT_TASK.apply(dto).orElseThrow(ResourceNotFoundException::new);
+			Optional<Leads> lead = leadDaoService.getLeadById(leadsId);
+			if (lead.isPresent())
+				visitTask.setAssignTo(lead.get().getEmployee());
+			visitDaoService.getVisitsByVisitId(visitId).ifPresent(visitTask::setVisit);
+			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Added Successfully..!!");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Added");
+			}
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("error occured while adding visit tasks..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

@@ -3,9 +3,12 @@ package ai.rnt.crm.service;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dto.CallDto;
+import ai.rnt.crm.dto.CallTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
 
 public interface CallService {
@@ -21,4 +24,6 @@ public interface CallService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> editCall(Integer callId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(CallDto dto, Integer callId, String status);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@Valid CallTaskDto dto, Integer leadsId, Integer callId);
 }

@@ -65,7 +65,7 @@ public class VisitTask extends Auditable {
 	@JoinColumn(name = "task_assign_to", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
-	private EmployeeMaster assinTo;
+	private EmployeeMaster assignTo;
 
 	@JoinColumn(name = "visit_id", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)

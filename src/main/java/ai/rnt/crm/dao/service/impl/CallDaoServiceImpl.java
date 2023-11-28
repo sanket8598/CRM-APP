@@ -8,7 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.entity.Call;
+import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.repository.CallRepository;
+import ai.rnt.crm.repository.CallTaskRepository;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class CallDaoServiceImpl implements CallDaoService {
 
 	private final CallRepository callRepository;
+	private final CallTaskRepository callTaskRepository;
 
 	@Override
 	public Call call(Call call) {
@@ -37,5 +40,10 @@ public class CallDaoServiceImpl implements CallDaoService {
 	@Override
 	public Optional<Call> getCallById(Integer callId) {
 		return callRepository.findById(callId);
+	}
+
+	@Override
+	public PhoneCallTask addCallTask(PhoneCallTask phoneCallTask) {
+		return callTaskRepository.save(phoneCallTask);
 	}
 }
