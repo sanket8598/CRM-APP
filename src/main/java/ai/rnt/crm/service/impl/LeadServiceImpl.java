@@ -188,6 +188,7 @@ public class LeadServiceImpl implements LeadService {
 					filterMap.put("PrimaryField", sortFilter.getPrimaryFilter());
 					filterMap.put("SecondaryField", sortFilter.getSecondaryFilter());
 				});
+				dataMap.put("sortFilter",filterMap);
 				if (auditAwareUtil.isAdmin()) {
 					dataMap.put("allLead",
 							allLeads.stream()
