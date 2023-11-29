@@ -31,6 +31,7 @@ public class FunctionUtil {
 	static {
 		 mp.getConfiguration().setAmbiguityIgnored(true);
 		 mp.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+		 mp.getConfiguration().setPreferNestedProperties(false);
 	}
    
 	/**

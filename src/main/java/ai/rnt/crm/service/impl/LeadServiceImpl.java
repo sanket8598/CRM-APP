@@ -110,6 +110,9 @@ public class LeadServiceImpl implements LeadService {
 	private final LeadSortFilterDaoService leadSortFilterDaoService;
 	private final ReadExcelUtil readExcelUtil;
 	private final ExcelHeaderDaoService excelHeaderDaoService;
+	
+	private static final String PRIMFIELD="PrimaryField";
+	private static final String SECNDFIELD="SecondaryField";
 
 	@Override
 	@Transactional
@@ -176,59 +179,59 @@ public class LeadServiceImpl implements LeadService {
 				List<Leads> allLeads = leadDaoService.getAllLeads();
 				allLeads.stream().forEach(lead -> {
 					if (impLeads.contains(lead))
-						lead.setImportant(true);
+						 lead.setImportant(true);
 				});
 				Comparator<Leads> importantLeads = (l1, l2) -> l2.getImportant().compareTo(l1.getImportant());
 				allLeads.sort(
 						importantLeads.thenComparing((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())));
 				Map<String, Object> filterMap = new HashMap<>();
-				filterMap.put("PrimaryField", "Lead Name");
-				filterMap.put("SecondaryField", "Topic");
+				filterMap.put(PRIMFIELD, "Lead Name");
+				filterMap.put(SECNDFIELD, "Topic");
 				leadSortFilterDaoService.findSortFilterByEmployeeStaffId(loggedInStaffId).ifPresent(sortFilter -> {
-					filterMap.put("PrimaryField", sortFilter.getPrimaryFilter());
-					filterMap.put("SecondaryField", sortFilter.getSecondaryFilter());
+					filterMap.put(PRIMFIELD, sortFilter.getPrimaryFilter());
+					filterMap.put(SECNDFIELD, sortFilter.getSecondaryFilter());
 				});
 				dataMap.put("sortFilter",filterMap);
 				if (auditAwareUtil.isAdmin()) {
 					dataMap.put("allLead",
 							allLeads.stream()
 									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get("PrimaryField").toString(),
-											filterMap.get("SecondaryField").toString()))
+											filterMap.get(PRIMFIELD).toString(),
+											filterMap.get(SECNDFIELD).toString()))
 									.collect(Collectors.toList()));
 					dataMap.put("openLead", allLeads.stream().filter(l -> nonNull(l.getStatus())
 							&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
 							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-									filterMap.get("PrimaryField").toString(),
-									filterMap.get("SecondaryField").toString()))
+									filterMap.get(PRIMFIELD).toString(),
+									filterMap.get(SECNDFIELD).toString()))
 							.collect(Collectors.toList()));
 					dataMap.put("closeLead",
 							allLeads.stream().filter(l -> !l.getStatus().equalsIgnoreCase("open"))
 									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get("PrimaryField").toString(),
-											filterMap.get("SecondaryField").toString()))
+											filterMap.get(PRIMFIELD).toString(),
+											filterMap.get(SECNDFIELD).toString()))
 									.collect(Collectors.toList()));
 				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
 					dataMap.put("allLead",
 							allLeads.stream().filter(l -> l.getEmployee().getStaffId().equals(loggedInStaffId))
 									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get("PrimaryField").toString(),
-											filterMap.get("SecondaryField").toString()))
+											filterMap.get(PRIMFIELD).toString(),
+											filterMap.get(SECNDFIELD).toString()))
 									.collect(Collectors.toList()));
 					dataMap.put("openLead", allLeads.stream().filter(l -> (nonNull(l.getStatus())
 							&& (l.getStatus().equalsIgnoreCase("new") || l.getStatus().equalsIgnoreCase("open")))
 							&& l.getEmployee().getStaffId().equals(loggedInStaffId))
 							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-									filterMap.get("PrimaryField").toString(),
-									filterMap.get("SecondaryField").toString()))
+									filterMap.get(PRIMFIELD).toString(),
+									filterMap.get(SECNDFIELD).toString()))
 							.collect(Collectors.toList()));
 					dataMap.put("closeLead",
 							allLeads.stream()
 									.filter(l -> !l.getStatus().equalsIgnoreCase("open")
 											&& l.getEmployee().getStaffId().equals(loggedInStaffId))
 									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get("PrimaryField").toString(),
-											filterMap.get("SecondaryField").toString()))
+											filterMap.get(PRIMFIELD).toString(),
+											filterMap.get(SECNDFIELD).toString()))
 									.collect(Collectors.toList()));
 				} else
 					dataMap.put("Data", Collections.emptyList());
