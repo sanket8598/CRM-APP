@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
@@ -35,6 +36,9 @@ public class VisitDto {
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date endDate;
+	
+	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+	private List<String> participates;
 
 	private String startTime;
 

@@ -77,6 +77,9 @@ public class Visit extends Auditable {
 	@Column(name = "status")
 	private String status;
 	
+	@Column(name = "participates")
+	private String participates;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "visit_by", updatable = true, nullable = false)
 	private EmployeeMaster visitBy;

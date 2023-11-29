@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -61,6 +62,7 @@ public class VisitServiceImpl implements VisitService {
 		log.info("inside add visit leadId:{}", dto.getLeadId());
 		try {
 			Visit visit = TO_VISIT.apply(dto).orElseThrow(null);
+			visit.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			Leads lead = leadDaoService.getLeadById(dto.getLeadId())
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", dto.getLeadId()));
 			visit.setLead(lead);
