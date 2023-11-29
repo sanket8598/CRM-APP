@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -39,5 +40,10 @@ public class MeetingDaoServiceImpl implements MeetingDaoService {
 	@Override
 	public MeetingTask addMeetingTask(MeetingTask meetingTask) {
 		return meetingTaskRepository.save(meetingTask);
+	}
+
+	@Override
+	public List<Meetings> getMeetingByLeadId(Integer leadId) {
+		return meetingRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
 	}
 }

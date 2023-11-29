@@ -1,5 +1,7 @@
 package ai.rnt.crm.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import ai.rnt.crm.entity.Meetings;
@@ -11,5 +13,7 @@ import ai.rnt.crm.entity.Meetings;
  *
  */
 public interface MeetingRepository extends JpaRepository<Meetings, Integer> {
+
+	List<Meetings> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
 
 }
