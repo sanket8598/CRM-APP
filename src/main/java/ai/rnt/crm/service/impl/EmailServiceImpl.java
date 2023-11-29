@@ -12,6 +12,7 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +30,8 @@ import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.AttachmentDto;
 import ai.rnt.crm.dto.EmailDto;
-import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.Attachment;
+import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
@@ -209,9 +210,15 @@ public class EmailServiceImpl implements EmailService {
 			Email email = emailDaoService.findById(mailId);
 			Optional<EmailDto> mailDto = TO_EMAIL_DTO.apply(email);
 			mailDto.ifPresent(e -> {
-				e.setBcc(Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList()));
-				e.setCc(Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList()));
-				e.setMailTo(Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList()));
+				e.setBcc(nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()
+						? Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList())
+						: Collections.emptyList());
+				e.setCc(nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
+						? Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList())
+						: Collections.emptyList());
+				e.setMailTo(nonNull(email.getToMail()) && !email.getToMail().isEmpty()
+						? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
+						: Collections.emptyList());
 			});
 			resultMap.put(DATA, mailDto);
 			resultMap.put(SUCCESS, true);
