@@ -3,6 +3,8 @@ package ai.rnt.crm.util;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
@@ -141,16 +143,23 @@ public class LeadsCardUtil {
 	}
 
 	/*
-	 * * This Predicate return true if it the date is within 3-4 days.
+	 * * This Predicate return true if it the date is within 4 days.
 	 * 
 	 * @since version 1.0
 	 */
 	public static final Predicate<Date> UPNEXT = s -> {
-		Date tillDate = Date.from(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusDays(4)
+		Date after4Days = Date.from(new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime().plusDays(4)
 				.atZone(ZoneId.systemDefault()).toInstant());
 		if (isNull(s))
 			return false;
-		return s.compareTo(tillDate)>0 && s.compareTo(tillDate)<=4;
+		else {
+			try {
+				Date endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(s.toString());
+				return (endDate.before(after4Days) && endDate.after(new Date()));
+			} catch (ParseException e) {
+				return false;
+			}
+		}
 	};
 
 }

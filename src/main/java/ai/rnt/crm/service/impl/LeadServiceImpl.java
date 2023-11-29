@@ -24,9 +24,9 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -569,7 +569,12 @@ public class LeadServiceImpl implements LeadService {
 			dataMap.put("leadSource", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put("Timeline", timeLine);
 			dataMap.put("Activity", activity);
-			dataMap.put("UpNext", upNext);
+			dataMap.put("UpNext", upNext.stream().map(e -> {
+				e.setWaitTwoDays(false);
+				if (ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(e.getCreatedOn(), formatter)) > 2)
+					e.setWaitTwoDays(true);
+				return e;
+			}).collect(Collectors.toList()));
 			dataMap.put("TaskData", getTaskDataMap(calls, visits, meetings));
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);
