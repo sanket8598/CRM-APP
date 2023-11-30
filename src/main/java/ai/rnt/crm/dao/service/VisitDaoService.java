@@ -17,4 +17,6 @@ public interface VisitDaoService extends CrudService<Visit, VisitDto> {
 
 	VisitTask addVisitTask(VisitTask visitTask);
 
+	Optional<VisitTask> getVisitTaskById(Integer taskId);
+
 }

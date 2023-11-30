@@ -21,4 +21,13 @@ public class GetVisitTaskDto {
 
 	@JsonFormat(pattern = "dd-MMM-yyyy")
 	private Date dueDate;
+
+	private boolean remainderOn;
+
+	private String remainderVia;
+
+	private String remainderDueAt;
+
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private Date remainderDueOn;
 }
