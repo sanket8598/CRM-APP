@@ -104,11 +104,11 @@ public class Leads extends Auditable {
 	@Column(name = "pseudo_name")
 	private String pseudoName;
 
-	@ManyToOne(cascade = ALL)
+	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "lead_source_id")
 	private LeadSourceMaster leadSourceMaster;
 
-	@ManyToOne(cascade = ALL)
+	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "service_falls_id")
 	private ServiceFallsMaster serviceFallsMaster;
 
