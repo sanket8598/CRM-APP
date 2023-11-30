@@ -5,6 +5,7 @@ import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_CALL;
 import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_GET_CALL_DTO;
 import static ai.rnt.crm.dto_mapper.CallTaskDtoMapper.TO_CALL_TASK;
+import static ai.rnt.crm.dto_mapper.CallTaskDtoMapper.TO_GET_CALL_TASK_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
@@ -212,6 +213,21 @@ public class CallServiceImpl implements CallService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while adding phone call tasks..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getCallTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> callTask = new EnumMap<>(ApiResponse.class);
+		try {
+			callTask.put(DATA, TO_GET_CALL_TASK_DTO.apply(callDaoService.getCallTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("PhoneCallTask", "taskId", taskId))));
+			callTask.put(SUCCESS, true);
+			return new ResponseEntity<>(callTask, FOUND);
+
+		} catch (Exception e) {
+			log.error("error occured while getting phone call task by id..{}", +taskId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}

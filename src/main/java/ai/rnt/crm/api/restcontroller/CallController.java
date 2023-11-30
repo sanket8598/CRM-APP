@@ -75,4 +75,9 @@ public class CallController {
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "callId") Integer callId) {
 		return callService.addCallTask(dto, leadsId, callId);
 	}
+
+	@GetMapping("/task/{taskId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getCallTask(@PathVariable Integer taskId) {
+		return callService.getCallTask(taskId);
+	}
 }

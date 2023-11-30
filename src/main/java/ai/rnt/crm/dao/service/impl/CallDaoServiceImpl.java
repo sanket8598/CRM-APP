@@ -46,4 +46,9 @@ public class CallDaoServiceImpl implements CallDaoService {
 	public PhoneCallTask addCallTask(PhoneCallTask phoneCallTask) {
 		return callTaskRepository.save(phoneCallTask);
 	}
+
+	@Override
+	public Optional<PhoneCallTask> getCallTaskById(Integer taskId) {
+		return callTaskRepository.findById(taskId);
+	}
 }
