@@ -154,8 +154,10 @@ public class LeadsCardUtil {
 			return false;
 		else {
 			try {
+				System.out.println("ss "+s);
 				Date endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(s.toString());
-				return (endDate.before(after4Days) && endDate.after(new Date()));
+				System.out.println("end date is equals or not "+endDate.equals(new Date())+" /n----");
+				return (endDate.before(after4Days) && (endDate.equals(new Date())  || endDate.after(new Date())));
 			} catch (ParseException e) {
 				return false;
 			}
