@@ -17,4 +17,6 @@ public interface MeetingService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@Valid MeetingTaskDto dto, Integer leadsId,
 			Integer meetingId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> editMeeting(Integer meetingId);
+
 }

@@ -2,13 +2,16 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT;
+import static ai.rnt.crm.dto_mapper.MeetingDtoMapper.TO_GET_MEETING_DTO;
 import static ai.rnt.crm.dto_mapper.MeetingDtoMapper.TO_MEETING;
 import static ai.rnt.crm.dto_mapper.MeetingTaskDtoMapper.TO_MEETING_TASK;
+import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FOUND;
 
 import java.util.EnumMap;
 import java.util.Optional;
@@ -106,6 +109,20 @@ public class MeetingServiceImpl implements MeetingService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while adding meeting tasks..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editMeeting(Integer meetingId) {
+		EnumMap<ApiResponse, Object> meeting = new EnumMap<>(ApiResponse.class);
+		try {
+			meeting.put(SUCCESS, true);
+			meeting.put(DATA, TO_GET_MEETING_DTO.apply(meetingDaoService.getMeetingById(meetingId)
+					.orElseThrow(() -> new ResourceNotFoundException("Meeting", "meetingId", meetingId))));
+			return new ResponseEntity<>(meeting, FOUND);
+		} catch (Exception e) {
+			log.info("Got Exception while geting meeting for edit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

@@ -3,7 +3,7 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_CALL;
-import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_EDIT_CALL_DTO;
+import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_GET_CALL_DTO;
 import static ai.rnt.crm.dto_mapper.CallTaskDtoMapper.TO_CALL_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
@@ -151,7 +151,7 @@ public class CallServiceImpl implements CallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(Integer callId) {
 		EnumMap<ApiResponse, Object> call = new EnumMap<>(ApiResponse.class);
 		try {
-			call.put(DATA, TO_EDIT_CALL_DTO.apply(callDaoService.getCallById(callId)
+			call.put(DATA, TO_GET_CALL_DTO.apply(callDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", callId))));
 			call.put(SUCCESS, true);
 			return new ResponseEntity<>(call, FOUND);

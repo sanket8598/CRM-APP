@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.dto.EditCallDto;
+import ai.rnt.crm.dto.GetCallDto;
 import ai.rnt.crm.entity.Call;
 
 public class CallDtoMapper {
@@ -75,4 +76,5 @@ public class CallDtoMapper {
 	public static final Function<Collection<Call>, List<EditCallDto>> TO_EDIT_CALL_DTOS = e -> e.stream()
 			.map(dm -> TO_EDIT_CALL_DTO.apply(dm).get()).collect(Collectors.toList());
 
+	public static final Function<Call, Optional<GetCallDto>> TO_GET_CALL_DTO = e -> evalMapper(e, GetCallDto.class);
 }

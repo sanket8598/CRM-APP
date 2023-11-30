@@ -2,7 +2,7 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
-import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_EDIT_VISIT_DTO;
+import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_GET_VISIT_DTO;
 import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_VISIT;
 import static ai.rnt.crm.dto_mapper.VisitTaskDtoMapper.TO_VISIT_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
@@ -157,7 +157,7 @@ public class VisitServiceImpl implements VisitService {
 		EnumMap<ApiResponse, Object> visit = new EnumMap<>(ApiResponse.class);
 		try {
 			visit.put(SUCCESS, true);
-			visit.put(DATA, TO_EDIT_VISIT_DTO.apply(visitDaoService.getVisitsByVisitId(visitId)
+			visit.put(DATA, TO_GET_VISIT_DTO.apply(visitDaoService.getVisitsByVisitId(visitId)
 					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId))));
 			return new ResponseEntity<>(visit, FOUND);
 		} catch (Exception e) {

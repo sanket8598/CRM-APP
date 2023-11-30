@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -24,4 +26,5 @@ public class EditVisitDto extends TimeLineActivityDto {
 	private String type;
 
 	private String shortName;
+	
 }
