@@ -108,7 +108,7 @@ public class CallServiceImpl implements CallService {
 			Call call = callDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException("Call", "callId", callId));
 			call.setUpdatedDate(LocalDateTime.now());
-			call.setStatus("complete");
+			call.setStatus("Complete");
 			if (nonNull(callDaoService.call(call))) {
 				result.put(MESSAGE, "Call updated SuccessFully");
 				result.put(SUCCESS, true);

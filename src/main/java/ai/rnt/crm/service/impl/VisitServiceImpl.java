@@ -111,7 +111,7 @@ public class VisitServiceImpl implements VisitService {
 			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
 					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
 			visit.setUpdatedDate(LocalDateTime.now());
-			visit.setStatus("complete");
+			visit.setStatus("Complete");
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit updated SuccessFully");
 				result.put(SUCCESS, true);
