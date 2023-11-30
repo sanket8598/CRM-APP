@@ -57,6 +57,7 @@ public class MeetingServiceImpl implements MeetingService {
 			boolean saveStatus = false;
 			Meetings metting = TO_MEETING.apply(dto).orElseThrow(ResourceNotFoundException::new);
 			metting.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
+			metting.setMeetingStatus("Save");
 			leadDaoService.getLeadById(leadsId).ifPresent(metting::setLead);
 			if (isNull(dto.getMeetingAttachments()) || dto.getMeetingAttachments().isEmpty()) {
 				if (nonNull(meetingDaoService.addMeeting(metting)))
