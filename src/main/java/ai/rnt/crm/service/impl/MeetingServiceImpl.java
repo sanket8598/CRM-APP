@@ -1,5 +1,6 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT;
 import static ai.rnt.crm.dto_mapper.MeetingDtoMapper.TO_MEETING;
 import static ai.rnt.crm.dto_mapper.MeetingTaskDtoMapper.TO_MEETING_TASK;
@@ -57,7 +58,7 @@ public class MeetingServiceImpl implements MeetingService {
 			boolean saveStatus = false;
 			Meetings metting = TO_MEETING.apply(dto).orElseThrow(ResourceNotFoundException::new);
 			metting.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
-			metting.setMeetingStatus("Save");
+			metting.setMeetingStatus(SAVE);
 			leadDaoService.getLeadById(leadsId).ifPresent(metting::setLead);
 			if (isNull(dto.getMeetingAttachments()) || dto.getMeetingAttachments().isEmpty()) {
 				if (nonNull(meetingDaoService.addMeeting(metting)))
