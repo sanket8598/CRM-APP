@@ -48,6 +48,6 @@ public class Attachment extends Auditable {
 	private String attachName;
 
 	@ManyToOne(cascade = ALL)
-	@JoinColumn(name = "add_mail_id")
+	@JoinColumn(name = "mail_id")
 	private Email mail;
 }

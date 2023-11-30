@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
+import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_CALL;
 import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_EDIT_CALL_DTO;
 import static ai.rnt.crm.dto_mapper.CallTaskDtoMapper.TO_CALL_TASK;
@@ -64,7 +66,7 @@ public class CallServiceImpl implements CallService {
 			call.setLead(lead);
 			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
-			call.setStatus("Save");
+			call.setStatus(SAVE);
 			if (nonNull(callDaoService.call(call)))
 				result.put(MESSAGE, "Call Added Successfully");
 			else
@@ -108,7 +110,7 @@ public class CallServiceImpl implements CallService {
 			Call call = callDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException("Call", "callId", callId));
 			call.setUpdatedDate(LocalDateTime.now());
-			call.setStatus("complete");
+			call.setStatus(COMPLETE);
 			if (nonNull(callDaoService.call(call))) {
 				result.put(MESSAGE, "Call updated SuccessFully");
 				result.put(SUCCESS, true);
@@ -176,7 +178,7 @@ public class CallServiceImpl implements CallService {
 			call.setStatus(status);
 			call.setUpdatedDate(LocalDateTime.now());
 			if (nonNull(callDaoService.call(call))) {
-				if (status.equalsIgnoreCase("Save"))
+				if (status.equalsIgnoreCase(SAVE))
 					result.put(MESSAGE, "Call Updated Successfully");
 				else
 					result.put(MESSAGE, "Call Updated And Completed Successfully");

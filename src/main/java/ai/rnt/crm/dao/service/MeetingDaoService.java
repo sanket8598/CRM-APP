@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import ai.rnt.crm.dto.MeetingDto;
@@ -19,5 +20,7 @@ public interface MeetingDaoService extends CrudService<Meetings, MeetingDto> {
 	Optional<Meetings> getMeetingById(Integer meetingId);
 
 	MeetingTask addMeetingTask(MeetingTask meetingTask);
+
+	List<Meetings> getMeetingByLeadId(Integer leadId);
 
 }

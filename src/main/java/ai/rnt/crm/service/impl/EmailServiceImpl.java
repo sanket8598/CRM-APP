@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.StatusConstants.SAVE;
+import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
@@ -88,11 +90,11 @@ public class EmailServiceImpl implements EmailService {
 					saveStatus = nonNull(addAttachment);
 				}
 			}
-			if (saveStatus && "save".equalsIgnoreCase(status)) {
+			if (saveStatus && SAVE.equalsIgnoreCase(status)) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Added Successfully");
 				result.put(DATA, sendEmail.getMailId());
-			} else if ("send".equalsIgnoreCase(status)) {
+			} else if (SEND.equalsIgnoreCase(status)) {
 				boolean sendEmailStatus = EmailUtil.sendEmail(sendEmail);
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
@@ -100,7 +102,7 @@ public class EmailServiceImpl implements EmailService {
 				} else {
 					result.put(SUCCESS, true);
 					if (saveStatus && !sendEmailStatus) {
-						email.setStatus("save");
+						email.setStatus(SAVE);
 						emailDaoService.email(email);
 						result.put(MESSAGE, "Email Saved but Problem while Sending Email!!");
 					} else
@@ -267,10 +269,10 @@ public class EmailServiceImpl implements EmailService {
 					saveStatus = nonNull(addAttachment);
 				}
 			}
-			if (saveStatus && "save".equalsIgnoreCase(status)) {
+			if (saveStatus && SAVE.equalsIgnoreCase(status)) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Updated Successfully");
-			} else if ("send".equalsIgnoreCase(status)) {
+			} else if (SEND.equalsIgnoreCase(status)) {
 				boolean sendEmailStatus = EmailUtil.sendEmail(sendEmail);
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);

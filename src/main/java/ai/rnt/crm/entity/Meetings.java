@@ -75,6 +75,9 @@ public class Meetings extends Auditable {
 
 	@Column(name = "mtg_mode")
 	private String meetingMode;
+	
+	@Column(name = "mtg_status")
+	private String meetingStatus;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "lead_id")

@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
+import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_EDIT_VISIT_DTO;
 import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_VISIT;
 import static ai.rnt.crm.dto_mapper.VisitTaskDtoMapper.TO_VISIT_TASK;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -61,13 +64,14 @@ public class VisitServiceImpl implements VisitService {
 		log.info("inside add visit leadId:{}", dto.getLeadId());
 		try {
 			Visit visit = TO_VISIT.apply(dto).orElseThrow(null);
+			visit.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			Leads lead = leadDaoService.getLeadById(dto.getLeadId())
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", dto.getLeadId()));
 			visit.setLead(lead);
 			EmployeeMaster employee = employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", auditAwareUtil.getLoggedInStaffId()));
 			visit.setVisitBy(employee);
-			visit.setStatus("Save");
+			visit.setStatus(SAVE);
 			if (nonNull(visitDaoService.saveVisit(visit)))
 				result.put(MESSAGE, "Visit Added Successfully");
 			else
@@ -109,7 +113,7 @@ public class VisitServiceImpl implements VisitService {
 			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
 					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
 			visit.setUpdatedDate(LocalDateTime.now());
-			visit.setStatus("complete");
+			visit.setStatus(COMPLETE);
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit updated SuccessFully");
 				result.put(SUCCESS, true);
@@ -176,7 +180,7 @@ public class VisitServiceImpl implements VisitService {
 			visit.setStatus(status);
 			visit.setUpdatedDate(LocalDateTime.now());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
-				if (status.equalsIgnoreCase("Save"))
+				if (status.equalsIgnoreCase(SAVE))
 					result.put(MESSAGE, "Visit Updated Successfully");
 				else
 					result.put(MESSAGE, "Visit Updated And Completed Successfully");
