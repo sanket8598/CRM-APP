@@ -16,6 +16,7 @@ public class JwtAuthRequest {
 	@NotEmpty(message ="Password should not be empty !!")
 	private String password;
 
+	private boolean fromCorp;
 
 
 }
