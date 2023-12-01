@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ai.rnt.crm.dto.GetMeetingTaskDto;
 import ai.rnt.crm.dto.MeetingDto;
 import ai.rnt.crm.dto.MeetingTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
@@ -50,5 +52,16 @@ public class MeetingController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@RequestBody @Valid MeetingTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "meetingId") Integer meetingId) {
 		return meetingService.addMeetingTask(dto, leadsId, meetingId);
+	}
+
+	@GetMapping("/task/{taskId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getMeetingTask(@PathVariable Integer taskId) {
+		return meetingService.getMeetingTask(taskId);
+	}
+
+	@PutMapping("/task/{taskId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(@RequestBody GetMeetingTaskDto dto,
+			@PathVariable Integer taskId) {
+		return meetingService.updateMeetingTask(dto, taskId);
 	}
 }

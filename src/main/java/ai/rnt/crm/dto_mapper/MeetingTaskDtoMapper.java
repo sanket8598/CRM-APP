@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.GetMeetingTaskDto;
 import ai.rnt.crm.dto.MeetingTaskDto;
 import ai.rnt.crm.entity.MeetingTask;
 
@@ -56,5 +57,8 @@ public class MeetingTaskDtoMapper {
 	 */
 	public static final Function<Collection<MeetingTask>, List<MeetingTaskDto>> TO_MEETING_TASK_DTOS = e -> e.stream()
 			.map(dm -> TO_MEETING_TASK_DTO.apply(dm).get()).collect(Collectors.toList());
+
+	public static final Function<MeetingTask, Optional<GetMeetingTaskDto>> TO_GET_MEETING_TASK_DTO = e -> evalMapper(e,
+			GetMeetingTaskDto.class);
 
 }

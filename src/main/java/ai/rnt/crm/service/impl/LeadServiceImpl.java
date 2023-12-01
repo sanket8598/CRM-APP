@@ -928,8 +928,8 @@ public class LeadServiceImpl implements LeadService {
 
 	public boolean isValidExcel(Sheet sheet) throws IOException {
 		List<String> dbHeaderNames = excelHeaderDaoService.getAllExcelHeaders().stream()
-				.map(ExcelHeaderMaster::getHeaderName).collect(Collectors.toList());
-		List<String> excelHeader = readExcelUtil.getAllHeaders(sheet);
+				.map(ExcelHeaderMaster::getHeaderName).map(String::trim).collect(Collectors.toList());
+		List<String> excelHeader = readExcelUtil.getAllHeaders(sheet).stream().map(String::trim).collect(Collectors.toList());
 		return (nonNull(excelHeader) && !excelHeader.isEmpty()) && (nonNull(dbHeaderNames) && !dbHeaderNames.isEmpty())
 				&& excelHeader.stream().allMatch(dbHeaderNames::contains) && excelHeader.containsAll(dbHeaderNames);
 	}

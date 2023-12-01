@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.dto.GetVisitTaskDto;
 import ai.rnt.crm.dto.VisitDto;
 import ai.rnt.crm.dto.VisitTaskDto;
 import ai.rnt.crm.entity.EmployeeMaster;
@@ -229,6 +230,36 @@ public class VisitServiceImpl implements VisitService {
 			return new ResponseEntity<>(visitTask, FOUND);
 		} catch (Exception e) {
 			log.error("error occured while getting visit task by id..{}", +taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisitTask(GetVisitTaskDto dto, Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			VisitTask visitTask = visitDaoService.getVisitTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("VisitTask", "taskId", taskId));
+			visitTask.setSubject(dto.getSubject());
+			visitTask.setStatus(dto.getStatus());
+			visitTask.setPriority(dto.getPriority());
+			visitTask.setDueDate(dto.getUpdateDueDate());
+			visitTask.setRemainderDueAt(dto.getRemainderDueAt());
+			visitTask.setRemainderDueOn(dto.getRemainderDueOn());
+			visitTask.setRemainderOn(dto.isRemainderOn());
+			visitTask.setRemainderVia(dto.getRemainderVia());
+			visitTask.setDescription(dto.getDescription());
+			visitTask.setUpdatedDate(LocalDateTime.now());
+			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Updated Successfully..!!");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Updated");
+			}
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("error occured while updating visit task by id..{}", +taskId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}

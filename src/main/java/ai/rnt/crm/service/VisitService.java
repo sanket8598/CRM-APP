@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 
+import ai.rnt.crm.dto.GetVisitTaskDto;
 import ai.rnt.crm.dto.VisitDto;
 import ai.rnt.crm.dto.VisitTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
@@ -29,5 +30,7 @@ public interface VisitService {
 			Integer visitId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getVisitTask(Integer taskId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> updateVisitTask(GetVisitTaskDto dto, Integer taskId);
 
 }

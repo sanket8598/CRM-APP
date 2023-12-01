@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ai.rnt.crm.dto.GetVisitTaskDto;
 import ai.rnt.crm.dto.VisitDto;
 import ai.rnt.crm.dto.VisitTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
@@ -79,5 +80,11 @@ public class VisitController {
 	@GetMapping("/task/{taskId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getVisitTask(@PathVariable Integer taskId) {
 		return visitService.getVisitTask(taskId);
+	}
+
+	@PutMapping("/task/{taskId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisitTask(@RequestBody GetVisitTaskDto dto,
+			@PathVariable Integer taskId) {
+		return visitService.updateVisitTask(dto, taskId);
 	}
 }
