@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.CallTaskDto;
+import ai.rnt.crm.dto.GetCallTaskDto;
 import ai.rnt.crm.entity.PhoneCallTask;
 
 public class CallTaskDtoMapper {
@@ -57,4 +58,6 @@ public class CallTaskDtoMapper {
 	public static final Function<Collection<PhoneCallTask>, List<CallTaskDto>> TO_CALL_TASK_DTOS = e -> e.stream()
 			.map(dm -> TO_CALL_TASK_DTO.apply(dm).get()).collect(Collectors.toList());
 
+	public static final Function<PhoneCallTask, Optional<GetCallTaskDto>> TO_GET_CALL_TASK_DTO = e -> evalMapper(e,
+			GetCallTaskDto.class);
 }

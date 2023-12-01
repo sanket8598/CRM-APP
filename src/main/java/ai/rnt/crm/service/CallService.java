@@ -26,4 +26,6 @@ public interface CallService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(CallDto dto, Integer callId, String status);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@Valid CallTaskDto dto, Integer leadsId, Integer callId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> getCallTask(Integer taskId);
 }

@@ -75,4 +75,9 @@ public class VisitController {
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "visitId") Integer visitId) {
 		return visitService.addVisitTask(dto, leadsId, visitId);
 	}
+
+	@GetMapping("/task/{taskId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getVisitTask(@PathVariable Integer taskId) {
+		return visitService.getVisitTask(taskId);
+	}
 }

@@ -980,7 +980,7 @@ public class LeadServiceImpl implements LeadService {
 
 	public List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
-				.map(e -> new MainTaskDto(e.getVistitTaskId(), e.getSubject(), e.getStatus(), VISIT))
+				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT))
 				.collect(Collectors.toList());
 	}
 

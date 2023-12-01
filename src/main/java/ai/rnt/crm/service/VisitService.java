@@ -28,4 +28,6 @@ public interface VisitService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> addVisitTask(@Valid VisitTaskDto dto, Integer leadsId,
 			Integer visitId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> getVisitTask(Integer taskId);
+
 }

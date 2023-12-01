@@ -9,6 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.EditVisitDto;
+import ai.rnt.crm.dto.GetVisitDto;
 import ai.rnt.crm.dto.VisitDto;
 import ai.rnt.crm.entity.Visit;
 
@@ -75,4 +76,7 @@ public class VisitDtoMapper {
 	 */
 	public static final Function<Collection<Visit>, List<EditVisitDto>> TO_EDIT_VISIT_DTOS = e -> e.stream()
 			.map(dm -> TO_EDIT_VISIT_DTO.apply(dm).get()).collect(Collectors.toList());
+	
+	public static final Function<Visit, Optional<GetVisitDto>> TO_GET_VISIT_DTO = e -> evalMapper(e,
+			GetVisitDto.class);
 }

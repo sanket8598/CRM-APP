@@ -46,4 +46,9 @@ public class VisitDaoServiceImpl implements VisitDaoService {
 	public VisitTask addVisitTask(VisitTask visitTask) {
 		return visitTaskRepository.save(visitTask);
 	}
+
+	@Override
+	public Optional<VisitTask> getVisitTaskById(Integer taskId) {
+		return visitTaskRepository.findById(taskId);
+	}
 }

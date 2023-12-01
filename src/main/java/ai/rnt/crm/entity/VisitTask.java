@@ -33,7 +33,7 @@ public class VisitTask extends Auditable {
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "visit_task_id")
-	private Integer vistitTaskId;
+	private Integer visitTaskId;
 
 	@Column(name = "subject")
 	private String subject;
