@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -30,9 +31,8 @@ public class ReadExcelUtil {
 			throws EncryptedDocumentException, InvalidFormatException, IOException {
 		List<List<String>> records = new ArrayList<>();
 		try {
-			int numOfRows = sheet.getPhysicalNumberOfRows();
 			int numOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();
-			row: for (int i = 1; i < numOfRows; i++) {
+			row: for (int i = 1; i <= sheet.getPhysicalNumberOfRows(); i++) {
 				ArrayList<String> tableData = new ArrayList<>();
 				Row row = sheet.getRow(i);
 				if (row == null)
@@ -40,7 +40,11 @@ public class ReadExcelUtil {
 				for (int j = 0; j <= numOfColumns; j++) {
 					Cell cell = row.getCell(j);
 					if (cell != null) {
-						String data = cell.toString().trim();
+						String data = "";
+						if (cell.getCellTypeEnum() == CellType.NUMERIC)
+							data = cell.getNumericCellValue() + "";
+						else
+							data = cell.getStringCellValue() + "";
 						if (!(data).equals("") && !(data.isEmpty()))
 							tableData.add(data);
 					}

@@ -26,10 +26,11 @@ public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice{
 	@Override
 	@Cacheable(value="serviceFalls")
 	public List<ServiceFallsMaster> getAllSerciveFalls() {
-		return serviceFallRepository.findAll();
+		return serviceFallRepository.findByDeletedDateIsNullOrderByServiceNameAsc();
 	}
 
 	@Override
+	@Cacheable(value = "serviceFall")
 	public Optional<ServiceFallsMaster> findByName(String serviceFalls) {
 		return serviceFallRepository.findByServiceName(serviceFalls);
 	}
