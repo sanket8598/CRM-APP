@@ -72,7 +72,8 @@ public class LoginController {
 			@RequestBody @Valid JwtAuthRequest jwtAuthRequest) {
 		log.info("calling login api...");
 		try {
-			jwtAuthRequest.setPassword(Sha1Encryptor.encryptThisString(jwtAuthRequest.getPassword()));
+			  if(!jwtAuthRequest.isFromCorp())
+				  jwtAuthRequest.setPassword(Sha1Encryptor.encryptThisString(jwtAuthRequest.getPassword()));
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
 			String token = helper.generateToken(customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()));
