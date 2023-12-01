@@ -2,6 +2,7 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
+import static ai.rnt.crm.constants.MessageConstants.MSG;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
@@ -121,6 +122,7 @@ import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.ConvertDateFormatUtil;
+import ai.rnt.crm.util.ExcelFieldValidationUtil;
 import ai.rnt.crm.util.LeadsCardUtil;
 import ai.rnt.crm.util.ReadExcelUtil;
 import lombok.RequiredArgsConstructor;
@@ -876,20 +878,30 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		List<List<String>> excelData = new ArrayList<>();
 		try {
 			result.put(SUCCESS, false);
 			Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
 			if (isValidExcel(sheet)) {
-				excelData = readExcelUtil.getLeadFromExcelFile(workbook, sheet);
 				int saveLeadCount = 0;
 				int duplicateLead = 0;
-				for (List<String> data : excelData) {
-					Leads leads = buildLeadObj(data);
-
-					if (data.size() > 11)
-						setAssignToNameForTheLead(leads, data.get(11).split(" "));
+				for (List<String> data : readExcelUtil.getLeadFromExcelFile(workbook, sheet)) {
+					Leads leads = null;
+					Map<String, Object> leadDataMap = buildLeadObj(data);
+					if (nonNull(leadDataMap) && leadDataMap.containsKey("ErrorList")) {
+						@SuppressWarnings("unchecked")
+						List<String> errorList = (List<String>) leadDataMap.get("ErrorList");
+						if (nonNull(errorList) && !errorList.isEmpty()) {
+							result.put(MESSAGE, errorList);
+							return new ResponseEntity<>(result, BAD_REQUEST);
+						}else if (leadDataMap.containsKey(MSG) && leadDataMap.get(MSG).equals(COMPLETE))
+							leads = (Leads) leadDataMap.get("Lead");
+					}else {
+						result.put(MESSAGE, leadDataMap.get(MSG));
+						return new ResponseEntity<>(result, BAD_REQUEST);
+					}
+					if (nonNull(data) && data.size() > 11)
+						setAssignToNameForTheLead(leads, nonNull(data.get(11)) ? data.get(11).split(" ") : null);
 					else
 						setAssignToNameForTheLead(leads, auditAwareUtil.getLoggedInUserName().split(" "));
 					if (LeadsCardUtil.checkDuplicateLead(leadDaoService.getAllLeads(), leads))
@@ -922,43 +934,103 @@ public class LeadServiceImpl implements LeadService {
 				&& excelHeader.stream().allMatch(dbHeaderNames::contains) && excelHeader.containsAll(dbHeaderNames);
 	}
 
-	public Leads buildLeadObj(List<String> data) {
-		LeadDto dto = new LeadDto();
-		dto.setFirstName(data.get(0));
-		dto.setLastName(data.get(1));
-		dto.setEmail(data.get(2));
-		dto.setPhoneNumber(data.get(3));
-		dto.setDesignation(data.get(4));
-		dto.setTopic(data.get(5));
-		dto.setCompanyName(data.get(6));
-		dto.setCompanyWebsite(data.get(7));
-		dto.setBudgetAmount(data.get(8));
-		dto.setStatus(OPEN);
-		dto.setDisqualifyAs(OPEN);
-		Leads leads = TO_LEAD.apply(dto).orElseThrow(null);
-		Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
-		if (existCompany.isPresent()) {
-			existCompany.get().setCompanyWebsite(dto.getCompanyWebsite());
-			leads.setCompanyMaster(
-					TO_COMPANY
-							.apply(companyMasterDaoService
-									.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
-											.orElseThrow(ResourceNotFoundException::new))
-									.orElseThrow(ResourceNotFoundException::new))
-							.orElseThrow(ResourceNotFoundException::new));
+	public Map<String, Object> buildLeadObj(List<String> data) {
+		Map<String, Object> excelMap = new HashMap<>();
+		List<String> errorList = new ArrayList<>();
+		excelMap.put(MSG, COMPLETE);
+		int errorCount = 0;
+		if (nonNull(data) && !data.isEmpty()) {
+			LeadDto dto = new LeadDto();
+			if (nonNull(data.get(0)) && !data.get(0).equalsIgnoreCase(""))
+				if (ExcelFieldValidationUtil.isValidFnameLname(data.get(0)))
+					dto.setFirstName(data.get(0));
+				else
+					errorList.add("Please Enter Valid First Name!!");
+			else
+				errorCount++;
+			if (nonNull(data.get(1)) && !data.get(1).equalsIgnoreCase(""))
+				if (ExcelFieldValidationUtil.isValidFnameLname(data.get(1)))
+					dto.setLastName(data.get(1));
+				else
+					errorList.add("Please Enter Valid Last Name!!");
+			else
+				errorCount++;
+			if (nonNull(data.get(2)) && !data.get(2).equalsIgnoreCase(""))
+				if (ExcelFieldValidationUtil.isValidEmail(data.get(2)))
+					dto.setEmail(data.get(2));
+				else
+					errorList.add("Please Enter Valid Email Address!!");
+			else
+				errorCount++;
+			if (nonNull(data.get(3)) && !data.get(3).equalsIgnoreCase(""))
+				if (ExcelFieldValidationUtil.isValidPhoneNumber(data.get(3)))
+					dto.setPhoneNumber("+"+data.get(3));
+				else
+					errorList.add("Please Enter Valid Phone Number!!");
+			else
+				errorCount++;
+			if (nonNull(data.get(4)) && !data.get(4).equalsIgnoreCase(""))
+				if (ExcelFieldValidationUtil.isValidDesignation(data.get(4)))
+					dto.setDesignation(data.get(4));
+				else
+					errorList.add("Please Enter Character For the Designation!!");
+			else
+				errorCount++;
+			if (nonNull(data.get(5)) && !data.get(5).equalsIgnoreCase(""))
+				dto.setTopic(data.get(5));
+			else
+				errorCount++;
+			if (nonNull(data.get(6)) && !data.get(6).equalsIgnoreCase(""))
+				dto.setCompanyName(data.get(6));
+			else
+				errorCount++;
+			if (nonNull(data.get(7)) && !data.get(7).equalsIgnoreCase(""))
+				dto.setCompanyWebsite(data.get(7));
+			else
+				errorCount++;
+			if (ExcelFieldValidationUtil.isValidBudgetAmount(data.get(8)))
+				dto.setBudgetAmount(data.get(8));
+			else
+				errorList.add("Alphabates Char Not Allowed In the Budget Amount!!");
+			dto.setStatus(OPEN);
+			dto.setDisqualifyAs(OPEN);
+			Leads leads = TO_LEAD.apply(dto).orElseThrow(null);
+			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
+			if (existCompany.isPresent()) {
+				existCompany.get().setCompanyWebsite(dto.getCompanyWebsite());
+				leads.setCompanyMaster(TO_COMPANY
+						.apply(companyMasterDaoService
+								.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
+										.orElseThrow(ResourceNotFoundException::new))
+								.orElseThrow(ResourceNotFoundException::new))
+						.orElseThrow(ResourceNotFoundException::new));
+			} else
+				leads.setCompanyMaster(TO_COMPANY
+						.apply(companyMasterDaoService
+								.save(TO_COMPANY
+										.apply(CompanyDto.builder().companyName(dto.getCompanyName())
+												.companyWebsite(dto.getCompanyWebsite()).build())
+										.orElseThrow(ResourceNotFoundException::new))
+								.orElseThrow(ResourceNotFoundException::new))
+						.orElseThrow(ResourceNotFoundException::new));
+			if ((data.size() > 9 && nonNull(data.get(9))) && !data.get(9).equalsIgnoreCase(""))
+				serviceFallsDaoSevice.findByName(data.get(9)).ifPresent(leads::setServiceFallsMaster);
+			else
+				errorCount++;
+			if ((data.size() > 10 && nonNull(data.get(10))) && !data.get(10).equalsIgnoreCase(""))
+				leadSourceDaoService.getByName(data.get(10)).ifPresent(leads::setLeadSourceMaster);
+			else
+				errorCount++;
+
+			if (errorCount != 0)
+				excelMap.put(MSG, (errorCount == 1 ? "" + errorCount + " Field is " : "" + errorCount + " Fields are ")
+						+ "Null or Empty,Please Verify the Excel!!");
+			else
+				excelMap.put("Lead", leads);
 		} else
-			leads.setCompanyMaster(
-					TO_COMPANY
-							.apply(companyMasterDaoService
-									.save(TO_COMPANY
-											.apply(CompanyDto.builder().companyName(dto.getCompanyName())
-													.companyWebsite(dto.getCompanyWebsite()).build())
-											.orElseThrow(ResourceNotFoundException::new))
-									.orElseThrow(ResourceNotFoundException::new))
-							.orElseThrow(ResourceNotFoundException::new));
-		serviceFallsDaoSevice.findByName(data.get(9)).ifPresent(leads::setServiceFallsMaster);
-		leadSourceDaoService.getByName(data.get(10)).ifPresent(leads::setLeadSourceMaster);
-		return leads;
+			excelMap.put(MSG, "Excel Row Are Empty !!");
+		excelMap.put("ErrorList", errorList);
+		return excelMap;
 	}
 
 	public void setAssignToNameForTheLead(Leads leads, String[] split) {
@@ -1008,10 +1080,12 @@ public class LeadServiceImpl implements LeadService {
 		List<MainTaskDto> completedTask = allTask.stream()
 				.filter(task -> nonNull(task.getStatus()) && task.getStatus().equalsIgnoreCase(TASK_COMPLETED))
 				.collect(Collectors.toList());
+		taskData.put("allTask", allTask);
 		taskData.put("completedTask", completedTask);
 		taskData.put("inProgressTask", inProgressTask);
 		taskData.put("onHoldTask", onHoldTask);
 		taskData.put("notStartedTask", notStartedTask);
+		taskCount.put("allTaskCount", allTask.stream().count());
 		taskCount.put("completedTaskCount", completedTask.stream().count());
 		taskCount.put("inProgressTaskCount", inProgressTask.stream().count());
 		taskCount.put("onHoldTaskCount", onHoldTask.stream().count());

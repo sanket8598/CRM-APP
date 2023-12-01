@@ -26,10 +26,11 @@ public class LeadSourceDaoServiceImpl implements LeadSourceDaoService {
 	@Override
 	@Cacheable(value = "leadSources")
 	public List<LeadSourceMaster> getAllLeadSource() {
-		return leadSourceMasterRepository.findAll();
+		return leadSourceMasterRepository.findByDeletedDateIsNullOrderBySourceNameAsc();
 	}
 
 	@Override
+	@Cacheable(value = "leadSource")
 	public Optional<LeadSourceMaster> getByName(String leadSource) {
 		return leadSourceMasterRepository.findBySourceName(leadSource);
 	}
