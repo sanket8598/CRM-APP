@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.dto.CallTaskDto;
+import ai.rnt.crm.dto.GetCallTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
 
 public interface CallService {
@@ -28,4 +29,6 @@ public interface CallService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@Valid CallTaskDto dto, Integer leadsId, Integer callId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getCallTask(Integer taskId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> updateCallTask(GetCallTaskDto dto, Integer taskId);
 }

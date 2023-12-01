@@ -46,4 +46,9 @@ public class MeetingDaoServiceImpl implements MeetingDaoService {
 	public List<Meetings> getMeetingByLeadId(Integer leadId) {
 		return meetingRepository.findByLeadLeadIdOrderByCreatedDateDesc(leadId);
 	}
+
+	@Override
+	public Optional<MeetingTask> getMeetingTaskById(Integer taskId) {
+		return meetingTaskRepository.findById(taskId);
+	}
 }

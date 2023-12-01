@@ -16,11 +16,13 @@ import ai.rnt.crm.entity.Meetings;
 public interface MeetingDaoService extends CrudService<Meetings, MeetingDto> {
 
 	Meetings addMeeting(Meetings metting);
-	
+
 	Optional<Meetings> getMeetingById(Integer meetingId);
 
 	MeetingTask addMeetingTask(MeetingTask meetingTask);
 
 	List<Meetings> getMeetingByLeadId(Integer leadId);
+
+	Optional<MeetingTask> getMeetingTaskById(Integer taskId);
 
 }

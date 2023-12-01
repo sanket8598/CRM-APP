@@ -28,6 +28,7 @@ import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.dto.CallTaskDto;
+import ai.rnt.crm.dto.GetCallTaskDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
@@ -228,6 +229,36 @@ public class CallServiceImpl implements CallService {
 
 		} catch (Exception e) {
 			log.error("error occured while getting phone call task by id..{}", +taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCallTask(GetCallTaskDto dto, Integer taskId) {
+		EnumMap<ApiResponse, Object> callTask = new EnumMap<>(ApiResponse.class);
+		try {
+			PhoneCallTask phoneCallTask = callDaoService.getCallTaskById(taskId).orElseThrow(
+					() -> new ResourceNotFoundException("PhoneCallTask", "callTaskId", dto.getCallTaskId()));
+			phoneCallTask.setSubject(dto.getSubject());
+			phoneCallTask.setStatus(dto.getStatus());
+			phoneCallTask.setDueDate(dto.getUpdateDueDate());
+			phoneCallTask.setPriority(dto.getPriority());
+			phoneCallTask.setRemainderOn(dto.isRemainderOn());
+			phoneCallTask.setRemainderDueOn(dto.getRemainderDueOn());
+			phoneCallTask.setRemainderVia(dto.getRemainderVia());
+			phoneCallTask.setRemainderDueAt(dto.getRemainderDueAt());
+			phoneCallTask.setDescription(dto.getDescription());
+			phoneCallTask.setUpdatedDate(LocalDateTime.now());
+			if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
+				callTask.put(SUCCESS, true);
+				callTask.put(MESSAGE, "Task Updated Successfully..!!");
+			} else {
+				callTask.put(SUCCESS, false);
+				callTask.put(MESSAGE, "Task Not Updated");
+			}
+			return new ResponseEntity<>(callTask, CREATED);
+		} catch (Exception e) {
+			log.error("error occured while updating phone call task by id..{}", +taskId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}

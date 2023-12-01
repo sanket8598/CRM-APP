@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 
+import ai.rnt.crm.dto.GetMeetingTaskDto;
 import ai.rnt.crm.dto.MeetingDto;
 import ai.rnt.crm.dto.MeetingTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
@@ -18,5 +19,9 @@ public interface MeetingService {
 			Integer meetingId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> editMeeting(Integer meetingId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> getMeetingTask(Integer taskId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(GetMeetingTaskDto dto, Integer taskId);
 
 }

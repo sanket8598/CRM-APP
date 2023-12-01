@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.dto.CallTaskDto;
+import ai.rnt.crm.dto.GetCallTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.CallService;
 import lombok.RequiredArgsConstructor;
@@ -70,7 +71,7 @@ public class CallController {
 		return callService.updateCall(dto, callId, status);
 	}
 
-	@PostMapping("/addTask/{leadId}/{callId}")
+	@PostMapping("/task/{leadId}/{callId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@RequestBody @Valid CallTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "callId") Integer callId) {
 		return callService.addCallTask(dto, leadsId, callId);
@@ -79,5 +80,11 @@ public class CallController {
 	@GetMapping("/task/{taskId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getCallTask(@PathVariable Integer taskId) {
 		return callService.getCallTask(taskId);
+	}
+
+	@PutMapping("/task/{taskId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCallTask(@RequestBody GetCallTaskDto dto,
+			@PathVariable Integer taskId) {
+		return callService.updateCallTask(dto, taskId);
 	}
 }

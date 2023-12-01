@@ -4,6 +4,7 @@ import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT;
 import static ai.rnt.crm.dto_mapper.MeetingDtoMapper.TO_GET_MEETING_DTO;
 import static ai.rnt.crm.dto_mapper.MeetingDtoMapper.TO_MEETING;
+import static ai.rnt.crm.dto_mapper.MeetingTaskDtoMapper.TO_GET_MEETING_TASK_DTO;
 import static ai.rnt.crm.dto_mapper.MeetingTaskDtoMapper.TO_MEETING_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
@@ -13,6 +14,7 @@ import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 
+import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.MeetingAttachmentDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
+import ai.rnt.crm.dto.GetMeetingTaskDto;
 import ai.rnt.crm.dto.MeetingAttachmentsDto;
 import ai.rnt.crm.dto.MeetingDto;
 import ai.rnt.crm.dto.MeetingTaskDto;
@@ -123,6 +126,50 @@ public class MeetingServiceImpl implements MeetingService {
 			return new ResponseEntity<>(meeting, FOUND);
 		} catch (Exception e) {
 			log.info("Got Exception while geting meeting for edit..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getMeetingTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> meetingTask = new EnumMap<>(ApiResponse.class);
+		try {
+			meetingTask.put(SUCCESS, true);
+			meetingTask.put(DATA, TO_GET_MEETING_TASK_DTO.apply(meetingDaoService.getMeetingTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "meetingTaskId", taskId))));
+			return new ResponseEntity<>(meetingTask, FOUND);
+		} catch (Exception e) {
+			log.error("Got Exception while getting the meeting task by id..{} " + taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(GetMeetingTaskDto dto, Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", taskId));
+			meetingTask.setSubject(dto.getSubject());
+			meetingTask.setStatus(dto.getStatus());
+			meetingTask.setPriority(dto.getPriority());
+			meetingTask.setDueDate(dto.getUpdateDueDate());
+			meetingTask.setRemainderOn(dto.isRemainderOn());
+			meetingTask.setRemainderDueAt(dto.getRemainderDueAt());
+			meetingTask.setRemainderDueOn(dto.getRemainderDueOn());
+			meetingTask.setRemainderVia(dto.getRemainderVia());
+			meetingTask.setDescription(dto.getDescription());
+			meetingTask.setUpdatedDate(LocalDateTime.now());
+			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Updated Successfully..!!");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Updated");
+			}
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception while updating the meeting task by id..{} " + taskId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}
