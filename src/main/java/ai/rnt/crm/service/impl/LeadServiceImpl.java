@@ -876,6 +876,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	@Override
+	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
@@ -892,8 +893,8 @@ public class LeadServiceImpl implements LeadService {
 						@SuppressWarnings("unchecked")
 						List<String> errorList = (List<String>) leadDataMap.get("ErrorList");
 						if (nonNull(errorList) && !errorList.isEmpty()) {
-							result.put(MESSAGE, errorList);
-							return new ResponseEntity<>(result, BAD_REQUEST);
+							result.put(MESSAGE, errorList.get(0));
+						return new ResponseEntity<>(result, BAD_REQUEST);
 						}else if (leadDataMap.containsKey(MSG) && leadDataMap.get(MSG).equals(COMPLETE))
 							leads = (Leads) leadDataMap.get("Lead");
 					}else {
@@ -995,7 +996,8 @@ public class LeadServiceImpl implements LeadService {
 			dto.setStatus(OPEN);
 			dto.setDisqualifyAs(OPEN);
 			Leads leads = TO_LEAD.apply(dto).orElseThrow(null);
-			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
+			if(isNull(errorList) || errorList.isEmpty()) {
+				Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
 			if (existCompany.isPresent()) {
 				existCompany.get().setCompanyWebsite(dto.getCompanyWebsite());
 				leads.setCompanyMaster(TO_COMPANY
@@ -1013,6 +1015,7 @@ public class LeadServiceImpl implements LeadService {
 										.orElseThrow(ResourceNotFoundException::new))
 								.orElseThrow(ResourceNotFoundException::new))
 						.orElseThrow(ResourceNotFoundException::new));
+			}
 			if ((data.size() > 9 && nonNull(data.get(9))) && !data.get(9).equalsIgnoreCase(""))
 				serviceFallsDaoSevice.findByName(data.get(9)).ifPresent(leads::setServiceFallsMaster);
 			else
@@ -1046,19 +1049,19 @@ public class LeadServiceImpl implements LeadService {
 
 	public List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
 		return calls.stream().flatMap(call -> call.getCallTasks().stream())
-				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL))
+				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,e.getDueDate()))
 				.collect(Collectors.toList());
 	}
 
 	public List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
-				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT))
+				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,e.getDueDate()))
 				.collect(Collectors.toList());
 	}
 
 	public List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
 		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
-				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING))
+				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,e.getDueDate()))
 				.collect(Collectors.toList());
 	}
 
