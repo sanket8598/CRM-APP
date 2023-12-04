@@ -917,8 +917,8 @@ public class LeadServiceImpl implements LeadService {
 							return new ResponseEntity<>(result, BAD_REQUEST);
 						}
 					} 
-					if (nonNull(data) && data.size() > 11)
-						setAssignToNameForTheLead(leads, nonNull(data.get(11)) ? data.get(11).split(" ") : null);
+					if (nonNull(data) && data.size() > 11 && (nonNull(data.get(11)) && !data.get(11).isEmpty()))
+						setAssignToNameForTheLead(leads,  data.get(11).split(" "));
 					else
 						setAssignToNameForTheLead(leads, auditAwareUtil.getLoggedInUserName().split(" "));
 					if (LeadsCardUtil.checkDuplicateLead(leadDaoService.getAllLeads(), leads))
@@ -1013,7 +1013,7 @@ public class LeadServiceImpl implements LeadService {
 			if (ExcelFieldValidationUtil.isValidBudgetAmount(data.get(8)))
 				dto.setBudgetAmount(data.get(8));
 			else
-				errorList.add("Alphabates Char Not Allowed In the Budget Amount!!");
+				errorList.add("Please Enter The Valid Budget Amount!!");
 			dto.setStatus(OPEN);
 			dto.setDisqualifyAs(OPEN);
 			Leads leads = TO_LEAD.apply(dto).orElseThrow(null);
@@ -1044,7 +1044,7 @@ public class LeadServiceImpl implements LeadService {
 			if ((data.size() > 10 && nonNull(data.get(10))) && !data.get(10).equalsIgnoreCase(""))
 				leadSourceDaoService.getByName(data.get(10)).ifPresent(leads::setLeadSourceMaster);
 			else
-				errorCount++;
+				leadSourceDaoService.getByName("Other").ifPresent(leads::setLeadSourceMaster);
 
 			if (errorCount != 0)
 				excelMap.put(MSG, (errorCount == 1 ? "" + errorCount + " Field is " : "" + errorCount + " Fields are ")
