@@ -37,7 +37,7 @@ public class ReadExcelUtil {
 				ArrayList<String> tableData = new ArrayList<>();
 				Row row = sheet.getRow(i);
 				if (row == null)
-					continue row;
+					break;
 				for (int j = 0; j <= numOfColumns; j++) {
 					Cell cell = row.getCell(j);
 					if (cell != null) {
