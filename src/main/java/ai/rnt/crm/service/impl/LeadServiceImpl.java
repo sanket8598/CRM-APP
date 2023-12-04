@@ -123,6 +123,7 @@ import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.ConvertDateFormatUtil;
+import ai.rnt.crm.util.CurrencyUtil;
 import ai.rnt.crm.util.ExcelFieldValidationUtil;
 import ai.rnt.crm.util.LeadsCardUtil;
 import ai.rnt.crm.util.ReadExcelUtil;
@@ -1011,7 +1012,7 @@ public class LeadServiceImpl implements LeadService {
 			else
 				errorCount++;
 			if (ExcelFieldValidationUtil.isValidBudgetAmount(data.get(8)))
-				dto.setBudgetAmount(data.get(8));
+				dto.setBudgetAmount(CurrencyUtil.CommaSepAmount(Double.parseDouble(data.get(8))));
 			else
 				errorList.add("Please Enter The Valid Budget Amount!!");
 			dto.setStatus(OPEN);
