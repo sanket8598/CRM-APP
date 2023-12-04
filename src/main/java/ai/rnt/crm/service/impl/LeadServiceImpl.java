@@ -912,10 +912,11 @@ public class LeadServiceImpl implements LeadService {
 							return new ResponseEntity<>(result, BAD_REQUEST);
 						} else if (leadDataMap.containsKey(MSG) && leadDataMap.get(MSG).equals(COMPLETE))
 							leads = (Leads) leadDataMap.get("Lead");
-					} else {
-						result.put(MESSAGE, leadDataMap.get(MSG));
-						return new ResponseEntity<>(result, BAD_REQUEST);
-					}
+						else {
+							result.put(MESSAGE, leadDataMap.get(MSG));
+							return new ResponseEntity<>(result, BAD_REQUEST);
+						}
+					} 
 					if (nonNull(data) && data.size() > 11)
 						setAssignToNameForTheLead(leads, nonNull(data.get(11)) ? data.get(11).split(" ") : null);
 					else
@@ -963,8 +964,10 @@ public class LeadServiceImpl implements LeadService {
 					dto.setFirstName(data.get(0));
 				else
 					errorList.add("Please Enter Valid First Name!!");
-			else
+			else {
+				errorList.add("Please Enter The First Name!!");
 				errorCount++;
+			}
 			if (nonNull(data.get(1)) && !data.get(1).equalsIgnoreCase(""))
 				if (ExcelFieldValidationUtil.isValidFnameLname(data.get(1)))
 					dto.setLastName(data.get(1));

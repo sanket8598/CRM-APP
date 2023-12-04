@@ -47,8 +47,7 @@ public class ReadExcelUtil {
 						else
 							data = cell.getStringCellValue() + "";
 						tableData.add(data);
-					}else
-						tableData.add(null);
+					}
 				}
 				if (!tableData.isEmpty())
 					records.add(tableData);
