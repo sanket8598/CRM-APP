@@ -70,5 +70,8 @@ public final class ApiConstants {
 	public static final String MEETING = BASE + "meeting" + SEPERATOR;
 	
 	public static final String GET_ALL_MAIL_ID = GET_ADMIN_AND_USER +SEPERATOR+ "{email}";
+	
+	public static final String DOWNLOAD = SEPERATOR+"download";
+	
 
 }

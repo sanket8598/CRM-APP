@@ -33,7 +33,6 @@ public class AuthenticationUtil {
 		List<String> api = new ArrayList<>();
 		api.add("/api/v1/auth/login"); 
 		api.add("/api/v1/auth/tokenparse"); 
-		api.add("/api/v1/excel/download"); 
 		api.add("/v3/api-docs"); 
 		api.add("swagger-resources/"); 
 		api.add("/swagger-ui/index.html"); 
@@ -46,7 +45,7 @@ public class AuthenticationUtil {
 		
 	};
 	
-	public static final String[] PUBLIC_URLS = { "/api/v1/auth/**", "/v3/api-docs", "/v2/api-docs","/api/v1/excel/**",
+	public static final String[] PUBLIC_URLS = { "/api/v1/auth/**", "/v3/api-docs", "/v2/api-docs",
 			"swagger-resources/**", "swagger-ui/**", "/webjars/**" };
 	public static final String[] ADMIN_URLS = { "/api/v1/admin/**" };
 	public static final String[] USER_URLS = { "/api/v1/user/**"};
