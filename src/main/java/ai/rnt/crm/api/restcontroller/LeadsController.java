@@ -156,4 +156,10 @@ public class LeadsController {
 			@NotNull(message = "Please Select The File!!") @ValidFile(message = "Only Excel File is Allowed!!") @RequestParam("file") MultipartFile file) {
 		return leadService.uploadExcel(file);
 	}
+	
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/qualify/edit/{leadId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editQualifyLead(@PathVariable Integer leadId) {
+		return leadService.getForQualifyLead(leadId);
+	}
 }

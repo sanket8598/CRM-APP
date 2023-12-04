@@ -36,6 +36,7 @@ import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSortFilterDtoMapper.TO_LEAD_SORT_FILTER;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
+import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_QUALIFY_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
@@ -52,6 +53,7 @@ import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -63,6 +65,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -876,6 +879,20 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getForQualifyLead(Integer leadId) {
+		try {
+			EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+			result.put(DATA, TO_QUALIFY_LEAD.apply(leadDaoService.getLeadById(leadId)
+					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId))));
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, FOUND);
+		} catch (Exception e) {
+			log.info("Got Exception while getting the Qualified lead for edit..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
@@ -894,10 +911,10 @@ public class LeadServiceImpl implements LeadService {
 						List<String> errorList = (List<String>) leadDataMap.get("ErrorList");
 						if (nonNull(errorList) && !errorList.isEmpty()) {
 							result.put(MESSAGE, errorList.get(0));
-						return new ResponseEntity<>(result, BAD_REQUEST);
-						}else if (leadDataMap.containsKey(MSG) && leadDataMap.get(MSG).equals(COMPLETE))
+							return new ResponseEntity<>(result, BAD_REQUEST);
+						} else if (leadDataMap.containsKey(MSG) && leadDataMap.get(MSG).equals(COMPLETE))
 							leads = (Leads) leadDataMap.get("Lead");
-					}else {
+					} else {
 						result.put(MESSAGE, leadDataMap.get(MSG));
 						return new ResponseEntity<>(result, BAD_REQUEST);
 					}
@@ -930,7 +947,8 @@ public class LeadServiceImpl implements LeadService {
 	public boolean isValidExcel(Sheet sheet) throws IOException {
 		List<String> dbHeaderNames = excelHeaderDaoService.getAllExcelHeaders().stream()
 				.map(ExcelHeaderMaster::getHeaderName).map(String::trim).collect(Collectors.toList());
-		List<String> excelHeader = readExcelUtil.getAllHeaders(sheet).stream().map(String::trim).collect(Collectors.toList());
+		List<String> excelHeader = readExcelUtil.getAllHeaders(sheet).stream().map(String::trim)
+				.collect(Collectors.toList());
 		return (nonNull(excelHeader) && !excelHeader.isEmpty()) && (nonNull(dbHeaderNames) && !dbHeaderNames.isEmpty())
 				&& excelHeader.stream().allMatch(dbHeaderNames::contains) && excelHeader.containsAll(dbHeaderNames);
 	}
@@ -965,7 +983,7 @@ public class LeadServiceImpl implements LeadService {
 				errorCount++;
 			if (nonNull(data.get(3)) && !data.get(3).equalsIgnoreCase(""))
 				if (ExcelFieldValidationUtil.isValidPhoneNumber(data.get(3)))
-					dto.setPhoneNumber("+"+data.get(3));
+					dto.setPhoneNumber("+" + data.get(3));
 				else
 					errorList.add("Please Enter Valid Phone Number!!");
 			else
@@ -990,31 +1008,31 @@ public class LeadServiceImpl implements LeadService {
 			else
 				errorCount++;
 			if (ExcelFieldValidationUtil.isValidBudgetAmount(data.get(8)))
-				dto.setBudgetAmount(data.get(8));
+				dto.setBudgetAmount(NumberFormat.getCurrencyInstance(new Locale("en", "in")).format(data.get(8)));
 			else
 				errorList.add("Alphabates Char Not Allowed In the Budget Amount!!");
 			dto.setStatus(OPEN);
 			dto.setDisqualifyAs(OPEN);
 			Leads leads = TO_LEAD.apply(dto).orElseThrow(null);
-			if(isNull(errorList) || errorList.isEmpty()) {
+			if (isNull(errorList) || errorList.isEmpty()) {
 				Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
-			if (existCompany.isPresent()) {
-				existCompany.get().setCompanyWebsite(dto.getCompanyWebsite());
-				leads.setCompanyMaster(TO_COMPANY
-						.apply(companyMasterDaoService
-								.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
-										.orElseThrow(ResourceNotFoundException::new))
-								.orElseThrow(ResourceNotFoundException::new))
-						.orElseThrow(ResourceNotFoundException::new));
-			} else
-				leads.setCompanyMaster(TO_COMPANY
-						.apply(companyMasterDaoService
-								.save(TO_COMPANY
-										.apply(CompanyDto.builder().companyName(dto.getCompanyName())
-												.companyWebsite(dto.getCompanyWebsite()).build())
-										.orElseThrow(ResourceNotFoundException::new))
-								.orElseThrow(ResourceNotFoundException::new))
-						.orElseThrow(ResourceNotFoundException::new));
+				if (existCompany.isPresent()) {
+					existCompany.get().setCompanyWebsite(dto.getCompanyWebsite());
+					leads.setCompanyMaster(TO_COMPANY
+							.apply(companyMasterDaoService
+									.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
+											.orElseThrow(ResourceNotFoundException::new))
+									.orElseThrow(ResourceNotFoundException::new))
+							.orElseThrow(ResourceNotFoundException::new));
+				} else
+					leads.setCompanyMaster(TO_COMPANY
+							.apply(companyMasterDaoService
+									.save(TO_COMPANY
+											.apply(CompanyDto.builder().companyName(dto.getCompanyName())
+													.companyWebsite(dto.getCompanyWebsite()).build())
+											.orElseThrow(ResourceNotFoundException::new))
+									.orElseThrow(ResourceNotFoundException::new))
+							.orElseThrow(ResourceNotFoundException::new));
 			}
 			if ((data.size() > 9 && nonNull(data.get(9))) && !data.get(9).equalsIgnoreCase(""))
 				serviceFallsDaoSevice.findByName(data.get(9)).ifPresent(leads::setServiceFallsMaster);
@@ -1048,20 +1066,22 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
-		return calls.stream().flatMap(call -> call.getCallTasks().stream())
-				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,e.getDueDate()))
+		return calls.stream().flatMap(call -> call.getCallTasks().stream()).map(e -> new MainTaskDto(e.getCallTaskId(),
+				e.getSubject(), e.getStatus(), CALL, e.getDueDate(), TO_Employee.apply(e.getAssignTo()).orElse(null)))
 				.collect(Collectors.toList());
 	}
 
 	public List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
-				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,e.getDueDate()))
+				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT, e.getDueDate(),
+						TO_Employee.apply(e.getAssignTo()).orElse(null)))
 				.collect(Collectors.toList());
 	}
 
 	public List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
 		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
-				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,e.getDueDate()))
+				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING, e.getDueDate(),
+						TO_Employee.apply(e.getAssignTo()).orElse(null)))
 				.collect(Collectors.toList());
 	}
 
@@ -1096,4 +1116,5 @@ public class LeadServiceImpl implements LeadService {
 		taskData.put("countByStatus", taskCount);
 		return taskData;
 	}
+
 }

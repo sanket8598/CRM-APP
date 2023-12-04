@@ -44,4 +44,6 @@ public interface LeadService {
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file);
 
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getForQualifyLead(Integer leadId);
+
 }
