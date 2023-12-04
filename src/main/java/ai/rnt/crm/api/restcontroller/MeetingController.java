@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,5 +64,10 @@ public class MeetingController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(@RequestBody GetMeetingTaskDto dto,
 			@PathVariable Integer taskId) {
 		return meetingService.updateMeetingTask(dto, taskId);
+	}
+
+	@DeleteMapping("/task/delete/{taskId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeetingTask(@PathVariable Integer taskId) {
+		return meetingService.deleteMeetingTask(taskId);
 	}
 }

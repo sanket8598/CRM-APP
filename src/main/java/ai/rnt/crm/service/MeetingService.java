@@ -24,4 +24,6 @@ public interface MeetingService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(GetMeetingTaskDto dto, Integer taskId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeetingTask(Integer taskId);
+
 }

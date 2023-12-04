@@ -13,6 +13,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.time.LocalDateTime;
 import java.util.EnumMap;
@@ -39,6 +40,7 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.MeetingService;
+import ai.rnt.crm.util.AuditAwareUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,6 +58,7 @@ public class MeetingServiceImpl implements MeetingService {
 	private final MeetingDaoService meetingDaoService;
 	private final MeetingAttachmentDaoService meetingAttachmetDaoService;
 	private final LeadDaoService leadDaoService;
+	private final AuditAwareUtil auditAwareUtil;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeeting(@Valid MeetingDto dto, Integer leadsId) {
@@ -170,6 +173,29 @@ public class MeetingServiceImpl implements MeetingService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while updating the meeting task by id..{} " + taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeetingTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", taskId));
+			meetingTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			meetingTask.setDeletedDate(LocalDateTime.now());
+			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
+				result.put(MESSAGE, "Meeting Task Deleted SuccessFully.");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Meeting Task Not delete.");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+
+		} catch (Exception e) {
+			log.error("Got Exception while deleting the meeting task by id..{} " + taskId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}

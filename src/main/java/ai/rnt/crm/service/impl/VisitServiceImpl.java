@@ -263,4 +263,27 @@ public class VisitServiceImpl implements VisitService {
 			throw new CRMException(e);
 		}
 	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisitTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			VisitTask visitTask = visitDaoService.getVisitTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("VisitTask", "taskId", taskId));
+			visitTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			visitTask.setDeletedDate(LocalDateTime.now());
+			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
+				result.put(MESSAGE, "Visit Task Deleted SuccessFully.");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Visit Task Not delete.");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+
+		} catch (Exception e) {
+			log.error("error occured while deleting visit task by id..{}", +taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
 }
