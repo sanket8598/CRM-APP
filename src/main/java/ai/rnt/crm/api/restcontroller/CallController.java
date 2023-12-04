@@ -87,4 +87,9 @@ public class CallController {
 			@PathVariable Integer taskId) {
 		return callService.updateCallTask(dto, taskId);
 	}
+
+	@DeleteMapping("/task/delete/{taskId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCallTask(@PathVariable Integer taskId) {
+		return callService.deleteCallTask(taskId);
+	}
 }

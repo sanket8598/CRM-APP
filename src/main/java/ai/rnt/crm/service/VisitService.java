@@ -33,4 +33,6 @@ public interface VisitService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> updateVisitTask(GetVisitTaskDto dto, Integer taskId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisitTask(Integer taskId);
+
 }

@@ -262,4 +262,26 @@ public class CallServiceImpl implements CallService {
 			throw new CRMException(e);
 		}
 	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCallTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> deleteTask = new EnumMap<>(ApiResponse.class);
+		try {
+			PhoneCallTask callTask = callDaoService.getCallTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("PhoneCallTask", "taskId", taskId));
+			callTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			callTask.setDeletedDate(LocalDateTime.now());
+			if (nonNull(callDaoService.addCallTask(callTask))) {
+				deleteTask.put(MESSAGE, "Call Task Deleted SuccessFully.");
+				deleteTask.put(SUCCESS, true);
+			} else {
+				deleteTask.put(MESSAGE, "Call Task Not deleted.");
+				deleteTask.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(deleteTask, OK);
+		} catch (Exception e) {
+			log.error("error occured while deleting the phone call task by id..{}", +taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
 }

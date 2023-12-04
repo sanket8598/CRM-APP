@@ -87,4 +87,9 @@ public class VisitController {
 			@PathVariable Integer taskId) {
 		return visitService.updateVisitTask(dto, taskId);
 	}
+
+	@DeleteMapping("/task/delete/{taskId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisitTask(@PathVariable Integer taskId) {
+		return visitService.deleteVisitTask(taskId);
+	}
 }
