@@ -31,8 +31,9 @@ public class ReadExcelUtil {
 			throws EncryptedDocumentException, InvalidFormatException, IOException {
 		List<List<String>> records = new ArrayList<>();
 		try {
+			int noOfRows= sheet.getPhysicalNumberOfRows();
 			int numOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();
-			row: for (int i = 1; i <= sheet.getPhysicalNumberOfRows(); i++) {
+			row: for (int i = 1; i <=noOfRows; i++) {
 				ArrayList<String> tableData = new ArrayList<>();
 				Row row = sheet.getRow(i);
 				if (row == null)
@@ -45,9 +46,9 @@ public class ReadExcelUtil {
 							data = cell.getNumericCellValue() + "";
 						else
 							data = cell.getStringCellValue() + "";
-						if (!(data).equals("") && !(data.isEmpty()))
-							tableData.add(data);
-					}
+						tableData.add(data);
+					}else
+						tableData.add(null);
 				}
 				if (!tableData.isEmpty())
 					records.add(tableData);

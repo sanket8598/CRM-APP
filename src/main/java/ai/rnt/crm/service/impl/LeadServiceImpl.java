@@ -36,10 +36,10 @@ import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSortFilterDtoMapper.TO_LEAD_SORT_FILTER;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
-import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_QUALIFY_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
+import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_QUALIFY_LEAD;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
@@ -53,7 +53,6 @@ import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -65,7 +64,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -993,8 +991,10 @@ public class LeadServiceImpl implements LeadService {
 					dto.setDesignation(data.get(4));
 				else
 					errorList.add("Please Enter Character For the Designation!!");
-			else
+			else {
+				errorList.add("Please Enter the Designation!!");
 				errorCount++;
+			}
 			if (nonNull(data.get(5)) && !data.get(5).equalsIgnoreCase(""))
 				dto.setTopic(data.get(5));
 			else
@@ -1008,7 +1008,7 @@ public class LeadServiceImpl implements LeadService {
 			else
 				errorCount++;
 			if (ExcelFieldValidationUtil.isValidBudgetAmount(data.get(8)))
-				dto.setBudgetAmount(NumberFormat.getCurrencyInstance(new Locale("en", "in")).format(data.get(8)));
+				dto.setBudgetAmount(data.get(8));
 			else
 				errorList.add("Alphabates Char Not Allowed In the Budget Amount!!");
 			dto.setStatus(OPEN);
