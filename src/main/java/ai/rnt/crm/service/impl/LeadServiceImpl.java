@@ -1049,19 +1049,19 @@ public class LeadServiceImpl implements LeadService {
 
 	public List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
 		return calls.stream().flatMap(call -> call.getCallTasks().stream())
-				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL))
+				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,e.getDueDate()))
 				.collect(Collectors.toList());
 	}
 
 	public List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
-				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT))
+				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,e.getDueDate()))
 				.collect(Collectors.toList());
 	}
 
 	public List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
 		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
-				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING))
+				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,e.getDueDate()))
 				.collect(Collectors.toList());
 	}
 
