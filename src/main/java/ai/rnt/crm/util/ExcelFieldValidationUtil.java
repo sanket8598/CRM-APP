@@ -36,6 +36,7 @@ public class ExcelFieldValidationUtil {
 	}
 
 	public static boolean isValidBudgetAmount(String amount) {
-		return nonNull(amount) && Pattern.compile("[0-9]+").matcher(amount).matches();
+		return nonNull(amount) && Pattern.compile("^\\d+$").matcher(amount).matches();
 	}
+	
 }
