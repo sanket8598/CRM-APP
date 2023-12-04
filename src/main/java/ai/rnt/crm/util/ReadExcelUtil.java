@@ -12,7 +12,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import ai.rnt.crm.exception.CRMException;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,7 @@ public class ReadExcelUtil {
 		try {
 			int noOfRows= sheet.getPhysicalNumberOfRows();
 			int numOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();
-			row: for (int i = 1; i <=noOfRows; i++) {
+			 for (int i = 1; i <=noOfRows; i++) {
 				ArrayList<String> tableData = new ArrayList<>();
 				Row row = sheet.getRow(i);
 				if (checkIfRowIsEmpty(row))

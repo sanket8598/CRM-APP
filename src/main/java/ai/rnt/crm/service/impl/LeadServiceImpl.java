@@ -1012,7 +1012,7 @@ public class LeadServiceImpl implements LeadService {
 			else
 				errorCount++;
 			if (ExcelFieldValidationUtil.isValidBudgetAmount(data.get(8)))
-				dto.setBudgetAmount(CurrencyUtil.CommaSepAmount(Double.parseDouble(data.get(8))));
+				dto.setBudgetAmount(CurrencyUtil.commaSepAmount(Double.parseDouble(data.get(8))));
 			else
 				errorList.add("Please Enter The Valid Budget Amount!!");
 			dto.setStatus(OPEN);

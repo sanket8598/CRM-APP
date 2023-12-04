@@ -120,6 +120,11 @@
 		</dependency>
 
    <!-- end-->
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>4.8</version>
+		</dependency>
 
 	</dependencies>
 
