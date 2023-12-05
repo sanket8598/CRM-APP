@@ -1,5 +1,8 @@
 package ai.rnt.crm.config;
 
+import static ai.rnt.crm.constants.SchedularConstant.EVERY_DAY_11_AM;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
+
 import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -20,7 +23,7 @@ public class CacheService {
 		cacheManager.getCache(cacheName).clear();
 	}
 
-	@Scheduled(cron = "0 0 11 * * ?")//Running Everyday at 11 AM
+	@Scheduled(cron=EVERY_DAY_11_AM ,zone=INDIA_ZONE)//Running Everyday at 11 AM
 	public void evictAllcachesAtIntervals() {
 	    evictAllCaches();
 	}
