@@ -1,5 +1,6 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT;
 import static ai.rnt.crm.dto_mapper.MeetingDtoMapper.TO_GET_MEETING_DTO;
@@ -17,6 +18,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.time.LocalDateTime;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -196,6 +198,68 @@ public class MeetingServiceImpl implements MeetingService {
 
 		} catch (Exception e) {
 			log.error("Got Exception while deleting the meeting task by id..{} " + taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeeting(MeetingDto dto, Integer meetingId,
+			String status) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			boolean meetingStatus = false;
+			Meetings saveMeeting = null;
+			Meetings meetings = meetingDaoService.getMeetingById(meetingId)
+					.orElseThrow(() -> new ResourceNotFoundException("Meetings", "meetingId", meetingId));
+			meetings.setMeetingTitle(dto.getMeetingTitle());
+			meetings.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
+			meetings.setStartDate(dto.getStartDate());
+			meetings.setEndDate(dto.getEndDate());
+			meetings.setStartTime(dto.getStartTime());
+			meetings.setEndTime(dto.getEndTime());
+			meetings.setDuration(dto.getDuration());
+			meetings.setLocation(dto.getLocation());
+			meetings.setAllDay(dto.isAllDay());
+			meetings.setMeetingMode(dto.getMeetingMode());
+			meetings.setDescription(dto.getDescription());
+			meetings.setMeetingStatus(status);
+			if (isNull(dto.getMeetingAttachments()) || dto.getMeetingAttachments().isEmpty()) {
+				saveMeeting = meetingDaoService.addMeeting(meetings);
+				meetingStatus = nonNull(saveMeeting);
+			} else {
+				for (MeetingAttachmentsDto attach : dto.getMeetingAttachments()) {
+					List<Integer> newIds = dto.getMeetingAttachments().stream()
+							.map(MeetingAttachmentsDto::getMeetingAttchId).collect(Collectors.toList());
+					for (MeetingAttachments existingAttachment : meetings.getMeetingAttachments()) {
+						if (!newIds.contains(existingAttachment.getMeetingAttchId())) {
+							MeetingAttachments data = meetingAttachmetDaoService
+									.findById(existingAttachment.getMeetingAttchId()).orElse(null);
+							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+							data.setDeletedDate(LocalDateTime.now());
+							meetingAttachmetDaoService.removeExistingMeetingAttachment(data);
+						}
+					}
+					MeetingAttachments attachment = TO_METTING_ATTACHMENT.apply(attach)
+							.orElseThrow(ResourceNotFoundException::new);
+					attachment.setMeetings(meetings);
+					MeetingAttachments addAttachment = meetingAttachmetDaoService.addMeetingAttachment(attachment);
+					saveMeeting = addAttachment.getMeetings();
+					meetingStatus = nonNull(saveMeeting);
+				}
+			}
+			if (meetingStatus && SAVE.equalsIgnoreCase(status)) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Meeting Updated Successfully");
+			} else if (meetingStatus && COMPLETE.equalsIgnoreCase(status)) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Meeting Updated And Completed Successfully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Meeting Not Updated");
+			}
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception while updating the meeting by id..{} " + meetingId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}

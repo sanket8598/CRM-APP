@@ -49,7 +49,13 @@ public class MeetingController {
 		return meetingService.editMeeting(meetingId);
 	}
 
-	@PostMapping("/addTask/{leadId}/{meetingId}")
+	@PutMapping("/update/{meetingId}/{status}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeeting(@RequestBody MeetingDto dto,
+			@PathVariable(name = "meetingId") Integer meetingId, @PathVariable(name = "status") String status) {
+		return meetingService.updateMeeting(dto, meetingId, status);
+	}
+
+	@PostMapping("/task/{leadId}/{meetingId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@RequestBody @Valid MeetingTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "meetingId") Integer meetingId) {
 		return meetingService.addMeetingTask(dto, leadsId, meetingId);

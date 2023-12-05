@@ -1,5 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,17 @@ public class MeetingAttachmentDaoServiceImpl implements MeetingAttachmentDaoServ
 	@Override
 	public MeetingAttachments addMeetingAttachment(MeetingAttachments meetingAttachments) {
 		return meetingAttachmentRepository.save(meetingAttachments);
+	}
+
+	@Override
+	public Optional<MeetingAttachments> findById(Integer meetingAttchId) {
+		return meetingAttachmentRepository.findById(meetingAttchId);
+	}
+
+	@Override
+	public void removeExistingMeetingAttachment(MeetingAttachments data) {
+		meetingAttachmentRepository.delete(data);
+		
 	}
 
 }
