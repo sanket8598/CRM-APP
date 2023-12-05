@@ -43,7 +43,7 @@ public class ServiceFallsDtoMapper {
 	 * @since 04-09-2023
 	 * @Version 1.0
 	 */
-	public static final Function<ServiceFallsMaster, Optional<ServiceFallsDto>> TO_SERVICEFALLMASTER_DTO = e -> evalMapper(e,
+	public static final Function<ServiceFallsMaster, Optional<ServiceFallsDto>> TO_SERVICE_FALL_MASTER_DTO = e -> evalMapper(e,
 			ServiceFallsDto.class);
 
 	/**
@@ -51,7 +51,7 @@ public class ServiceFallsDtoMapper {
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<ServiceFallsMaster>, List<ServiceFallsDto>> TO_SERVICEFALLMASTER_DTOS = e -> e.stream()
-			.map(dm -> TO_SERVICEFALLMASTER_DTO.apply(dm).get()).collect(Collectors.toList());
+	public static final Function<Collection<ServiceFallsMaster>, List<ServiceFallsDto>> TO_SERVICE_FALL_MASTER_DTOS = e -> e.stream()
+			.map(dm -> TO_SERVICE_FALL_MASTER_DTO.apply(dm).get()).collect(Collectors.toList());
 
 }
