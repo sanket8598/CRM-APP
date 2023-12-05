@@ -18,5 +18,6 @@ public class EditCallDto extends TimeLineActivityDto {
 	private String phoneNo;
 	private String comment;
 	private String duration;
+	private String dueDate;
 
 }
