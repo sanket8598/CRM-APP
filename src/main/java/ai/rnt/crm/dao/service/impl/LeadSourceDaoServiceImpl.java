@@ -4,6 +4,8 @@ import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTO;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +28,7 @@ public class LeadSourceDaoServiceImpl implements LeadSourceDaoService {
 	}
 
 	@Override
-	@Cacheable(value = "leadSources")
+	@Cacheable(value = "leadSource")
 	public List<LeadSourceMaster> getAllLeadSource() {
 		return leadSourceMasterRepository.findByDeletedDateIsNullOrderBySourceNameAsc();
 	}
@@ -38,6 +40,8 @@ public class LeadSourceDaoServiceImpl implements LeadSourceDaoService {
 	}
 
 	@Override
+	@CacheEvict(value="leadSource")
+	@CachePut(value="leadSource")
 	public Optional<LeadSourceDto> save(LeadSourceMaster leadSource) throws Exception {
 		return TO_LEAD_SOURCE_DTO.apply(leadSourceMasterRepository.save(leadSource));
 	}

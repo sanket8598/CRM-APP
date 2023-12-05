@@ -4,6 +4,7 @@ import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice{
 	}
 
 	@Override
-	@Cacheable(value="serviceFalls")
+	@Cacheable(value="serviceFall")
 	public List<ServiceFallsMaster> getAllSerciveFalls() {
 		return serviceFallRepository.findByDeletedDateIsNullOrderByServiceNameAsc();
 	}
@@ -38,6 +39,7 @@ public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice{
 	}
 
 	@Override
+	@CachePut(value="serviceFall")
 	public Optional<ServiceFallsDto> save(ServiceFallsMaster serviceFalls) throws Exception {
 		return TO_SERVICE_FALL_MASTER_DTO.apply(serviceFallRepository.save(serviceFalls));
 	}
