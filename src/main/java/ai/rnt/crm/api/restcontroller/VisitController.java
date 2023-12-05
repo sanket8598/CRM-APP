@@ -71,7 +71,7 @@ public class VisitController {
 		return visitService.updateVisit(dto, visitId, status);
 	}
 
-	@PostMapping("/addTask/{leadId}/{visitId}")
+	@PostMapping("/task/{leadId}/{visitId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addVisitTask(@RequestBody @Valid VisitTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "visitId") Integer visitId) {
 		return visitService.addVisitTask(dto, leadsId, visitId);
