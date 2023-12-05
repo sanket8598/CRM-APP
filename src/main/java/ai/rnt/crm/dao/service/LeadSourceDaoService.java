@@ -3,11 +3,12 @@ package ai.rnt.crm.dao.service;
 import java.util.List;
 import java.util.Optional;
 
+import ai.rnt.crm.dto.LeadSourceDto;
 import ai.rnt.crm.entity.LeadSourceMaster;
 
-public interface LeadSourceDaoService {
+public interface LeadSourceDaoService extends CrudService<LeadSourceMaster, LeadSourceDto>{
 
-	Optional<LeadSourceMaster> getById(Integer leadSourceId);
+	Optional<LeadSourceMaster> getLeadSourceById(Integer leadSourceId);
 
 	List<LeadSourceMaster> getAllLeadSource();
 

@@ -32,7 +32,7 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 	}
 
 	@Override
-	public Optional<EmployeeDto> getById(Integer assignTo) {
+	public Optional<EmployeeDto> getServiceFallById(Integer assignTo) {
 		return TO_Employee.apply(employeeMasterRepository.findById(assignTo)
 				.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", assignTo)));
 	}

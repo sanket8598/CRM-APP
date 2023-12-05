@@ -7,8 +7,6 @@ import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
 import static ai.rnt.crm.constants.StatusConstants.CANCELED;
-import static ai.rnt.crm.constants.StatusConstants.NON_CONTACTABLE;
-import static ai.rnt.crm.constants.StatusConstants.NON_WORKABLE;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_DISQUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_LEAD;
@@ -18,6 +16,8 @@ import static ai.rnt.crm.constants.StatusConstants.EMAIL;
 import static ai.rnt.crm.constants.StatusConstants.FOLLOW_UP;
 import static ai.rnt.crm.constants.StatusConstants.LOST;
 import static ai.rnt.crm.constants.StatusConstants.MEETING;
+import static ai.rnt.crm.constants.StatusConstants.NON_CONTACTABLE;
+import static ai.rnt.crm.constants.StatusConstants.NON_WORKABLE;
 import static ai.rnt.crm.constants.StatusConstants.NO_LONGER_INTERESTED;
 import static ai.rnt.crm.constants.StatusConstants.OPEN;
 import static ai.rnt.crm.constants.StatusConstants.OPEN_LEAD;
@@ -35,14 +35,16 @@ import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSortFilterDtoMapper.TO_LEAD_SORT_FILTER;
+import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_QUALIFY_LEAD;
-import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT_DTOS;
+import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
+import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
@@ -67,6 +69,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Sheet;
@@ -112,8 +115,10 @@ import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.ExcelHeaderMaster;
 import ai.rnt.crm.entity.LeadImportant;
+import ai.rnt.crm.entity.LeadSourceMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Meetings;
+import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.entity.StateMaster;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
@@ -186,8 +191,21 @@ public class LeadServiceImpl implements LeadService {
 			leads.setStatus(OPEN);
 			leads.setDisqualifyAs(OPEN);
 			leads.setPseudoName(auditAwareUtil.getLoggedInUserName());
-			serviceFallsDaoSevice.getById(leadDto.getServiceFallsId()).ifPresent(leads::setServiceFallsMaster);
-			leadSourceDaoService.getById(leadDto.getLeadSourceId()).ifPresent(leads::setLeadSourceMaster);
+			if(nonNull(leadDto.getServiceFallsId()) && Pattern.compile("^\\d+$").matcher(leadDto.getServiceFallsId()).matches())
+			 serviceFallsDaoSevice.getServiceFallById(Integer.parseInt(leadDto.getServiceFallsId())).ifPresent(leads::setServiceFallsMaster);
+			else {
+				ServiceFallsMaster serviceFalls=new ServiceFallsMaster();
+				serviceFalls.setServiceName(leadDto.getServiceFallsId());
+				TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).get()).ifPresent(leads::setServiceFallsMaster);;
+			}
+			if(nonNull(leadDto.getLeadSourceId()) && Pattern.compile("^\\d+$").matcher(leadDto.getLeadSourceId()).matches())
+				leadSourceDaoService.getLeadSourceById(Integer.parseInt(leadDto.getLeadSourceId())).ifPresent(leads::setLeadSourceMaster);
+			else {
+				LeadSourceMaster leadSource=new LeadSourceMaster();
+				leadSource.setSourceName(leadDto.getLeadSourceId());
+				TO_LEAD_SOURCE.apply(leadSourceDaoService.save(leadSource).get()).ifPresent(leads::setLeadSourceMaster);
+			}
+			
 			if (nonNull(leadDto.getAssignTo()))
 				employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
 			else
@@ -636,7 +654,7 @@ public class LeadServiceImpl implements LeadService {
 				lead.get().setStatus(CLOSE_AS_QUALIFIED);
 				lead.get().setDisqualifyAs(QUALIFIED);
 				lead.get().setServiceFallsMaster(
-						serviceFallsDaoSevice.getById(dto.getServiceFallsMaster().getServiceFallsId())
+						serviceFallsDaoSevice.getServiceFallById(dto.getServiceFallsMaster().getServiceFallsId())
 								.orElseThrow(() -> new ResourceNotFoundException("ServiceFallMaster", "serviceFallId",
 										dto.getServiceFallsMaster().getServiceFallsId())));
 				if (nonNull(leadDaoService.addLead(lead.get()))) {
@@ -790,9 +808,20 @@ public class LeadServiceImpl implements LeadService {
 				TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(null))
 						.ifPresent(lead::setCompanyMaster);
 			}
-			serviceFallsDaoSevice.getById(dto.getServiceFallsId()).ifPresent(lead::setServiceFallsMaster);
-			leadSourceDaoService.getById(dto.getLeadSourceId()).ifPresent(lead::setLeadSourceMaster);
-
+			if(nonNull(dto.getServiceFallsId()) && Pattern.compile("^\\d+$").matcher(dto.getServiceFallsId()).matches())
+				 serviceFallsDaoSevice.getServiceFallById(Integer.parseInt(dto.getServiceFallsId())).ifPresent(lead::setServiceFallsMaster);
+				else {
+					ServiceFallsMaster serviceFalls=new ServiceFallsMaster();
+					serviceFalls.setServiceName(dto.getServiceFallsId());
+					TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).get()).ifPresent(lead::setServiceFallsMaster);
+				}
+				if(nonNull(dto.getLeadSourceId()) && Pattern.compile("^\\d+$").matcher(dto.getLeadSourceId()).matches())
+					leadSourceDaoService.getLeadSourceById(Integer.parseInt(dto.getLeadSourceId())).ifPresent(lead::setLeadSourceMaster);
+				else {
+					LeadSourceMaster leadSource=new LeadSourceMaster();
+					leadSource.setSourceName(dto.getLeadSourceId());
+					TO_LEAD_SOURCE.apply(leadSourceDaoService.save(leadSource).get()).ifPresent(lead::setLeadSourceMaster);
+				}
 			if (nonNull(leadDaoService.addLead(lead)))
 				result.put(MESSAGE, "Leads Contact Updated Successfully !!");
 			else

@@ -19,7 +19,7 @@ public class LeadSourceDaoServiceImpl implements LeadSourceDaoService {
 
 	@Override
 	@Cacheable(value = "leadSource",key = "#leadSourceId")
-	public Optional<LeadSourceMaster> getById(Integer leadSourceId) {
+	public Optional<LeadSourceMaster> getLeadSourceById(Integer leadSourceId) {
 		return leadSourceMasterRepository.findById(leadSourceId);
 	}
 
