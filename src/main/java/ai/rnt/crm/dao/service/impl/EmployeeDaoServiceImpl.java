@@ -5,7 +5,6 @@ import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,7 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 	}
 
 	@Override
-	public Optional<EmployeeDto> getById(Integer assignTo) {
+	public Optional<EmployeeDto> getServiceFallById(Integer assignTo) {
 		return TO_Employee.apply(employeeMasterRepository.findById(assignTo)
 				.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", assignTo)));
 	}

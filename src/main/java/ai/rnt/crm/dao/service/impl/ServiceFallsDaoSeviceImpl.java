@@ -19,7 +19,7 @@ public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice{
 
 	@Override
 	@Cacheable(value = "serviceFall",key = "#serviceFallsId")
-	public Optional<ServiceFallsMaster> getById(Integer serviceFallsId) {
+	public Optional<ServiceFallsMaster> getServiceFallById(Integer serviceFallsId) {
 		return serviceFallRepository.findById(serviceFallsId);
 	}
 

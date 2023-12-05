@@ -10,7 +10,7 @@ public interface EmployeeDaoService extends CrudService<EmployeeMaster, Employee
 
 	Optional<EmployeeMaster> getEmployeebyUserId(String userId);
 
-	Optional<EmployeeDto> getById(Integer assignTo);
+	Optional<EmployeeDto> getServiceFallById(Integer assignTo);
 
 	Optional<EmployeeMaster> findByName(String firstName, String lastName);
 	

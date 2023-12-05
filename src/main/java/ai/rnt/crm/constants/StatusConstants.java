@@ -27,7 +27,8 @@ public final class StatusConstants {
 	public static final String CANCELED = "Canceled";
 	public static final String FOLLOW_UP = "Follow-Up";
 	public static final String QUALIFIED = "Qualified";
-	public static final String CANT_CONTACT = "Cannot Contact";
+	public static final String NON_CONTACTABLE = "Non-Contactable";
+	public static final String NON_WORKABLE = "Non-Workable";
 	public static final String CLOSE_AS_QUALIFIED = "CloseAsQualified";
 	public static final String CLOSE_AS_DISQUALIFIED = "CloseAsDisqualified";
 	public static final String NO_LONGER_INTERESTED = "No Longer Interested";
