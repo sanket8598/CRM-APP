@@ -1,6 +1,6 @@
 package ai.rnt.crm.service.impl;
 
-import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
+import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER_DTOS;
 
 import java.util.EnumMap;
 
@@ -33,7 +33,7 @@ public class ServiceFallsServiceImpl implements ServiceFallsService {
 		try {
 			resultMap.put(ApiResponse.SUCCESS, true);
 			resultMap.put(ApiResponse.DATA,
-					TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
+					TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
 		} catch (Exception e) {
 			log.info("Got Exception while getting the service falls data..{}" ,e.getMessage());
