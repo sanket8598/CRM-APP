@@ -37,7 +37,7 @@ public class MeetingAttachments extends Auditable {
 	@Column(name = "mtg_attch_id")
 	private Integer meetingAttchId;
 
-	@Column(name = "mtg_attachment")
+	@Column(name = "mtg_attachment",columnDefinition = "longtext")
 	private String meetingAttachmentData;
 
 	@Column(name = "mtg_attach_type")

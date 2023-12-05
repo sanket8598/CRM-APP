@@ -41,6 +41,7 @@ import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_QUALIFY_LEAD;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICEFALLMASTER_DTOS;
+import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
@@ -53,8 +54,7 @@ import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -155,6 +155,7 @@ public class LeadServiceImpl implements LeadService {
 
 	private static final String PRIMFIELD = "PrimaryField";
 	private static final String SECNDFIELD = "SecondaryField";
+	private static final DateTimeFormatter DATE_TIME_WITH_AM_OR_PM = DateTimeFormatter.ofPattern("dd-MMM-yyyy hh:mm a");
 
 	@Override
 	@Transactional
@@ -410,7 +411,6 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editLead(Integer leadId) {
 		EnumMap<ApiResponse, Object> lead = new EnumMap<>(ApiResponse.class);
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
 			Map<String, Object> dataMap = new LinkedHashMap<>();
 
 			Leads leadById = leadDaoService.getLeadById(leadId)
@@ -452,7 +452,7 @@ public class LeadServiceImpl implements LeadService {
 						editEmailDto.setSubject(email.getSubject());
 						editEmailDto.setBody(email.getContent());
 						editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
-						editEmailDto.setCreatedOn(ConvertDateFormatUtil.convertDate(email.getCreatedDate()));
+						editEmailDto.setCreatedOn(ConvertDateFormatUtil.convertDate(email.getUpdatedDate()));
 						editEmailDto.setShortName(LeadsCardUtil.shortName(email.getMailFrom()));
 						return editEmailDto;
 					}).collect(Collectors.toList()));
@@ -467,7 +467,7 @@ public class LeadServiceImpl implements LeadService {
 						visitDto.setBody(visit.getContent());
 						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> visitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
-						visitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
+						visitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getUpdatedDate()));
 						return visitDto;
 					}).collect(Collectors.toList()));
 			timeLine.addAll(meetings.stream().filter(meeting -> nonNull(meeting.getMeetingStatus())
@@ -479,12 +479,12 @@ public class LeadServiceImpl implements LeadService {
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						meetDto.setSubject(meet.getMeetingTitle());
 						meetDto.setBody(meet.getDescription());
-						meetDto.setCreatedOn(ConvertDateFormatUtil.convertDate(
-								meet.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
+						meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
+						meetDto.setCreatedOn(ConvertDateFormatUtil.convertDate(meet.getUpdatedDate()));
 						return meetDto;
 					}).collect(Collectors.toList()));
-			timeLine.sort((t1, t2) -> LocalDate.parse(t2.getCreatedOn(), formatter)
-					.compareTo(LocalDate.parse(t1.getCreatedOn(), formatter)));
+			timeLine.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
+					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 			List<TimeLineActivityDto> activity = calls.stream()
 					.filter(call -> (isNull(call.getStatus()) || call.getStatus().equalsIgnoreCase(SAVE))
 							&& !UPNEXT.test(call.getEndDate()))
@@ -494,10 +494,10 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setSubject(call.getSubject());
 						callDto.setType(CALL);
 						callDto.setBody(call.getComment());
-						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
 						callDto.setDueDate(ConvertDateFormatUtil.convertDateDateWithTime(call.getStartDate(),
 								call.getStartTime()));
+						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
 						TO_Employee.apply(call.getCallFrom())
 								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 						return callDto;
@@ -525,6 +525,8 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setSubject(visit.getSubject());
 						editVisitDto.setType(VISIT);
 						editVisitDto.setBody(visit.getContent());
+						editVisitDto.setDueDate(ConvertDateFormatUtil.convertDateDateWithTime(visit.getStartDate(),
+								visit.getStartTime()));
 						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> editVisitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						editVisitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(visit.getCreatedDate()));
@@ -541,12 +543,14 @@ public class LeadServiceImpl implements LeadService {
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						meetDto.setSubject(meet.getMeetingTitle());
 						meetDto.setBody(meet.getDescription());
-						meetDto.setCreatedOn(ConvertDateFormatUtil.convertDate(
-								meet.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
+						meetDto.setDueDate(ConvertDateFormatUtil.convertDateDateWithTime(meet.getStartDate(),
+								meet.getStartTime()));
+						meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
+						meetDto.setCreatedOn(ConvertDateFormatUtil.convertDate(meet.getCreatedDate()));
 						return meetDto;
 					}).collect(Collectors.toList()));
-			activity.sort((t1, t2) -> LocalDate.parse(t2.getCreatedOn(), formatter)
-					.compareTo(LocalDate.parse(t1.getCreatedOn(), formatter)));
+			activity.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
+					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 			List<TimeLineActivityDto> upNext = calls.stream()
 					.filter(call -> (isNull(call.getStatus()) || call.getStatus().equalsIgnoreCase(SAVE))
 							&& UPNEXT.test(call.getEndDate()))
@@ -556,9 +560,8 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setSubject(call.getSubject());
 						callDto.setType(CALL);
 						callDto.setBody(call.getComment());
-						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(
-								call.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
-						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
+						callDto.setCreatedOn(ConvertDateFormatUtil.convertDateDateWithTime(call.getStartDate(),
+								call.getStartTime()));
 						TO_Employee.apply(call.getCallFrom())
 								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 						return callDto;
@@ -576,8 +579,8 @@ public class LeadServiceImpl implements LeadService {
 						editVisitDto.setBody(visit.getContent());
 						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> editVisitDto
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
-						editVisitDto.setCreatedOn(ConvertDateFormatUtil.convertDate(
-								visit.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
+						editVisitDto.setCreatedOn(ConvertDateFormatUtil.convertDateDateWithTime(visit.getStartDate(),
+								visit.getStartTime()));
 						return editVisitDto;
 					}).collect(Collectors.toList()));
 			upNext.addAll(meetings.stream()
@@ -591,12 +594,13 @@ public class LeadServiceImpl implements LeadService {
 								.setShortName(LeadsCardUtil.shortName(byId.getFirstName() + " " + byId.getLastName())));
 						meetDto.setSubject(meet.getMeetingTitle());
 						meetDto.setBody(meet.getDescription());
-						meetDto.setCreatedOn(ConvertDateFormatUtil.convertDate(
-								meet.getEndDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime()));
+						meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
+						meetDto.setCreatedOn(ConvertDateFormatUtil.convertDateDateWithTime(meet.getStartDate(),
+								meet.getStartTime()));
 						return meetDto;
 					}).collect(Collectors.toList()));
-			upNext.sort((t1, t2) -> LocalDate.parse(t2.getCreatedOn(), formatter)
-					.compareTo(LocalDate.parse(t1.getCreatedOn(), formatter)));
+			upNext.sort((t1, t2) -> LocalDateTime.parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
+					.compareTo(LocalDateTime.parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 
 			dataMap.put("Contact", dto);
 			dataMap.put("serviceFalls", TO_SERVICEFALLMASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
@@ -605,7 +609,7 @@ public class LeadServiceImpl implements LeadService {
 			dataMap.put("Activity", activity);
 			dataMap.put("UpNext", upNext.stream().map(e -> {
 				e.setWaitTwoDays(false);
-				if (ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(e.getCreatedOn(), formatter)) > 2)
+				if (ChronoUnit.DAYS.between(LocalDateTime.now(), LocalDateTime.parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)) > 2)
 					e.setWaitTwoDays(true);
 				return e;
 			}).collect(Collectors.toList()));

@@ -60,7 +60,7 @@ public class MeetingTask extends Auditable {
 	// @Temporal(TIME)
 	private String remainderDueAt;
 
-	@Column(name = "remainder_due_on")
+	@Column(name = "remainder_due_on",columnDefinition = "date")
 	private Date remainderDueOn;
 
 	@JoinColumn(name = "crm_mtg_id", updatable = true)

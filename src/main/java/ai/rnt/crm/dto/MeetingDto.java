@@ -29,6 +29,8 @@ public class MeetingDto {
 	private Date endDate;
 
 	private String startTime;
+	
+	private String duration;
 
 	private String endTime;
 

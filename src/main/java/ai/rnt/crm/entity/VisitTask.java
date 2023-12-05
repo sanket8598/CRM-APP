@@ -59,7 +59,7 @@ public class VisitTask extends Auditable {
 	@Column(name = "remainder_due_at")
 	private String remainderDueAt;
 
-	@Column(name = "remainder_due_on")
+	@Column(name = "remainder_due_on",columnDefinition = "date")
 	private Date remainderDueOn;
 
 	@JoinColumn(name = "task_assign_to", updatable = true)
