@@ -9,6 +9,15 @@ import java.util.Date;
 import ai.rnt.crm.exception.CRMException;
 import lombok.extern.slf4j.Slf4j;
 
+
+/**
+ * This class is used to get the required formattedDates through methods and functions.
+ * 
+ * @author Sanket Wakankar
+ * @version 1.0
+ * @since 05-12-2023
+ */
+
 @Slf4j
 public class ConvertDateFormatUtil {
 
@@ -42,5 +51,32 @@ public class ConvertDateFormatUtil {
 			log.error("Got Excetion while converting date format in convertDateUtilDate:", e.getMessage());
 			throw new CRMException("error while date conversion");
 		}
+	}
+	
+	/**
+	 * This method is used to convert the given date(yyyy-MM-dd) to the format (dd-MMM-yyyy) with give String time added to it.
+	 *  e.g 2023-12-04 is converted to the  04 Dec 2023 and also time is added.
+	 * @author Sanket Wakankar
+	 * @version 1.0
+	 * @since 05/12/2023.
+	 * @param Date,String
+	 * @return String
+	 */
+	public static String convertDateDateWithTime(Date date,String endTime) {
+		try {
+			return new SimpleDateFormat("dd-MMM-yyyy")
+					.format(new SimpleDateFormat("yyyy-MM-dd").parse(date.toString()))+" "+endTime;
+		} catch (Exception e) {
+			log.error("Got Excetion while converting date format in convertDateUtilDate:", e.getMessage());
+			throw new CRMException("error while date conversion");
+		}
+	}
+	
+	public static void main(String[] args) throws ParseException {
+		System.out.println(new Date());
+		Date parse = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy").parse(new Date().toString());
+		new SimpleDateFormat("yyyy-MM-dd").parse(null);
+System.out.println(ConvertDateFormatUtil.convertDateUtilDate(parse));
+System.out.println(ConvertDateFormatUtil.convertDateDateWithTime(parse,"02.30"));
 	}
 }
