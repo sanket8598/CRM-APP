@@ -35,7 +35,7 @@ public class ConvertDateFormatUtil {
 
 	public static String convertDate(LocalDateTime toConvertDate) {
 		try {
-			return new SimpleDateFormat("dd-MMM-yyyy").format(new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy")
+			return new SimpleDateFormat("dd-MMM-yyyy hh:mm a").format(new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy")
 					.parse(Date.from(toConvertDate.atZone(ZoneId.systemDefault()).toInstant()).toString()));
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format:", e.getMessage());
@@ -59,7 +59,7 @@ public class ConvertDateFormatUtil {
 	 * @author Sanket Wakankar
 	 * @version 1.0
 	 * @since 05/12/2023.
-	 * @param Date,String
+	 * @param date in java.util.Date,Time in String
 	 * @return String
 	 */
 	public static String convertDateDateWithTime(Date date,String endTime) {
@@ -67,16 +67,9 @@ public class ConvertDateFormatUtil {
 			return new SimpleDateFormat("dd-MMM-yyyy")
 					.format(new SimpleDateFormat("yyyy-MM-dd").parse(date.toString()))+" "+endTime;
 		} catch (Exception e) {
-			log.error("Got Excetion while converting date format in convertDateUtilDate:", e.getMessage());
+			log.error("Got Excetion while converting date format in convertDateDateWithTime:", e.getMessage());
 			throw new CRMException("error while date conversion");
 		}
 	}
 	
-	public static void main(String[] args) throws ParseException {
-		System.out.println(new Date());
-		Date parse = new SimpleDateFormat("E MMM dd HH:mm:ss z yyyy").parse(new Date().toString());
-		new SimpleDateFormat("yyyy-MM-dd").parse(null);
-System.out.println(ConvertDateFormatUtil.convertDateUtilDate(parse));
-System.out.println(ConvertDateFormatUtil.convertDateDateWithTime(parse,"02.30"));
-	}
 }

@@ -59,10 +59,10 @@ public class Visit extends Auditable {
 	@Column(name = "duration")
 	private String duration;
 
-	@Column(name = "start_date")
+	@Column(name = "start_date", columnDefinition = "date")
 	private Date startDate;
 	
-	@Column(name = "end_date")
+	@Column(name = "end_date",columnDefinition = "date")
 	private Date endDate;
 	
 	@Column(name = "start_time")
