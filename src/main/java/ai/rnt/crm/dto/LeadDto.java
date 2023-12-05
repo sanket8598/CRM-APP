@@ -2,9 +2,7 @@ package ai.rnt.crm.dto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 
-import ai.rnt.crm.validation.PhoneNumValid;
 import lombok.Data;
 
 @Data
@@ -18,9 +16,9 @@ public class LeadDto {
 	@NotBlank(message = "Last Name should not be null or empty!!")
 	private String lastName;
 
-	@Size(min = 10, max = 14)
+	//@Size(min = 10, max = 14)
 	//@Pattern(regexp ="^(\+\d{1,2}\s?)?(\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4})$", message = "Please Enter a valid Phone Number!!")
-	@PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
+	//@PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
 	private String phoneNumber;
 
 	private String topic;

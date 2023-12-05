@@ -7,7 +7,8 @@ import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
 import static ai.rnt.crm.constants.StatusConstants.CANCELED;
-import static ai.rnt.crm.constants.StatusConstants.CANT_CONTACT;
+import static ai.rnt.crm.constants.StatusConstants.NON_CONTACTABLE;
+import static ai.rnt.crm.constants.StatusConstants.NON_WORKABLE;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_DISQUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_LEAD;
@@ -347,9 +348,10 @@ public class LeadServiceImpl implements LeadService {
 				countMap.put(DISQUALIFIED_LEAD, leadDashboardData.stream()
 						.filter(l -> nonNull(l.getStatus()) && l.getStatus().equalsIgnoreCase(CLOSE_AS_DISQUALIFIED)
 								&& (l.getDisqualifyAs().equalsIgnoreCase(LOST)
-										|| l.getDisqualifyAs().equalsIgnoreCase(CANT_CONTACT)
+										|| l.getDisqualifyAs().equalsIgnoreCase(NON_CONTACTABLE)
 										|| l.getDisqualifyAs().equalsIgnoreCase(NO_LONGER_INTERESTED)
-										|| l.getDisqualifyAs().equalsIgnoreCase(CANCELED)))
+										|| l.getDisqualifyAs().equalsIgnoreCase(CANCELED)
+										|| l.getDisqualifyAs().equalsIgnoreCase(NON_WORKABLE)))
 						.count());
 				dataMap.put("COUNTDATA", countMap);
 				if (nonNull(leadsStatus) && leadsStatus.equalsIgnoreCase(ALL)) {
@@ -378,7 +380,7 @@ public class LeadServiceImpl implements LeadService {
 						.filter(l -> nonNull(l.getStatus()) && l.getStatus().equalsIgnoreCase(CLOSE_AS_DISQUALIFIED)
 								&& l.getEmployee().getStaffId().equals(loggedInStaffId)
 								&& (l.getDisqualifyAs().equalsIgnoreCase(LOST)
-										|| l.getDisqualifyAs().equalsIgnoreCase(CANT_CONTACT)
+										|| l.getDisqualifyAs().equalsIgnoreCase(NON_CONTACTABLE)
 										|| l.getDisqualifyAs().equalsIgnoreCase(NO_LONGER_INTERESTED)
 										|| l.getDisqualifyAs().equalsIgnoreCase(CANCELED)))
 						.count());
@@ -994,12 +996,9 @@ public class LeadServiceImpl implements LeadService {
 			else
 				errorCount++;
 			if (nonNull(data.get(3)) && !data.get(3).equalsIgnoreCase(""))
-				if (ExcelFieldValidationUtil.isValidPhoneNumber(data.get(3)))
-					dto.setPhoneNumber("+" + data.get(3));
-				else
-					errorList.add("Please Enter Valid Phone Number!!");
+				dto.setPhoneNumber("+" + data.get(3));
 			else
-				errorCount++;
+				dto.setPhoneNumber(null);
 			if (nonNull(data.get(4)) && !data.get(4).equalsIgnoreCase(""))
 				if (ExcelFieldValidationUtil.isValidDesignation(data.get(4)))
 					dto.setDesignation(data.get(4));
