@@ -496,6 +496,8 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setBody(call.getComment());
 						callDto.setCreatedOn(ConvertDateFormatUtil.convertDate(call.getCreatedDate()));
 						callDto.setShortName(LeadsCardUtil.shortName(call.getCallTo()));
+						callDto.setDueDate(ConvertDateFormatUtil.convertDateDateWithTime(call.getStartDate(),
+								call.getStartTime()));
 						TO_Employee.apply(call.getCallFrom())
 								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 						return callDto;
@@ -914,12 +916,16 @@ public class LeadServiceImpl implements LeadService {
 						} else if (leadDataMap.containsKey(MSG) && leadDataMap.get(MSG).equals(COMPLETE))
 							leads = (Leads) leadDataMap.get("Lead");
 						else {
-							result.put(MESSAGE, leadDataMap.get(MSG));
-							return new ResponseEntity<>(result, BAD_REQUEST);
+							if (duplicateLead != 0 || saveLeadCount != 0)
+								result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead
+										+ " Duplicate Found And " + leadDataMap.get(MSG));
+							else
+								result.put(MESSAGE, leadDataMap.get(MSG));
+						return new ResponseEntity<>(result, BAD_REQUEST);
 						}
-					} 
+					}
 					if (nonNull(data) && data.size() > 11 && (nonNull(data.get(11)) && !data.get(11).isEmpty()))
-						setAssignToNameForTheLead(leads,  data.get(11).split(" "));
+						setAssignToNameForTheLead(leads, data.get(11).split(" "));
 					else
 						setAssignToNameForTheLead(leads, auditAwareUtil.getLoggedInUserName().split(" "));
 					if (LeadsCardUtil.checkDuplicateLead(leadDaoService.getAllLeads(), leads))
