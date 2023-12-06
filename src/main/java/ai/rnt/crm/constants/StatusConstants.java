@@ -37,4 +37,5 @@ public final class StatusConstants {
 	public static final String EMAIL = "Email";
 	public static final String VISIT = "Visit";
 	public static final String MEETING = "Meeting";
+	
 }

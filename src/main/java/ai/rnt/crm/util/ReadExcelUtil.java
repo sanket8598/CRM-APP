@@ -1,13 +1,19 @@
 package ai.rnt.crm.util;
 
+import static ai.rnt.crm.constants.ExcelConstants.COLUMN_SIZE;
+import static ai.rnt.crm.constants.ExcelConstants.ERROR;
+import static ai.rnt.crm.constants.ExcelConstants.FLAG;
+import static ai.rnt.crm.constants.ExcelConstants.LEAD_DATA;
 import static ai.rnt.crm.constants.MessageConstants.MSG;
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 import org.apache.poi.EncryptedDocumentException;
@@ -24,7 +30,7 @@ import ai.rnt.crm.exception.CRMException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author Nikhil Gaikwad
+ * @author sanket wakankar
  * @version 1.0
  * @since 16/11/2023
  *
@@ -38,7 +44,7 @@ public class ReadExcelUtil {
 			throws EncryptedDocumentException, InvalidFormatException, IOException {
 		Map<String, Object> dataExcel = new HashMap<>();
 		List<LeadDto> excelLeads = new ArrayList<>();
-		dataExcel.put("status", true);
+		dataExcel.put(FLAG, true);
 		try {
 			int noOfRows = sheet.getPhysicalNumberOfRows();
 			int numOfColumns = sheet.getRow(0).getPhysicalNumberOfCells();
@@ -53,23 +59,25 @@ public class ReadExcelUtil {
 					Cell cell = row.getCell(j);
 					if (cell != null) {
 						String data = "";
-						if (cell.getCellTypeEnum() == CellType.NUMERIC)
+						if (cell.getCellTypeEnum().equals(CellType.NUMERIC))
 							data = cell.getNumericCellValue() + "";
 						else
 							data = cell.getStringCellValue() + "";
-						Map<String, Object> excelMap = createLeadFromExcel(data, j, leadDto);
-						if (Objects.nonNull(excelMap) && !excelMap.isEmpty() && excelMap.containsKey("errorList")) {
-							dataExcel.put("status", false);
-							dataExcel.put(MSG, excelMap.get("errorList"));
-							return dataExcel;
+						Map<String, Object> excelMap = createLeadFromExcel(data, j, leadDto, i);
+						if (Objects.nonNull(excelMap) && !excelMap.isEmpty() && excelMap.containsKey(ERROR)) {
+							String error = (String) excelMap.get(ERROR);
+							if (nonNull(error) && !error.isEmpty()) {
+								dataExcel.put(FLAG, false);
+								dataExcel.put(MSG, error);
+								return dataExcel;
+							}
 						}
 					}
 				}
-				if (leadDto != null)
+				if (nonNull(leadDto))
 					excelLeads.add(leadDto);
 			}
-			excelLeads.forEach(e -> System.out.println(e + "---Excel Leads"));
-			dataExcel.put("leadData", excelLeads);
+			dataExcel.put(LEAD_DATA, excelLeads);
 			return dataExcel;
 		} catch (Exception e) {
 			log.info("Got Exception while getting data from excel file..{}", e.getMessage());
@@ -83,7 +91,7 @@ public class ReadExcelUtil {
 		List<String> headerList = new ArrayList<>();
 		try {
 			Row row = sheet.getRow(0);
-			if (row != null)
+			if (nonNull(row))
 				for (int k = 0; k < row.getPhysicalNumberOfCells(); k++)
 					headerList.add(row.getCell(k).getStringCellValue());
 		} catch (Exception e) {
@@ -93,83 +101,96 @@ public class ReadExcelUtil {
 	}
 
 	private boolean checkIfRowIsEmpty(Row row) {
-		return row == null || row.getLastCellNum() <= 0 || IntStream.range(row.getFirstCellNum(), row.getLastCellNum())
-				.filter(i -> row.getCell(i) == null || row.getCell(i).getCellTypeEnum() == CellType.BLANK).count() > 11;
+		return row == null || row.getLastCellNum() <= 0
+				|| IntStream.range(row.getFirstCellNum(), row.getLastCellNum())
+						.filter(i -> isNull(row.getCell(i)) || row.getCell(i).getCellTypeEnum() == CellType.BLANK)
+						.count() > COLUMN_SIZE;
 	}
 
-	private Map<String, Object> createLeadFromExcel(String data, int fieldCount, LeadDto leadDto) {
-		List<String> errorList = new ArrayList<>();
+	private Map<String, Object> createLeadFromExcel(String data, int fieldCount, LeadDto leadDto, int rowNum) {
+		StringBuilder errorList = new StringBuilder();
 		Map<String, Object> dataMap = new HashMap<>();
-		Optional.ofNullable(data).filter(d -> !d.isEmpty()).ifPresent(d -> {
-			switch (fieldCount) {
-			case 0:
-				if (ExcelFieldValidationUtil.isValidFnameLname(d))
-					leadDto.setFirstName(d);
+		switch (fieldCount) {
+		case 0:
+			if (nonNull(data) && !data.isEmpty())
+				if (ExcelFieldValidationUtil.isValidFnameLname(data))
+					leadDto.setFirstName(data);
 				else
-					errorList.add("Please Enter Valid First Name!!");
-				break;
-			case 1:
-				if (ExcelFieldValidationUtil.isValidFnameLname(d))
-					leadDto.setLastName(d);
+					errorList.append("Please Enter Valid First Name On Row No: " + rowNum);
+			else
+				errorList.append("Please Enter The First Name On Row No: " + rowNum);
+			break;
+		case 1:
+			if (nonNull(data) && !data.isEmpty())
+				if (ExcelFieldValidationUtil.isValidFnameLname(data))
+					leadDto.setLastName(data);
 				else
-					errorList.add("Please Enter Valid Last Name!!");
-				break;
-			case 2:
-				if (ExcelFieldValidationUtil.isValidEmail(d))
-					leadDto.setEmail(d);
+					errorList.append("Please Enter Valid Last Name On Row No: " + rowNum);
+			else
+				errorList.append("Please Enter The Last Name On Row No: " + rowNum);
+			break;
+		case 2:
+			if (nonNull(data) && !data.isEmpty())
+				if (ExcelFieldValidationUtil.isValidEmail(data))
+					leadDto.setEmail(data);
 				else
-					errorList.add("Please Enter Valid Email Address!!");
-				break;
-			case 3:
-				leadDto.setPhoneNumber(d);
-				break;
-			case 4:
-				if (ExcelFieldValidationUtil.isValidDesignation(d))
-					leadDto.setDesignation(d);
+					errorList.append("Please Enter Valid Email Address On Row No: " + rowNum);
+			else
+				errorList.append("Please Enter The Email Address On Row No: " + rowNum);
+			break;
+		case 3:
+			leadDto.setPhoneNumber(nonNull(data) && !data.isEmpty() ? "+" + data : data);
+			break;
+		case 4:
+			if (nonNull(data) && !data.isEmpty())
+				if (ExcelFieldValidationUtil.isValidDesignation(data))
+					leadDto.setDesignation(data);
 				else
-					errorList.add("Please Enter Character For the Designation!!");
-				break;
-			case 5:
-				if (!d.isEmpty())
-					leadDto.setTopic(d);
-				else
-					errorList.add("Please Enter The Topic!!");
-				break;
-			case 6:
-				if (!d.isEmpty())
-					leadDto.setCompanyName(d);
-				else
-					errorList.add("Please Enter The Company Name!!");
-				break;
-			case 7:
-				if (!d.isEmpty())
-					leadDto.setCompanyWebsite(d);
-				else
-					errorList.add("Please Enter The Company Website!!");
-				break;
-			case 8:
-				if (ExcelFieldValidationUtil.isValidBudgetAmount(d))
-					leadDto.setBudgetAmount(CurrencyUtil.commaSepAmount(Double.parseDouble(d)));
-				else
-					errorList.add("Please Enter The Valid Budget Amount!!");
-				break;
-			case 9:
-				if (!d.isEmpty())
-					leadDto.setServiceFallsId(d);
-				else
-					errorList.add("Please Enter The Service Falls!!");
-				break;
-			case 10:
-				leadDto.setLeadSourceId(d);
-				break;
-			case 11:
-				leadDto.setPseudoName(d);
-				break;
-			default:
-				errorList.add("Invalid field count!");
-			}
-		});
-		dataMap.put("errorList", errorList);
+					errorList.append("Please Enter Character For the Designation On Row No: " + rowNum);
+			else
+				errorList.append("Please Enter the Designation On Row No: " + rowNum);
+			break;
+		case 5:
+			if (nonNull(data) && !data.isEmpty())
+				leadDto.setTopic(data);
+			else
+				errorList.append("Please Enter The Topic On Row No: " + rowNum);
+			break;
+		case 6:
+			if (nonNull(data) && !data.isEmpty())
+				leadDto.setCompanyName(data);
+			else
+				errorList.append("Please Enter The Company Name On Row No: " + rowNum);
+			break;
+		case 7:
+			if (nonNull(data) && !data.isEmpty())
+				leadDto.setCompanyWebsite(data);
+			else
+				errorList.append("Please Enter The Company Website On Row No: " + rowNum);
+			break;
+		case 8:
+			if (ExcelFieldValidationUtil.isValidBudgetAmount(data))
+				leadDto.setBudgetAmount(CurrencyUtil.commaSepAmount(Double.parseDouble(data)));
+			else
+				errorList.append("Please Enter The Valid Budget Amount On Row No: " + rowNum);
+			break;
+		case 9:
+			if (nonNull(data) && !data.isEmpty())
+				leadDto.setServiceFallsId(data);
+			else
+				errorList.append("Please Enter The Service Falls Into On Row No: " + rowNum);
+			break;
+		case 10:
+			leadDto.setLeadSourceId(data);
+			break;
+		case 11:
+			leadDto.setPseudoName(data);
+			break;
+		default:
+			dataMap.put(ERROR, errorList.toString());
+			break;
+		}
+		dataMap.put(ERROR, errorList.toString());
 		return dataMap;
 	}
 }
