@@ -47,8 +47,10 @@ import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.config.CustomUserDetails;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.JwtTokenDecoder;
+import ai.rnt.crm.util.PhoneNumberValidateApi;
 import ai.rnt.crm.util.RSAToJwtDecoder;
 import ai.rnt.crm.util.Sha1Encryptor;
+import ai.rnt.crm.validation.PhoneNumValid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,6 +66,7 @@ public class LoginController {
 	private final EmployeeService employeeService;
 
 	private final CustomUserDetails customUserDetails;
+	private final PhoneNumberValidateApi api;
 	private final JWTTokenHelper helper;
 	public static Map<String, PrivateKey> keystore = new HashMap<>();
 
@@ -127,5 +130,10 @@ public class LoginController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser(
 	@PathVariable(name = "email", required = false) String mail) {
 		return employeeService.getAdminAndUser(mail);
+	}
+	
+	@GetMapping("/phoneNum/{phoneNum}")
+	public Map<String,Object> validatePhoneNo(@PathVariable String phoneNum){
+		return api.checkPhoneNumberInfo(phoneNum);
 	}
 }
