@@ -191,21 +191,26 @@ public class LeadServiceImpl implements LeadService {
 			leads.setStatus(OPEN);
 			leads.setDisqualifyAs(OPEN);
 			leads.setPseudoName(auditAwareUtil.getLoggedInUserName());
-			if(nonNull(leadDto.getServiceFallsId()) && Pattern.compile("^\\d+$").matcher(leadDto.getServiceFallsId()).matches())
-			 serviceFallsDaoSevice.getServiceFallById(Integer.parseInt(leadDto.getServiceFallsId())).ifPresent(leads::setServiceFallsMaster);
+			if (nonNull(leadDto.getServiceFallsId())
+					&& Pattern.compile("^\\d+$").matcher(leadDto.getServiceFallsId()).matches())
+				serviceFallsDaoSevice.getServiceFallById(Integer.parseInt(leadDto.getServiceFallsId()))
+						.ifPresent(leads::setServiceFallsMaster);
 			else {
-				ServiceFallsMaster serviceFalls=new ServiceFallsMaster();
+				ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
 				serviceFalls.setServiceName(leadDto.getServiceFallsId());
-				TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).get()).ifPresent(leads::setServiceFallsMaster);;
+				TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).get())
+						.ifPresent(leads::setServiceFallsMaster);
 			}
-			if(nonNull(leadDto.getLeadSourceId()) && Pattern.compile("^\\d+$").matcher(leadDto.getLeadSourceId()).matches())
-				leadSourceDaoService.getLeadSourceById(Integer.parseInt(leadDto.getLeadSourceId())).ifPresent(leads::setLeadSourceMaster);
+			if (nonNull(leadDto.getLeadSourceId())
+					&& Pattern.compile("^\\d+$").matcher(leadDto.getLeadSourceId()).matches())
+				leadSourceDaoService.getLeadSourceById(Integer.parseInt(leadDto.getLeadSourceId()))
+						.ifPresent(leads::setLeadSourceMaster);
 			else {
-				LeadSourceMaster leadSource=new LeadSourceMaster();
+				LeadSourceMaster leadSource = new LeadSourceMaster();
 				leadSource.setSourceName(leadDto.getLeadSourceId());
 				TO_LEAD_SOURCE.apply(leadSourceDaoService.save(leadSource).get()).ifPresent(leads::setLeadSourceMaster);
 			}
-			
+
 			if (nonNull(leadDto.getAssignTo()))
 				employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
 			else
@@ -321,7 +326,8 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Map<String, Object> dataMap = new HashMap<>();
-			dataMap.put("serviceFallData", TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
+			dataMap.put("serviceFallData",
+					TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put("leadSourceData", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put("assignToData", TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
 			resultMap.put(SUCCESS, true);
@@ -629,7 +635,8 @@ public class LeadServiceImpl implements LeadService {
 			dataMap.put("Activity", activity);
 			dataMap.put("UpNext", upNext.stream().map(e -> {
 				e.setWaitTwoDays(false);
-				if (ChronoUnit.DAYS.between(LocalDateTime.now(), LocalDateTime.parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)) > 2)
+				if (ChronoUnit.DAYS.between(LocalDateTime.now(),
+						LocalDateTime.parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)) > 2)
 					e.setWaitTwoDays(true);
 				return e;
 			}).collect(Collectors.toList()));
@@ -653,10 +660,22 @@ public class LeadServiceImpl implements LeadService {
 				lead.get().setProposedSolution(dto.getProposedSolution());
 				lead.get().setStatus(CLOSE_AS_QUALIFIED);
 				lead.get().setDisqualifyAs(QUALIFIED);
-				lead.get().setServiceFallsMaster(
-						serviceFallsDaoSevice.getServiceFallById(dto.getServiceFallsMaster().getServiceFallsId())
-								.orElseThrow(() -> new ResourceNotFoundException("ServiceFallMaster", "serviceFallId",
-										dto.getServiceFallsMaster().getServiceFallsId())));
+				if (nonNull(dto.getServiceFallsMaster().getServiceName())
+						&& Pattern.compile("^\\d+$").matcher(dto.getServiceFallsMaster().getServiceName()).matches())
+					lead.get()
+							.setServiceFallsMaster(serviceFallsDaoSevice
+									.getServiceFallById(Integer.parseInt(dto.getServiceFallsMaster().getServiceName()))
+									.orElseThrow(() -> new ResourceNotFoundException("ServiceFallMaster",
+											"serviceFallId", dto.getServiceFallsMaster().getServiceName())));
+				else {
+					ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
+					serviceFalls.setServiceName(dto.getServiceFallsMaster().getServiceName());
+					lead.get().setServiceFallsMaster(
+							TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).get())
+									.orElseThrow(() -> new ResourceNotFoundException("ServiceFallMaster", "serviceName",
+											dto.getServiceFallsMaster().getServiceName())));
+				}
+
 				if (nonNull(leadDaoService.addLead(lead.get()))) {
 					result.put(MESSAGE, "Lead Qualified SuccessFully");
 					result.put(SUCCESS, true);
@@ -808,20 +827,24 @@ public class LeadServiceImpl implements LeadService {
 				TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(null))
 						.ifPresent(lead::setCompanyMaster);
 			}
-			if(nonNull(dto.getServiceFallsId()) && Pattern.compile("^\\d+$").matcher(dto.getServiceFallsId()).matches())
-				 serviceFallsDaoSevice.getServiceFallById(Integer.parseInt(dto.getServiceFallsId())).ifPresent(lead::setServiceFallsMaster);
-				else {
-					ServiceFallsMaster serviceFalls=new ServiceFallsMaster();
-					serviceFalls.setServiceName(dto.getServiceFallsId());
-					TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).get()).ifPresent(lead::setServiceFallsMaster);
-				}
-				if(nonNull(dto.getLeadSourceId()) && Pattern.compile("^\\d+$").matcher(dto.getLeadSourceId()).matches())
-					leadSourceDaoService.getLeadSourceById(Integer.parseInt(dto.getLeadSourceId())).ifPresent(lead::setLeadSourceMaster);
-				else {
-					LeadSourceMaster leadSource=new LeadSourceMaster();
-					leadSource.setSourceName(dto.getLeadSourceId());
-					TO_LEAD_SOURCE.apply(leadSourceDaoService.save(leadSource).get()).ifPresent(lead::setLeadSourceMaster);
-				}
+			if (nonNull(dto.getServiceFallsId())
+					&& Pattern.compile("^\\d+$").matcher(dto.getServiceFallsId()).matches())
+				serviceFallsDaoSevice.getServiceFallById(Integer.parseInt(dto.getServiceFallsId()))
+						.ifPresent(lead::setServiceFallsMaster);
+			else {
+				ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
+				serviceFalls.setServiceName(dto.getServiceFallsId());
+				TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).get())
+						.ifPresent(lead::setServiceFallsMaster);
+			}
+			if (nonNull(dto.getLeadSourceId()) && Pattern.compile("^\\d+$").matcher(dto.getLeadSourceId()).matches())
+				leadSourceDaoService.getLeadSourceById(Integer.parseInt(dto.getLeadSourceId()))
+						.ifPresent(lead::setLeadSourceMaster);
+			else {
+				LeadSourceMaster leadSource = new LeadSourceMaster();
+				leadSource.setSourceName(dto.getLeadSourceId());
+				TO_LEAD_SOURCE.apply(leadSourceDaoService.save(leadSource).get()).ifPresent(lead::setLeadSourceMaster);
+			}
 			if (nonNull(leadDaoService.addLead(lead)))
 				result.put(MESSAGE, "Leads Contact Updated Successfully !!");
 			else
@@ -956,7 +979,7 @@ public class LeadServiceImpl implements LeadService {
 										+ " Duplicate Found And " + leadDataMap.get(MSG));
 							else
 								result.put(MESSAGE, leadDataMap.get(MSG));
-						return new ResponseEntity<>(result, BAD_REQUEST);
+							return new ResponseEntity<>(result, BAD_REQUEST);
 						}
 					}
 					if (nonNull(data) && data.size() > 11 && (nonNull(data.get(11)) && !data.get(11).isEmpty()))
@@ -994,7 +1017,7 @@ public class LeadServiceImpl implements LeadService {
 				&& excelHeader.stream().allMatch(dbHeaderNames::contains) && excelHeader.containsAll(dbHeaderNames);
 	}
 
-	public Map<String, Object> buildLeadObj(List<String> data) {
+	public Map<String, Object> buildLeadObj(List<String> data) throws Exception {
 		Map<String, Object> excelMap = new HashMap<>();
 		List<String> errorList = new ArrayList<>();
 		excelMap.put(MSG, COMPLETE);
@@ -1076,13 +1099,29 @@ public class LeadServiceImpl implements LeadService {
 									.orElseThrow(ResourceNotFoundException::new))
 							.orElseThrow(ResourceNotFoundException::new));
 			}
-			if ((data.size() > 9 && nonNull(data.get(9))) && !data.get(9).equalsIgnoreCase(""))
-				serviceFallsDaoSevice.findByName(data.get(9)).ifPresent(leads::setServiceFallsMaster);
-			else
+			if ((data.size() > 9 && nonNull(data.get(9))) && !data.get(9).equalsIgnoreCase("")) {
+				Optional<ServiceFallsMaster> serviceFalls = serviceFallsDaoSevice.findByName(data.get(9));
+				if (serviceFalls.isPresent())
+					serviceFalls.ifPresent(leads::setServiceFallsMaster);
+				else {
+					ServiceFallsMaster serviceFall = new ServiceFallsMaster();
+					serviceFall.setServiceName(data.get(9));
+					TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFall).get())
+							.ifPresent(leads::setServiceFallsMaster);
+				}
+			} else
 				errorCount++;
-			if ((data.size() > 10 && nonNull(data.get(10))) && !data.get(10).equalsIgnoreCase(""))
-				leadSourceDaoService.getByName(data.get(10)).ifPresent(leads::setLeadSourceMaster);
-			else
+			if ((data.size() > 10 && nonNull(data.get(10))) && !data.get(10).equalsIgnoreCase("")) {
+				Optional<LeadSourceMaster> leadSource = leadSourceDaoService.getByName(data.get(10));
+				if (leadSource.isPresent())
+					leadSource.ifPresent(leads::setLeadSourceMaster);
+				else {
+					LeadSourceMaster leadSources = new LeadSourceMaster();
+					leadSources.setSourceName(data.get(10));
+					TO_LEAD_SOURCE.apply(leadSourceDaoService.save(leadSources).get())
+							.ifPresent(leads::setLeadSourceMaster);
+				}
+			} else
 				leadSourceDaoService.getByName("Other").ifPresent(leads::setLeadSourceMaster);
 
 			if (errorCount != 0)
