@@ -6,5 +6,6 @@ public final class CacheConstant {
 	public static final String LEAD_SOURCE_ID="#leadSourceId";
 	public static final String SERVICE_FALLS="serviceFall";
 	public static final String SERVICE_FALLS_ID="#serviceFallsId";
+	public static final String ROLES="roles";
 
 }

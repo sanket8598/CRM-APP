@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
 import static ai.rnt.crm.util.RoleUtil.APP_ROLES;
+import static ai.rnt.crm.constants.CacheConstant.ROLES;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -22,7 +23,7 @@ public class RoleMasterDaoServiceImpl implements RoleMasterDaoService {
 	public final RoleMasterRepository roleMasterRepository;
 	
 	@Override
-	@Cacheable(value="roles")
+	@Cacheable(value=ROLES)
 	public List<EmployeeMaster> getAdminAndUser() {
 		return this.roleMasterRepository
 				.findByEmployeeRoleIn(APP_ROLES.get()).stream()

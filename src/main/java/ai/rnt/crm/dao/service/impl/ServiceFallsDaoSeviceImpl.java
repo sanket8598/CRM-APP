@@ -7,10 +7,10 @@ import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.config.CacheService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dto.ServiceFallsDto;
 import ai.rnt.crm.entity.ServiceFallsMaster;
@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice {
 
 	private final ServiceFallRepository serviceFallRepository;
-	private final CacheService cacheService;
 
 	@Override
 	@Cacheable(value = SERVICE_FALLS, key = SERVICE_FALLS_ID)
@@ -43,8 +42,8 @@ public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice {
 	}
 
 	@Override
+	@CacheEvict(value =SERVICE_FALLS,allEntries = true)
 	public Optional<ServiceFallsDto> save(ServiceFallsMaster serviceFalls) throws Exception {
-		cacheService.clearCacheWithGivenName(SERVICE_FALLS);
 		return TO_SERVICE_FALL_MASTER_DTO.apply(serviceFallRepository.save(serviceFalls));
 	}
 
