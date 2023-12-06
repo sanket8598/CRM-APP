@@ -951,6 +951,7 @@ public class LeadServiceImpl implements LeadService {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file) {
@@ -960,29 +961,33 @@ public class LeadServiceImpl implements LeadService {
 			Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
 			if (isValidExcel(sheet)) {
+				Map<String, Object> excelData = readExcelUtil.getLeadFromExcelFile(workbook, sheet);
 				int saveLeadCount = 0;
 				int duplicateLead = 0;
-				for (List<String> data : readExcelUtil.getLeadFromExcelFile(workbook, sheet)) {
-					Leads leads = null;
-					Map<String, Object> leadDataMap = buildLeadObj(data);
-					if (nonNull(leadDataMap) && leadDataMap.containsKey("ErrorList")) {
-						@SuppressWarnings("unchecked")
-						List<String> errorList = (List<String>) leadDataMap.get("ErrorList");
-						if (nonNull(errorList) && !errorList.isEmpty()) {
-							result.put(MESSAGE, errorList.get(0));
-							return new ResponseEntity<>(result, BAD_REQUEST);
-						} else if (leadDataMap.containsKey(MSG) && leadDataMap.get(MSG).equals(COMPLETE))
-							leads = (Leads) leadDataMap.get("Lead");
-						else {
-							if (duplicateLead != 0 || saveLeadCount != 0)
-								result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead
-										+ " Duplicate Found And " + leadDataMap.get(MSG));
-							else
-								result.put(MESSAGE, leadDataMap.get(MSG));
-							return new ResponseEntity<>(result, BAD_REQUEST);
+				if(nonNull(excelData) && !excelData.isEmpty() && (boolean)excelData.get("status")) {
+					for(LeadDto leadDto:(List<LeadDto>) excelData.get("leadData")) {
+						Leads lead = TO_LEAD.apply(leadDto).orElseThrow(null);
+						if(nonNull(lead)) {
+							Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
+							if (existCompany.isPresent()) {
+								existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
+								lead.setCompanyMaster(TO_COMPANY
+										.apply(companyMasterDaoService
+												.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
+														.orElseThrow(ResourceNotFoundException::new))
+												.orElseThrow(ResourceNotFoundException::new))
+										.orElseThrow(ResourceNotFoundException::new));
+							} else
+								lead.setCompanyMaster(TO_COMPANY
+										.apply(companyMasterDaoService
+												.save(TO_COMPANY
+														.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
+																.companyWebsite(leadDto.getCompanyWebsite()).build())
+														.orElseThrow(ResourceNotFoundException::new))
+												.orElseThrow(ResourceNotFoundException::new))
+										.orElseThrow(ResourceNotFoundException::new));
 						}
-					}
-					if (nonNull(data) && data.size() > 11 && (nonNull(data.get(11)) && !data.get(11).isEmpty()))
+					if ( && data.size() > 11 && (nonNull(data.get(11)) && !data.get(11).isEmpty()))
 						setAssignToNameForTheLead(leads, data.get(11).split(" "));
 					else
 						setAssignToNameForTheLead(leads, auditAwareUtil.getLoggedInUserName().split(" "));
@@ -990,14 +995,18 @@ public class LeadServiceImpl implements LeadService {
 						duplicateLead++;
 					else if (nonNull(leadDaoService.addLead(leads)))
 						saveLeadCount++;
-				}
-				if (duplicateLead == 0 && saveLeadCount == 0)
-					result.put(MESSAGE, "Leads Not Added !!");
-				else {
-					result.put(SUCCESS, true);
-					result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
-				}
-				return new ResponseEntity<>(result, CREATED);
+					}
+					if (duplicateLead == 0 && saveLeadCount == 0)
+						result.put(MESSAGE, "Leads Not Added !!");
+					else {
+						result.put(SUCCESS, true);
+						result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
+					return new ResponseEntity<>(result, CREATED);
+					}
+				}else {
+					    result.put(MESSAGE, excelData.get(MSG));
+					    return new ResponseEntity<>(result, BAD_REQUEST);
+					}
 			} else {
 				result.put(MESSAGE, "Invalid Excel Format!!");
 				return new ResponseEntity<>(result, BAD_REQUEST);
@@ -1021,68 +1030,14 @@ public class LeadServiceImpl implements LeadService {
 		Map<String, Object> excelMap = new HashMap<>();
 		List<String> errorList = new ArrayList<>();
 		excelMap.put(MSG, COMPLETE);
-		int errorCount = 0;
-		if (nonNull(data) && !data.isEmpty()) {
-			LeadDto dto = new LeadDto();
-			if (nonNull(data.get(0)) && !data.get(0).equalsIgnoreCase(""))
-				if (ExcelFieldValidationUtil.isValidFnameLname(data.get(0)))
-					dto.setFirstName(data.get(0));
-				else
-					errorList.add("Please Enter Valid First Name!!");
-			else {
-				errorList.add("Please Enter The First Name!!");
-				errorCount++;
-			}
-			if (nonNull(data.get(1)) && !data.get(1).equalsIgnoreCase(""))
-				if (ExcelFieldValidationUtil.isValidFnameLname(data.get(1)))
-					dto.setLastName(data.get(1));
-				else
-					errorList.add("Please Enter Valid Last Name!!");
-			else
-				errorCount++;
-			if (nonNull(data.get(2)) && !data.get(2).equalsIgnoreCase(""))
-				if (ExcelFieldValidationUtil.isValidEmail(data.get(2)))
-					dto.setEmail(data.get(2));
-				else
-					errorList.add("Please Enter Valid Email Address!!");
-			else
-				errorCount++;
-			if (nonNull(data.get(3)) && !data.get(3).equalsIgnoreCase(""))
-				dto.setPhoneNumber("+" + data.get(3));
-			else
-				dto.setPhoneNumber(null);
-			if (nonNull(data.get(4)) && !data.get(4).equalsIgnoreCase(""))
-				if (ExcelFieldValidationUtil.isValidDesignation(data.get(4)))
-					dto.setDesignation(data.get(4));
-				else
-					errorList.add("Please Enter Character For the Designation!!");
-			else {
-				errorList.add("Please Enter the Designation!!");
-				errorCount++;
-			}
-			if (nonNull(data.get(5)) && !data.get(5).equalsIgnoreCase(""))
-				dto.setTopic(data.get(5));
-			else
-				errorCount++;
-			if (nonNull(data.get(6)) && !data.get(6).equalsIgnoreCase(""))
-				dto.setCompanyName(data.get(6));
-			else
-				errorCount++;
-			if (nonNull(data.get(7)) && !data.get(7).equalsIgnoreCase(""))
-				dto.setCompanyWebsite(data.get(7));
-			else
-				errorCount++;
-			if (ExcelFieldValidationUtil.isValidBudgetAmount(data.get(8)))
-				dto.setBudgetAmount(CurrencyUtil.commaSepAmount(Double.parseDouble(data.get(8))));
-			else
-				errorList.add("Please Enter The Valid Budget Amount!!");
-			dto.setStatus(OPEN);
-			dto.setDisqualifyAs(OPEN);
-			Leads leads = TO_LEAD.apply(dto).orElseThrow(null);
+	
+//			dto.setStatus(OPEN);
+//			dto.setDisqualifyAs(OPEN);
+			Leads leads = TO_LEAD.apply(null).orElseThrow(null);
 			if (isNull(errorList) || errorList.isEmpty()) {
-				Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
+				Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
 				if (existCompany.isPresent()) {
-					existCompany.get().setCompanyWebsite(dto.getCompanyWebsite());
+					existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
 					leads.setCompanyMaster(TO_COMPANY
 							.apply(companyMasterDaoService
 									.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
@@ -1093,8 +1048,8 @@ public class LeadServiceImpl implements LeadService {
 					leads.setCompanyMaster(TO_COMPANY
 							.apply(companyMasterDaoService
 									.save(TO_COMPANY
-											.apply(CompanyDto.builder().companyName(dto.getCompanyName())
-													.companyWebsite(dto.getCompanyWebsite()).build())
+											.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
+													.companyWebsite(leadDto.getCompanyWebsite()).build())
 											.orElseThrow(ResourceNotFoundException::new))
 									.orElseThrow(ResourceNotFoundException::new))
 							.orElseThrow(ResourceNotFoundException::new));
@@ -1109,8 +1064,7 @@ public class LeadServiceImpl implements LeadService {
 					TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFall).get())
 							.ifPresent(leads::setServiceFallsMaster);
 				}
-			} else
-				errorCount++;
+			
 			if ((data.size() > 10 && nonNull(data.get(10))) && !data.get(10).equalsIgnoreCase("")) {
 				Optional<LeadSourceMaster> leadSource = leadSourceDaoService.getByName(data.get(10));
 				if (leadSource.isPresent())
@@ -1124,10 +1078,6 @@ public class LeadServiceImpl implements LeadService {
 			} else
 				leadSourceDaoService.getByName("Other").ifPresent(leads::setLeadSourceMaster);
 
-			if (errorCount != 0)
-				excelMap.put(MSG, (errorCount == 1 ? "" + errorCount + " Field is " : "" + errorCount + " Fields are ")
-						+ "Null or Empty,Please Verify the Excel!!");
-			else
 				excelMap.put("Lead", leads);
 		} else
 			excelMap.put(MSG, "Excel Row Are Empty !!");

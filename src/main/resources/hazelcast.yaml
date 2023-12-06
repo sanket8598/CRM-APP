@@ -3,8 +3,9 @@ hazelcast:
     join:
       multicast:
         enabled: true
--Dhazelcast:
-     diagnostics:
+      tcp-ip:
+        enabled: false
+  diagnostics:
          :enabled: true
 hazelcast-client:
   ringbuffer:
