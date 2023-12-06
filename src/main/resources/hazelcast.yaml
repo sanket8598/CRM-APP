@@ -3,3 +3,24 @@ hazelcast:
     join:
       multicast:
         enabled: true
+-Dhazelcast:
+     diagnostics:
+         :enabled: true
+hazelcast-client:
+  ringbuffer:
+    default:
+      capacity: 10000000
+      time-to-live-seconds: 15
+  reliable-topic:
+    default:
+      topic-overload-policy: BLOCK
+      read-batch-size: 100
+  connection-strategy:
+    async-start: false
+    reconnect-mode: ON
+    connection-retry:
+      initial-backoff-millis: 5000
+      max-backoff-millis: 90000
+      multiplier: 4
+      cluster-connect-timeout-millis: 90000
+      jitter: 0.2 
