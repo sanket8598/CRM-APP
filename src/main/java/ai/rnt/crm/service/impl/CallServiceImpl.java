@@ -19,6 +19,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -128,12 +129,19 @@ public class CallServiceImpl implements CallService {
 	}
 
 	@Override
+	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
+			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			Call call = callDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException("Call", "callId", callId));
-			call.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			call.getCallTasks().stream().forEach(e -> {
+				e.setDeletedBy(loggedInStaffId);
+				e.setDeletedDate(LocalDateTime.now());
+				callDaoService.addCallTask(e);
+			});
+			call.setDeletedBy(loggedInStaffId);
 			call.setDeletedDate(LocalDateTime.now());
 			if (nonNull(callDaoService.call(call))) {
 				result.put(MESSAGE, "Call deleted SuccessFully.");
@@ -173,10 +181,15 @@ public class CallServiceImpl implements CallService {
 					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
 			call.setCallTo(dto.getCallTo());
 			call.setSubject(dto.getSubject());
+			call.setStartDate(dto.getStartDate());
+			call.setEndDate(dto.getEndDate());
+			call.setStartTime(dto.getStartTime());
+			call.setEndTime(dto.getEndTime());
 			call.setDirection(dto.getDirection());
 			call.setPhoneNo(dto.getPhoneNo());
 			call.setComment(dto.getComment());
 			call.setDuration(dto.getDuration());
+			call.setAllDay(dto.isAllDay());
 			call.setStatus(status);
 			call.setUpdatedDate(LocalDateTime.now());
 			if (nonNull(callDaoService.call(call))) {

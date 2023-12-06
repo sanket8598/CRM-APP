@@ -45,7 +45,7 @@ public class VisitController {
 		return visitService.saveVisit(dto);
 	}
 
-	@DeleteMapping("/deleteVisit/{visitId}")
+	@DeleteMapping("/delete/{visitId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(@PathVariable Integer visitId) {
 		return visitService.deleteVisit(visitId);
 	}

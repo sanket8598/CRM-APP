@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -260,6 +261,40 @@ public class MeetingServiceImpl implements MeetingService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while updating the meeting by id..{} " + meetingId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeeting(Integer meetingId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
+			Meetings meetings = meetingDaoService.getMeetingById(meetingId)
+					.orElseThrow(() -> new ResourceNotFoundException("Meetings", "meetingId", meetingId));
+			meetings.getMeetingTasks().stream().forEach(e -> {
+				e.setDeletedBy(loggedInStaffId);
+				e.setDeletedDate(LocalDateTime.now());
+				meetingDaoService.addMeetingTask(e);
+			});
+			meetings.getMeetingAttachments().stream().forEach(e -> {
+				e.setDeletedBy(loggedInStaffId);
+				e.setDeletedDate(LocalDateTime.now());
+				meetingAttachmetDaoService.addMeetingAttachment(e);
+			});
+			meetings.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			meetings.setDeletedDate(LocalDateTime.now());
+			if (nonNull(meetingDaoService.addMeeting(meetings))) {
+				result.put(MESSAGE, "Meeting deleted SuccessFully.");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Meeting Not delete.");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while deleting the meeting by id..{} " + meetingId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}

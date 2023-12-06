@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -87,12 +88,19 @@ public class VisitServiceImpl implements VisitService {
 	}
 
 	@Override
+	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(Integer visitId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
+			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
 					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
-			visit.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			visit.getVisitTasks().stream().forEach(e -> {
+				e.setDeletedBy(loggedInStaffId);
+				e.setDeletedDate(LocalDateTime.now());
+				visitDaoService.addVisitTask(e);
+			});
+			visit.setDeletedBy(loggedInStaffId);
 			visit.setDeletedDate(LocalDateTime.now());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit deleted SuccessFully.");
@@ -179,6 +187,12 @@ public class VisitServiceImpl implements VisitService {
 			visit.setContent(dto.getContent());
 			visit.setComment(dto.getComment());
 			visit.setDuration(dto.getDuration());
+			visit.setStartDate(dto.getStartDate());
+			visit.setEndDate(dto.getEndDate());
+			visit.setStartTime(dto.getStartTime());
+			visit.setEndTime(dto.getEndTime());
+			visit.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
+			visit.setAllDay(dto.isAllDay());
 			visit.setStatus(status);
 			visit.setUpdatedDate(LocalDateTime.now());
 			if (nonNull(visitDaoService.saveVisit(visit))) {

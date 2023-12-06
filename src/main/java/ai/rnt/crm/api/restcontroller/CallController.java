@@ -55,7 +55,7 @@ public class CallController {
 		return callService.markAsCompleted(callId);
 	}
 
-	@DeleteMapping("/deleteCall/{callId}")
+	@DeleteMapping("/delete/{callId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(@PathVariable Integer callId) {
 		return callService.deleteCall(callId);
 	}

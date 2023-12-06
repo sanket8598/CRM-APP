@@ -55,6 +55,11 @@ public class MeetingController {
 		return meetingService.updateMeeting(dto, meetingId, status);
 	}
 
+	@DeleteMapping("/delete/{meetingId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeeting(@PathVariable Integer meetingId) {
+		return meetingService.deleteMeeting(meetingId);
+	}
+
 	@PostMapping("/task/{leadId}/{meetingId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@RequestBody @Valid MeetingTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "meetingId") Integer meetingId) {
