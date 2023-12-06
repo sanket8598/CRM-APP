@@ -39,6 +39,7 @@ public class PhoneNumberValidateApi {
 
 			if (response.getStatus() == 200) {
 				responseMap.put(KEY, "OK");
+				responseMap.put("Data", new JSONObject(response.getBody()));
 				responseMap.put("isValidNumber", new JSONObject(response.getBody()).get("isValidNumber"));
 			} 
 		} catch (Exception e) {
@@ -59,4 +60,5 @@ public class PhoneNumberValidateApi {
 				? phoneNumberUtil.getRegionCodeForNumber(phoneNumberObject)
 				: null;
 	}
+	
 }
