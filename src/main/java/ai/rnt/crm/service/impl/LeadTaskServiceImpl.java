@@ -1,13 +1,19 @@
 package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
+import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_GET_LEAD_TASK_DTO;
 import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_LEAD_TASK;
+import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
+import java.time.LocalDateTime;
 import java.util.EnumMap;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -17,6 +23,7 @@ import org.springframework.stereotype.Service;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadTaskDaoService;
 import ai.rnt.crm.dto.LeadTaskDto;
+import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
@@ -28,6 +35,12 @@ import ai.rnt.crm.util.AuditAwareUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @author Nikhil Gaikwad
+ * @since 07/12/2023
+ * @version 1.0
+ *
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -49,14 +62,106 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leadTask::setAssignTo);
 			leadTask.setLead(lead);
 			leadTask.setStatus(SAVE);
-			if (nonNull(leadTaskDaoService.addTask(leadTask)))
+			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
+				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Added Successfully");
-			else
+			} else {
+				result.put(SUCCESS, false);
 				result.put(MESSAGE, "Task Not Added");
-			result.put(SUCCESS, true);
+			}
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.info("Got Exception while adding the task..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(LeadTaskDto dto, Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", taskId));
+			leadTask.setSubject(dto.getSubject());
+			leadTask.setStatus(dto.getStatus());
+			leadTask.setPriority(dto.getPriority());
+			leadTask.setDueDate(dto.getDueDate());
+			leadTask.setRemainderOn(dto.isRemainderOn());
+			leadTask.setRemainderDueOn(dto.getRemainderDueOn());
+			leadTask.setRemainderDueAt(dto.getRemainderDueAt());
+			leadTask.setRemainderVia(dto.getRemainderVia());
+			leadTask.setDescription(dto.getDescription());
+			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Updated Successfully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Updated");
+			}
+			return new ResponseEntity<>(result, CREATED);
+
+		} catch (Exception e) {
+			log.info("Got Exception while updating the lead task..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignTask(Map<String, Integer> map) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		log.info("inside assign task staffId: {} taskId:{}", map.get("staffId"), map.get("taskId"));
+		try {
+			LeadTask leadTask = leadTaskDaoService.getTaskById(map.get("taskId"))
+					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", map.get("taskId")));
+			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			leadTask.setAssignTo(employee);
+			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Assigned SuccessFully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Assigned");
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while assigning the lead task..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", taskId));
+			leadTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			leadTask.setDeletedDate(LocalDateTime.now());
+			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task deleted SuccessFully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not delete.");
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while deleting the lead task..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			result.put(DATA, TO_GET_LEAD_TASK_DTO.apply(leadTaskDaoService.getTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", taskId))));
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, FOUND);
+		} catch (Exception e) {
+			log.info("Got Exception while getting the lead task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
