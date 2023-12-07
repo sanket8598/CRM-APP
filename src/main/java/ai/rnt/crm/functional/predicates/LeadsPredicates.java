@@ -16,7 +16,10 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import ai.rnt.crm.entity.Leads;
+import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 
+@NoArgsConstructor(access= AccessLevel.PRIVATE)
 public class LeadsPredicates {
 
 	
