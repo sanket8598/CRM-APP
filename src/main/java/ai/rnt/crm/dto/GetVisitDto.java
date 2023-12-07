@@ -28,7 +28,7 @@ public class GetVisitDto {
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date endDate;
 
-	private String participates;
+	private List<String> participants;
 
 	private String startTime;
 
