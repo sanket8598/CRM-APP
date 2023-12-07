@@ -79,10 +79,10 @@ public class Leads extends Auditable {
 
 	@Column(name = "business_card", columnDefinition = "LONGTEXT")
 	private String businessCard;
-	
+
 	@Column(name = "business_card_name")
 	private String businessCardName;
-	
+
 	@Column(name = "business_card_type")
 	private String businessCardType;
 
@@ -131,4 +131,6 @@ public class Leads extends Auditable {
 	@Transient
 	private Boolean important = false;
 
+	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
+	private List<LeadTask> leadTasks = new ArrayList<>();
 }
