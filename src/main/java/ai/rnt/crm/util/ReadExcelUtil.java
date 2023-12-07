@@ -63,7 +63,7 @@ public class ReadExcelUtil {
 							data = cell.getNumericCellValue() + "";
 						else
 							data = cell.getStringCellValue() + "";
-						Map<String, Object> excelMap = createLeadFromExcel(data, j, leadDto, i);
+						Map<String, Object> excelMap = createLeadFromExcel(data, j, leadDto, i+1);
 						if (Objects.nonNull(excelMap) && !excelMap.isEmpty() && excelMap.containsKey(ERROR)) {
 							String error = (String) excelMap.get(ERROR);
 							if (nonNull(error) && !error.isEmpty()) {
