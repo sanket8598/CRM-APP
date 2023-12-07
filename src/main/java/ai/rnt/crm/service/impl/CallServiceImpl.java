@@ -239,7 +239,6 @@ public class CallServiceImpl implements CallService {
 					.orElseThrow(() -> new ResourceNotFoundException("PhoneCallTask", "taskId", taskId))));
 			callTask.put(SUCCESS, true);
 			return new ResponseEntity<>(callTask, FOUND);
-
 		} catch (Exception e) {
 			log.error("error occured while getting phone call task by id..{}", +taskId, e.getMessage());
 			throw new CRMException(e);

@@ -1,6 +1,7 @@
 package ai.rnt.crm.service;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -12,5 +13,13 @@ import ai.rnt.crm.enums.ApiResponse;
 public interface LeadTaskService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> addTask(@Valid LeadTaskDto dto, Integer leadsId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> getLeadTask(Integer taskId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(LeadTaskDto dto, Integer taskId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> assignTask(Map<String, Integer> map);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteTask(Integer taskId);
 
 }

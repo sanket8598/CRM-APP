@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.GetLeadTaskDto;
 import ai.rnt.crm.dto.LeadTaskDto;
 import ai.rnt.crm.entity.LeadTask;
 import lombok.NoArgsConstructor;
@@ -54,4 +55,6 @@ public class LeadTaskDtoMapper {
 	public static final Function<Collection<LeadTask>, List<LeadTaskDto>> TO_LEAD_TASK_DTOS = e -> e.stream()
 			.map(dm -> TO_LEAD_TASK_DTO.apply(dm).get()).collect(Collectors.toList());
 
+	public static final Function<LeadTask, Optional<GetLeadTaskDto>> TO_GET_LEAD_TASK_DTO = e -> evalMapper(e,
+			GetLeadTaskDto.class);
 }

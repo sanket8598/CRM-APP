@@ -1,5 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,5 +20,10 @@ public class LeadTaskDaoServiceImpl implements LeadTaskDaoService {
 	@Override
 	public LeadTask addTask(LeadTask leadTask) {
 		return leadTaskRepository.save(leadTask);
+	}
+
+	@Override
+	public Optional<LeadTask> getTaskById(Integer taskId) {
+		return leadTaskRepository.findById(taskId);
 	}
 }
