@@ -59,7 +59,7 @@ public final class ApiConstants {
 
 	public static final String CALL = BASE + "call" + SEPERATOR;
 	
-	public static final String TASK = BASE + "task" + SEPERATOR;
+	public static final String TASK = BASE + "lead" + SEPERATOR + "task" + SEPERATOR;
 
 	public static final String ADD_CALL = SEPERATOR + "add" + SEPERATOR + "{leadId}";
 
