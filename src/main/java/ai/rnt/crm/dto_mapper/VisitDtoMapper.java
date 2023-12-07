@@ -1,7 +1,9 @@
 package ai.rnt.crm.dto_mapper;
 
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static java.util.Objects.nonNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -76,7 +78,11 @@ public class VisitDtoMapper {
 	 */
 	public static final Function<Collection<Visit>, List<EditVisitDto>> TO_EDIT_VISIT_DTOS = e -> e.stream()
 			.map(dm -> TO_EDIT_VISIT_DTO.apply(dm).get()).collect(Collectors.toList());
-	
-	public static final Function<Visit, Optional<GetVisitDto>> TO_GET_VISIT_DTO = e -> evalMapper(e,
-			GetVisitDto.class);
+
+	public static final Function<Visit, Optional<GetVisitDto>> TO_GET_VISIT_DTO = e -> {
+		Optional<GetVisitDto> getVisitDto = evalMapper(e, GetVisitDto.class);
+		getVisitDto.ifPresent(l -> l.setParticipates(
+				nonNull(e.getParticipates()) ? Arrays.toString(e.getParticipates().split(",")) : null));
+		return getVisitDto;
+	};
 }

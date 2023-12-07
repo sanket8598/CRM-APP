@@ -1,7 +1,9 @@
 package ai.rnt.crm.dto_mapper;
 
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static java.util.Objects.nonNull;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -56,5 +58,10 @@ public class MeetingDtoMapper {
 	public static final Function<Collection<Meetings>, List<MeetingDto>> TO_MEETING_DTOS = e -> e.stream()
 			.map(dm -> TO_MEETING_DTO.apply(dm).get()).collect(Collectors.toList());
 
-	public static final Function<Meetings, Optional<GetMeetingDto>> TO_GET_MEETING_DTO = e -> evalMapper(e, GetMeetingDto.class);
+	public static final Function<Meetings, Optional<GetMeetingDto>> TO_GET_MEETING_DTO = e -> {
+		Optional<GetMeetingDto> getMeetingDto = evalMapper(e, GetMeetingDto.class);
+		getMeetingDto.ifPresent(l -> l.setParticipates(
+				nonNull(e.getParticipates()) ? Arrays.toString(e.getParticipates().split(",")) : null));
+		return getMeetingDto;
+	};
 }
