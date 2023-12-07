@@ -1,6 +1,6 @@
 package ai.rnt.crm.service.impl;
 
-import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
+import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EmployeeMaster;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 
@@ -47,7 +47,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public Optional<EmployeeDto> getEmployeeByUserId(String userId) {
-		return TO_Employee.apply(employeeDaoService.getEmployeebyUserId(userId).orElseThrow(()->new ResourceNotFoundException("Employee", "userId", userId)));
+		return TO_EMPLOYEE.apply(employeeDaoService.getEmployeebyUserId(userId).orElseThrow(()->new ResourceNotFoundException("Employee", "userId", userId)));
 	}
 
 	@Override

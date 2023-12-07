@@ -27,7 +27,7 @@ import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto.CompanyDto.builder;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
-import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
+import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSortFilterDtoMapper.TO_LEAD_SORT_FILTER;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE;
@@ -54,6 +54,7 @@ import static ai.rnt.crm.functional.predicates.TaskPredicates.TASK_ON_HOLD_FILTE
 import static ai.rnt.crm.functional.predicates.UpnextPredicate.UPNEXT;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
+import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static java.lang.Integer.parseInt;
 import static java.time.LocalDateTime.now;
@@ -64,10 +65,12 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.of;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.poi.ss.usermodel.WorkbookFactory.create;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
@@ -88,7 +91,6 @@ import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -146,6 +148,15 @@ import ai.rnt.crm.util.LeadsCardUtil;
 import ai.rnt.crm.util.ReadExcelUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+/**
+ * This class is the implementation of the leadService interface method.<br>
+ * {@code All Business Logic Of Lead Module Is Inside This Class}
+ * 
+ * @author Sanket Wakankar
+ * @version 1.0
+ * @since 19-08-2023
+ */
 
 @Service
 @RequiredArgsConstructor
@@ -232,42 +243,40 @@ public class LeadServiceImpl implements LeadService {
 					filterMap.put(SECNDFIELD, sortFilter.getSecondaryFilter());
 				});
 				dataMap.put("sortFilter", filterMap);
+				String primaryField = filterMap.get(PRIMFIELD).toString();
+				String secondaryField = filterMap.get(SECNDFIELD).toString();
 				if (auditAwareUtil.isAdmin()) {
-					dataMap.put(ALL_LEAD,
-							allLeads.stream()
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get(PRIMFIELD).toString(), filterMap.get(SECNDFIELD).toString()))
-									.collect(toList()));
+					dataMap.put(ALL_LEAD, allLeads.stream().map(
+							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField))
+							.collect(toList()));
 					dataMap.put(OPEN_LEAD,
 							allLeads.stream()
 									.filter(l -> nonNull(l.getStatus()) && l.getStatus().equalsIgnoreCase(OPEN))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get(PRIMFIELD).toString(), filterMap.get(SECNDFIELD).toString()))
+									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
+											secondaryField))
 									.collect(toList()));
-					dataMap.put(CLOSE_LEAD,
-							allLeads.stream().filter(l -> !l.getStatus().equalsIgnoreCase(OPEN))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get(PRIMFIELD).toString(), filterMap.get(SECNDFIELD).toString()))
-									.collect(toList()));
+					dataMap.put(CLOSE_LEAD, allLeads.stream().filter(l -> !l.getStatus().equalsIgnoreCase(OPEN)).map(
+							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField))
+							.collect(toList()));
 				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
 					dataMap.put(ALL_LEAD,
 							allLeads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get(PRIMFIELD).toString(), filterMap.get(SECNDFIELD).toString()))
+									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
+											secondaryField))
 									.collect(toList()));
 					dataMap.put(OPEN_LEAD,
 							allLeads.stream()
 									.filter(l -> (nonNull(l.getStatus()) && l.getStatus().equalsIgnoreCase(OPEN))
 											&& ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get(PRIMFIELD).toString(), filterMap.get(SECNDFIELD).toString()))
+									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
+											secondaryField))
 									.collect(toList()));
 					dataMap.put(CLOSE_LEAD,
 							allLeads.stream()
 									.filter(l -> !l.getStatus().equalsIgnoreCase(OPEN)
 											&& ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
-											filterMap.get(PRIMFIELD).toString(), filterMap.get(SECNDFIELD).toString()))
+									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
+											secondaryField))
 									.collect(toList()));
 				} else
 					dataMap.put("DATA", emptyList());
@@ -412,7 +421,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setBody(call.getComment());
 						callDto.setCreatedOn(convertDate(call.getUpdatedDate()));
 						callDto.setShortName(shortName(call.getCallTo()));
-						TO_Employee.apply(call.getCallFrom())
+						TO_EMPLOYEE.apply(call.getCallFrom())
 								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 						return callDto;
 					}).collect(toList());
@@ -471,7 +480,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setShortName(shortName(call.getCallTo()));
 						callDto.setDueDate(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
 						callDto.setCreatedOn(convertDate(call.getCreatedDate()));
-						TO_Employee.apply(call.getCallFrom())
+						TO_EMPLOYEE.apply(call.getCallFrom())
 								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 						return callDto;
 					}).collect(toList());
@@ -532,7 +541,7 @@ public class LeadServiceImpl implements LeadService {
 						callDto.setType(CALL);
 						callDto.setBody(call.getComment());
 						callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
-						TO_Employee.apply(call.getCallFrom())
+						TO_EMPLOYEE.apply(call.getCallFrom())
 								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 						return callDto;
 					}).collect(toList());
@@ -587,7 +596,7 @@ public class LeadServiceImpl implements LeadService {
 							upNextData.add(e);
 						});
 						if (count == 1 && !data.getKey().equals(0L))
-							upNextDataMap.put("Message", "Wait for "+data.getKey()+" day(s)");
+							upNextDataMap.put("Message", "Wait for " + data.getKey() + " day(s)");
 						count++;
 					}
 					upNextDataMap.put("UpNextData", upNextData);
@@ -613,24 +622,19 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(Integer leadId, QualifyLeadDto dto) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			Optional<Leads> lead = leadDaoService.getLeadById(leadId);
-			if (lead.isPresent()) {
-				lead.get().setCustomerNeed(dto.getCustomerNeed());
-				lead.get().setProposedSolution(dto.getProposedSolution());
-				lead.get().setStatus(CLOSE_AS_QUALIFIED);
-				lead.get().setDisqualifyAs(QUALIFIED);
-				setServiceFallsIntoAndLeadSourceToLead(dto.getServiceFallsMaster().getServiceName(), null, lead.get());
-				if (nonNull(leadDaoService.addLead(lead.get()))) {
-					result.put(MESSAGE, "Lead Qualified SuccessFully");
-					result.put(SUCCESS, true);
-				} else {
-					result.put(MESSAGE, "Lead Not Qualify");
-					result.put(SUCCESS, false);
-				}
-			} else {
-				result.put(MESSAGE, "Lead Not Qualify");
+			result.put(SUCCESS, true);
+			result.put(MESSAGE, "Lead Not Qualify");
+			Leads lead = leadDaoService.getLeadById(leadId)
+					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
+			lead.setCustomerNeed(dto.getCustomerNeed());
+			lead.setProposedSolution(dto.getProposedSolution());
+			lead.setStatus(CLOSE_AS_QUALIFIED);
+			lead.setDisqualifyAs(QUALIFIED);
+			setServiceFallsIntoAndLeadSourceToLead(dto.getServiceFallsMaster().getServiceName(), null, lead);
+			if (nonNull(leadDaoService.addLead(lead)))
+				result.put(MESSAGE, "Lead Qualified SuccessFully");
+			else
 				result.put(SUCCESS, false);
-			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
 			log.info("Got Exception while qualifying the lead..{}", e.getMessage());
@@ -714,7 +718,7 @@ public class LeadServiceImpl implements LeadService {
 				else {
 					country = new CountryMaster();
 					country.setCountry(dto.getCountry());
-					Optional<CountryMaster> newFindByCountryName = Optional.of(countryDaoService.addCountry(country));
+					Optional<CountryMaster> newFindByCountryName = of(countryDaoService.addCountry(country));
 					newFindByCountryName.ifPresent(companyMaster::setCountry);
 				}
 				if (findBystate.isPresent())
@@ -722,7 +726,7 @@ public class LeadServiceImpl implements LeadService {
 				else {
 					state = new StateMaster();
 					state.setState(dto.getState());
-					Optional<StateMaster> newFindBystate = Optional.of(stateDaoService.addState(state));
+					Optional<StateMaster> newFindBystate = of(stateDaoService.addState(state));
 					newFindBystate.ifPresent(companyMaster::setState);
 				}
 				if (existCityByName.isPresent())
@@ -730,7 +734,7 @@ public class LeadServiceImpl implements LeadService {
 				else {
 					city = new CityMaster();
 					city.setCity(dto.getCity());
-					Optional<CityMaster> newExistCityByName = Optional.of(cityDaoService.addCity(city));
+					Optional<CityMaster> newExistCityByName = of(cityDaoService.addCity(city));
 					newExistCityByName.ifPresent(companyMaster::setCity);
 				}
 				companyMaster.setZipCode(dto.getZipCode());
@@ -739,16 +743,15 @@ public class LeadServiceImpl implements LeadService {
 						.apply(companyMasterDaoService.save(companyMaster).orElseThrow(ResourceNotFoundException::new))
 						.ifPresent(lead::setCompanyMaster);
 			} else {
-				CompanyMaster companyMaster = TO_COMPANY
-						.apply(CompanyDto.builder().companyName(dto.getCompanyName())
-								.companyWebsite(dto.getCompanyWebsite()).build())
+				CompanyMaster companyMaster = TO_COMPANY.apply(
+						builder().companyName(dto.getCompanyName()).companyWebsite(dto.getCompanyWebsite()).build())
 						.orElseThrow(ResourceNotFoundException::new);
 				if (findByCountryName.isPresent())
 					findByCountryName.ifPresent(companyMaster::setCountry);
 				else {
 					country = new CountryMaster();
 					country.setCountry(dto.getCountry());
-					Optional<CountryMaster> newFindByCountryName = Optional.of(countryDaoService.addCountry(country));
+					Optional<CountryMaster> newFindByCountryName = of(countryDaoService.addCountry(country));
 					newFindByCountryName.ifPresent(companyMaster::setCountry);
 				}
 				if (findBystate.isPresent())
@@ -756,7 +759,7 @@ public class LeadServiceImpl implements LeadService {
 				else {
 					state = new StateMaster();
 					state.setState(dto.getState());
-					Optional<StateMaster> newFindBystate = Optional.of(stateDaoService.addState(state));
+					Optional<StateMaster> newFindBystate = of(stateDaoService.addState(state));
 					newFindBystate.ifPresent(companyMaster::setState);
 				}
 				if (existCityByName.isPresent())
@@ -764,7 +767,7 @@ public class LeadServiceImpl implements LeadService {
 				else {
 					city = new CityMaster();
 					city.setCity(dto.getCity());
-					Optional<CityMaster> newExistCityByName = Optional.of(cityDaoService.addCity(city));
+					Optional<CityMaster> newExistCityByName = of(cityDaoService.addCity(city));
 					newExistCityByName.ifPresent(companyMaster::setCity);
 				}
 				companyMaster.setZipCode(dto.getZipCode());
@@ -844,7 +847,7 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
-			sortFilter.setEmployee(TO_Employee
+			sortFilter.setEmployee(TO_EMPLOYEE
 					.apply(employeeService.getById(loggedInStaffId)
 							.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", loggedInStaffId)))
 					.orElseThrow(null));
@@ -883,37 +886,29 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			result.put(SUCCESS, false);
-			Workbook workbook = WorkbookFactory.create(file.getInputStream());
+			Workbook workbook = create(file.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
 			if (isValidExcel(sheet)) {
-				Map<String, Object> excelData = readExcelUtil.getLeadFromExcelFile(workbook, sheet);
+				Map<String, Object> excelData = readExcelUtil.readExcelFile(workbook, sheet);
 				if ((nonNull(excelData) && !excelData.isEmpty())
 						&& (excelData.containsKey(FLAG) && (boolean) excelData.get(FLAG))) {
 					List<LeadDto> leadDtos = (List<LeadDto>) excelData.get(LEAD_DATA);
 					int saveLeadCount = leadDtos.stream().filter(Objects::nonNull).mapToInt(leadDto -> {
-						Leads leads = null;
-						try {
-							leads = buildLeadObj(leadDto);
-						} catch (Exception e) {
-							log.error("error while building the lead Object...{}", e.getMessage());
-						}
-						if (nonNull(leadDto.getPseudoName()) && !leadDto.getPseudoName().isEmpty())
-							setAssignToNameForTheLead(leads, leadDto.getPseudoName().split(" "));
-						else
-							setAssignToNameForTheLead(leads, auditAwareUtil.getLoggedInUserName().split(" "));
-						leads.setPseudoName(null);
-						if (LeadsCardUtil.checkDuplicateLead(leadDaoService.getAllLeads(), leads))
+						Leads leads = buildLeadObj(leadDto);
+						setAssignToNameForTheLead(leads,
+								nonNull(leadDto.getPseudoName()) && !leadDto.getPseudoName().isEmpty()
+										? leadDto.getPseudoName().split(" ")
+										: auditAwareUtil.getLoggedInUserName().split(" "));
+						leads.setPseudoName(null);// because we added the assign to person name from excel data object
+						if (checkDuplicateLead(leadDaoService.getAllLeads(), leads))
 							return 0;
-						else
-							return nonNull(leadDaoService.addLead(leads)) ? 1 : 0;
+						return nonNull(leadDaoService.addLead(leads)) ? 1 : 0;
 					}).sum();
-
 					int duplicateLead = leadDtos.size() - saveLeadCount;
 					result.put(SUCCESS, saveLeadCount > 0);
+					result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
 					if (duplicateLead == 0 && saveLeadCount == 0)
-						result.put(MESSAGE, "Leads Not Added !!");
-					else
-						result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
+						result.put(MESSAGE, "No Lead Found To Add !!");
 					return new ResponseEntity<>(result, CREATED);
 				} else {
 					result.put(MESSAGE, excelData.get(MSG));
@@ -930,43 +925,50 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public boolean isValidExcel(Sheet sheet) throws IOException {
-		List<String> dbHeaderNames = excelHeaderDaoService.getAllExcelHeaders().stream()
-				.map(ExcelHeaderMaster::getHeaderName).map(String::trim).collect(toList());
-		List<String> excelHeader = readExcelUtil.getAllHeaders(sheet).stream().map(String::trim).collect(toList());
+		List<String> dbHeaderNames = excelHeaderDaoService.getExcelHeadersFromDB().stream()
+				.map(ExcelHeaderMaster::getHeaderName).filter(Objects::nonNull).map(String::trim).collect(toList());
+		List<String> excelHeader = readExcelUtil.readExcelHeaders(sheet).stream().filter(Objects::nonNull)
+				.map(String::trim).collect(toList());
 		return (nonNull(excelHeader) && !excelHeader.isEmpty()) && (nonNull(dbHeaderNames) && !dbHeaderNames.isEmpty())
 				&& excelHeader.stream().allMatch(dbHeaderNames::contains) && excelHeader.containsAll(dbHeaderNames);
 	}
 
-	public Leads buildLeadObj(LeadDto leadDto) throws Exception {
-		leadDto.setStatus(OPEN);
-		leadDto.setDisqualifyAs(OPEN);
+	public Leads buildLeadObj(LeadDto leadDto) {
 		Leads leads = TO_LEAD.apply(leadDto).orElseThrow(ResourceNotFoundException::new);
-		Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
-		setCompanyDetailsToLead(existCompany, leadDto, leads);
-		if (nonNull(leadDto.getServiceFallsId()) && !leadDto.getServiceFallsId().isEmpty()) {
-			Optional<ServiceFallsMaster> serviceFalls = serviceFallsDaoSevice.findByName(leadDto.getServiceFallsId());
-			if (serviceFalls.isPresent())
-				serviceFalls.ifPresent(leads::setServiceFallsMaster);
-			else {
-				ServiceFallsMaster serviceFall = new ServiceFallsMaster();
-				serviceFall.setServiceName(leadDto.getServiceFallsId());
-				TO_SERVICE_FALL_MASTER
-						.apply(serviceFallsDaoSevice.save(serviceFall).orElseThrow(ResourceNotFoundException::new))
-						.ifPresent(leads::setServiceFallsMaster);
+		try {
+			leadDto.setStatus(OPEN);
+			leadDto.setDisqualifyAs(OPEN);
+			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
+			setCompanyDetailsToLead(existCompany, leadDto, leads);
+			if (nonNull(leadDto.getServiceFallsId()) && !leadDto.getServiceFallsId().isEmpty()) {
+				Optional<ServiceFallsMaster> serviceFalls = serviceFallsDaoSevice
+						.findByName(leadDto.getServiceFallsId());
+				if (serviceFalls.isPresent())
+					serviceFalls.ifPresent(leads::setServiceFallsMaster);
+				else {
+					ServiceFallsMaster serviceFall = new ServiceFallsMaster();
+					serviceFall.setServiceName(leadDto.getServiceFallsId());
+					TO_SERVICE_FALL_MASTER
+							.apply(serviceFallsDaoSevice.save(serviceFall).orElseThrow(ResourceNotFoundException::new))
+							.ifPresent(leads::setServiceFallsMaster);
+				}
 			}
+			if (nonNull(leadDto.getLeadSourceId()) && !leadDto.getLeadSourceId().isEmpty()) {
+				Optional<LeadSourceMaster> leadSource = leadSourceDaoService.getByName(leadDto.getLeadSourceId());
+				if (leadSource.isPresent())
+					leadSource.ifPresent(leads::setLeadSourceMaster);
+				else {
+					LeadSourceMaster leadSources = new LeadSourceMaster();
+					leadSources.setSourceName(leadDto.getLeadSourceId());
+					TO_LEAD_SOURCE
+							.apply(leadSourceDaoService.save(leadSources).orElseThrow(ResourceNotFoundException::new))
+							.ifPresent(leads::setLeadSourceMaster);
+				}
+			} else
+				leadSourceDaoService.getByName("Other").ifPresent(leads::setLeadSourceMaster);
+		} catch (Exception e) {
+			log.error("error while building the lead Object...{}", e.getMessage());
 		}
-		if (nonNull(leadDto.getLeadSourceId()) && !leadDto.getLeadSourceId().isEmpty()) {
-			Optional<LeadSourceMaster> leadSource = leadSourceDaoService.getByName(leadDto.getLeadSourceId());
-			if (leadSource.isPresent())
-				leadSource.ifPresent(leads::setLeadSourceMaster);
-			else {
-				LeadSourceMaster leadSources = new LeadSourceMaster();
-				leadSources.setSourceName(leadDto.getLeadSourceId());
-				TO_LEAD_SOURCE.apply(leadSourceDaoService.save(leadSources).orElseThrow(ResourceNotFoundException::new))
-						.ifPresent(leads::setLeadSourceMaster);
-			}
-		} else
-			leadSourceDaoService.getByName("Other").ifPresent(leads::setLeadSourceMaster);
 		return leads;
 	}
 
@@ -983,27 +985,27 @@ public class LeadServiceImpl implements LeadService {
 
 	public List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
 		return calls.stream().flatMap(call -> call.getCallTasks().stream()).map(e -> new MainTaskDto(e.getCallTaskId(),
-				e.getSubject(), e.getStatus(), CALL, e.getDueDate(), TO_Employee.apply(e.getAssignTo()).orElse(null)))
+				e.getSubject(), e.getStatus(), CALL, e.getDueDate(), TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null)))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
 				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT, e.getDueDate(),
-						TO_Employee.apply(e.getAssignTo()).orElse(null)))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null)))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
 		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
 				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING, e.getDueDate(),
-						TO_Employee.apply(e.getAssignTo()).orElse(null)))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null)))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getLeadRelatedTasks(Leads lead) {
 		return lead.getLeadTasks().stream().map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(),
-				LEAD, e.getDueDate(), TO_Employee.apply(e.getAssignTo()).orElse(null))).collect(toList());
+				LEAD, e.getDueDate(), TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null))).collect(toList());
 	}
 
 	public Map<String, Object> getTaskDataMap(List<Call> calls, List<Visit> visits, List<Meetings> meetings,
