@@ -6,6 +6,8 @@ import static ai.rnt.crm.constants.ExcelConstants.LEAD_DATA;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
 import static ai.rnt.crm.constants.MessageConstants.MSG;
+import static ai.rnt.crm.constants.MessageConstants.NO_ACTIVITY;
+import static ai.rnt.crm.constants.MessageConstants.WAIT_FOR;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
@@ -581,32 +583,12 @@ public class LeadServiceImpl implements LeadService {
 					.collect(groupingBy(e -> DAYS.between(now(), parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
 					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
 							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
-
-			Map<String, Object> upNextDataMap = new HashMap<>();
-			upNextDataMap.put("Message", "There No Up-Coming Activity");
-			if (nonNull(upNextActivities) && !upNextActivities.isEmpty()) {
-				Long lowestKey = upNextActivities.keySet().stream().min(naturalOrder()).get();
-				if (nonNull(lowestKey)) {
-					int count = 0;
-					List<TimeLineActivityDto> upNextData = new ArrayList<>();
-					for (Map.Entry<Long, List<TimeLineActivityDto>> data : upNextActivities.entrySet()) {
-						data.getValue().forEach(e -> {
-							e.setWaitTwoDays(!lowestKey.equals(data.getKey()));
-							upNextData.add(e);
-						});
-						if (count == 1 && !data.getKey().equals(0L))
-							upNextDataMap.put("Message", "Wait for " + data.getKey() + " day(s)");
-						count++;
-					}
-					upNextDataMap.put("UpNextData", upNextData);
-				}
-			}
 			dataMap.put("Contact", dto);
 			dataMap.put("serviceFalls", TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put("leadSource", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put("Timeline", timeLine);
 			dataMap.put("Activity", activity);
-			dataMap.put("UpNext", upNextDataMap);
+			dataMap.put("UpNext", upNextActivities(upNextActivities));
 			dataMap.put("TaskData", getTaskDataMap(calls, visits, meetings, leadById));
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);
@@ -1056,7 +1038,7 @@ public class LeadServiceImpl implements LeadService {
 							.orElseThrow(ResourceNotFoundException::new));
 	}
 
-	public void setServiceFallsIntoAndLeadSourceToLead(String serviceFallsName, String leadSourceName, Leads leads)
+	private void setServiceFallsIntoAndLeadSourceToLead(String serviceFallsName, String leadSourceName, Leads leads)
 			throws Exception {
 		Pattern pattern = compile("^\\d+$");
 		if (nonNull(serviceFallsName) && pattern.matcher(serviceFallsName).matches())
@@ -1079,6 +1061,29 @@ public class LeadServiceImpl implements LeadService {
 							() -> new ResourceNotFoundException("LeadSourceMaster", "leadSourceName", leadSourceName)))
 					.ifPresent(leads::setLeadSourceMaster);
 		}
+	}
+
+	private Map<String, Object> upNextActivities(LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities) {
+		Map<String, Object> upNextDataMap = new HashMap<>();
+		upNextDataMap.put(MSG, NO_ACTIVITY);
+		if (nonNull(upNextActivities) && !upNextActivities.isEmpty()) {
+			Long lowestKey = upNextActivities.keySet().stream().min(naturalOrder()).orElse(null);
+			if (nonNull(lowestKey)) {
+				int count = 0;
+				List<TimeLineActivityDto> upNextData = new ArrayList<>();
+				for (Map.Entry<Long, List<TimeLineActivityDto>> data : upNextActivities.entrySet()) {
+					data.getValue().forEach(e -> {
+						e.setWaitTwoDays(!lowestKey.equals(data.getKey()));
+						upNextData.add(e);
+					});
+					if (count == 1 && !data.getKey().equals(0L))
+						upNextDataMap.put(MSG, String.format(WAIT_FOR, data.getKey()));
+					count++;
+				}
+				upNextDataMap.put("UpNextData", upNextData);
+			}
+		}
+		return upNextDataMap;
 	}
 
 }
