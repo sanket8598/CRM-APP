@@ -220,10 +220,10 @@ public class CallServiceImpl implements CallService {
 				phoneCallTask.setAssignTo(lead.get().getEmployee());
 			callDaoService.getCallById(callId).ifPresent(phoneCallTask::setCall);
 			if (checkDuplicateTask(callDaoService.getAllTask(), phoneCallTask)) {
-				result.put(MESSAGE, "Task Already Exists !!");
 				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Already Exists !!");
 			} 
-			if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
+			else if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Added Successfully..!!");
 			} else {
