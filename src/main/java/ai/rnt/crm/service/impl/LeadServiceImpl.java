@@ -974,28 +974,31 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
-		return calls.stream().flatMap(call -> call.getCallTasks().stream()).map(e -> new MainTaskDto(e.getCallTaskId(),
-				e.getSubject(), e.getStatus(), CALL, e.getDueDate(), TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null)))
+		return calls.stream().flatMap(call -> call.getCallTasks().stream())
+				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL, e.getDueDate(),
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId()))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
 				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT, e.getDueDate(),
-						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null)))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId()))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
 		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
 				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING, e.getDueDate(),
-						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null)))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getMeetings().getMeetingId()))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getLeadRelatedTasks(Leads lead) {
-		return lead.getLeadTasks().stream().map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(),
-				LEAD, e.getDueDate(), TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null))).collect(toList());
+		return lead
+				.getLeadTasks().stream().map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(),
+						LEAD, e.getDueDate(), TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId()))
+				.collect(toList());
 	}
 
 	public Map<String, Object> getTaskDataMap(List<Call> calls, List<Visit> visits, List<Meetings> meetings,
@@ -1075,13 +1078,13 @@ public class LeadServiceImpl implements LeadService {
 		Map<String, Object> upNextDataMap = new HashMap<>();
 		upNextDataMap.put(MSG, NO_ACTIVITY);
 		if (nonNull(upNextActivities) && !upNextActivities.isEmpty()) {
-			Long lowestKey = upNextActivities.keySet().stream().min(naturalOrder()).orElse(null);
-			if (nonNull(lowestKey)) {
+			Long lowestDayDiff = upNextActivities.keySet().stream().min(naturalOrder()).orElse(null);
+			if (nonNull(lowestDayDiff)) {
 				int count = 0;
 				List<TimeLineActivityDto> upNextData = new ArrayList<>();
 				for (Map.Entry<Long, List<TimeLineActivityDto>> data : upNextActivities.entrySet()) {
 					data.getValue().forEach(e -> {
-						e.setWaitTwoDays(!lowestKey.equals(data.getKey()));
+						e.setWaitTwoDays(!lowestDayDiff.equals(data.getKey()));
 						upNextData.add(e);
 					});
 					if (count == 1 && !data.getKey().equals(0L))

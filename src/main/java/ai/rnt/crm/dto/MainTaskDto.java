@@ -18,10 +18,10 @@ public  class MainTaskDto {
 	
 	private EmployeeDto assignTo;
 	
-	private String parentId;
+	private Integer parentId;
 	
 
-	public MainTaskDto(Integer id, String subject, String status, String type,Date dueDate,EmployeeDto assignTo) {
+	public MainTaskDto(Integer id, String subject, String status, String type,Date dueDate,EmployeeDto assignTo,Integer parentId) {
 		super();
 		this.id = id;
 		this.subject = subject;
@@ -29,6 +29,7 @@ public  class MainTaskDto {
 		this.type = type;
 		this.dueDate = dueDate;
 		this.assignTo = assignTo;
+		this.parentId = parentId;
 	}
 
 	public MainTaskDto() {
