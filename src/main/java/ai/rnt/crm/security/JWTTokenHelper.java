@@ -1,6 +1,10 @@
 package ai.rnt.crm.security;
 
-import  static java.util.Objects.nonNull;
+import static ai.rnt.crm.constants.CRMConstants.EMAIL_ID;
+import static ai.rnt.crm.constants.CRMConstants.FULL_NAME;
+import static ai.rnt.crm.constants.CRMConstants.ROLE;
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
+import static java.util.Objects.nonNull;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -67,11 +71,11 @@ public class JWTTokenHelper {
 	public String generateToken(UserDetails userDetails) {
 		Map<String, Object> claims = new HashMap<>();
 		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
-			claims.put("fullName", emp.getFirstName() + " " + emp.getLastName());
-			claims.put("StaffId",emp.getStaffId());
-			claims.put("EmailId", emp.getEmailID());
-			claims.put("Role",
-			 RoleUtil.getSingleRole(emp.getEmployeeRole().stream().map(Role::getRoleName).collect(Collectors.toList())));
+			claims.put(FULL_NAME, emp.getFirstName() + " " + emp.getLastName());
+			claims.put(STAFF_ID, emp.getStaffId());
+			claims.put(EMAIL_ID, emp.getEmailID());
+			claims.put(ROLE, RoleUtil
+					.getSingleRole(emp.getEmployeeRole().stream().map(Role::getRoleName).collect(Collectors.toList())));
 		});
 		return createToken(claims, userDetails.getUsername());
 	}
@@ -97,8 +101,8 @@ public class JWTTokenHelper {
 		}
 		return null;
 	}
-	
+
 	public String getfullNameOfLoggedInUser(String token) {
-		return nonNull(this.extractAllClaims(token))?this.extractAllClaims(token).get("fullName").toString():null;
+		return nonNull(this.extractAllClaims(token)) ? this.extractAllClaims(token).get(FULL_NAME).toString() : null;
 	}
 }

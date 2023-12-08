@@ -5,6 +5,11 @@ import static ai.rnt.crm.constants.ApiConstants.GET_ADMIN_AND_USER;
 import static ai.rnt.crm.constants.ApiConstants.GET_ALL_MAIL_ID;
 import static ai.rnt.crm.constants.ApiConstants.LOGIN;
 import static ai.rnt.crm.constants.ApiConstants.TOKENPARSE;
+import static ai.rnt.crm.constants.CRMConstants.EMAIL_ID;
+import static ai.rnt.crm.constants.CRMConstants.FULL_NAME;
+import static ai.rnt.crm.constants.CRMConstants.ROLE;
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
+import static ai.rnt.crm.constants.CRMConstants.TOKEN;
 import static ai.rnt.crm.constants.EncryptionAlgoConstants.RSA;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 import static ai.rnt.crm.util.RSAToJwtDecoder.rsaToJwtDecoder;
@@ -106,20 +111,20 @@ public class LoginController {
 			@RequestBody @NotEmpty(message = "body should not be empty!!") Map<String, String> token) {
 		try {
 
-			if (isNull(token.get("token")))
+			if (isNull(token.get(TOKEN)))
 				throw new ResponseStatusException(BAD_REQUEST, "token cannot be null");
-			if (token.get("token").trim().length() <= 0)
+			if (token.get(TOKEN).trim().length() <= 0)
 				throw new ResponseStatusException(BAD_REQUEST, "token cannot be empty");
 
-			log.info("token inside tokenParse...{}", token.get("token"));
-			String rsaToJwtDecoder = rsaToJwtDecoder(token.get("token"));
+			log.info("token inside tokenParse...{}", token.get(TOKEN));
+			String rsaToJwtDecoder = rsaToJwtDecoder(token.get(TOKEN));
 			log.info("token after RSA inside tokenParse...{}", rsaToJwtDecoder);
 			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(rsaToJwtDecoder));
 			Map<String, Object> map = new LinkedHashMap<>();
-			map.put("fullName", json.get("fullName"));
-			map.put("role", json.get("Role"));
-			map.put("staffId", json.get("StaffId"));
-			map.put("emailId", json.get("EmailId"));
+			map.put(FULL_NAME, json.get(FULL_NAME));
+			map.put(ROLE, json.get(ROLE));
+			map.put(STAFF_ID, json.get(STAFF_ID));
+			map.put(EMAIL_ID, json.get(EMAIL_ID));
 			return ok(map);
 		} catch (Exception e) {
 			log.error("error occured while decoding the token.. {}", e.getLocalizedMessage());

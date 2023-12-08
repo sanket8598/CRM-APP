@@ -1,5 +1,37 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.CRMConstants.ACTIVITY;
+import static ai.rnt.crm.constants.CRMConstants.ALL_TASK;
+import static ai.rnt.crm.constants.CRMConstants.ALL_TASK_COUNT;
+import static ai.rnt.crm.constants.CRMConstants.ASSIGN_DATA;
+import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_COUNT;
+import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_KEY;
+import static ai.rnt.crm.constants.CRMConstants.CONTACT;
+import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
+import static ai.rnt.crm.constants.CRMConstants.COUNT_BY_STATUS;
+import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
+import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_COUNT;
+import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_KEY;
+import static ai.rnt.crm.constants.CRMConstants.LEAD_ID;
+import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE;
+import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE_DATA;
+import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE_MASTER;
+import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE_NAME;
+import static ai.rnt.crm.constants.CRMConstants.NOT_STARTED_TASK_COUNT;
+import static ai.rnt.crm.constants.CRMConstants.NOT_STARTED_TASK_KEY;
+import static ai.rnt.crm.constants.CRMConstants.ON_HOLD_TASK_COUNT;
+import static ai.rnt.crm.constants.CRMConstants.ON_HOLD_TASK_KEY;
+import static ai.rnt.crm.constants.CRMConstants.OTHER;
+import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALL;
+import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALLS_MASTER;
+import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALL_DATA;
+import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALL_ID;
+import static ai.rnt.crm.constants.CRMConstants.SORT_FILTER;
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
+import static ai.rnt.crm.constants.CRMConstants.TASK;
+import static ai.rnt.crm.constants.CRMConstants.TIMELINE;
+import static ai.rnt.crm.constants.CRMConstants.UPNEXT_DATA;
+import static ai.rnt.crm.constants.CRMConstants.UPNEXT_DATA_KEY;
 import static ai.rnt.crm.constants.DateFormatterConstant.DATE_TIME_WITH_AM_OR_PM;
 import static ai.rnt.crm.constants.ExcelConstants.FLAG;
 import static ai.rnt.crm.constants.ExcelConstants.LEAD_DATA;
@@ -14,7 +46,6 @@ import static ai.rnt.crm.constants.StatusConstants.CALL;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_DISQUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_LEAD;
-import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.DISQUALIFIED_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.EMAIL;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
@@ -23,8 +54,6 @@ import static ai.rnt.crm.constants.StatusConstants.OPEN;
 import static ai.rnt.crm.constants.StatusConstants.OPEN_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.QUALIFIED_LEAD;
-import static ai.rnt.crm.constants.StatusConstants.SAVE;
-import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
@@ -44,15 +73,26 @@ import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_CALL;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_EMAIL;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_MEETING;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_VISIT;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.ASSIGNED_TO_FILTER;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.CLOSE_LEAD_FILTER;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.DISQUALIFIED_LEAD_FILTER;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.OPEN_LEAD_FILTER;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.QUALIFIED_LEAD_FILTER;
-import static ai.rnt.crm.functional.predicates.TaskPredicates.TASK_COMPLETED_FILTER;
-import static ai.rnt.crm.functional.predicates.TaskPredicates.TASK_IN_PROGRESS_FILTER;
-import static ai.rnt.crm.functional.predicates.TaskPredicates.TASK_NOT_STARTED_FILTER;
-import static ai.rnt.crm.functional.predicates.TaskPredicates.TASK_ON_HOLD_FILTER;
-import static ai.rnt.crm.functional.predicates.UpnextPredicate.UPNEXT;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_CALL;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_EMAIL;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_MEETING;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_VISIT;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_CALL;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_MEETING;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_VISIT;
+import static ai.rnt.crm.functional.predicates.TaskPredicates.COMPLETED_TASK;
+import static ai.rnt.crm.functional.predicates.TaskPredicates.IN_PROGRESS_TASK;
+import static ai.rnt.crm.functional.predicates.TaskPredicates.NOT_STARTED_TASK;
+import static ai.rnt.crm.functional.predicates.TaskPredicates.ON_HOLD_TASK;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
@@ -98,6 +138,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import ai.rnt.crm.constants.ApiResponseKeyConstant;
 import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
@@ -243,20 +284,17 @@ public class LeadServiceImpl implements LeadService {
 					filterMap.put(PRIMFIELD, sortFilter.getPrimaryFilter());
 					filterMap.put(SECNDFIELD, sortFilter.getSecondaryFilter());
 				});
-				dataMap.put("sortFilter", filterMap);
+				dataMap.put(SORT_FILTER, filterMap);
 				String primaryField = filterMap.get(PRIMFIELD).toString();
 				String secondaryField = filterMap.get(SECNDFIELD).toString();
 				if (auditAwareUtil.isAdmin()) {
 					dataMap.put(ALL_LEAD, allLeads.stream().map(
 							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField))
 							.collect(toList()));
-					dataMap.put(OPEN_LEAD,
-							allLeads.stream()
-									.filter(l -> nonNull(l.getStatus()) && l.getStatus().equalsIgnoreCase(OPEN))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
-											secondaryField))
-									.collect(toList()));
-					dataMap.put(CLOSE_LEAD, allLeads.stream().filter(l -> !l.getStatus().equalsIgnoreCase(OPEN)).map(
+					dataMap.put(OPEN_LEAD, allLeads.stream().filter(OPEN_LEAD_FILTER).map(
+							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField))
+							.collect(toList()));
+					dataMap.put(CLOSE_LEAD, allLeads.stream().filter(CLOSE_LEAD_FILTER).map(
 							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField))
 							.collect(toList()));
 				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
@@ -265,22 +303,18 @@ public class LeadServiceImpl implements LeadService {
 									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
 											secondaryField))
 									.collect(toList()));
-					dataMap.put(OPEN_LEAD,
-							allLeads.stream()
-									.filter(l -> (nonNull(l.getStatus()) && l.getStatus().equalsIgnoreCase(OPEN))
-											&& ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
-											secondaryField))
-									.collect(toList()));
-					dataMap.put(CLOSE_LEAD,
-							allLeads.stream()
-									.filter(l -> !l.getStatus().equalsIgnoreCase(OPEN)
-											&& ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
-											secondaryField))
-									.collect(toList()));
+					dataMap.put(OPEN_LEAD, allLeads.stream()
+							.filter(l -> OPEN_LEAD_FILTER.test(l) && ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
+							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
+									secondaryField))
+							.collect(toList()));
+					dataMap.put(CLOSE_LEAD, allLeads.stream()
+							.filter(l -> CLOSE_LEAD_FILTER.test(l) && ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
+							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
+									secondaryField))
+							.collect(toList()));
 				} else
-					dataMap.put("DATA", emptyList());
+					dataMap.put(ApiResponseKeyConstant.DATA, emptyList());
 				getAllLeads.put(DATA, dataMap);
 			} else
 				getAllLeads.put(DATA, TO_LEAD_DTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
@@ -309,10 +343,10 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Map<String, Object> dataMap = new HashMap<>();
-			dataMap.put("serviceFallData",
+			dataMap.put(SERVICE_FALL_DATA,
 					TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
-			dataMap.put("leadSourceData", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
-			dataMap.put("assignToData", TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
+			dataMap.put(LEAD_SOURCE_DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
+			dataMap.put(ASSIGN_DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
 			resultMap.put(SUCCESS, true);
 			resultMap.put(DATA, dataMap);
 			return new ResponseEntity<>(resultMap, FOUND);
@@ -348,12 +382,12 @@ public class LeadServiceImpl implements LeadService {
 				countMap.put(OPEN_LEAD, leadDashboardData.stream().filter(OPEN_LEAD_FILTER).count());
 				countMap.put(QUALIFIED_LEAD, leadDashboardData.stream().filter(QUALIFIED_LEAD_FILTER).count());
 				countMap.put(DISQUALIFIED_LEAD, leadDashboardData.stream().filter(DISQUALIFIED_LEAD_FILTER).count());
-				dataMap.put("COUNTDATA", countMap);
+				dataMap.put(COUNTDATA, countMap);
 				if (nonNull(leadsStatus) && leadsStatus.equalsIgnoreCase(ALL)) {
-					dataMap.put("DATA", TO_DASHBOARD_LEADDTOS.apply(leadDashboardData));
+					dataMap.put(ApiResponseKeyConstant.DATA, TO_DASHBOARD_LEADDTOS.apply(leadDashboardData));
 					leadsDataByStatus.put(DATA, dataMap);
 				} else {
-					dataMap.put("DATA", TO_DASHBOARD_LEADDTOS
+					dataMap.put(ApiResponseKeyConstant.DATA, TO_DASHBOARD_LEADDTOS
 							.apply(leadDaoService.getLeadsByStatus(leadsStatus).stream().collect(Collectors.toList())));
 					leadsDataByStatus.put(DATA, dataMap);
 				}
@@ -370,14 +404,15 @@ public class LeadServiceImpl implements LeadService {
 						leadDashboardData.stream().filter(
 								l -> DISQUALIFIED_LEAD_FILTER.test(l) && ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
 								.count());
-				dataMap.put("COUNTDATA", countMap);
+				dataMap.put(COUNTDATA, countMap);
 				if (nonNull(leadsStatus) && leadsStatus.equalsIgnoreCase(ALL)) {
-					dataMap.put("DATA", TO_DASHBOARD_LEADDTOS.apply(leadDashboardData.stream()
+					dataMap.put(ApiResponseKeyConstant.DATA, TO_DASHBOARD_LEADDTOS.apply(leadDashboardData.stream()
 							.filter(d -> ASSIGNED_TO_FILTER.test(d, loggedInStaffId)).collect(toList())));
 					leadsDataByStatus.put(DATA, dataMap);
 				} else {
-					dataMap.put("DATA", TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)
-							.stream().filter(d -> ASSIGNED_TO_FILTER.test(d, loggedInStaffId)).collect(toList())));
+					dataMap.put(ApiResponseKeyConstant.DATA,
+							TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus).stream()
+									.filter(d -> ASSIGNED_TO_FILTER.test(d, loggedInStaffId)).collect(toList())));
 					leadsDataByStatus.put(DATA, dataMap);
 				}
 			} else
@@ -398,13 +433,13 @@ public class LeadServiceImpl implements LeadService {
 			Map<String, Object> dataMap = new LinkedHashMap<>();
 
 			Leads leadById = leadDaoService.getLeadById(leadId)
-					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			Optional<EditLeadDto> dto = TO_EDITLEAD_DTO.apply(leadById);
 			dto.ifPresent(e -> {
 				e.setMessage("Assigned To " + leadById.getEmployee().getFirstName() + " "
 						+ leadById.getEmployee().getLastName());
-				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy()).orElseThrow(
-						() -> new ResourceNotFoundException("Employee", "staffId", leadById.getCreatedBy()));
+				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy())
+						.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, leadById.getCreatedBy()));
 				e.setGeneratedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
 			});
 			List<Call> calls = callDaoService.getCallsByLeadId(leadId);
@@ -412,184 +447,157 @@ public class LeadServiceImpl implements LeadService {
 			List<Email> emails = emailDaoService.getEmailByLeadId(leadId);
 			List<Meetings> meetings = meetingDaoService.getMeetingByLeadId(leadId);
 			List<TimeLineActivityDto> timeLine = new ArrayList<>();
-			List<EditCallDto> list = calls.stream()
-					.filter(call -> nonNull(call.getStatus()) && call.getStatus().equalsIgnoreCase(COMPLETE))
-					.map(call -> {
-						EditCallDto callDto = new EditCallDto();
-						callDto.setId(call.getCallId());
-						callDto.setSubject(call.getSubject());
-						callDto.setType(CALL);
-						callDto.setBody(call.getComment());
-						callDto.setCreatedOn(convertDate(call.getUpdatedDate()));
-						callDto.setShortName(shortName(call.getCallTo()));
-						TO_EMPLOYEE.apply(call.getCallFrom())
-								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
-						return callDto;
-					}).collect(toList());
+			List<EditCallDto> list = calls.stream().filter(TIMELINE_CALL).map(call -> {
+				EditCallDto callDto = new EditCallDto();
+				callDto.setId(call.getCallId());
+				callDto.setSubject(call.getSubject());
+				callDto.setType(CALL);
+				callDto.setBody(call.getComment());
+				callDto.setCreatedOn(convertDate(call.getUpdatedDate()));
+				callDto.setShortName(shortName(call.getCallTo()));
+				TO_EMPLOYEE.apply(call.getCallFrom())
+						.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
+				return callDto;
+			}).collect(toList());
 			timeLine.addAll(list);
-			timeLine.addAll(emails.stream()
-					.filter(email -> nonNull(email.getStatus()) && email.getStatus().equalsIgnoreCase(SEND))
-					.map(email -> {
-						EditEmailDto editEmailDto = new EditEmailDto();
-						editEmailDto.setId(email.getMailId());
-						editEmailDto.setType(EMAIL);
-						editEmailDto.setSubject(email.getSubject());
-						editEmailDto.setBody(email.getContent());
-						editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
-						editEmailDto.setCreatedOn(convertDate(email.getUpdatedDate()));
-						editEmailDto.setShortName(shortName(email.getMailFrom()));
-						return editEmailDto;
-					}).collect(toList()));
-			timeLine.addAll(visits.stream()
-					.filter(visit -> nonNull(visit.getStatus()) && visit.getStatus().equalsIgnoreCase(COMPLETE))
-					.map(visit -> {
-						EditVisitDto visitDto = new EditVisitDto();
-						visitDto.setId(visit.getVisitId());
-						visitDto.setLocation(visit.getLocation());
-						visitDto.setSubject(visit.getSubject());
-						visitDto.setType(VISIT);
-						visitDto.setBody(visit.getContent());
-						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> visitDto
-								.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-						visitDto.setCreatedOn(convertDate(visit.getUpdatedDate()));
-						return visitDto;
-					}).collect(toList()));
-			timeLine.addAll(meetings.stream().filter(meeting -> nonNull(meeting.getMeetingStatus())
-					&& meeting.getMeetingStatus().equalsIgnoreCase(COMPLETE)).map(meet -> {
-						EditMeetingDto meetDto = new EditMeetingDto();
-						meetDto.setId(meet.getMeetingId());
-						meetDto.setType(MEETING);
-						employeeService.getById(meet.getCreatedBy()).ifPresent(byId -> meetDto
-								.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-						meetDto.setSubject(meet.getMeetingTitle());
-						meetDto.setBody(meet.getDescription());
-						meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-						meetDto.setCreatedOn(convertDate(meet.getUpdatedDate()));
-						return meetDto;
-					}).collect(toList()));
+			timeLine.addAll(emails.stream().filter(TIMELINE_EMAIL).map(email -> {
+				EditEmailDto editEmailDto = new EditEmailDto();
+				editEmailDto.setId(email.getMailId());
+				editEmailDto.setType(EMAIL);
+				editEmailDto.setSubject(email.getSubject());
+				editEmailDto.setBody(email.getContent());
+				editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
+				editEmailDto.setCreatedOn(convertDate(email.getUpdatedDate()));
+				editEmailDto.setShortName(shortName(email.getMailFrom()));
+				return editEmailDto;
+			}).collect(toList()));
+			timeLine.addAll(visits.stream().filter(TIMELINE_VISIT).map(visit -> {
+				EditVisitDto visitDto = new EditVisitDto();
+				visitDto.setId(visit.getVisitId());
+				visitDto.setLocation(visit.getLocation());
+				visitDto.setSubject(visit.getSubject());
+				visitDto.setType(VISIT);
+				visitDto.setBody(visit.getContent());
+				employeeService.getById(visit.getCreatedBy()).ifPresent(
+						byId -> visitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+				visitDto.setCreatedOn(convertDate(visit.getUpdatedDate()));
+				return visitDto;
+			}).collect(toList()));
+			timeLine.addAll(meetings.stream().filter(TIMELINE_MEETING).map(meet -> {
+				EditMeetingDto meetDto = new EditMeetingDto();
+				meetDto.setId(meet.getMeetingId());
+				meetDto.setType(MEETING);
+				employeeService.getById(meet.getCreatedBy()).ifPresent(
+						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+				meetDto.setSubject(meet.getMeetingTitle());
+				meetDto.setBody(meet.getDescription());
+				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
+				meetDto.setCreatedOn(convertDate(meet.getUpdatedDate()));
+				return meetDto;
+			}).collect(toList()));
 			timeLine.sort((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
-			List<TimeLineActivityDto> activity = calls.stream()
-					.filter(call -> (isNull(call.getStatus()) || call.getStatus().equalsIgnoreCase(SAVE))
-							&& !UPNEXT.test(convertDateDateWithTime(call.getStartDate(), call.getStartTime())))
-					.map(call -> {
-						EditCallDto callDto = new EditCallDto();
-						callDto.setId(call.getCallId());
-						callDto.setSubject(call.getSubject());
-						callDto.setType(CALL);
-						callDto.setBody(call.getComment());
-						callDto.setShortName(shortName(call.getCallTo()));
-						callDto.setDueDate(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
-						callDto.setCreatedOn(convertDate(call.getCreatedDate()));
-						TO_EMPLOYEE.apply(call.getCallFrom())
-								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
-						return callDto;
-					}).collect(toList());
-			activity.addAll(emails.stream()
-					.filter(email -> isNull(email.getStatus()) || email.getStatus().equalsIgnoreCase(SAVE))
-					.map(email -> {
-						EditEmailDto editEmailDto = new EditEmailDto();
-						editEmailDto.setId(email.getMailId());
-						editEmailDto.setType(EMAIL);
-						editEmailDto.setSubject(email.getSubject());
-						editEmailDto.setBody(email.getContent());
-						editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
-						editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
-						editEmailDto.setShortName(shortName(email.getMailFrom()));
-						return editEmailDto;
-					}).collect(toList()));
-			activity.addAll(visits.stream()
-					.filter(visit -> (isNull(visit.getStatus()) || visit.getStatus().equalsIgnoreCase(SAVE))
-							&& !UPNEXT.test(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime())))
-					.map(visit -> {
-						EditVisitDto editVisitDto = new EditVisitDto();
-						editVisitDto.setId(visit.getVisitId());
-						editVisitDto.setLocation(visit.getLocation());
-						editVisitDto.setSubject(visit.getSubject());
-						editVisitDto.setType(VISIT);
-						editVisitDto.setBody(visit.getContent());
-						editVisitDto.setDueDate(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime()));
-						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> editVisitDto
-								.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-						editVisitDto.setCreatedOn(convertDate(visit.getCreatedDate()));
-						return editVisitDto;
-					}).collect(toList()));
-			activity.addAll(meetings.stream().filter(
-					meeting -> (isNull(meeting.getMeetingStatus()) || meeting.getMeetingStatus().equalsIgnoreCase(SAVE))
-							&& !UPNEXT.test(convertDateDateWithTime(meeting.getStartDate(), meeting.getStartTime())))
-					.map(meet -> {
-						EditMeetingDto meetDto = new EditMeetingDto();
-						meetDto.setId(meet.getMeetingId());
-						meetDto.setType(MEETING);
-						employeeService.getById(meet.getCreatedBy()).ifPresent(byId -> meetDto
-								.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-						meetDto.setSubject(meet.getMeetingTitle());
-						meetDto.setBody(meet.getDescription());
-						meetDto.setDueDate(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime()));
-						meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-						meetDto.setCreatedOn(convertDate(meet.getCreatedDate()));
-						return meetDto;
-					}).collect(toList()));
+			List<TimeLineActivityDto> activity = calls.stream().filter(ACTIVITY_CALL).map(call -> {
+				EditCallDto callDto = new EditCallDto();
+				callDto.setId(call.getCallId());
+				callDto.setSubject(call.getSubject());
+				callDto.setType(CALL);
+				callDto.setBody(call.getComment());
+				callDto.setShortName(shortName(call.getCallTo()));
+				callDto.setDueDate(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
+				callDto.setCreatedOn(convertDate(call.getCreatedDate()));
+				TO_EMPLOYEE.apply(call.getCallFrom())
+						.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
+				return callDto;
+			}).collect(toList());
+			activity.addAll(emails.stream().filter(ACTIVITY_EMAIL).map(email -> {
+				EditEmailDto editEmailDto = new EditEmailDto();
+				editEmailDto.setId(email.getMailId());
+				editEmailDto.setType(EMAIL);
+				editEmailDto.setSubject(email.getSubject());
+				editEmailDto.setBody(email.getContent());
+				editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
+				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
+				editEmailDto.setShortName(shortName(email.getMailFrom()));
+				return editEmailDto;
+			}).collect(toList()));
+			activity.addAll(visits.stream().filter(ACTIVITY_VISIT).map(visit -> {
+				EditVisitDto editVisitDto = new EditVisitDto();
+				editVisitDto.setId(visit.getVisitId());
+				editVisitDto.setLocation(visit.getLocation());
+				editVisitDto.setSubject(visit.getSubject());
+				editVisitDto.setType(VISIT);
+				editVisitDto.setBody(visit.getContent());
+				editVisitDto.setDueDate(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime()));
+				employeeService.getById(visit.getCreatedBy()).ifPresent(
+						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+				editVisitDto.setCreatedOn(convertDate(visit.getCreatedDate()));
+				return editVisitDto;
+			}).collect(toList()));
+			activity.addAll(meetings.stream().filter(ACTIVITY_MEETING).map(meet -> {
+				EditMeetingDto meetDto = new EditMeetingDto();
+				meetDto.setId(meet.getMeetingId());
+				meetDto.setType(MEETING);
+				employeeService.getById(meet.getCreatedBy()).ifPresent(
+						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+				meetDto.setSubject(meet.getMeetingTitle());
+				meetDto.setBody(meet.getDescription());
+				meetDto.setDueDate(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime()));
+				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
+				meetDto.setCreatedOn(convertDate(meet.getCreatedDate()));
+				return meetDto;
+			}).collect(toList()));
 			activity.sort((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
-			List<TimeLineActivityDto> upNext = calls.stream()
-					.filter(call -> (isNull(call.getStatus()) || call.getStatus().equalsIgnoreCase(SAVE))
-							&& UPNEXT.test(convertDateDateWithTime(call.getStartDate(), call.getStartTime())))
-					.map(call -> {
-						EditCallDto callDto = new EditCallDto();
-						callDto.setId(call.getCallId());
-						callDto.setSubject(call.getSubject());
-						callDto.setType(CALL);
-						callDto.setBody(call.getComment());
-						callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
-						TO_EMPLOYEE.apply(call.getCallFrom())
-								.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
-						return callDto;
-					}).collect(toList());
+			List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
+				EditCallDto callDto = new EditCallDto();
+				callDto.setId(call.getCallId());
+				callDto.setSubject(call.getSubject());
+				callDto.setType(CALL);
+				callDto.setBody(call.getComment());
+				callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
+				TO_EMPLOYEE.apply(call.getCallFrom())
+						.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
+				return callDto;
+			}).collect(toList());
 
-			upNext.addAll(visits.stream()
-					.filter(visit -> (isNull(visit.getStatus()) || visit.getStatus().equalsIgnoreCase(SAVE))
-							&& UPNEXT.test(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime())))
-					.map(visit -> {
-						EditVisitDto editVisitDto = new EditVisitDto();
-						editVisitDto.setId(visit.getVisitId());
-						editVisitDto.setLocation(visit.getLocation());
-						editVisitDto.setSubject(visit.getSubject());
-						editVisitDto.setType(VISIT);
-						editVisitDto.setBody(visit.getContent());
-						employeeService.getById(visit.getCreatedBy()).ifPresent(byId -> editVisitDto
-								.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-						editVisitDto.setCreatedOn(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime()));
-						return editVisitDto;
-					}).collect(toList()));
-			upNext.addAll(meetings.stream().filter(
-					meeting -> (isNull(meeting.getMeetingStatus()) || meeting.getMeetingStatus().equalsIgnoreCase(SAVE))
-							&& UPNEXT.test(convertDateDateWithTime(meeting.getStartDate(), meeting.getStartTime())))
-					.map(meet -> {
-						EditMeetingDto meetDto = new EditMeetingDto();
-						meetDto.setId(meet.getMeetingId());
-						meetDto.setType(MEETING);
-						employeeService.getById(meet.getCreatedBy()).ifPresent(byId -> meetDto
-								.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-						meetDto.setSubject(meet.getMeetingTitle());
-						meetDto.setBody(meet.getDescription());
-						meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-						meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime()));
-						return meetDto;
-					}).collect(toList()));
+			upNext.addAll(visits.stream().filter(UPNEXT_VISIT).map(visit -> {
+				EditVisitDto editVisitDto = new EditVisitDto();
+				editVisitDto.setId(visit.getVisitId());
+				editVisitDto.setLocation(visit.getLocation());
+				editVisitDto.setSubject(visit.getSubject());
+				editVisitDto.setType(VISIT);
+				editVisitDto.setBody(visit.getContent());
+				employeeService.getById(visit.getCreatedBy()).ifPresent(
+						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+				editVisitDto.setCreatedOn(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime()));
+				return editVisitDto;
+			}).collect(toList()));
+			upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
+				EditMeetingDto meetDto = new EditMeetingDto();
+				meetDto.setId(meet.getMeetingId());
+				meetDto.setType(MEETING);
+				employeeService.getById(meet.getCreatedBy()).ifPresent(
+						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+				meetDto.setSubject(meet.getMeetingTitle());
+				meetDto.setBody(meet.getDescription());
+				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
+				meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime()));
+				return meetDto;
+			}).collect(toList()));
 			upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 			LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities = upNext.stream()
 					.collect(groupingBy(e -> DAYS.between(now(), parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
 					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
 							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
-			dataMap.put("Contact", dto);
-			dataMap.put("serviceFalls", TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
-			dataMap.put("leadSource", TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
-			dataMap.put("Timeline", timeLine);
-			dataMap.put("Activity", activity);
-			dataMap.put("UpNext", upNextActivities(upNextActivities));
-			dataMap.put("TaskData", getTaskDataMap(calls, visits, meetings, leadById));
+			dataMap.put(CONTACT, dto);
+			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
+			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
+			dataMap.put(TIMELINE, timeLine);
+			dataMap.put(ACTIVITY, activity);
+			dataMap.put(UPNEXT_DATA, upNextActivities(upNextActivities));
+			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, leadById));
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);
 			return new ResponseEntity<>(lead, FOUND);
@@ -606,7 +614,7 @@ public class LeadServiceImpl implements LeadService {
 			result.put(SUCCESS, true);
 			result.put(MESSAGE, "Lead Not Qualify");
 			Leads lead = leadDaoService.getLeadById(leadId)
-					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			lead.setCustomerNeed(dto.getCustomerNeed());
 			lead.setProposedSolution(dto.getProposedSolution());
 			lead.setStatus(CLOSE_AS_QUALIFIED);
@@ -626,12 +634,12 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLead(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
-		log.info("inside assign lead staffId: {} LeadId:{}", map.get("leadId"));
+		log.info("inside assign lead staffId: {} LeadId:{}", map.get(LEAD_ID));
 		try {
-			Leads leads = leadDaoService.getLeadById(map.get("leadId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", map.get("leadId")));
-			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			Leads leads = leadDaoService.getLeadById(map.get(LEAD_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, map.get(LEAD_ID)));
+			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			leads.setEmployee(employee);
 			if (nonNull(leadDaoService.addLead(leads))) {
 				resultMap.put(MESSAGE, "Lead Assigned SuccessFully");
@@ -652,7 +660,7 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId)
-					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			lead.setDisqualifyAs(dto.getDisqualifyAs());
 			lead.setDisqualifyReason(dto.getDisqualifyReason());
 			lead.setStatus(CLOSE_AS_DISQUALIFIED);
@@ -678,7 +686,7 @@ public class LeadServiceImpl implements LeadService {
 		CityMaster city = new CityMaster();
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId)
-					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			lead.setTopic(dto.getTopic());
 			lead.setPhoneNumber(dto.getPhoneNumber());
 			lead.setEmail(dto.getEmail());
@@ -780,9 +788,9 @@ public class LeadServiceImpl implements LeadService {
 			if (status) {
 				LeadImportant importantLead = new LeadImportant();
 				importantLead.setLead(leadDaoService.getLeadById(leadId)
-						.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId)));
+						.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId)));
 				importantLead.setEmployee(employeeService.getById(loggedInStaffId)
-						.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", loggedInStaffId)));
+						.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, loggedInStaffId)));
 				result.put(MESSAGE, "Problem Occurred While Making Lead Important !!");
 				if (leadDaoService.addImportantLead(importantLead).isPresent())
 					result.put(MESSAGE, "Lead marked as Important !!");
@@ -806,7 +814,7 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId)
-					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			lead.setDisqualifyAs(OPEN);
 			lead.setDisqualifyReason(null);
 			lead.setStatus(OPEN);
@@ -831,7 +839,7 @@ public class LeadServiceImpl implements LeadService {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			sortFilter.setEmployee(TO_EMPLOYEE
 					.apply(employeeService.getById(loggedInStaffId)
-							.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", loggedInStaffId)))
+							.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, loggedInStaffId)))
 					.orElseThrow(null));
 			if (nonNull(leadSortFilterDaoService.save(TO_LEAD_SORT_FILTER.apply(sortFilter).orElse(null)))) {
 				result.put(MESSAGE, "Lead Sort Filter Added Successfully!!");
@@ -852,7 +860,7 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 			result.put(DATA, TO_QUALIFY_LEAD.apply(leadDaoService.getLeadById(leadId)
-					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId))));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId))));
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, FOUND);
 		} catch (Exception e) {
@@ -947,7 +955,7 @@ public class LeadServiceImpl implements LeadService {
 							.ifPresent(leads::setLeadSourceMaster);
 				}
 			} else
-				leadSourceDaoService.getByName("Other").ifPresent(leads::setLeadSourceMaster);
+				leadSourceDaoService.getByName(OTHER).ifPresent(leads::setLeadSourceMaster);
 		} catch (Exception e) {
 			log.error("error while building the lead Object...{}", e.getMessage());
 		}
@@ -998,21 +1006,21 @@ public class LeadServiceImpl implements LeadService {
 		allTask.addAll(getVistRelatedTasks(visits));
 		allTask.addAll(getMeetingRelatedTasks(meetings));
 		allTask.addAll(getLeadRelatedTasks(lead));
-		List<MainTaskDto> notStartedTask = allTask.stream().filter(TASK_NOT_STARTED_FILTER).collect(toList());
-		List<MainTaskDto> inProgressTask = allTask.stream().filter(TASK_IN_PROGRESS_FILTER).collect(toList());
-		List<MainTaskDto> onHoldTask = allTask.stream().filter(TASK_ON_HOLD_FILTER).collect(toList());
-		List<MainTaskDto> completedTask = allTask.stream().filter(TASK_COMPLETED_FILTER).collect(toList());
-		taskData.put("allTask", allTask);
-		taskData.put("completedTask", completedTask);
-		taskData.put("inProgressTask", inProgressTask);
-		taskData.put("onHoldTask", onHoldTask);
-		taskData.put("notStartedTask", notStartedTask);
-		taskCount.put("allTaskCount", allTask.stream().count());
-		taskCount.put("completedTaskCount", completedTask.stream().count());
-		taskCount.put("inProgressTaskCount", inProgressTask.stream().count());
-		taskCount.put("onHoldTaskCount", onHoldTask.stream().count());
-		taskCount.put("notStartedTaskCount", notStartedTask.stream().count());
-		taskData.put("countByStatus", taskCount);
+		List<MainTaskDto> notStartedTask = allTask.stream().filter(NOT_STARTED_TASK).collect(toList());
+		List<MainTaskDto> inProgressTask = allTask.stream().filter(IN_PROGRESS_TASK).collect(toList());
+		List<MainTaskDto> onHoldTask = allTask.stream().filter(ON_HOLD_TASK).collect(toList());
+		List<MainTaskDto> completedTask = allTask.stream().filter(COMPLETED_TASK).collect(toList());
+		taskData.put(ALL_TASK, allTask);
+		taskData.put(COMPLETED_TASK_KEY, completedTask);
+		taskData.put(IN_PROGRESS_TASK_KEY, inProgressTask);
+		taskData.put(ON_HOLD_TASK_KEY, onHoldTask);
+		taskData.put(NOT_STARTED_TASK_KEY, notStartedTask);
+		taskCount.put(ALL_TASK_COUNT, allTask.stream().count());
+		taskCount.put(COMPLETED_TASK_COUNT, completedTask.stream().count());
+		taskCount.put(IN_PROGRESS_TASK_COUNT, inProgressTask.stream().count());
+		taskCount.put(ON_HOLD_TASK_COUNT, onHoldTask.stream().count());
+		taskCount.put(NOT_STARTED_TASK_COUNT, notStartedTask.stream().count());
+		taskData.put(COUNT_BY_STATUS, taskCount);
 		return taskData;
 	}
 
@@ -1048,7 +1056,7 @@ public class LeadServiceImpl implements LeadService {
 			ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
 			serviceFalls.setServiceName(serviceFallsName);
 			TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).orElseThrow(
-					() -> new ResourceNotFoundException("ServiceFallMaster", "serviceFallId", serviceFallsName)))
+					() -> new ResourceNotFoundException(SERVICE_FALLS_MASTER, SERVICE_FALL_ID, serviceFallsName)))
 					.ifPresent(leads::setServiceFallsMaster);
 		}
 		if (nonNull(leadSourceName) && pattern.matcher(leadSourceName).matches())
@@ -1058,7 +1066,7 @@ public class LeadServiceImpl implements LeadService {
 			leadSource.setSourceName(leadSourceName);
 			TO_LEAD_SOURCE
 					.apply(leadSourceDaoService.save(leadSource).orElseThrow(
-							() -> new ResourceNotFoundException("LeadSourceMaster", "leadSourceName", leadSourceName)))
+							() -> new ResourceNotFoundException(LEAD_SOURCE_MASTER, LEAD_SOURCE_NAME, leadSourceName)))
 					.ifPresent(leads::setLeadSourceMaster);
 		}
 	}
@@ -1080,7 +1088,7 @@ public class LeadServiceImpl implements LeadService {
 						upNextDataMap.put(MSG, String.format(WAIT_FOR, data.getKey()));
 					count++;
 				}
-				upNextDataMap.put("UpNextData", upNextData);
+				upNextDataMap.put(UPNEXT_DATA_KEY, upNextData);
 			}
 		}
 		return upNextDataMap;
