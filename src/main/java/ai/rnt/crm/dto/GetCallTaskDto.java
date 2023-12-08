@@ -22,6 +22,8 @@ public class GetCallTaskDto {
 	@JsonFormat(pattern = "dd-MMM-yyyy")
 	private Date dueDate;
 	
+	private String dueTime;
+	
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date updateDueDate;
 	

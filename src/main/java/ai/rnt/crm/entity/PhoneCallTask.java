@@ -46,6 +46,9 @@ public class PhoneCallTask extends Auditable {
 
 	@Column(name = "task_due_date")
 	private Date dueDate;
+	
+	@Column(name = "task_due_time")
+	private String dueTime;
 
 	@Column(name = "task_description")
 	private String description;

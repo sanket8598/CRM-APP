@@ -26,6 +26,8 @@ public class MeetingTaskDto {
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date dueDate;
 
+	private String dueTime;
+
 	private String description;
 
 	private boolean remainderOn;
