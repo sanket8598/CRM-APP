@@ -20,28 +20,28 @@ public class TaskPredicates {
 	 * 
 	 * @since version 1.0
 	 */
-	public static final Predicate<MainTaskDto> TASK_NOT_STARTED_FILTER = task -> nonNull(task.getStatus())
+	public static final Predicate<MainTaskDto> NOT_STARTED_TASK = task -> nonNull(task.getStatus())
 			&& task.getStatus().equalsIgnoreCase(TASK_NOT_STARTED);
 	/*
 	 * * This Predicate return true if it the task status is in progress.
 	 * 
 	 * @since version 1.0
 	 */
-	public static final Predicate<MainTaskDto> TASK_IN_PROGRESS_FILTER = task -> nonNull(task.getStatus())
+	public static final Predicate<MainTaskDto> IN_PROGRESS_TASK = task -> nonNull(task.getStatus())
 			&& task.getStatus().equalsIgnoreCase(TASK_IN_PROGRESS);
 	/*
 	 * * This Predicate return true if it the task status is on hold.
 	 * 
 	 * @since version 1.0
 	 */
-	public static final Predicate<MainTaskDto> TASK_ON_HOLD_FILTER = task -> nonNull(task.getStatus())
+	public static final Predicate<MainTaskDto> ON_HOLD_TASK = task -> nonNull(task.getStatus())
 			&& task.getStatus().equalsIgnoreCase(TASK_ON_HOLD);
 	/*
 	 * * This Predicate return true if it the task status is completed.
 	 * 
 	 * @since version 1.0
 	 */
-	public static final Predicate<MainTaskDto> TASK_COMPLETED_FILTER = task -> nonNull(task.getStatus())
+	public static final Predicate<MainTaskDto> COMPLETED_TASK = task -> nonNull(task.getStatus())
 			&& task.getStatus().equalsIgnoreCase(TASK_COMPLETED);
 
 }
