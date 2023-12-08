@@ -5,6 +5,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +25,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -39,8 +42,10 @@ import lombok.extern.slf4j.Slf4j;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig implements WebMvcConfigurer {
 
+	@Autowired
+	@Qualifier("handlerExceptionResolver")
+	private HandlerExceptionResolver exceptionResolver;
 	private final CustomUserDetails customUserDetails;
-	private final JwtAuthenticationFilter authenticationFilter;
 	private final JWTAuthenticationEntryPoint authenticationEntryPoint;
 
 	@Bean
@@ -58,7 +63,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 			}
 		}).exceptionHandling(handling -> handling.authenticationEntryPoint(authenticationEntryPoint))
 				.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-		http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 		http.authenticationProvider(daoAuthenticationProvider());
 
@@ -68,6 +73,10 @@ public class SecurityConfig implements WebMvcConfigurer {
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return NoOpPasswordEncoder.getInstance();
+	}
+	@Bean
+	JwtAuthenticationFilter authenticationFilter() {
+		return new JwtAuthenticationFilter(exceptionResolver);
 	}
 
 	@Bean

@@ -14,16 +14,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
-import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.UserDetail;
-import ai.rnt.crm.util.RSAToJwtDecoder;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,14 +32,21 @@ import lombok.extern.slf4j.Slf4j;
  * @version 1.0
  * @since 19-08-2023
  */
-@Component
-@RequiredArgsConstructor
+
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-	private final CustomUserDetails detailsService;
+	private HandlerExceptionResolver exceptionResolver;
+	
+	@Autowired
+	private  CustomUserDetails detailsService;
 
-	private final JWTTokenHelper helper;
+	@Autowired
+	private JWTTokenHelper helper;
+	
+	public JwtAuthenticationFilter(HandlerExceptionResolver exceptionResolver){
+		this.exceptionResolver=exceptionResolver;
+	}
 
 	/**
 	 * This method is entrypoint for every request of the application.<br>
@@ -64,7 +69,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				String userName;
 				if (requestTokenHeader.startsWith(TOKEN_PREFIX_BEARER) && nonNull(requestTokenHeader)) {
 					requestTokenHeader = requestTokenHeader.substring(7);
-					requestTokenHeader=RSAToJwtDecoder.rsaToJwtDecoder(requestTokenHeader);
 					userName = this.helper.extractUsername(requestTokenHeader);
 					UserDetail loadUserByUsername = this.detailsService.loadUserByUsername(userName);
 					if (Boolean.TRUE.equals(this.helper.validateToken(requestTokenHeader, loadUserByUsername))) {
@@ -74,12 +78,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 						getContext().setAuthentication(usernamePasswordAuthenticationToken);
 					}
 				}
-				filterChain.doFilter(request, response);
 			}
+			filterChain.doFilter(request, response);
 		} catch (Exception e) {
 			log.error("Got Excetion while checking request authorizations. Request: {} {} {}",
 					request.getHeader(AUTHORIZATION),e.getClass(), e.getMessage());
-				throw new CRMException(e);
+			exceptionResolver.resolveException(request, response, null, e);
 		}
 	}
 

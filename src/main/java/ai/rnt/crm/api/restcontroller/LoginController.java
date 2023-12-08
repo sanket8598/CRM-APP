@@ -10,28 +10,19 @@ import static ai.rnt.crm.constants.CRMConstants.FULL_NAME;
 import static ai.rnt.crm.constants.CRMConstants.ROLE;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.CRMConstants.TOKEN;
-import static ai.rnt.crm.constants.EncryptionAlgoConstants.RSA;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
-import static ai.rnt.crm.util.RSAToJwtDecoder.rsaToJwtDecoder;
 import static ai.rnt.crm.util.Sha1Encryptor.encryptThisString;
-import static java.util.Base64.getEncoder;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static javax.crypto.Cipher.ENCRYPT_MODE;
-import static javax.crypto.Cipher.getInstance;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.ResponseEntity.ok;
 
-import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.crypto.Cipher;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
@@ -77,7 +68,6 @@ public class LoginController {
 	private final CustomUserDetails customUserDetails;
 	private final PhoneNumberValidateApi api;
 	private final JWTTokenHelper helper;
-	public static Map<String, PrivateKey> keystore = new HashMap<>();
 
 	@PostMapping(LOGIN)
 	public ResponseEntity<JwtAuthResponse> createAuthenticationToken(
@@ -89,16 +79,9 @@ public class LoginController {
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
 			String token = helper.generateToken(customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()));
-			if (nonNull(token)) {
-				KeyPair keyPair = helper.getKeyPair();
-				Cipher cipher = getInstance(RSA);
-				cipher.init(ENCRYPT_MODE, keyPair.getPublic());
-				String newToken = getEncoder().encodeToString(cipher.doFinal(token.getBytes()));
-				keystore.put(newToken, keyPair.getPrivate());
-				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(newToken).build(), OK);
-			}
+			if (nonNull(token))
+				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).build(), OK);
 			return new ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(), NO_CONTENT);
-
 		} catch (Exception e) {
 			log.error("Error Occured while login.. {}", e.getLocalizedMessage());
 			throw new CRMException(e);
@@ -116,9 +99,7 @@ public class LoginController {
 				throw new ResponseStatusException(BAD_REQUEST, "token cannot be empty");
 
 			log.info("token inside tokenParse...{}", token.get(TOKEN));
-			String rsaToJwtDecoder = rsaToJwtDecoder(token.get(TOKEN));
-			log.info("token after RSA inside tokenParse...{}", rsaToJwtDecoder);
-			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(rsaToJwtDecoder));
+			JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(token.get(TOKEN)));
 			Map<String, Object> map = new LinkedHashMap<>();
 			map.put(FULL_NAME, json.get(FULL_NAME));
 			map.put(ROLE, json.get(ROLE));

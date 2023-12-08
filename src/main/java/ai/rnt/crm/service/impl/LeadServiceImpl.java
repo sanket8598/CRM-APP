@@ -342,6 +342,7 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData() {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
+			log.info("user looged in..{}",auditAwareUtil.getLoggedInStaffId());
 			Map<String, Object> dataMap = new HashMap<>();
 			dataMap.put(SERVICE_FALL_DATA,
 					TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
