@@ -9,6 +9,7 @@ import static ai.rnt.crm.dto_mapper.CallTaskDtoMapper.TO_GET_CALL_TASK_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.TaskUtil.checkDuplicateTask;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
@@ -40,6 +41,7 @@ import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.CallService;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.TaskUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -217,6 +219,10 @@ public class CallServiceImpl implements CallService {
 			if (lead.isPresent())
 				phoneCallTask.setAssignTo(lead.get().getEmployee());
 			callDaoService.getCallById(callId).ifPresent(phoneCallTask::setCall);
+			if (checkDuplicateTask(callDaoService.getAllTask(), phoneCallTask)) {
+				result.put(MESSAGE, "Task Already Exists !!");
+				result.put(SUCCESS, false);
+			} 
 			if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Added Successfully..!!");

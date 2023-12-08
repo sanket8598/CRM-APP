@@ -2,16 +2,16 @@ package ai.rnt.crm.util;
 
 import static java.util.Objects.nonNull;
 import static java.util.regex.Pattern.compile;
+import static lombok.AccessLevel.PRIVATE;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.exception.CRMException;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,23 +21,8 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@NoArgsConstructor(access = PRIVATE)
 public class LeadsCardUtil {
-
-	private LeadsCardUtil() {
-
-	}
-
-	private static final Map<String, String> fieldMap = new HashMap<>();
-	static {
-		fieldMap.put("Lead Name", "firstName+lastName");
-		fieldMap.put("Topic", "topic");
-		fieldMap.put("Company Name", "companyMaster.companyName");
-		fieldMap.put("Designation", "designation");
-		fieldMap.put("Budget Amount", "budgetAmount");
-		fieldMap.put("Service Falls Into", "serviceFallsMaster.serviceName");
-		fieldMap.put("Lead Source", "leadSourceMaster.sourceName");
-		fieldMap.put("Lead Assign Username", "employee.firstName+employee.lastName");
-	}
 
 	public static String shortName(String fName, String lName) {
 		try {
