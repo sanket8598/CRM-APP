@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import ai.rnt.crm.entity.PhoneCallTask;
+import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.exception.CRMException;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,32 @@ public class TaskUtil {
 						&& task.getDescription().equals(phoneCallTask.getDescription())
 						&& task.getDueTime().equals(phoneCallTask.getDueTime())
 						&& task.isRemainderOn() == phoneCallTask.isRemainderOn()) {
+					status = true;
+					break;
+				}
+			}
+			return status;
+		} catch (Exception e) {
+			log.info("Got Exception while checking the DuplicateTask..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public static boolean checkDuplicateVisitTask(List<VisitTask> allTask, VisitTask visitTask) {
+		boolean status = false;
+		try {
+			if (isNull(allTask) || allTask.isEmpty())
+				status = false;
+			for (VisitTask task : allTask) {
+				if (task.getSubject().equals(visitTask.getSubject()) && task.getStatus().equals(visitTask.getStatus())
+						&& task.getPriority().equals(visitTask.getPriority())
+						&& compareDatesIgnoringTime(task.getDueDate(), visitTask.getDueDate())
+						&& task.getRemainderVia().equals(visitTask.getRemainderVia())
+						&& task.getRemainderDueAt().equals(visitTask.getRemainderDueAt())
+						&& compareDatesIgnoringTime(task.getRemainderDueOn(), visitTask.getRemainderDueOn())
+						&& task.getDescription().equals(visitTask.getDescription())
+						&& task.getDueTime().equals(visitTask.getDueTime())
+						&& task.isRemainderOn() == visitTask.isRemainderOn()) {
 					status = true;
 					break;
 				}
