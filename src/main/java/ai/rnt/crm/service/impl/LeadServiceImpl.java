@@ -24,7 +24,6 @@ import static ai.rnt.crm.constants.StatusConstants.QUALIFIED_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.constants.StatusConstants.VISIT;
-import static ai.rnt.crm.dto.CompanyDto.builder;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
@@ -743,8 +742,9 @@ public class LeadServiceImpl implements LeadService {
 						.apply(companyMasterDaoService.save(companyMaster).orElseThrow(ResourceNotFoundException::new))
 						.ifPresent(lead::setCompanyMaster);
 			} else {
-				CompanyMaster companyMaster = TO_COMPANY.apply(
-						builder().companyName(dto.getCompanyName()).companyWebsite(dto.getCompanyWebsite()).build())
+				CompanyMaster companyMaster = TO_COMPANY
+						.apply(CompanyDto.builder().companyName(dto.getCompanyName())
+								.companyWebsite(dto.getCompanyWebsite()).build())
 						.orElseThrow(ResourceNotFoundException::new);
 				if (findByCountryName.isPresent())
 					findByCountryName.ifPresent(companyMaster::setCountry);
@@ -1049,7 +1049,7 @@ public class LeadServiceImpl implements LeadService {
 					TO_COMPANY
 							.apply(companyMasterDaoService
 									.save(TO_COMPANY
-											.apply(builder().companyName(leadDto.getCompanyName())
+											.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
 													.companyWebsite(leadDto.getCompanyWebsite()).build())
 											.orElseThrow(ResourceNotFoundException::new))
 									.orElseThrow(ResourceNotFoundException::new))

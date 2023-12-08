@@ -7,7 +7,6 @@ import static ai.rnt.crm.constants.ApiConstants.LOGIN;
 import static ai.rnt.crm.constants.ApiConstants.TOKENPARSE;
 import static ai.rnt.crm.constants.EncryptionAlgoConstants.RSA;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
-import static ai.rnt.crm.payloads.JwtAuthResponse.builder;
 import static ai.rnt.crm.util.RSAToJwtDecoder.rsaToJwtDecoder;
 import static ai.rnt.crm.util.Sha1Encryptor.encryptThisString;
 import static java.util.Base64.getEncoder;
@@ -91,9 +90,9 @@ public class LoginController {
 				cipher.init(ENCRYPT_MODE, keyPair.getPublic());
 				String newToken = getEncoder().encodeToString(cipher.doFinal(token.getBytes()));
 				keystore.put(newToken, keyPair.getPrivate());
-				return new ResponseEntity<>(builder().status(true).token(newToken).build(), OK);
+				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(newToken).build(), OK);
 			}
-			return new ResponseEntity<>(builder().status(false).token(null).build(), NO_CONTENT);
+			return new ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(), NO_CONTENT);
 
 		} catch (Exception e) {
 			log.error("Error Occured while login.. {}", e.getLocalizedMessage());
