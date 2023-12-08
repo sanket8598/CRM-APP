@@ -3,6 +3,7 @@ package ai.rnt.crm.util;
 import static java.util.Objects.isNull;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -30,11 +31,12 @@ public class TaskUtil {
 				if (task.getSubject().equals(phoneCallTask.getSubject())
 						&& task.getStatus().equals(phoneCallTask.getStatus())
 						&& task.getPriority().equals(phoneCallTask.getPriority())
-						&& compareDates(task.getDueDate(), phoneCallTask.getDueDate())
+						&& compareDatesIgnoringTime(task.getDueDate(), phoneCallTask.getDueDate())
 						&& task.getRemainderVia().equals(phoneCallTask.getRemainderVia())
 						&& task.getRemainderDueAt().equals(phoneCallTask.getRemainderDueAt())
-						&& task.getRemainderDueOn().equals(phoneCallTask.getRemainderDueOn())
+						&& compareDatesIgnoringTime(task.getRemainderDueOn(), phoneCallTask.getRemainderDueOn())
 						&& task.getDescription().equals(phoneCallTask.getDescription())
+						&& task.getDueTime().equals(phoneCallTask.getDueTime())
 						&& task.isRemainderOn() == phoneCallTask.isRemainderOn()) {
 					status = true;
 					break;
@@ -47,18 +49,8 @@ public class TaskUtil {
 		}
 	}
 
-	private static boolean compareDates(Date date1, Date date2) {
-		Date oldDate = clearTimeComponents(date1);
-		Date newDate = clearTimeComponents(date2);
-		return oldDate.equals(newDate);
-	}
-
-	private static Date clearTimeComponents(Date date) {
-		// Set the time components to midnight (00:00:00)
-		date.setHours(0);
-		date.setMinutes(0);
-		date.setSeconds(0);
-		date.setTime((date.getTime() / 86400000) * 86400000); // Clear milliseconds
-		return date;
+	private static boolean compareDatesIgnoringTime(Date oldDate, Date newDate) {
+		return oldDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+				.equals(newDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 	}
 }
