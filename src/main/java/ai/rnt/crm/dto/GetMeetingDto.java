@@ -14,7 +14,7 @@ public class GetMeetingDto {
 
 	private String meetingTitle;
 
-	private String participates;
+	private List<String> participants;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date startDate;

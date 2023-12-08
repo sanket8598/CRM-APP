@@ -1,25 +1,26 @@
 package ai.rnt.crm.dto_mapper;
 
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static lombok.AccessLevel.PRIVATE;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.GetVisitDto;
 import ai.rnt.crm.dto.VisitDto;
 import ai.rnt.crm.entity.Visit;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = PRIVATE)
 public class VisitDtoMapper {
-
-	VisitDtoMapper() {
-
-	}
 
 	/**
 	 * This function will convert VisitDto into optional Visit Entity. <b>This
@@ -77,12 +78,13 @@ public class VisitDtoMapper {
 	 *
 	 */
 	public static final Function<Collection<Visit>, List<EditVisitDto>> TO_EDIT_VISIT_DTOS = e -> e.stream()
-			.map(dm -> TO_EDIT_VISIT_DTO.apply(dm).get()).collect(Collectors.toList());
+			.map(dm -> TO_EDIT_VISIT_DTO.apply(dm).get()).collect(toList());
 
 	public static final Function<Visit, Optional<GetVisitDto>> TO_GET_VISIT_DTO = e -> {
 		Optional<GetVisitDto> getVisitDto = evalMapper(e, GetVisitDto.class);
-		getVisitDto.ifPresent(l -> l.setParticipates(
-				nonNull(e.getParticipates()) ? Arrays.toString(e.getParticipates().split(",")) : null));
+		getVisitDto.ifPresent(l -> l.setParticipants(nonNull(e.getParticipates()) && !e.getParticipates().isEmpty()
+				? Stream.of(e.getParticipates().split(",")).map(String::trim).collect(toList())
+				: emptyList()));
 		return getVisitDto;
 	};
 }

@@ -20,7 +20,7 @@ public class ExcelHeaderDaoServiceImpl implements ExcelHeaderDaoService {
 
 	@Override
 	@Cacheable(value = "excelHeaders")
-	public List<ExcelHeaderMaster> getAllExcelHeaders() {
+	public List<ExcelHeaderMaster> getExcelHeadersFromDB() {
 		return excelHeaderRepository.findAll();
 	}
 }

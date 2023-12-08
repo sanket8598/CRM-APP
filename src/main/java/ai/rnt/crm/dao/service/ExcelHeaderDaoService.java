@@ -6,5 +6,5 @@ import ai.rnt.crm.entity.ExcelHeaderMaster;
 
 public interface ExcelHeaderDaoService{
 
-	public List <ExcelHeaderMaster> getAllExcelHeaders();
+	public List <ExcelHeaderMaster> getExcelHeadersFromDB();
 }

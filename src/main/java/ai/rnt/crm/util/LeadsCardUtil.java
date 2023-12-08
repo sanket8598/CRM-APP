@@ -1,7 +1,7 @@
 package ai.rnt.crm.util;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.regex.Pattern.compile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +41,7 @@ public class LeadsCardUtil {
 
 	public static String shortName(String fName, String lName) {
 		try {
-			Pattern pattern = Pattern.compile("^.");
+			Pattern pattern = compile("^.");
 			Matcher firstNameMatcher = pattern.matcher(fName);
 			Matcher lastNameMatcher = pattern.matcher(lName);
 			if (firstNameMatcher.find() && lastNameMatcher.find())
@@ -58,7 +58,7 @@ public class LeadsCardUtil {
 	public static String shortName(String fullName) {
 		Matcher firstNameMatcher = null;
 		Matcher lastNameMatcher = null;
-		Pattern pattern = Pattern.compile("^.");
+		Pattern pattern = compile("^.");
 		try {
 			if (Objects.nonNull(fullName) && fullName.trim().contains(" ")) {
 				String[] result = fullName.split(" ");
@@ -86,55 +86,33 @@ public class LeadsCardUtil {
 	 * @since version 1.0
 	 */
 	public static boolean checkDuplicateLead(List<Leads> allLeads, Leads newLead) {
-		boolean flag = false;
-		try {
-			if (isNull(allLeads) || allLeads.isEmpty())
-				return false;
-			for (Leads leads : allLeads) {
-				if (leads.getFirstName().equals(newLead.getFirstName())
-						&& leads.getLastName().equals(newLead.getLastName())
-						&& ((isNull(leads.getBudgetAmount()) && isNull(newLead.getBudgetAmount()))
-								|| leads.getBudgetAmount().equals(newLead.getBudgetAmount()))
-						&& ((isNull(leads.getBusinessCard()) && isNull(newLead.getBusinessCard()))
-								|| leads.getBusinessCard().equals(newLead.getBusinessCard()))
-						&& ((isNull(leads.getCompanyWebsite()) && isNull(newLead.getCompanyWebsite()))
-								|| leads.getCompanyWebsite().equals(newLead.getCompanyWebsite()))
-						&& ((isNull(leads.getCompanyMaster()) && isNull(newLead.getCompanyMaster()))
-								|| (isNull(leads.getCompanyMaster().getCompanyId())
-										&& isNull(newLead.getCompanyMaster().getCompanyId()))
-								|| leads.getCompanyMaster().getCompanyId()
-										.equals(newLead.getCompanyMaster().getCompanyId()))
-						&& ((isNull(leads.getCustomerNeed()) && isNull(newLead.getCustomerNeed()))
-								|| leads.getCustomerNeed().equals(newLead.getCustomerNeed()))
-						&& ((isNull(leads.getDesignation()) && isNull(newLead.getDesignation()))
-								|| leads.getDesignation().equals(newLead.getDesignation()))
-						&& leads.getEmail().equals(newLead.getEmail())
-						&& leads.getPhoneNumber().equals(newLead.getPhoneNumber())
-						&& ((isNull(leads.getProposedSolution()) && isNull(newLead.getProposedSolution()))
-								|| leads.getProposedSolution().equals(newLead.getProposedSolution()))
-						&& ((isNull(leads.getTopic()) && isNull(newLead.getTopic()))
-								|| leads.getTopic().equals(newLead.getTopic()))
-						&& (isNull(leads.getLeadSourceMaster()) && isNull(newLead.getLeadSourceMaster())
-								|| (isNull(leads.getLeadSourceMaster().getLeadSourceId())
-										&& isNull(newLead.getLeadSourceMaster().getLeadSourceId()))
-								|| leads.getLeadSourceMaster().getLeadSourceId()
-										.equals(newLead.getLeadSourceMaster().getLeadSourceId()))
-						&& (isNull(leads.getServiceFallsMaster()) && isNull(newLead.getServiceFallsMaster())
-								|| (isNull(leads.getServiceFallsMaster().getServiceFallsId())
-										&& isNull(newLead.getServiceFallsMaster().getServiceFallsId()))
-								|| leads.getServiceFallsMaster().getServiceFallsId()
-										.equals(newLead.getServiceFallsMaster().getServiceFallsId()))
-
-				) {
-					flag = true;
-					break;
-				}
-			}
-			return flag;
-		} catch (Exception e) {
-			log.info("Got Exception while checking the DuplicateLead..{}", e.getMessage());
-			throw new CRMException(e);
-		}
+		return nonNull(newLead) && allLeads.stream().filter(Objects::nonNull)
+				.anyMatch(lead -> Objects.equals(lead.getFirstName(), newLead.getFirstName())
+						&& Objects.equals(lead.getLastName(), newLead.getLastName())
+						&& Objects.equals(lead.getBudgetAmount(), newLead.getBudgetAmount())
+						&& Objects.equals(lead.getBusinessCard(), newLead.getBusinessCard())
+						&& Objects.equals(lead.getCompanyWebsite(), newLead.getCompanyWebsite())
+						&& Objects.equals(
+								nonNull(lead.getCompanyMaster()) ? lead.getCompanyMaster().getCompanyId() : null,
+								nonNull(newLead.getCompanyMaster()) ? newLead.getCompanyMaster().getCompanyId() : null)
+						&& Objects.equals(lead.getCustomerNeed(), newLead.getCustomerNeed())
+						&& Objects.equals(lead.getDesignation(), newLead.getDesignation())
+						&& Objects.equals(lead.getEmail(), newLead.getEmail())
+						&& Objects.equals(lead.getProposedSolution(), newLead.getProposedSolution())
+						&& Objects.equals(lead.getTopic(), newLead.getTopic())
+						&& Objects.equals(nonNull(lead.getLeadSourceMaster())
+								? lead.getLeadSourceMaster().getLeadSourceId()
+								: null,
+								nonNull(newLead.getLeadSourceMaster())
+										? newLead.getLeadSourceMaster().getLeadSourceId()
+										: null)
+						&& Objects.equals(
+								nonNull(lead.getServiceFallsMaster()) ? lead.getServiceFallsMaster().getServiceFallsId()
+										: null,
+								nonNull(newLead.getServiceFallsMaster())
+										? newLead.getServiceFallsMaster().getServiceFallsId()
+										: null)
+						&& Objects.equals(lead.getPhoneNumber(), newLead.getPhoneNumber()));
 	}
 
 }

@@ -22,7 +22,7 @@ public class EmployeeToDtoMapper {
 	 * @since 15-09-2023
 	 * @version 1.0 
 	 */
-	public static final Function<EmployeeMaster, Optional<EmployeeDto>> TO_Employee = e -> {
+	public static final Function<EmployeeMaster, Optional<EmployeeDto>> TO_EMPLOYEE = e -> {
 		EmployeeDto employee = evalMapper(e, EmployeeDto.class).get();
 		employee.setEmployeeRole(TO_Roles.apply(e.getEmployeeRole()));
 		return Optional.of(employee);
@@ -33,7 +33,7 @@ public class EmployeeToDtoMapper {
 	 *
 	 */
 	public static final Function<Collection<EmployeeMaster>, Collection<EmployeeDto>> TO_Employees = e ->{
-		return e.stream().map(dm -> TO_Employee.apply(dm).get()).collect(Collectors.toList());
+		return e.stream().map(dm -> TO_EMPLOYEE.apply(dm).get()).collect(Collectors.toList());
 	};
 	
 	public static final Function<EmployeeDto, Optional<EmployeeMaster>> TO_EmployeeMaster = e -> evalMapper(e, EmployeeMaster.class);

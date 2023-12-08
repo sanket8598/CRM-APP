@@ -1,6 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
-import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employee;
+import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
@@ -33,7 +33,7 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 
 	@Override
 	public Optional<EmployeeDto> getServiceFallById(Integer assignTo) {
-		return TO_Employee.apply(employeeMasterRepository.findById(assignTo)
+		return TO_EMPLOYEE.apply(employeeMasterRepository.findById(assignTo)
 				.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", assignTo)));
 	}
 
