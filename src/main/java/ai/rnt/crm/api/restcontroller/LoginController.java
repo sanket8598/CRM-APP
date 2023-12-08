@@ -110,7 +110,6 @@ public class LoginController {
 	public ResponseEntity<Map<String, Object>> tokenDecode(
 			@RequestBody @NotEmpty(message = "body should not be empty!!") Map<String, String> token) {
 		try {
-
 			if (isNull(token.get(TOKEN)))
 				throw new ResponseStatusException(BAD_REQUEST, "token cannot be null");
 			if (token.get(TOKEN).trim().length() <= 0)

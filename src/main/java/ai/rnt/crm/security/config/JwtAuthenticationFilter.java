@@ -53,6 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		try {
+			log.info("entered inside the security entryPoint with...{}",request.getServletPath());
 			if (ALLOW_URL.test(request.getServletPath())) {
 				filterChain.doFilter(request, response);
 				return;
@@ -73,13 +74,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 						getContext().setAuthentication(usernamePasswordAuthenticationToken);
 					}
 				}
+				filterChain.doFilter(request, response);
 			}
-			filterChain.doFilter(request, response);
 		} catch (Exception e) {
 			log.error("Got Excetion while checking request authorizations. Request: {} {} {}",
 					request.getHeader(AUTHORIZATION),e.getClass(), e.getMessage());
 				throw new CRMException(e);
-					
 		}
 	}
 

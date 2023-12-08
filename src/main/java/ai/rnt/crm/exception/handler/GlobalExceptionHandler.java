@@ -4,7 +4,9 @@ import static ai.rnt.crm.constants.MessageConstants.ACCESS_DENIED;
 import static ai.rnt.crm.constants.MessageConstants.BAD_CREDENTIALS;
 import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
 import static ai.rnt.crm.util.HttpUtils.getURL;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import java.security.InvalidKeyException;
@@ -141,12 +143,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 
 	@ExceptionHandler(CRMException.class)
-	private ResponseEntity<ApiError> handleCRMException(CRMException exc) {
+	private ResponseEntity<ApiError> handleCRMException(CRMException exc) throws Throwable {
 		log.info("handling CRM Exception....{}", exc.getLocalizedMessage());
-		return new ResponseEntity<>(
-				new ApiError(false,
-						exc.getException() instanceof BadCredentialsException ? BAD_CREDENTIALS :(exc.getException() instanceof InvalidKeyException?TOKEN_EXPIRED: exc.getMessage())),
-				HttpStatus.INTERNAL_SERVER_ERROR);
+		if(exc.getException() instanceof BadCredentialsException)
+			return new ResponseEntity<>(new ApiError(false,BAD_CREDENTIALS),HttpStatus.BAD_REQUEST);
+		else if(exc.getException() instanceof InvalidKeyException)
+			return new ResponseEntity<>(new ApiError(false,TOKEN_EXPIRED),HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(new ApiError(false,getRootCause(exc).getMessage()),INTERNAL_SERVER_ERROR);
 	}
 
 	@Override
@@ -199,13 +202,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler({ SQLException.class })
 	private ResponseEntity<ApiError> handleDBException(Exception exc) {
 		log.error("handle DB connection exception and api error handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.TOO_MANY_REQUESTS);
+		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), HttpStatus.TOO_MANY_REQUESTS);
 	}
 
 	@ExceptionHandler(Exception.class)
 	private ResponseEntity<ApiError> handleAllException(Exception exc) {
 		log.error("inside All exception and api error handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(new ApiError(false,getRootCause(exc).getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }
