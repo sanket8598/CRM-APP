@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -82,6 +83,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		String error = ex.getParameterName() + " parameter is missing";
+		ApiError apiError = new ApiError(BAD_REQUEST, ex.getLocalizedMessage(), Arrays.asList(error));
+		log.error("handleMissingServletRequestParameter api error: {}", apiError);
+		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getHttpStatus());
+	}
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * @since version 1.0
+	 */
+	@Override
+	protected ResponseEntity<Object> handleMissingServletRequestPart(MissingServletRequestPartException ex,
+			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		String error = ex.getRequestPartName() + " parameter is missing";
 		ApiError apiError = new ApiError(BAD_REQUEST, ex.getLocalizedMessage(), Arrays.asList(error));
 		log.error("handleMissingServletRequestParameter api error: {}", apiError);
 		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getHttpStatus());

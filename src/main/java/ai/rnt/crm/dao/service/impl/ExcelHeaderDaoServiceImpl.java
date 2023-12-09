@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import static ai.rnt.crm.constants.CacheConstant.EXCEL_HEADER;
 import java.util.List;
 
 import org.springframework.cache.annotation.Cacheable;
@@ -19,7 +20,7 @@ public class ExcelHeaderDaoServiceImpl implements ExcelHeaderDaoService {
 	private final ExcelHeaderRepository excelHeaderRepository;
 
 	@Override
-	@Cacheable(value = "excelHeaders")
+	@Cacheable(value = EXCEL_HEADER)
 	public List<ExcelHeaderMaster> getExcelHeadersFromDB() {
 		return excelHeaderRepository.findAll();
 	}

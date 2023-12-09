@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class CompanyMasterServiceImpl implements CompanyMasterDaoService{
+public class CompanyMasterDaoServiceImpl implements CompanyMasterDaoService{
 	
 	private final CompanyMasterRepository companyMasterRepository;
 	

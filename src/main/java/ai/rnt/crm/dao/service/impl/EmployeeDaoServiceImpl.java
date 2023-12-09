@@ -39,12 +39,14 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 
 	@Override
 	public Optional<EmployeeMaster> findByName(String firstName, String lastName) {
-		return employeeMasterRepository.findByFirstNameAndLastName(firstName,lastName);
+		return employeeMasterRepository.findByFirstNameAndLastName(firstName, lastName);
 	}
 
 	@Override
 	public List<String> activeEmployeeEmailIds() {
-		return employeeMasterRepository.findEmailIdByDepartureDateIsNullOrDepartureDateBefore(LocalDate.now()).stream().filter(e->nonNull(e) && nonNull(e.getEmailId())).map(EmailIdProjection::getEmailId).collect(Collectors.toList());
+		return employeeMasterRepository.findEmailIdByDepartureDateIsNullOrDepartureDateBefore(LocalDate.now()).stream()
+				.filter(e -> nonNull(e) && nonNull(e.getEmailId())).map(EmailIdProjection::getEmailId)
+				.collect(Collectors.toList());
 	}
 
 }

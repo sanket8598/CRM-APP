@@ -1,10 +1,14 @@
 package ai.rnt.crm.dao.service.impl;
 
+import static ai.rnt.crm.constants.CacheConstant.LEADS;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
 
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,33 +27,37 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 	private final ImpLeadRepository impLeadRepositroy;
 
 	@Override
+	@CacheEvict(value = LEADS,allEntries = true)
 	public Leads addLead(Leads leads) {
 		return leadsRepository.save(leads);
 	}
 
 	@Override
+	@Cacheable(value = LEADS)
 	public List<Leads> getLeadsByStatus(String leadsStatus) {
 		return leadsRepository.findByStatusOrderByCreatedDateDesc(leadsStatus);
 	}
 
 	@Override
+	@Cacheable(value = LEADS)
 	public List<Leads> getAllLeads() {
 		return leadsRepository.findByOrderByCreatedDateDesc();
 	}
 
 	@Override
+	@Cacheable(value = LEADS)
 	public List<Leads> getLeadDashboardData() {
 		return leadsRepository.findByOrderByCreatedDateDesc();
 	}
 
 	@Override
-	public Optional<Leads> getLeadById(Integer id) {
-		return leadsRepository.findById(id);
+	public Optional<Leads> getLeadById(Integer leadId) {
+		return leadsRepository.findById(leadId);
 	}
 
 	@Override
 	public Optional<LeadImportant> addImportantLead(LeadImportant leadImportant) {
-		return Optional.of(impLeadRepositroy.save(leadImportant));
+		return ofNullable(impLeadRepositroy.save(leadImportant));
 	}
 
 	@Override
