@@ -90,10 +90,10 @@ public class ReadExcelUtil {
 		try {
 			Row row = sheet.getRow(0);
 			if (nonNull(row))
-				rangeClosed(0, row.getPhysicalNumberOfCells())
+				rangeClosed(0, row.getPhysicalNumberOfCells()).filter(i-> nonNull(row.getCell(i)))
 						.forEach(r -> headerList.add(row.getCell(r).getStringCellValue()));
 		} catch (Exception e) {
-			log.error("Exception Occured while fetching the excel header:" + e);
+			log.error("Exception Occured while fetching the excel header: {}",e.getMessage());
 		}
 		return headerList;
 	}

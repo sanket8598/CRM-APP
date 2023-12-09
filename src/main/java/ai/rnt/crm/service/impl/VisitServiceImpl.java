@@ -9,6 +9,7 @@ import static ai.rnt.crm.dto_mapper.VisitTaskDtoMapper.TO_VISIT_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.TaskUtil.checkDuplicateVisitTask;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
@@ -220,7 +221,10 @@ public class VisitServiceImpl implements VisitService {
 			if (lead.isPresent())
 				visitTask.setAssignTo(lead.get().getEmployee());
 			visitDaoService.getVisitsByVisitId(visitId).ifPresent(visitTask::setVisit);
-			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
+			if (checkDuplicateVisitTask(visitDaoService.getAllTask(), visitTask)) {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Already Exists !!");
+			} else if (nonNull(visitDaoService.addVisitTask(visitTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Added Successfully..!!");
 			} else {
@@ -258,6 +262,7 @@ public class VisitServiceImpl implements VisitService {
 			visitTask.setStatus(dto.getStatus());
 			visitTask.setPriority(dto.getPriority());
 			visitTask.setDueDate(dto.getUpdateDueDate());
+			visitTask.setDueTime(dto.getDueTime());
 			visitTask.setRemainderDueAt(dto.getRemainderDueAt());
 			visitTask.setRemainderDueOn(dto.getRemainderDueOn());
 			visitTask.setRemainderOn(dto.isRemainderOn());

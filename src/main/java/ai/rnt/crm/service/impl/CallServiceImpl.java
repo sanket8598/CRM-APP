@@ -9,6 +9,7 @@ import static ai.rnt.crm.dto_mapper.CallTaskDtoMapper.TO_GET_CALL_TASK_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.TaskUtil.checkDuplicateTask;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
@@ -217,7 +218,11 @@ public class CallServiceImpl implements CallService {
 			if (lead.isPresent())
 				phoneCallTask.setAssignTo(lead.get().getEmployee());
 			callDaoService.getCallById(callId).ifPresent(phoneCallTask::setCall);
-			if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
+			if (checkDuplicateTask(callDaoService.getAllTask(), phoneCallTask)) {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Already Exists !!");
+			} 
+			else if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Added Successfully..!!");
 			} else {
@@ -254,6 +259,7 @@ public class CallServiceImpl implements CallService {
 			phoneCallTask.setSubject(dto.getSubject());
 			phoneCallTask.setStatus(dto.getStatus());
 			phoneCallTask.setDueDate(dto.getUpdateDueDate());
+			phoneCallTask.setDueTime(dto.getDueTime());
 			phoneCallTask.setPriority(dto.getPriority());
 			phoneCallTask.setRemainderOn(dto.isRemainderOn());
 			phoneCallTask.setRemainderDueOn(dto.getRemainderDueOn());

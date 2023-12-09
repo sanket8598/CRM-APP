@@ -4,8 +4,14 @@ import static ai.rnt.crm.constants.MessageConstants.ACCESS_DENIED;
 import static ai.rnt.crm.constants.MessageConstants.BAD_CREDENTIALS;
 import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
 import static ai.rnt.crm.util.HttpUtils.getURL;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_ACCEPTABLE;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import java.security.InvalidKeyException;
 import java.sql.SQLException;
@@ -39,6 +45,9 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.DTOConvertionException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.payloads.ApiError;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -112,7 +121,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 		log.error("error occured while invalid request body...{}", ex);
-		return new ResponseEntity<>(new ApiError(false, ex.getMessage()), HttpStatus.NOT_ACCEPTABLE);
+		return new ResponseEntity<>(new ApiError(false, ex.getMessage()), NOT_ACCEPTABLE);
 	}
 
 	@Override
@@ -133,20 +142,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		log.info("handling ResourceNotFoundException....{}", exc.getLocalizedMessage());
 		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.NOT_FOUND);
 	}
+
 	@ExceptionHandler(InvalidKeyException.class)
 	private ResponseEntity<ApiError> handleInvalidKeyException(InvalidKeyException exc) {
 		log.error("handle InvalidKeyException handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), UNAUTHORIZED);
 	}
 
-
 	@ExceptionHandler(CRMException.class)
-	private ResponseEntity<ApiError> handleCRMException(CRMException exc) {
+	private ResponseEntity<ApiError> handleCRMException(CRMException exc) throws Throwable {
 		log.info("handling CRM Exception....{}", exc.getLocalizedMessage());
-		return new ResponseEntity<>(
-				new ApiError(false,
-						exc.getException() instanceof BadCredentialsException ? BAD_CREDENTIALS :(exc.getException() instanceof InvalidKeyException?TOKEN_EXPIRED: exc.getMessage())),
-				HttpStatus.INTERNAL_SERVER_ERROR);
+		if (exc.getException() instanceof BadCredentialsException)
+			return new ResponseEntity<>(new ApiError(false, BAD_CREDENTIALS), BAD_REQUEST);
+		else if (exc.getException() instanceof InvalidKeyException)
+			return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), UNAUTHORIZED);
+		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), INTERNAL_SERVER_ERROR);
 	}
 
 	@Override
@@ -187,25 +197,39 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(ConstraintViolationException.class)
 	private ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException exc) {
 		List<String> errors = new ArrayList<>();
-		exc.getConstraintViolations().forEach(e->{
-			String fieldName =  e.getPropertyPath().toString();
+		exc.getConstraintViolations().forEach(e -> {
+			String fieldName = e.getPropertyPath().toString();
 			errors.add(fieldName + ": " + e.getMessage());
 		});
 		log.error("handle Contraint not valid api error: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(BAD_REQUEST, !errors.isEmpty() ? errors.get(0).split(":")[1] : null, errors),
-				BAD_REQUEST);
+		return new ResponseEntity<>(
+				new ApiError(BAD_REQUEST, !errors.isEmpty() ? errors.get(0).split(":")[1] : null, errors), BAD_REQUEST);
 	}
+	
+	 @ExceptionHandler(SignatureException.class)
+	    public ResponseEntity<ApiError> handleSignatureException(SignatureException ex) {
+		 return new ResponseEntity<>(new ApiError(false,"JWT Signature Is Not Valid!!"), UNAUTHORIZED);
+	    }
+	 @ExceptionHandler(ExpiredJwtException.class)
+	 public ResponseEntity<ApiError> handleSignatureException(ExpiredJwtException ex) {
+		 return new ResponseEntity<>(new ApiError(false,TOKEN_EXPIRED), UNAUTHORIZED);
+	 }
+	 @ExceptionHandler(MalformedJwtException.class)
+	 public ResponseEntity<ApiError> handleMalformedJwtException(MalformedJwtException ex) {
+		 return new ResponseEntity<>(new ApiError(false,"JWT Token is Not Valid!!"), FORBIDDEN);
+	 }
+	
 
 	@ExceptionHandler({ SQLException.class })
 	private ResponseEntity<ApiError> handleDBException(Exception exc) {
 		log.error("handle DB connection exception and api error handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.TOO_MANY_REQUESTS);
+		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), TOO_MANY_REQUESTS);
 	}
 
 	@ExceptionHandler(Exception.class)
 	private ResponseEntity<ApiError> handleAllException(Exception exc) {
-		log.error("inside All exception and api error handler: {}", exc.getMessage());
-		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		log.error("inside All exception and api error handler: {}{}", exc.getMessage(),exc);
+		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), INTERNAL_SERVER_ERROR);
 	}
 
 }

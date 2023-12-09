@@ -51,4 +51,9 @@ public class VisitDaoServiceImpl implements VisitDaoService {
 	public Optional<VisitTask> getVisitTaskById(Integer taskId) {
 		return visitTaskRepository.findById(taskId);
 	}
+
+	@Override
+	public List<VisitTask> getAllTask() {
+		return visitTaskRepository.findAll();
+	}
 }

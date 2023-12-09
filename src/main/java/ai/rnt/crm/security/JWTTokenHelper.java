@@ -8,6 +8,7 @@ import static java.util.Objects.nonNull;
 
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.spec.ECGenParameterSpec;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,9 +45,11 @@ public class JWTTokenHelper {
 	private final EmployeeService service;
 	@Value("${jwt.secret.key}")
 	private String secret;
+	
 
-	public static final long JWT_TOKEN_VALIDITY = 20000 * 60 * 60;
-
+	public static final long JWT_TOKEN_VALIDITY = 300 * 60 * 60; //18 minutes
+	// Singleton instance of KeyPair
+    private static final KeyPair keyPair = generateECKeyPair();
 	public String extractUsername(String token) {
 		return extractClaim(token, Claims::getSubject);
 	}
@@ -61,7 +64,7 @@ public class JWTTokenHelper {
 	}
 
 	private Claims extractAllClaims(String token) {
-		return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+		return Jwts.parser().setSigningKey(keyPair.getPublic()).parseClaimsJws(token).getBody();
 	}
 
 	private Boolean isTokenExpired(String token) {
@@ -83,7 +86,7 @@ public class JWTTokenHelper {
 	private String createToken(Map<String, Object> claims, String subject) {
 		return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
 				.setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-				.signWith(SignatureAlgorithm.HS256, secret).compact();
+				.signWith(SignatureAlgorithm.ES512,keyPair.getPrivate()).compact();
 	}
 
 	public Boolean validateToken(String token, UserDetails userDetails) {
@@ -105,4 +108,16 @@ public class JWTTokenHelper {
 	public String getfullNameOfLoggedInUser(String token) {
 		return nonNull(this.extractAllClaims(token)) ? this.extractAllClaims(token).get(FULL_NAME).toString() : null;
 	}
+	
+	private static KeyPair generateECKeyPair() {
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
+            ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("secp521r1");
+            keyPairGenerator.initialize(ecGenParameterSpec);
+            return keyPairGenerator.generateKeyPair();
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating key pair", e);
+        }
+    }
+	
 }

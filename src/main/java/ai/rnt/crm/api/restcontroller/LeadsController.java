@@ -10,7 +10,6 @@ import static ai.rnt.crm.constants.ApiConstants.GET_DROP_DOWN_DATA;
 import static ai.rnt.crm.constants.ApiConstants.GET_LEADS_BY_STATUS;
 import static ai.rnt.crm.constants.ApiConstants.LEAD;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
-import static ai.rnt.crm.constants.RoleConstants.CHECK_USER_ACCESS;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class LeadsController {
 	}
 
 	// for the open views table data
-	@PreAuthorize(CHECK_USER_ACCESS)
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping(DASHBOARD_ALL_LEADS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardData() {
 		return leadService.getLeadDashboardData();

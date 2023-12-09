@@ -13,10 +13,11 @@ public interface VisitDaoService extends CrudService<Visit, VisitDto> {
 
 	List<Visit> getVisitsByLeadId(Integer leadId);
 
-	Optional <Visit> getVisitsByVisitId(Integer visitId);
+	Optional<Visit> getVisitsByVisitId(Integer visitId);
 
 	VisitTask addVisitTask(VisitTask visitTask);
 
 	Optional<VisitTask> getVisitTaskById(Integer taskId);
 
+	List<VisitTask> getAllTask();
 }

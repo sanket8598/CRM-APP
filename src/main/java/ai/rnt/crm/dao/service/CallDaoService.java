@@ -24,4 +24,6 @@ public interface CallDaoService extends CrudService<Call, CallDto> {
 	PhoneCallTask addCallTask(PhoneCallTask phoneCallTask);
 
 	Optional<PhoneCallTask> getCallTaskById(Integer taskId);
+
+	List<PhoneCallTask> getAllTask();
 }

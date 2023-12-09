@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadTaskDaoService;
+import ai.rnt.crm.dto.GetLeadTaskDto;
 import ai.rnt.crm.dto.LeadTaskDto;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.LeadTask;
@@ -77,7 +78,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(LeadTaskDto dto, Integer taskId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(GetLeadTaskDto dto, Integer taskId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
@@ -85,7 +86,8 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			leadTask.setSubject(dto.getSubject());
 			leadTask.setStatus(dto.getStatus());
 			leadTask.setPriority(dto.getPriority());
-			leadTask.setDueDate(dto.getDueDate());
+			leadTask.setDueDate(dto.getUpdateDueDate());
+			leadTask.setDueTime(dto.getDueTime());
 			leadTask.setRemainderOn(dto.isRemainderOn());
 			leadTask.setRemainderDueOn(dto.getRemainderDueOn());
 			leadTask.setRemainderDueAt(dto.getRemainderDueAt());
