@@ -20,6 +20,8 @@ public class LeadTaskDto {
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date dueDate;
+	
+	private String dueTime;
 
 	private String description;
 
