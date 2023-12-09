@@ -1,9 +1,7 @@
 package ai.rnt.crm.entity;
 
-import static javax.persistence.GenerationType.IDENTITY;
 import static javax.persistence.CascadeType.ALL;
-
-import java.sql.Date;
+import static javax.persistence.GenerationType.IDENTITY;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,7 +36,7 @@ public class Contacts extends Auditable {
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "crm_contact_id")
-	private Integer crmContactId;
+	private Integer contactId;
 
 	@Column(name = "fname")
 	private String firstName;
@@ -48,9 +46,6 @@ public class Contacts extends Auditable {
 
 	@Column(name = "designtion")
 	private String designtion;
-
-	@Column(name = "department")
-	private String department;
 
 	@Column(name = "work_email")
 	private String workEmail;
@@ -70,17 +65,12 @@ public class Contacts extends Auditable {
 
 	@Column(name = "linkedin_id")
 	private String linkedinId;
+	
+	@Column(name = "is_primary",columnDefinition = "boolean default false")
+	private Boolean primary;
 
-	@Column(name = "communication_log")
-	private String communicationLog;
-
-	@Column(name = "touchpoint")
-	private String touchpoint;
-
-	@Column(name = "remark")
-	private String remark;
-
-	@Column(name = "followup_date")
-	private Date followUpDate;
+	@ManyToOne(cascade=ALL)
+	@JoinColumn(name = "lead_Id")
+	private Leads lead;
 
 }
