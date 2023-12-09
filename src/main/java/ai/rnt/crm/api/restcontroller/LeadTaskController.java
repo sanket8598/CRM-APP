@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ai.rnt.crm.dto.GetLeadTaskDto;
 import ai.rnt.crm.dto.LeadTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.LeadTaskService;
@@ -43,7 +44,7 @@ public class LeadTaskController {
 	}
 
 	@PutMapping("/update/{taskId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(@RequestBody LeadTaskDto dto,
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(@RequestBody GetLeadTaskDto dto,
 			@PathVariable(name = "taskId") Integer taskId) {
 		return leadTaskService.updateTask(dto, taskId);
 	}

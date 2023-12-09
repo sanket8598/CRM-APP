@@ -7,6 +7,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 
+import ai.rnt.crm.dto.GetLeadTaskDto;
 import ai.rnt.crm.dto.LeadTaskDto;
 import ai.rnt.crm.enums.ApiResponse;
 
@@ -16,7 +17,7 @@ public interface LeadTaskService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getLeadTask(Integer taskId);
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(LeadTaskDto dto, Integer taskId);
+	ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(GetLeadTaskDto dto, Integer taskId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> assignTask(Map<String, Integer> map);
 

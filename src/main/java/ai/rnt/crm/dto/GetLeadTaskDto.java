@@ -17,8 +17,13 @@ public class GetLeadTaskDto {
 
 	private String priority;
 
-	@JsonFormat(pattern = "dd-MMM-yyyy")
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private Date updateDueDate;
+	
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date dueDate;
+	
+	private String dueTime;
 
 	private String description;
 
@@ -28,6 +33,6 @@ public class GetLeadTaskDto {
 
 	private String remainderDueAt;
 
-	@JsonFormat(pattern = "dd-MMM-yyyy")
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date remainderDueOn;
 }
