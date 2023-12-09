@@ -67,7 +67,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				if (isNull(requestTokenHeader))
 					throw new MissingServletRequestPartException("AUTHORIZATION Header is missing");
 				String userName;
-				if (requestTokenHeader.startsWith(TOKEN_PREFIX_BEARER) && nonNull(requestTokenHeader)) {
+				if (nonNull(requestTokenHeader) && requestTokenHeader.startsWith(TOKEN_PREFIX_BEARER)) {
 					requestTokenHeader = requestTokenHeader.substring(7);
 					userName = this.helper.extractUsername(requestTokenHeader);
 					UserDetail loadUserByUsername = this.detailsService.loadUserByUsername(userName);
