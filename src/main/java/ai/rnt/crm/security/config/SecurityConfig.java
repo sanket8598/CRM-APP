@@ -56,8 +56,12 @@ public class SecurityConfig implements WebMvcConfigurer {
 				csrf.disable().authorizeHttpRequests()
 						// we can give give access to the api based on the role or using
 						// e.g.antMatchers("/api/users/{path}").hasRole(null)
-						.antMatchers(PUBLIC_URLS).permitAll().antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-						.requestMatchers(CorsUtils::isPreFlightRequest).permitAll().anyRequest().authenticated();
+						.antMatchers(PUBLIC_URLS).permitAll().antMatchers(HttpMethod.OPTIONS, "/**").permitAll().
+						anyRequest().authenticated().and().
+						cors().and().
+						exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).and()
+						.sessionManagement()
+						.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 			} catch (Exception e) {
 				log.error("error occurred in the securityFilterChain... {}", e.getMessage());
 			}
