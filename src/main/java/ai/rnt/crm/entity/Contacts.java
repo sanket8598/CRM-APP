@@ -71,7 +71,7 @@ public class Contacts extends Auditable {
 	@Column(name = "business_card_type")
 	private String businessCardType;
 
-	@ManyToOne(cascade=ALL)
+	@ManyToOne
 	@JoinColumn(name = "company_id",nullable = true)
 	private CompanyMaster companyMaster;
 
