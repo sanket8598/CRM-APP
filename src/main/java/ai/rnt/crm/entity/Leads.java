@@ -5,6 +5,7 @@ import static javax.persistence.CascadeType.DETACH;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.GenerationType.IDENTITY;
+import static org.hibernate.annotations.LazyCollectionOption.FALSE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +86,10 @@ public class Leads extends Auditable {
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "service_falls_id")
 	private ServiceFallsMaster serviceFallsMaster;
+	
+	@OneToMany(mappedBy = "lead",orphanRemoval = true)
+	@LazyCollection(FALSE)
+	private List<Contacts> contacts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "lead", cascade = ALL)
 	private List<Email> emails = new ArrayList<>();
@@ -104,6 +109,4 @@ public class Leads extends Auditable {
 	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
 	private List<LeadTask> leadTasks = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "lead",orphanRemoval = true)
-	private List<Contacts> contacts = new ArrayList<>();
 }

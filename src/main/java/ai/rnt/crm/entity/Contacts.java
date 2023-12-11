@@ -70,15 +70,16 @@ public class Contacts extends Auditable {
 
 	@Column(name = "business_card_type")
 	private String businessCardType;
+	
+	@ManyToOne(cascade=ALL)
+	@JoinColumn(name = "lead_Id",nullable = true)
+	private Leads lead;
 
 	@ManyToOne
 	@JoinColumn(name = "company_id",nullable = true)
 	private CompanyMaster companyMaster;
 
 
-	@ManyToOne(cascade=ALL)
-	@JoinColumn(name = "lead_Id",nullable = true)
-	private Leads lead;
 
 	@Column(name = "is_primary",columnDefinition = "boolean default false")
 	private Boolean primary;
