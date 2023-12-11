@@ -1,5 +1,8 @@
 package ai.rnt.crm.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ai.rnt.crm.util.LeadsCardUtil;
 import lombok.Data;
 
@@ -9,16 +12,8 @@ public class EditLeadDto {
 	
 	private Integer leadId;
 
-	private String firstName;
-
-	private String lastName;
-
-	private String phoneNumber;
-
 	private String topic;
 
-	private String email;
-	
 	private String budgetAmount;
 
 	private Integer assignTo;
@@ -33,8 +28,6 @@ public class EditLeadDto {
 	
 	private LeadSourceDto leadSourceMaster;
 	
-	private CompanyDto companyMaster;
-	
 	private String message;
 	
 	private String generatedBy;
@@ -43,13 +36,16 @@ public class EditLeadDto {
 	
 	private String pseudoName;
 	
+	private ContactDto primaryContact;
 	
 	public String getShortName() {
-		return LeadsCardUtil.shortName(getFirstName(), getLastName());
+		return LeadsCardUtil.shortName(primaryContact.getFirstName(), primaryContact.getLastName());
 	}
 
 	public String getFullName() {
-		return getFirstName()+" "+getLastName();
+		return primaryContact.getFirstName()+" "+primaryContact.getLastName();
 	}
 
+	private List<ContactDto> contacts = new ArrayList<>();
+	
 }

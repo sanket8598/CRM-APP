@@ -44,8 +44,8 @@ public class Contacts extends Auditable {
 	@Column(name = "lname")
 	private String lastName;
 
-	@Column(name = "designtion")
-	private String designtion;
+	@Column(name = "designation")
+	private String designation;
 
 	@Column(name = "work_email")
 	private String workEmail;
@@ -53,24 +53,33 @@ public class Contacts extends Auditable {
 	@Column(name = "personal_email")
 	private String personalEmail;
 
-	@Column(name = "contact_number_primary")
+	@Column(name = "contact_no_primary")
 	private String contactNumberPrimary;
 
-	@Column(name = "contact_number_secondary")
+	@Column(name = "contact_no_secondary")
 	private String contactNumberSecondary;
-
-	@ManyToOne(cascade=ALL)
-	@JoinColumn(name = "company_id")
-	private CompanyMaster companyMaster;
-
+	
 	@Column(name = "linkedin_id")
 	private String linkedinId;
 	
-	@Column(name = "is_primary",columnDefinition = "boolean default false")
-	private Boolean primary;
+	@Column(name = "business_card", columnDefinition = "LONGTEXT")
+	private String businessCard;
+
+	@Column(name = "business_card_name")
+	private String businessCardName;
+
+	@Column(name = "business_card_type")
+	private String businessCardType;
 
 	@ManyToOne(cascade=ALL)
-	@JoinColumn(name = "lead_Id")
+	@JoinColumn(name = "company_id",nullable = true)
+	private CompanyMaster companyMaster;
+
+
+	@ManyToOne(cascade=ALL)
+	@JoinColumn(name = "lead_Id",nullable = true)
 	private Leads lead;
 
+	@Column(name = "is_primary",columnDefinition = "boolean default false")
+	private Boolean primary;
 }

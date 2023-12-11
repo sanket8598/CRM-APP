@@ -15,7 +15,6 @@ import ai.rnt.crm.dto.LeadsCardDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.util.ConvertDateFormatUtil;
-import ai.rnt.crm.util.LeadsCardUtil;
 
 public class LeadsDtoMapper {
 
@@ -73,7 +72,7 @@ public class LeadsDtoMapper {
 	
 	public static final Function<Leads, Optional<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTO = e -> {
 		Optional<LeadsCardDto> leadDashboardDto = evalMapper(e, LeadsCardDto.class);
-		leadDashboardDto.ifPresent(l->l.setShortName(LeadsCardUtil.shortName(e.getFirstName(), e.getLastName())));
+	//	leadDashboardDto.ifPresent(l->l.setShortName(LeadsCardUtil.shortName(e.getFirstName(), e.getLastName())));
 		return leadDashboardDto;
 	};
 

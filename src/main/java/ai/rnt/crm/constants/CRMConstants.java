@@ -17,7 +17,7 @@ public final class CRMConstants {
 	public static final String SERVICE_FALLS_MASTER="ServiceFallMaster";
 	public static final String SERVICE_FALL_ID="serviceFallId";
 	public static final String SERVICE_FALL="serviceFalls";
-	public static final String CONTACT="Contact";
+	public static final String LEAD_INFO="LeadInfo";
 	public static final String LEAD_SOURCE="leadSource";
 	public static final String TIMELINE="Timeline";
 	public static final String ACTIVITY="Activity";
