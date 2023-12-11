@@ -14,6 +14,9 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMaster, 
 	Optional<EmployeeMaster> findByUserId(String userId);
 
 	Optional<EmployeeMaster> findByFirstNameAndLastName(String firstName, String lastName);
-	
-	List<EmailIdProjection> findEmailIdByDepartureDateIsNullOrDepartureDateBefore(LocalDate deparatureDateShouldSmaller);
+
+	List<EmailIdProjection> findEmailIdByDepartureDateIsNullOrDepartureDateBefore(
+			LocalDate deparatureDateShouldSmaller);
+
+	EmailIdProjection findEmailIdByStaffId(Integer staffId);
 }

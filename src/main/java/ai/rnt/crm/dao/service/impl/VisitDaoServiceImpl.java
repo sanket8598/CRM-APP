@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,5 +56,10 @@ public class VisitDaoServiceImpl implements VisitDaoService {
 	@Override
 	public List<VisitTask> getAllTask() {
 		return visitTaskRepository.findAll();
+	}
+
+	@Override
+	public List<VisitTask> getTodaysAllVisitTask(Date todayAsDate, String time) {
+		return visitTaskRepository.findByRemainderDueOnAndRemainderDueAtAndRemainderOn(todayAsDate, time, true);
 	}
 }

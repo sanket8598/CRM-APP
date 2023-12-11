@@ -26,8 +26,8 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.springframework.stereotype.Component;
 
-import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.Attachment;
+import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.exception.CRMException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -90,7 +90,8 @@ public class EmailUtil {
 					 */
 					.append("<br>").append(String.format("%s", sendEmail.getContent())).append("<br><br>")
 					.append("Regards,").append("<br>");
-	//				.append(sendEmail.getLead().getFirstName() + " " + sendEmail.getLead().getLastName());
+			// .append(sendEmail.getLead().getFirstName() + " " +
+			// sendEmail.getLead().getLastName());
 			if (sendEmail.getAttachment().isEmpty())
 				msg = sendAsPlainText(msg, content.toString());
 			else
@@ -145,4 +146,73 @@ public class EmailUtil {
 		return msg;
 	}
 
+	public static Message sendCallTaskRemainderMail(String mailId) {
+		try {
+			Message msg = new MimeMessage(getSession());
+
+			InternetAddress[] recipientAddress = new InternetAddress[1];
+			recipientAddress[0] = new InternetAddress(mailId);
+			msg.setFrom(new InternetAddress(USERNAME));
+			msg.setRecipients(Message.RecipientType.TO, recipientAddress);
+			msg.setSubject("Remainder of call task.");
+			msg.setSentDate(new Date());
+			StringBuilder content = new StringBuilder().append("<br>").append(String.format("%s",
+					"This email for remainder of your task. please check your current task on CRM application."))
+					.append("<br><br>").append("Regards,").append("<br>").append("From RNT-CRM team");
+			msg.setContent(content.toString(), "text/html");
+			Transport.send(msg);
+			return msg;
+		} catch (Exception e) {
+			log.info("Got Exception while sending call task remainder mail..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public static Message sendVisitTaskRemainderMail(String emailId) {
+		try {
+			Message msg = new MimeMessage(getSession());
+
+			InternetAddress[] recipientAddress = new InternetAddress[1];
+			recipientAddress[0] = new InternetAddress(emailId);
+			msg.setFrom(new InternetAddress(USERNAME));
+			msg.setRecipients(Message.RecipientType.TO, recipientAddress);
+			msg.setSubject("Remainder Of Visit Task.");
+			msg.setSentDate(new Date());
+			StringBuilder content = new StringBuilder().append("<br>")
+					.append(String.format("%s",
+							"This email for remainder of your visit related task."
+									+ " \n Please check your current task on CRM application."))
+					.append("<br><br>").append("Regards,").append("<br>").append("From RNT-CRM Team");
+			msg.setContent(content.toString(), "text/html");
+			Transport.send(msg);
+			return msg;
+		} catch (Exception e) {
+			log.info("Got Exception while sending call task remainder mail..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public static Object sendMeetingTaskRemainderMail(String emailId) {
+		try {
+			Message msg = new MimeMessage(getSession());
+
+			InternetAddress[] recipientAddress = new InternetAddress[1];
+			recipientAddress[0] = new InternetAddress(emailId);
+			msg.setFrom(new InternetAddress(USERNAME));
+			msg.setRecipients(Message.RecipientType.TO, recipientAddress);
+			msg.setSubject("Remainder Of Meeting Task.");
+			msg.setSentDate(new Date());
+			StringBuilder content = new StringBuilder().append("<br>")
+					.append(String.format("%s",
+							"This email for remainder of your meeting related task."
+									+ " \n Please check your current task on CRM application."))
+					.append("<br><br>").append("Regards,").append("<br>").append("From RNT-CRM Team");
+			msg.setContent(content.toString(), "text/html");
+			Transport.send(msg);
+			return msg;
+		} catch (Exception e) {
+			log.info("Got Exception while sending call task remainder mail..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
 }

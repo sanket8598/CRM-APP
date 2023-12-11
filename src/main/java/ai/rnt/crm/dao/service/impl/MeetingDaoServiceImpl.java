@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,5 +51,10 @@ public class MeetingDaoServiceImpl implements MeetingDaoService {
 	@Override
 	public Optional<MeetingTask> getMeetingTaskById(Integer taskId) {
 		return meetingTaskRepository.findById(taskId);
+	}
+
+	@Override
+	public List<MeetingTask> getTodaysMeetingTask(Date todayAsDate, String time) {
+		return meetingTaskRepository.findByRemainderDueOnAndRemainderDueAtAndRemainderOn(todayAsDate, time, true);
 	}
 }
