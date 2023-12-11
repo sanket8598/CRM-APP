@@ -1,9 +1,6 @@
 package ai.rnt.crm.security.config;
 
 import static ai.rnt.crm.security.AuthenticationUtil.PUBLIC_URLS;
-import static org.springframework.security.config.Customizer.withDefaults;
-
-import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,10 +18,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -50,18 +44,14 @@ public class SecurityConfig implements WebMvcConfigurer {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(withDefaults());
+        http.cors();
 		http.csrf(csrf -> {
 			try {
 				csrf.disable().authorizeHttpRequests()
 						// we can give give access to the api based on the role or using
 						// e.g.antMatchers("/api/users/{path}").hasRole(null)
-						.antMatchers(PUBLIC_URLS).permitAll().antMatchers(HttpMethod.OPTIONS, "/**").permitAll().
-						anyRequest().authenticated().and().
-						cors().and().
-						exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).and()
-						.sessionManagement()
-						.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+						.antMatchers(PUBLIC_URLS).permitAll().antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+						.requestMatchers(CorsUtils::isPreFlightRequest).permitAll().anyRequest().authenticated();
 			} catch (Exception e) {
 				log.error("error occurred in the securityFilterChain... {}", e.getMessage());
 			}

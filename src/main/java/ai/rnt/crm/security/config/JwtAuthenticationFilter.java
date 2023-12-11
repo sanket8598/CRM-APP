@@ -2,6 +2,7 @@ package ai.rnt.crm.security.config;
 
 import static ai.rnt.crm.constants.SecurityConstant.TOKEN_PREFIX_BEARER;
 import static ai.rnt.crm.security.AuthenticationUtil.ALLOW_URL;
+import static java.lang.Boolean.TRUE;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -71,7 +72,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 					requestTokenHeader = requestTokenHeader.substring(7);
 					userName = this.helper.extractUsername(requestTokenHeader);
 					UserDetail loadUserByUsername = this.detailsService.loadUserByUsername(userName);
-					if (Boolean.TRUE.equals(this.helper.validateToken(requestTokenHeader, loadUserByUsername))) {
+					if (TRUE.equals(this.helper.validateToken(requestTokenHeader, loadUserByUsername))) {
 						UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 								requestTokenHeader, null, loadUserByUsername.getAuthorities());
 						usernamePasswordAuthenticationToken.setDetails(loadUserByUsername);

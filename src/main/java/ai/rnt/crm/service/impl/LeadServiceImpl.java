@@ -927,8 +927,8 @@ public class LeadServiceImpl implements LeadService {
 	public Leads buildLeadObj(LeadDto leadDto) {
 		Leads leads = TO_LEAD.apply(leadDto).orElseThrow(ResourceNotFoundException::new);
 		try {
-			leadDto.setStatus(OPEN);
-			leadDto.setDisqualifyAs(OPEN);
+			leads.setStatus(OPEN);
+			leads.setDisqualifyAs(OPEN);
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
 			setCompanyDetailsToLead(existCompany, leadDto, leads);
 			if (nonNull(leadDto.getServiceFallsId()) && !leadDto.getServiceFallsId().isEmpty()) {

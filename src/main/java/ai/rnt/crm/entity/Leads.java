@@ -133,4 +133,7 @@ public class Leads extends Auditable {
 
 	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
 	private List<LeadTask> leadTasks = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
+	private List<Contacts> contacts = new ArrayList<>();
 }
