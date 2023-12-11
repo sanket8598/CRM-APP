@@ -48,20 +48,8 @@ public class Leads extends Auditable {
 	@Column(name = "lead_id")
 	private Integer leadId;
 
-	@Column(name = "f_name")
-	private String firstName;
-
-	@Column(name = "l_name")
-	private String lastName;
-
-	@Column(name = "phone_no")
-	private String phoneNumber;
-
 	@Column(name = "topic")
 	private String topic;
-
-	@Column(name = "email")
-	private String email;
 
 	@Column(name = "status")
 	private String status;
@@ -71,20 +59,9 @@ public class Leads extends Auditable {
 	@ManyToOne
 	private EmployeeMaster employee;
 
-	@Column(name = "company_website")
-	private String companyWebsite;
-
 	@Column(name = "budget_amount")
 	private String budgetAmount;
 
-	@Column(name = "business_card", columnDefinition = "LONGTEXT")
-	private String businessCard;
-
-	@Column(name = "business_card_name")
-	private String businessCardName;
-
-	@Column(name = "business_card_type")
-	private String businessCardType;
 
 	@Column(name = "customer_need")
 	private String customerNeed;
@@ -98,9 +75,6 @@ public class Leads extends Auditable {
 	@Column(name = "disqualify_reason")
 	private String disqualifyReason;
 
-	@Column(name = "designation")
-	private String designation;
-
 	@Column(name = "pseudo_name")
 	private String pseudoName;
 
@@ -111,10 +85,6 @@ public class Leads extends Auditable {
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "service_falls_id")
 	private ServiceFallsMaster serviceFallsMaster;
-
-	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
-	@JoinColumn(name = "company_id")
-	private CompanyMaster companyMaster;
 
 	@OneToMany(mappedBy = "lead", cascade = ALL)
 	private List<Email> emails = new ArrayList<>();
@@ -134,6 +104,6 @@ public class Leads extends Auditable {
 	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
 	private List<LeadTask> leadTasks = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "lead",orphanRemoval = true)
 	private List<Contacts> contacts = new ArrayList<>();
 }

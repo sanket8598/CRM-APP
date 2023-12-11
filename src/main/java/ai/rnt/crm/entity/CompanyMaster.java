@@ -66,9 +66,6 @@ public class CompanyMaster extends Auditable {
 	@Column(name = "zipcode")
 	private String zipCode;
 	
-	@OneToMany(mappedBy="companyMaster",cascade ={ ALL })
-	private List<Leads> leads=new ArrayList<>();
-	
 	@OneToMany(mappedBy="companyMaster",cascade =ALL)
 	private List<Contacts> contacts=new ArrayList<>();
 }

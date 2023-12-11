@@ -11,7 +11,7 @@ public class ContactDto {
 
 	private String lastName;
 
-	private String designtion;
+	private String designation;
 
 	private String workEmail;
 
@@ -26,6 +26,12 @@ public class ContactDto {
 	private String linkedinId;
 	
 	private Boolean primary;
+	
+	private String businessCard;
+
+	private String businessCardName;
+
+	private String businessCardType;
 
 
 }

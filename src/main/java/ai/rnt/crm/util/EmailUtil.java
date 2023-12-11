@@ -89,8 +89,8 @@ public class EmailUtil {
 					 * sendEmail.getLead().getLastName()))
 					 */
 					.append("<br>").append(String.format("%s", sendEmail.getContent())).append("<br><br>")
-					.append("Regards,").append("<br>")
-					.append(sendEmail.getLead().getFirstName() + " " + sendEmail.getLead().getLastName());
+					.append("Regards,").append("<br>");
+	//				.append(sendEmail.getLead().getFirstName() + " " + sendEmail.getLead().getLastName());
 			if (sendEmail.getAttachment().isEmpty())
 				msg = sendAsPlainText(msg, content.toString());
 			else

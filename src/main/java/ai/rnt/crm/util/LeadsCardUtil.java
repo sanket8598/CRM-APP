@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.exception.CRMException;
 import lombok.NoArgsConstructor;
@@ -70,34 +71,38 @@ public class LeadsCardUtil {
 	 * 
 	 * @since version 1.0
 	 */
+
 	public static boolean checkDuplicateLead(List<Leads> allLeads, Leads newLead) {
-		return nonNull(newLead) && allLeads.stream().filter(Objects::nonNull)
-				.anyMatch(lead -> Objects.equals(lead.getFirstName(), newLead.getFirstName())
-						&& Objects.equals(lead.getLastName(), newLead.getLastName())
-						&& Objects.equals(lead.getBudgetAmount(), newLead.getBudgetAmount())
-						&& Objects.equals(lead.getBusinessCard(), newLead.getBusinessCard())
-						&& Objects.equals(lead.getCompanyWebsite(), newLead.getCompanyWebsite())
+		Contacts primaryContact = newLead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null);
+		return (nonNull(primaryContact) && allLeads.stream().flatMap(lead -> lead.getContacts().stream())
+				.filter(Objects::nonNull)
+				.anyMatch(contact -> Objects.equals(contact.getFirstName(), primaryContact.getFirstName())
+						&& Objects.equals(contact.getLastName(), primaryContact.getLastName())
+						&& Objects.equals(contact.getBusinessCard(), primaryContact.getBusinessCard())
 						&& Objects.equals(
-								nonNull(lead.getCompanyMaster()) ? lead.getCompanyMaster().getCompanyId() : null,
-								nonNull(newLead.getCompanyMaster()) ? newLead.getCompanyMaster().getCompanyId() : null)
-						&& Objects.equals(lead.getCustomerNeed(), newLead.getCustomerNeed())
-						&& Objects.equals(lead.getDesignation(), newLead.getDesignation())
-						&& Objects.equals(lead.getEmail(), newLead.getEmail())
+								nonNull(contact.getCompanyMaster()) ? contact.getCompanyMaster().getCompanyId() : null,
+								nonNull(primaryContact.getCompanyMaster())
+										? primaryContact.getCompanyMaster().getCompanyId()
+										: null)
+						&& Objects.equals(contact.getDesignation(), primaryContact.getDesignation())
+						&& Objects.equals(contact.getWorkEmail(), primaryContact.getWorkEmail())
+						&& Objects.equals(contact.getContactNumberPrimary(), primaryContact.getContactNumberPrimary())))
+				&& nonNull(newLead)
+				&& allLeads.stream().filter(Objects::nonNull).anyMatch(lead -> Objects.equals(lead.getBudgetAmount(),
+						newLead.getBudgetAmount()) && Objects.equals(lead.getCustomerNeed(), newLead.getCustomerNeed())
 						&& Objects.equals(lead.getProposedSolution(), newLead.getProposedSolution())
 						&& Objects.equals(lead.getTopic(), newLead.getTopic())
-						&& Objects.equals(nonNull(lead.getLeadSourceMaster())
-								? lead.getLeadSourceMaster().getLeadSourceId()
-								: null,
-								nonNull(newLead.getLeadSourceMaster())
-										? newLead.getLeadSourceMaster().getLeadSourceId()
+						&& Objects.equals(
+								nonNull(lead.getLeadSourceMaster()) ? lead.getLeadSourceMaster().getLeadSourceId()
+										: null,
+								nonNull(newLead.getLeadSourceMaster()) ? newLead.getLeadSourceMaster().getLeadSourceId()
 										: null)
 						&& Objects.equals(
 								nonNull(lead.getServiceFallsMaster()) ? lead.getServiceFallsMaster().getServiceFallsId()
 										: null,
 								nonNull(newLead.getServiceFallsMaster())
 										? newLead.getServiceFallsMaster().getServiceFallsId()
-										: null)
-						&& Objects.equals(lead.getPhoneNumber(), newLead.getPhoneNumber()));
+										: null));
 	}
 
 }

@@ -8,9 +8,13 @@ import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_SOURCE;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.SERVICE_FALLS_INTO;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
+import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static java.util.Objects.nonNull;
 
+import java.util.Optional;
+
 import ai.rnt.crm.dto.LeadsCardDto;
+import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.functional.custominterface.LeadsCardMapper;
 import ai.rnt.crm.functional.custominterface.PrimaryFieldMapper;
@@ -39,22 +43,31 @@ public class LeadsCardMapperImpl implements LeadsCardMapper {
 		switch (primaryField) {
 		case LEAD_NAME:
 			return (lead, leadsCardDto) -> {
-				leadsCardDto.setPrimaryField(lead.getFirstName() + " " + lead.getLastName());
-				leadsCardDto.setShortName(LeadsCardUtil.shortName(lead.getFirstName(), lead.getLastName()));
+				Optional<Contacts> contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst();
+				contact.ifPresent(c -> {
+					leadsCardDto.setPrimaryField(c.getFirstName() + " " + c.getLastName());
+					leadsCardDto.setShortName(shortName(c.getFirstName(), c.getLastName()));
+				});
 			};
 		case COMPANY_NAME:
 			return (lead, leadsCardDto) -> {
-				leadsCardDto.setPrimaryField(
-						nonNull(lead.getCompanyMaster()) ? lead.getCompanyMaster().getCompanyName() : null);
-				leadsCardDto.setShortName(
-						nonNull(lead.getCompanyMaster()) && nonNull(lead.getCompanyMaster().getCompanyName())
-								? LeadsCardUtil.shortName(lead.getCompanyMaster().getCompanyName())
-								: null);
+				Optional<Contacts> contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst();
+				contact.ifPresent(c -> {
+					leadsCardDto.setPrimaryField(
+							nonNull(c.getCompanyMaster()) ? c.getCompanyMaster().getCompanyName() : null);
+					leadsCardDto.setShortName(
+							nonNull(c.getCompanyMaster()) && nonNull(c.getCompanyMaster().getCompanyName())
+									? LeadsCardUtil.shortName(c.getCompanyMaster().getCompanyName())
+									: null);
+				});
 			};
 		default:
 			return (lead, leadsCardDto) -> {
-				leadsCardDto.setPrimaryField(lead.getFirstName() + " " + lead.getLastName());
-				leadsCardDto.setShortName(LeadsCardUtil.shortName(lead.getFirstName(), lead.getLastName()));
+				Optional<Contacts> contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst();
+				contact.ifPresent(c -> {
+					leadsCardDto.setPrimaryField(c.getFirstName() + " " + c.getLastName());
+					leadsCardDto.setShortName(LeadsCardUtil.shortName(c.getFirstName(), c.getLastName()));
+				});
 			};
 		}
 	}
@@ -62,15 +75,32 @@ public class LeadsCardMapperImpl implements LeadsCardMapper {
 	private SecondaryFieldMapper getSecondaryFieldMapper(String secondaryField) {
 		switch (secondaryField) {
 		case LEAD_NAME:
-			return (lead, leadsCardDto) -> leadsCardDto
-					.setSecondaryField(lead.getFirstName() + " " + lead.getLastName());
+			return (lead, leadsCardDto) -> {
+				Optional<Contacts> contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst();
+				contact.ifPresent(c -> {
+					leadsCardDto.setPrimaryField(c.getFirstName() + " " + c.getLastName());
+					leadsCardDto.setShortName(shortName(c.getFirstName(), c.getLastName()));
+				});
+			};
 		case TOPIC:
 			return (lead, leadsCardDto) -> leadsCardDto.setSecondaryField(lead.getTopic());
 		case COMPANY_NAME:
-			return (lead, leadsCardDto) -> leadsCardDto.setSecondaryField(
-					nonNull(lead.getCompanyMaster()) ? lead.getCompanyMaster().getCompanyName() : null);
+			return (lead, leadsCardDto) -> {
+				Optional<Contacts> contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst();
+				contact.ifPresent(c -> {
+					leadsCardDto.setPrimaryField(
+							nonNull(c.getCompanyMaster()) ? c.getCompanyMaster().getCompanyName() : null);
+					leadsCardDto.setShortName(
+							nonNull(c.getCompanyMaster()) && nonNull(c.getCompanyMaster().getCompanyName())
+									? LeadsCardUtil.shortName(c.getCompanyMaster().getCompanyName())
+									: null);
+				});
+			};
 		case DESIGNATION:
-			return (lead, leadsCardDto) -> leadsCardDto.setSecondaryField(lead.getDesignation());
+			return (lead, leadsCardDto) -> {
+				Optional<Contacts> contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst();
+				contact.ifPresent(c -> leadsCardDto.setSecondaryField(c.getDesignation()));
+			};
 		case BUDGET_AMOUNT:
 			return (lead, leadsCardDto) -> leadsCardDto.setSecondaryField(lead.getBudgetAmount());
 		case SERVICE_FALLS_INTO:
