@@ -6,13 +6,13 @@ import static ai.rnt.crm.constants.CRMConstants.ALL_TASK_COUNT;
 import static ai.rnt.crm.constants.CRMConstants.ASSIGN_DATA;
 import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_COUNT;
 import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_KEY;
-import static ai.rnt.crm.constants.CRMConstants.LEAD_INFO;
 import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
 import static ai.rnt.crm.constants.CRMConstants.COUNT_BY_STATUS;
 import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_COUNT;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_KEY;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_ID;
+import static ai.rnt.crm.constants.CRMConstants.LEAD_INFO;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE_DATA;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE_MASTER;
@@ -96,6 +96,7 @@ import static ai.rnt.crm.functional.predicates.TaskPredicates.NOT_STARTED_TASK;
 import static ai.rnt.crm.functional.predicates.TaskPredicates.ON_HOLD_TASK;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
+import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static java.lang.Integer.parseInt;
 import static java.time.LocalDateTime.now;
@@ -107,7 +108,6 @@ import static java.util.Map.Entry.comparingByKey;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.of;
-import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -245,11 +245,11 @@ public class LeadServiceImpl implements LeadService {
 			else
 				employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leads::setEmployee);
 			createMap.put(SUCCESS, true);
-			Contacts contacts = setContactDetailsToLead(existCompany, leadDto,leads);
-		if (checkDuplicateLead(leadDaoService.getAllLeads(), leads)) {
-			createMap.put(MESSAGE, "Lead Already Exists !!");
-			createMap.put(SUCCESS, false);
-		}else if (nonNull(contactDaoService.addContact(contacts)))
+			Contacts contacts = setContactDetailsToLead(existCompany, leadDto, leads);
+			if (checkDuplicateLead(leadDaoService.getAllLeads(), leads)) {
+				createMap.put(MESSAGE, "Lead Already Exists !!");
+				createMap.put(SUCCESS, false);
+			} else if (nonNull(contactDaoService.addContact(contacts)))
 				createMap.put(MESSAGE, "Lead Added Successfully !!");
 			else
 				createMap.put(MESSAGE, "Lead Not Added !!");
@@ -345,7 +345,7 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData() {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
-			log.info("user looged in..{}",auditAwareUtil.getLoggedInStaffId());
+			log.info("user looged in..{}", auditAwareUtil.getLoggedInStaffId());
 			Map<String, Object> dataMap = new HashMap<>();
 			dataMap.put(SERVICE_FALL_DATA,
 					TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
@@ -440,7 +440,10 @@ public class LeadServiceImpl implements LeadService {
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			Optional<EditLeadDto> dto = TO_EDITLEAD_DTO.apply(leadById);
 			dto.ifPresent(e -> {
-				e.setPrimaryContact(TO_CONTACT_DTO.apply(leadById.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElseThrow(()->new ResourceNotFoundException("Priamry Contact"))).orElseThrow(ResourceNotFoundException::new));
+				e.setPrimaryContact(TO_CONTACT_DTO
+						.apply(leadById.getContacts().stream().filter(Contacts::getPrimary).findFirst()
+								.orElseThrow(() -> new ResourceNotFoundException("Priamry Contact")))
+						.orElseThrow(ResourceNotFoundException::new));
 				e.setMessage("Assigned To " + leadById.getEmployee().getFirstName() + " "
 						+ leadById.getEmployee().getLastName());
 				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy())
@@ -701,7 +704,8 @@ public class LeadServiceImpl implements LeadService {
 			Optional<StateMaster> findBystate = stateDaoService.findBystate(dto.getState());
 			Optional<CountryMaster> findByCountryName = countryDaoService.findByCountryName(dto.getCountry());
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
-			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElseThrow(()->new ResourceNotFoundException("Primary Contact"));
+			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
+					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
 			if (existCompany.isPresent()) {
 				CompanyMaster companyMaster = TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
 						.orElseThrow(ResourceNotFoundException::new);
@@ -735,7 +739,7 @@ public class LeadServiceImpl implements LeadService {
 				TO_COMPANY
 						.apply(companyMasterDaoService.save(companyMaster).orElseThrow(ResourceNotFoundException::new))
 						.ifPresent(contact::setCompanyMaster);
-				} else {
+			} else {
 				CompanyMaster companyMaster = TO_COMPANY
 						.apply(CompanyDto.builder().companyName(dto.getCompanyName())
 								.companyWebsite(dto.getCompanyWebsite()).build())
@@ -933,7 +937,7 @@ public class LeadServiceImpl implements LeadService {
 			leads.setStatus(OPEN);
 			leads.setDisqualifyAs(OPEN);
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
-			setContactDetailsToLead(existCompany, leadDto,leads);
+			setContactDetailsToLead(existCompany, leadDto, leads);
 			if (nonNull(leadDto.getServiceFallsId()) && !leadDto.getServiceFallsId().isEmpty()) {
 				Optional<ServiceFallsMaster> serviceFalls = serviceFallsDaoSevice
 						.findByName(leadDto.getServiceFallsId());
@@ -979,29 +983,33 @@ public class LeadServiceImpl implements LeadService {
 
 	public List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
 		return calls.stream().flatMap(call -> call.getCallTasks().stream())
-				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL, e.getDueDate(),
+				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,
+						convertDateDateWithTime(e.getDueDate(), e.getDueTime()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId()))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
-				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT, e.getDueDate(),
+				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,
+						convertDateDateWithTime(e.getDueDate(), e.getDueTime()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId()))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
 		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
-				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING, e.getDueDate(),
+				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,
+						convertDateDateWithTime(e.getDueDate(), e.getDueTime()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getMeetings().getMeetingId()))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getLeadRelatedTasks(Leads lead) {
-		return lead
-				.getLeadTasks().stream().map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(),
-						LEAD, e.getDueDate(), TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId()))
+		return lead.getLeadTasks().stream()
+				.map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(), LEAD,
+						convertDateDateWithTime(e.getDueDate(), e.getDueTime()),
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId()))
 				.collect(toList());
 	}
 
@@ -1032,41 +1040,41 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public Contacts setContactDetailsToLead(Optional<CompanyDto> existCompany, LeadDto leadDto, Leads leads) {
-		Contacts contact=new Contacts();
+		Contacts contact = new Contacts();
 		contact.setFirstName(leadDto.getFirstName());
 		contact.setLastName(leadDto.getLastName());
 		contact.setWorkEmail(leadDto.getEmail());
 		contact.setContactNumberPrimary(leadDto.getPhoneNumber());
 		contact.setDesignation(leadDto.getDesignation());
 		contact.setBusinessCard(leadDto.getBusinessCard());
-		contact.setBusinessCardName(leadDto.getBusinessCardName()); 	
-		contact.setBusinessCardType(leadDto.getBusinessCardType());	
+		contact.setBusinessCardName(leadDto.getBusinessCardName());
+		contact.setBusinessCardType(leadDto.getBusinessCardType());
 		contact.setPrimary(true);
-		setCompanyDetailsToContact(existCompany,leadDto, contact);
+		setCompanyDetailsToContact(existCompany, leadDto, contact);
 		contact.setLead(leads);
 		return contact;
-		}
-	
-	
-	public void setCompanyDetailsToContact(Optional<CompanyDto> existCompany, LeadDto leadDto,Contacts contact) {
+	}
+
+	public void setCompanyDetailsToContact(Optional<CompanyDto> existCompany, LeadDto leadDto, Contacts contact) {
 		if (existCompany.isPresent()) {
 			existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
-			contact.setCompanyMaster(TO_COMPANY
-					.apply(companyMasterDaoService
-							.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
+			contact.setCompanyMaster(
+					TO_COMPANY
+							.apply(companyMasterDaoService
+									.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
+											.orElseThrow(ResourceNotFoundException::new))
 									.orElseThrow(ResourceNotFoundException::new))
-							.orElseThrow(ResourceNotFoundException::new))
-					.orElseThrow(ResourceNotFoundException::new));
+							.orElseThrow(ResourceNotFoundException::new));
 		} else
 			contact.setCompanyMaster(
 					TO_COMPANY
-					.apply(companyMasterDaoService
-							.save(TO_COMPANY
-									.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
-											.companyWebsite(leadDto.getCompanyWebsite()).build())
+							.apply(companyMasterDaoService
+									.save(TO_COMPANY
+											.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
+													.companyWebsite(leadDto.getCompanyWebsite()).build())
+											.orElseThrow(ResourceNotFoundException::new))
 									.orElseThrow(ResourceNotFoundException::new))
-							.orElseThrow(ResourceNotFoundException::new))
-					.orElseThrow(ResourceNotFoundException::new));
+							.orElseThrow(ResourceNotFoundException::new));
 	}
 
 	private void setServiceFallsIntoAndLeadSourceToLead(String serviceFallsName, String leadSourceName, Leads leads)

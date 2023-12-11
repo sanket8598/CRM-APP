@@ -1,7 +1,5 @@
 package ai.rnt.crm.dto;
 
-import java.util.Date;
-
 import lombok.Data;
 
 @Data
@@ -14,14 +12,14 @@ public  class MainTaskDto {
 
 	private String type;
 	
-	private Date dueDate;
+	private String dueDate;
 	
 	private EmployeeDto assignTo;
 	
 	private Integer parentId;
 	
 
-	public MainTaskDto(Integer id, String subject, String status, String type,Date dueDate,EmployeeDto assignTo,Integer parentId) {
+	public MainTaskDto(Integer id, String subject, String status, String type,String dueDate,EmployeeDto assignTo,Integer parentId) {
 		super();
 		this.id = id;
 		this.subject = subject;
