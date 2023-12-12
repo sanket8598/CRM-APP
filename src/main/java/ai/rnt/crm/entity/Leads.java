@@ -88,7 +88,7 @@ public class Leads extends Auditable {
 	private ServiceFallsMaster serviceFallsMaster;
 	
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
-	@JoinColumn(name = "domain_master_id")
+	@JoinColumn(name = "domain_id")
 	private DomainMaster domainMaster;
 	
 	@OneToMany(mappedBy = "lead",orphanRemoval = true)
