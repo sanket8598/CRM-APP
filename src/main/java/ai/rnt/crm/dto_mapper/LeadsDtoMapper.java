@@ -1,5 +1,6 @@
 package ai.rnt.crm.dto_mapper;
 
+import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
 
 import java.util.Collection;
@@ -13,6 +14,7 @@ import ai.rnt.crm.dto.LeadDashboardDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadsCardDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
+import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.util.ConvertDateFormatUtil;
 
@@ -31,7 +33,7 @@ public class LeadsDtoMapper {
 	 * @version 1.0
 	 */
 	public static final Function<LeadDto, Optional<Leads>> TO_LEAD = e -> evalMapper(e, Leads.class);
-		
+
 	/**
 	 * @since 04-09-2023
 	 * @version 1.0
@@ -49,7 +51,7 @@ public class LeadsDtoMapper {
 	 * @since 04-09-2023
 	 * @Version 1.0
 	 */
-	public static final Function<Leads, Optional<LeadDto>> TO_LEAD_DTO = e ->evalMapper(e, LeadDto.class);
+	public static final Function<Leads, Optional<LeadDto>> TO_LEAD_DTO = e -> evalMapper(e, LeadDto.class);
 
 	/**
 	 * @since 04-09-2023
@@ -58,29 +60,35 @@ public class LeadsDtoMapper {
 	 */
 	public static final Function<Collection<Leads>, List<LeadDto>> TO_LEAD_DTOS = e -> e.stream()
 			.map(dm -> TO_LEAD_DTO.apply(dm).get()).collect(Collectors.toList());
-	
-	
+
 	public static final Function<Leads, Optional<LeadDashboardDto>> TO_DASHBOARD_LEADDTO = e -> {
 		Optional<LeadDashboardDto> leadDashboardDto = evalMapper(e, LeadDashboardDto.class);
-		leadDashboardDto.ifPresent(l->l.setCreatedOn(ConvertDateFormatUtil.convertDate(e.getCreatedDate())));
+		leadDashboardDto.ifPresent(l -> {
+			l.setCreatedOn(ConvertDateFormatUtil.convertDate(e.getCreatedDate()));
+			l.setPrimaryContact(
+					TO_CONTACT_DTO.apply(e.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null))
+							.orElse(null));
+		});
 		return leadDashboardDto;
 	};
 
 	public static final Function<Collection<Leads>, List<LeadDashboardDto>> TO_DASHBOARD_LEADDTOS = e -> e.stream()
 			.map(dm -> TO_DASHBOARD_LEADDTO.apply(dm).get()).collect(Collectors.toList());
-	
-	
+
 	public static final Function<Leads, Optional<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTO = e -> {
 		Optional<LeadsCardDto> leadDashboardDto = evalMapper(e, LeadsCardDto.class);
-	//	leadDashboardDto.ifPresent(l->l.setShortName(LeadsCardUtil.shortName(e.getFirstName(), e.getLastName())));
+		// leadDashboardDto.ifPresent(l->l.setShortName(LeadsCardUtil.shortName(e.getFirstName(),
+		// e.getLastName())));
 		return leadDashboardDto;
 	};
 
 	public static final Function<Collection<Leads>, List<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTOS = e -> e.stream()
 			.map(dm -> TO_DASHBOARD_CARDS_LEADDTO.apply(dm).get()).collect(Collectors.toList());
-	
-	public static final Function<Leads, Optional<EditLeadDto>> TO_EDITLEAD_DTO = e ->evalMapper(e, EditLeadDto.class);
-	public static final Function<Collection<Leads>, List<EditLeadDto>> TO_EDITLEAD_DTOS = e -> e.stream().map(dm -> TO_EDITLEAD_DTO.apply(dm).get()).collect(Collectors.toList());
-	
-	public static final Function<Leads, Optional<QualifyLeadDto>> TO_QUALIFY_LEAD = e ->  evalMapper(e, QualifyLeadDto.class);
+
+	public static final Function<Leads, Optional<EditLeadDto>> TO_EDITLEAD_DTO = e -> evalMapper(e, EditLeadDto.class);
+	public static final Function<Collection<Leads>, List<EditLeadDto>> TO_EDITLEAD_DTOS = e -> e.stream()
+			.map(dm -> TO_EDITLEAD_DTO.apply(dm).get()).collect(Collectors.toList());
+
+	public static final Function<Leads, Optional<QualifyLeadDto>> TO_QUALIFY_LEAD = e -> evalMapper(e,
+			QualifyLeadDto.class);
 }
