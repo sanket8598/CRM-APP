@@ -28,6 +28,8 @@ public class EditLeadDto {
 	
 	private LeadSourceDto leadSourceMaster;
 	
+	private DomainMasterDto domainMaster;
+	
 	private String message;
 	
 	private String generatedBy;

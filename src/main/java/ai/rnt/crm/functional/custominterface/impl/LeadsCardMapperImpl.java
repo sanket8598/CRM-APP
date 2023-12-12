@@ -8,6 +8,7 @@ import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_SOURCE;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.SERVICE_FALLS_INTO;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
+import static ai.rnt.crm.constants.LeadEntityFieldConstant.DOMAIN;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static java.util.Objects.nonNull;
 
@@ -104,6 +105,9 @@ public class LeadsCardMapperImpl implements LeadsCardMapper {
 					leadsCardDto) -> leadsCardDto.setSecondaryField(nonNull(lead.getEmployee())
 							? lead.getEmployee().getFirstName() + " " + lead.getEmployee().getLastName()
 							: null);
+		case DOMAIN:
+			return (lead, contacts, leadsCardDto) -> leadsCardDto.setSecondaryField(
+					nonNull(lead.getDomainMaster()) ? lead.getDomainMaster().getDomainName() : null);
 		default:
 			return (lead, contacts, leadsCardDto) -> leadsCardDto.setSecondaryField(lead.getTopic());
 		}

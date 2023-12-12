@@ -25,6 +25,9 @@ public class LeadDashboardDto {
 	
 	@JsonProperty("leadSource")
 	private LeadSourceDto leadSourceMaster;
+	
+	@JsonProperty("domain")
+    private DomainMasterDto domainMaster; 
 
 	@JsonProperty("contact")
 	private ContactDto primaryContact;
