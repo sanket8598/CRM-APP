@@ -9,6 +9,7 @@ import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_KEY;
 import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
 import static ai.rnt.crm.constants.CRMConstants.COUNT_BY_STATUS;
 import static ai.rnt.crm.constants.CRMConstants.DOMAIN_MASTER_DATA;
+import static ai.rnt.crm.constants.CRMConstants.DOMAINS;
 import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_COUNT;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_KEY;
@@ -621,6 +622,7 @@ public class LeadServiceImpl implements LeadService {
 			dataMap.put(LEAD_INFO, dto);
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
+			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
 			dataMap.put(TIMELINE, timeLine);
 			dataMap.put(ACTIVITY, activity);
 			dataMap.put(UPNEXT_DATA, upNextActivities(upNextActivities));
