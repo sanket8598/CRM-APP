@@ -146,7 +146,7 @@ public class EmailUtil {
 		return msg;
 	}
 
-	public static Message sendCallTaskRemainderMail(String mailId) {
+	public static void sendCallTaskRemainderMail(String mailId) {
 		try {
 			Message msg = new MimeMessage(getSession());
 
@@ -161,14 +161,13 @@ public class EmailUtil {
 					.append("<br><br>").append("Regards,").append("<br>").append("From RNT-CRM team");
 			msg.setContent(content.toString(), "text/html");
 			Transport.send(msg);
-			return msg;
 		} catch (Exception e) {
 			log.info("Got Exception while sending call task remainder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
 
-	public static Message sendVisitTaskRemainderMail(String emailId) {
+	public static void sendVisitTaskRemainderMail(String emailId) {
 		try {
 			Message msg = new MimeMessage(getSession());
 
@@ -185,14 +184,13 @@ public class EmailUtil {
 					.append("<br><br>").append("Regards,").append("<br>").append("From RNT-CRM Team");
 			msg.setContent(content.toString(), "text/html");
 			Transport.send(msg);
-			return msg;
 		} catch (Exception e) {
-			log.info("Got Exception while sending call task remainder mail..{}", e.getMessage());
+			log.info("Got Exception while sending visit task remainder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
 
-	public static Object sendMeetingTaskRemainderMail(String emailId) {
+	public static void sendMeetingTaskRemainderMail(String emailId) {
 		try {
 			Message msg = new MimeMessage(getSession());
 
@@ -209,9 +207,8 @@ public class EmailUtil {
 					.append("<br><br>").append("Regards,").append("<br>").append("From RNT-CRM Team");
 			msg.setContent(content.toString(), "text/html");
 			Transport.send(msg);
-			return msg;
 		} catch (Exception e) {
-			log.info("Got Exception while sending call task remainder mail..{}", e.getMessage());
+			log.info("Got Exception while sending meeting task remainder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

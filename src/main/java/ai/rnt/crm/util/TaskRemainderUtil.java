@@ -3,6 +3,7 @@ package ai.rnt.crm.util;
 import static ai.rnt.crm.util.EmailUtil.sendCallTaskRemainderMail;
 import static ai.rnt.crm.util.EmailUtil.sendMeetingTaskRemainderMail;
 import static ai.rnt.crm.util.EmailUtil.sendVisitTaskRemainderMail;
+import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,8 +53,15 @@ public class TaskRemainderUtil {
 			String time = LocalTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
 
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
-			callTaskList.forEach(
-					e -> sendCallTaskRemainderMail(employeeDaoService.getEmailId(e.getAssignTo().getStaffId())));
+			callTaskList.forEach(e -> {
+				String emailId = employeeDaoService.getEmailId(e.getAssignTo().getStaffId());
+				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Both")) {
+					sendCallTaskRemainderMail(emailId);
+				}
+				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Email"))
+					sendCallTaskRemainderMail(emailId);
+			});
+
 			List<VisitTask> visitTaskList = visitDaoService.getTodaysAllVisitTask(todayAsDate, time);
 			visitTaskList.forEach(
 					e -> sendVisitTaskRemainderMail(employeeDaoService.getEmailId(e.getAssignTo().getStaffId())));

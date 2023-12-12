@@ -1,8 +1,8 @@
 package ai.rnt.crm.entity;
 
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
-import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
@@ -52,12 +52,12 @@ public class Meetings extends Auditable {
 	@Column(name = "participates")
 	private String participates;
 
-	@Column(name = "mtg_start_date",columnDefinition = "date")
+	@Column(name = "mtg_start_date", columnDefinition = "date")
 	private Date startDate;
 
-	@Column(name = "mtg_end_date",columnDefinition = "date")
+	@Column(name = "mtg_end_date", columnDefinition = "date")
 	private Date endDate;
-	
+
 	@Column(name = "mtg_duration")
 	private String duration;
 
@@ -78,9 +78,13 @@ public class Meetings extends Auditable {
 
 	@Column(name = "mtg_mode")
 	private String meetingMode;
-	
+
 	@Column(name = "mtg_status")
 	private String meetingStatus;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "mtg_assign_to", updatable = true, nullable = false)
+	private EmployeeMaster assignTo;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "lead_id")
@@ -88,7 +92,7 @@ public class Meetings extends Auditable {
 
 	@OneToMany(mappedBy = "meetings", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
 	private List<MeetingAttachments> meetingAttachments = new ArrayList<>();
-	
+
 	@OneToMany(mappedBy = "meetings", cascade = ALL, orphanRemoval = true)
 	private List<MeetingTask> meetingTasks = new ArrayList<>();
 

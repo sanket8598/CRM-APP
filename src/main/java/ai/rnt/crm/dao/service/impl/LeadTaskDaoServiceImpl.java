@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -25,5 +26,10 @@ public class LeadTaskDaoServiceImpl implements LeadTaskDaoService {
 	@Override
 	public Optional<LeadTask> getTaskById(Integer taskId) {
 		return leadTaskRepository.findById(taskId);
+	}
+
+	@Override
+	public List<LeadTask> getAllTask() {
+		return leadTaskRepository.findAll();
 	}
 }

@@ -7,6 +7,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
+import ai.rnt.crm.entity.LeadTask;
+import ai.rnt.crm.entity.MeetingTask;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.exception.CRMException;
@@ -45,7 +47,7 @@ public class TaskUtil {
 			}
 			return status;
 		} catch (Exception e) {
-			log.info("Got Exception while checking the DuplicateTask..{}", e.getMessage());
+			log.info("Got Exception while checking the DuplicateCallTask..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -71,7 +73,60 @@ public class TaskUtil {
 			}
 			return status;
 		} catch (Exception e) {
-			log.info("Got Exception while checking the DuplicateTask..{}", e.getMessage());
+			log.info("Got Exception while checking the DuplicateVisitTask..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public static boolean checkDuplicateLeadTask(List<LeadTask> allTask, LeadTask leadTask) {
+		boolean status = false;
+		try {
+			if (isNull(allTask) || allTask.isEmpty())
+				status = false;
+			for (LeadTask task : allTask) {
+				if (task.getSubject().equals(leadTask.getSubject()) && task.getStatus().equals(leadTask.getStatus())
+						&& task.getPriority().equals(leadTask.getPriority())
+						&& compareDatesIgnoringTime(task.getDueDate(), leadTask.getDueDate())
+						&& task.getRemainderVia().equals(leadTask.getRemainderVia())
+						&& task.getRemainderDueAt().equals(leadTask.getRemainderDueAt())
+						&& compareDatesIgnoringTime(task.getRemainderDueOn(), leadTask.getRemainderDueOn())
+						&& task.getDescription().equals(leadTask.getDescription())
+						&& task.getDueTime().equals(leadTask.getDueTime())
+						&& task.isRemainderOn() == leadTask.isRemainderOn()) {
+					status = true;
+					break;
+				}
+			}
+			return status;
+		} catch (Exception e) {
+			log.info("Got Exception while checking the DuplicateLeadTask..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public static boolean checkDuplicateMeetingTask(List<MeetingTask> allMeetingTask, MeetingTask meetingTask) {
+		boolean status = false;
+		try {
+			if (isNull(allMeetingTask) || allMeetingTask.isEmpty())
+				status = false;
+			for (MeetingTask task : allMeetingTask) {
+				if (task.getSubject().equals(meetingTask.getSubject())
+						&& task.getStatus().equals(meetingTask.getStatus())
+						&& task.getPriority().equals(meetingTask.getPriority())
+						&& compareDatesIgnoringTime(task.getDueDate(), meetingTask.getDueDate())
+						&& task.getRemainderVia().equals(meetingTask.getRemainderVia())
+						&& task.getRemainderDueAt().equals(meetingTask.getRemainderDueAt())
+						&& compareDatesIgnoringTime(task.getRemainderDueOn(), meetingTask.getRemainderDueOn())
+						&& task.getDescription().equals(meetingTask.getDescription())
+						&& task.getDueTime().equals(meetingTask.getDueTime())
+						&& task.isRemainderOn() == meetingTask.isRemainderOn()) {
+					status = true;
+					break;
+				}
+			}
+			return status;
+		} catch (Exception e) {
+			log.info("Got Exception while checking the DuplicateMeetingTask..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
