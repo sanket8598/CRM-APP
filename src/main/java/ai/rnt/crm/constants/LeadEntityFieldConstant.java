@@ -14,5 +14,6 @@ public class LeadEntityFieldConstant {
 	public static final String SERVICE_FALLS_INTO="Service Falls Into";
 	public static final String LEAD_SOURCE="Lead Source";
 	public static final String LEAD_ASSIGN_USERNAME="Lead Assign Username";
+	public static final String DOMAIN="Domain";
 
 }
