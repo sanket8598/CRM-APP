@@ -28,4 +28,6 @@ public interface MeetingDaoService extends CrudService<Meetings, MeetingDto> {
 
 	List<MeetingTask> getTodaysMeetingTask(Date todayAsDate, String time);
 
+	List<MeetingTask> getAllMeetingTask();
+
 }

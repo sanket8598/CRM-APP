@@ -57,4 +57,9 @@ public class MeetingDaoServiceImpl implements MeetingDaoService {
 	public List<MeetingTask> getTodaysMeetingTask(Date todayAsDate, String time) {
 		return meetingTaskRepository.findByRemainderDueOnAndRemainderDueAtAndRemainderOn(todayAsDate, time, true);
 	}
+
+	@Override
+	public List<MeetingTask> getAllMeetingTask() {
+		return meetingTaskRepository.findAll();
+	}
 }

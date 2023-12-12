@@ -9,6 +9,7 @@ import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_KEY;
 import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
 import static ai.rnt.crm.constants.CRMConstants.COUNT_BY_STATUS;
 import static ai.rnt.crm.constants.CRMConstants.DOMAIN_MASTER_DATA;
+import static ai.rnt.crm.constants.CRMConstants.DOMAINS;
 import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_COUNT;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_KEY;
@@ -59,7 +60,7 @@ import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
-import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN;
+import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSortFilterDtoMapper.TO_LEAD_SORT_FILTER;
@@ -70,7 +71,6 @@ import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_QUALIFY_LEAD;
-import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER_DTOS;
@@ -622,6 +622,7 @@ public class LeadServiceImpl implements LeadService {
 			dataMap.put(LEAD_INFO, dto);
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
+			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
 			dataMap.put(TIMELINE, timeLine);
 			dataMap.put(ACTIVITY, activity);
 			dataMap.put(UPNEXT_DATA, upNextActivities(upNextActivities));
@@ -992,9 +993,7 @@ public class LeadServiceImpl implements LeadService {
 				else {
 					DomainMaster newDomain = new DomainMaster();
 					newDomain.setDomainName(leadDto.getDomainId());
-					TO_DOMAIN.apply(
-							domainMasterDaoService.addDomain(newDomain).orElseThrow(ResourceNotFoundException::new))
-							.ifPresent(leads::setDomainMaster);
+							domainMasterDaoService.addDomain(newDomain).ifPresent(leads::setDomainMaster);
 				}
 			}
 		} catch (Exception e) {
@@ -1134,14 +1133,12 @@ public class LeadServiceImpl implements LeadService {
 					.ifPresent(leads::setLeadSourceMaster);
 		}
 		if (nonNull(domainName) && pattern.matcher(domainName).matches())
-			TO_DOMAIN.apply(
-					domainMasterDaoService.getById(parseInt(domainName)).orElseThrow(ResourceNotFoundException::new))
-					.ifPresent(leads::setDomainMaster);
+			
+					domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
 		else {
 			DomainMaster domainMaster = new DomainMaster();
 			domainMaster.setDomainName(domainName);
-			TO_DOMAIN.apply(domainMasterDaoService.addDomain(domainMaster).orElseThrow(ResourceNotFoundException::new))
-					.ifPresent(leads::setDomainMaster);
+			domainMasterDaoService.addDomain(domainMaster).ifPresent(leads::setDomainMaster);
 		}
 	}
 

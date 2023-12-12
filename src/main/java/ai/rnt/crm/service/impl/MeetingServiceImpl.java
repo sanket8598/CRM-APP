@@ -10,6 +10,7 @@ import static ai.rnt.crm.dto_mapper.MeetingTaskDtoMapper.TO_MEETING_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.TaskUtil.checkDuplicateMeetingTask;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -42,6 +43,7 @@ import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.MeetingService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +64,7 @@ public class MeetingServiceImpl implements MeetingService {
 	private final MeetingAttachmentDaoService meetingAttachmetDaoService;
 	private final LeadDaoService leadDaoService;
 	private final AuditAwareUtil auditAwareUtil;
+	private final EmployeeService employeeService;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeeting(@Valid MeetingDto dto, Integer leadsId) {
@@ -70,6 +73,8 @@ public class MeetingServiceImpl implements MeetingService {
 			boolean saveStatus = false;
 			Meetings metting = TO_MEETING.apply(dto).orElseThrow(ResourceNotFoundException::new);
 			metting.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
+			metting.setAssignTo(employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
+					() -> new ResourceNotFoundException("Employee", "staffId", auditAwareUtil.getLoggedInStaffId())));
 			metting.setMeetingStatus(SAVE);
 			leadDaoService.getLeadById(leadsId).ifPresent(metting::setLead);
 			if (isNull(dto.getMeetingAttachments()) || dto.getMeetingAttachments().isEmpty()) {
@@ -99,30 +104,6 @@ public class MeetingServiceImpl implements MeetingService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@Valid MeetingTaskDto dto, Integer leadsId,
-			Integer meetingId) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		try {
-			MeetingTask meetingTask = TO_MEETING_TASK.apply(dto).orElseThrow(ResourceNotFoundException::new);
-			Optional<Leads> lead = leadDaoService.getLeadById(leadsId);
-			if (lead.isPresent())
-				meetingTask.setAssignTo(lead.get().getEmployee());
-			meetingDaoService.getMeetingById(meetingId).ifPresent(meetingTask::setMeetings);
-			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Added Successfully..!!");
-			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Added");
-			}
-			return new ResponseEntity<>(result, CREATED);
-		} catch (Exception e) {
-			log.error("error occured while adding meeting tasks..{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editMeeting(Integer meetingId) {
 		EnumMap<ApiResponse, Object> meeting = new EnumMap<>(ApiResponse.class);
 		try {
@@ -132,74 +113,6 @@ public class MeetingServiceImpl implements MeetingService {
 			return new ResponseEntity<>(meeting, FOUND);
 		} catch (Exception e) {
 			log.info("Got Exception while geting meeting for edit..{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getMeetingTask(Integer taskId) {
-		EnumMap<ApiResponse, Object> meetingTask = new EnumMap<>(ApiResponse.class);
-		try {
-			meetingTask.put(SUCCESS, true);
-			meetingTask.put(DATA, TO_GET_MEETING_TASK_DTO.apply(meetingDaoService.getMeetingTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "meetingTaskId", taskId))));
-			return new ResponseEntity<>(meetingTask, FOUND);
-		} catch (Exception e) {
-			log.error("Got Exception while getting the meeting task by id..{} " + taskId, e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(GetMeetingTaskDto dto, Integer taskId) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		try {
-			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", taskId));
-			meetingTask.setSubject(dto.getSubject());
-			meetingTask.setStatus(dto.getStatus());
-			meetingTask.setPriority(dto.getPriority());
-			meetingTask.setDueDate(dto.getUpdateDueDate());
-			meetingTask.setDueTime(dto.getDueTime());
-			meetingTask.setRemainderOn(dto.isRemainderOn());
-			meetingTask.setRemainderDueAt(dto.getRemainderDueAt());
-			meetingTask.setRemainderDueOn(dto.getRemainderDueOn());
-			meetingTask.setRemainderVia(dto.getRemainderVia());
-			meetingTask.setDescription(dto.getDescription());
-			meetingTask.setUpdatedDate(LocalDateTime.now());
-			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Updated Successfully..!!");
-			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Updated");
-			}
-			return new ResponseEntity<>(result, CREATED);
-		} catch (Exception e) {
-			log.error("Got Exception while updating the meeting task by id..{} " + taskId, e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeetingTask(Integer taskId) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		try {
-			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", taskId));
-			meetingTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			meetingTask.setDeletedDate(LocalDateTime.now());
-			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
-				result.put(MESSAGE, "Meeting Task Deleted SuccessFully.");
-				result.put(SUCCESS, true);
-			} else {
-				result.put(MESSAGE, "Meeting Task Not delete.");
-				result.put(SUCCESS, false);
-			}
-			return new ResponseEntity<>(result, OK);
-
-		} catch (Exception e) {
-			log.error("Got Exception while deleting the meeting task by id..{} " + taskId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -296,6 +209,101 @@ public class MeetingServiceImpl implements MeetingService {
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while deleting the meeting by id..{} " + meetingId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@Valid MeetingTaskDto dto, Integer leadsId,
+			Integer meetingId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			MeetingTask meetingTask = TO_MEETING_TASK.apply(dto).orElseThrow(ResourceNotFoundException::new);
+			Optional<Leads> lead = leadDaoService.getLeadById(leadsId);
+			if (lead.isPresent())
+				meetingTask.setAssignTo(lead.get().getEmployee());
+			meetingDaoService.getMeetingById(meetingId).ifPresent(meetingTask::setMeetings);
+			if (checkDuplicateMeetingTask(meetingDaoService.getAllMeetingTask(), meetingTask)) {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Already Exists !!");
+			} else if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Added Successfully..!!");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Added");
+			}
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("error occured while adding meeting tasks..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getMeetingTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> meetingTask = new EnumMap<>(ApiResponse.class);
+		try {
+			meetingTask.put(SUCCESS, true);
+			meetingTask.put(DATA, TO_GET_MEETING_TASK_DTO.apply(meetingDaoService.getMeetingTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "meetingTaskId", taskId))));
+			return new ResponseEntity<>(meetingTask, FOUND);
+		} catch (Exception e) {
+			log.error("Got Exception while getting the meeting task by id..{} " + taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(GetMeetingTaskDto dto, Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", taskId));
+			meetingTask.setSubject(dto.getSubject());
+			meetingTask.setStatus(dto.getStatus());
+			meetingTask.setPriority(dto.getPriority());
+			meetingTask.setDueDate(dto.getUpdateDueDate());
+			meetingTask.setDueTime(dto.getDueTime());
+			meetingTask.setRemainderOn(dto.isRemainderOn());
+			meetingTask.setRemainderDueAt(dto.getRemainderDueAt());
+			meetingTask.setRemainderDueOn(dto.getRemainderDueOn());
+			meetingTask.setRemainderVia(dto.getRemainderVia());
+			meetingTask.setDescription(dto.getDescription());
+			meetingTask.setUpdatedDate(LocalDateTime.now());
+			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Updated Successfully..!!");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Updated");
+			}
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception while updating the meeting task by id..{} " + taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeetingTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", taskId));
+			meetingTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			meetingTask.setDeletedDate(LocalDateTime.now());
+			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
+				result.put(MESSAGE, "Meeting Task Deleted SuccessFully.");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Meeting Task Not delete.");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+
+		} catch (Exception e) {
+			log.error("Got Exception while deleting the meeting task by id..{} " + taskId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}

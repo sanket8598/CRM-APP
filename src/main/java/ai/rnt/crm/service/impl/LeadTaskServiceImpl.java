@@ -1,11 +1,11 @@
 package ai.rnt.crm.service.impl;
 
-import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_GET_LEAD_TASK_DTO;
 import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_LEAD_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.TaskUtil.checkDuplicateLeadTask;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
@@ -62,7 +62,10 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadsId));
 			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leadTask::setAssignTo);
 			leadTask.setLead(lead);
-			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
+			if (checkDuplicateLeadTask(leadTaskDaoService.getAllTask(), leadTask)) {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Already Exists !!");
+			} else if (nonNull(leadTaskDaoService.addTask(leadTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Added Successfully");
 			} else {

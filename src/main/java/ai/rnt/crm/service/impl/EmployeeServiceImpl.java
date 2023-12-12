@@ -53,7 +53,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public Optional<EmployeeMaster> getById(Integer assignTo) {
 		try {
-			return TO_EmployeeMaster.apply(employeeDaoService.getServiceFallById(assignTo).get());
+			return TO_EmployeeMaster.apply(employeeDaoService.getById(assignTo).get());
 		} catch (Exception e) {
 			log.info("Got Exception while getting the user..{}" ,e.getMessage());
 			throw new CRMException(e);

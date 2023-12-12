@@ -72,9 +72,8 @@ public class VisitServiceImpl implements VisitService {
 			Leads lead = leadDaoService.getLeadById(dto.getLeadId())
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", dto.getLeadId()));
 			visit.setLead(lead);
-			EmployeeMaster employee = employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
-					() -> new ResourceNotFoundException("Employee", "staffId", auditAwareUtil.getLoggedInStaffId()));
-			visit.setVisitBy(employee);
+			visit.setVisitBy(employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
+					() -> new ResourceNotFoundException("Employee", "staffId", auditAwareUtil.getLoggedInStaffId())));
 			visit.setStatus(SAVE);
 			if (nonNull(visitDaoService.saveVisit(visit)))
 				result.put(MESSAGE, "Visit Added Successfully");
