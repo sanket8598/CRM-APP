@@ -32,6 +32,8 @@ public class UpdateLeadDto {
 	private String serviceFallsId;
 	
 	private String leadSourceId;
+	
+	private String domainId;
 	private String companyWebsite;
 	private String companyName;
 	private String country;

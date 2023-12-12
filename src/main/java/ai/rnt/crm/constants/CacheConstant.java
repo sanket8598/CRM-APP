@@ -12,5 +12,8 @@ public final class CacheConstant {
 	public static final String STATES="states";
 	public static final String COUNTRY="countries";
 	public static final String CITY="cities";
+	public static final String CONTACT="contact";
+	public static final String DOMAIN="domain";
+	public static final String DOMAIN_ID="#domainId";
 
 }

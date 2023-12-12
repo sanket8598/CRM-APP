@@ -182,6 +182,12 @@ public class ReadExcelUtil {
 			leadDto.setLeadSourceId(data);
 			break;
 		case 11:
+			if (nonNull(data) && !data.isEmpty())
+				leadDto.setDomainId(data);
+			else
+				errorList.append("Please Enter The Domain On Row No: " + rowNum);
+			break;
+		case 12:
 			leadDto.setPseudoName(data);
 			break;
 		default:

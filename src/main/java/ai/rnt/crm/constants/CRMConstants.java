@@ -26,6 +26,7 @@ public final class CRMConstants {
 	public static final String COUNTDATA="COUNTDATA";
 	public static final String SERVICE_FALL_DATA="serviceFall"+DATA;
 	public static final String LEAD_SOURCE_DATA=LEAD_SOURCE+DATA;
+	public static final String DOMAIN_MASTER_DATA="domain"+DATA;
 	public static final String ASSIGN_DATA="assignTo"+DATA;
 	public static final String SORT_FILTER="sortFilter";
 	public static final String UPNEXT_DATA_KEY=UPNEXT_DATA+DATA;
