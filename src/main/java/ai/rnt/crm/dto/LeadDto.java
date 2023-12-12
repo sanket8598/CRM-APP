@@ -32,6 +32,8 @@ public class LeadDto {
 	private String leadSourceId;
 
 	private String serviceFallsId;
+	
+	private String domainId;
 
 	private String companyName;
 

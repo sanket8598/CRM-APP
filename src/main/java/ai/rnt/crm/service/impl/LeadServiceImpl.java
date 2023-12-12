@@ -8,6 +8,7 @@ import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_COUNT;
 import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_KEY;
 import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
 import static ai.rnt.crm.constants.CRMConstants.COUNT_BY_STATUS;
+import static ai.rnt.crm.constants.CRMConstants.DOMAIN_MASTER_DATA;
 import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_COUNT;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_KEY;
@@ -58,6 +59,7 @@ import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
+import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSortFilterDtoMapper.TO_LEAD_SORT_FILTER;
@@ -145,6 +147,7 @@ import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.ContactDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
+import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.ExcelHeaderDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
@@ -172,6 +175,7 @@ import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
+import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.ExcelHeaderMaster;
@@ -225,6 +229,7 @@ public class LeadServiceImpl implements LeadService {
 	private final ExcelHeaderDaoService excelHeaderDaoService;
 	private final MeetingDaoService meetingDaoService;
 	private final ContactDaoService contactDaoService;
+	private final DomainMasterDaoService domainMasterDaoService;
 
 	private static final String PRIMFIELD = "PrimaryField";
 	private static final String SECNDFIELD = "SecondaryField";
@@ -239,7 +244,8 @@ public class LeadServiceImpl implements LeadService {
 			leads.setStatus(OPEN);
 			leads.setDisqualifyAs(OPEN);
 			leads.setPseudoName(auditAwareUtil.getLoggedInUserName());
-			setServiceFallsIntoAndLeadSourceToLead(leadDto.getServiceFallsId(), leadDto.getLeadSourceId(), leads);
+			setServiceFallLeadSourceAndDomainToLead(leadDto.getServiceFallsId(), leadDto.getLeadSourceId(),
+					leadDto.getDomainId(), leads);
 			if (nonNull(leadDto.getAssignTo()))
 				employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
 			else
@@ -270,14 +276,12 @@ public class LeadServiceImpl implements LeadService {
 			if (isNull(leadsStatus)) {
 				Map<String, Object> dataMap = new HashMap<>();
 				Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
-				List<Leads> impLeads = leadDaoService.findLeadByEmployeeStaffId(loggedInStaffId).stream()
-						.map(LeadImportant::getLead)
-						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())).collect(toList());
-				List<Leads> allLeads = leadDaoService.getAllLeads();
-				allLeads.stream().forEach(lead -> {
-					if (impLeads.contains(lead))
-						lead.setImportant(true);
-				});
+				List<LeadImportant> impLead = leadDaoService.findLeadByEmployeeStaffId(loggedInStaffId);
+				List<Leads> allLeads = leadDaoService.getAllLeads().stream()
+						.peek(lead -> lead.setImportant(impLead.stream().map(LeadImportant::getLead)
+								.anyMatch(l -> l.getLeadId().equals(lead.getLeadId()))))
+						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate()))
+						.collect(Collectors.toList());
 				Comparator<Leads> importantLeads = (l1, l2) -> l2.getImportant().compareTo(l1.getImportant());
 				allLeads.sort(
 						importantLeads.thenComparing((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())));
@@ -292,30 +296,45 @@ public class LeadServiceImpl implements LeadService {
 				String primaryField = filterMap.get(PRIMFIELD).toString();
 				String secondaryField = filterMap.get(SECNDFIELD).toString();
 				if (auditAwareUtil.isAdmin()) {
-					dataMap.put(ALL_LEAD, allLeads.stream().map(
-							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
-							.collect(toList()));
-					dataMap.put(OPEN_LEAD, allLeads.stream().filter(OPEN_LEAD_FILTER).map(
-							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
-							.collect(toList()));
-					dataMap.put(CLOSE_LEAD, allLeads.stream().filter(CLOSE_LEAD_FILTER).map(
-							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
-							.collect(toList()));
+					dataMap.put(
+							ALL_LEAD, allLeads
+									.stream().map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
+											primaryField, secondaryField, lead.getContacts().stream()
+													.filter(Contacts::getPrimary).findFirst().orElse(null)))
+									.collect(toList()));
+					dataMap.put(
+							OPEN_LEAD, allLeads
+									.stream().filter(OPEN_LEAD_FILTER).map(
+											lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
+													secondaryField, lead.getContacts().stream()
+															.filter(Contacts::getPrimary).findFirst().orElse(null)))
+									.collect(toList()));
+					dataMap.put(
+							CLOSE_LEAD, allLeads
+									.stream().filter(CLOSE_LEAD_FILTER).map(
+											lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
+													secondaryField, lead.getContacts().stream()
+															.filter(Contacts::getPrimary).findFirst().orElse(null)))
+									.collect(toList()));
 				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
-					dataMap.put(ALL_LEAD,
-							allLeads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
-									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
-											secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
+					dataMap.put(
+							ALL_LEAD, allLeads
+									.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId)).map(
+											lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
+													secondaryField, lead.getContacts().stream()
+															.filter(Contacts::getPrimary).findFirst().orElse(null)))
 									.collect(toList()));
 					dataMap.put(OPEN_LEAD, allLeads.stream()
 							.filter(l -> OPEN_LEAD_FILTER.test(l) && ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
 							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
-									secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
+									secondaryField,
+									lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
 							.collect(toList()));
 					dataMap.put(CLOSE_LEAD, allLeads.stream()
 							.filter(l -> CLOSE_LEAD_FILTER.test(l) && ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
 							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
-									secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
+									secondaryField,
+									lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
 							.collect(toList()));
 				} else
 					dataMap.put(ApiResponseKeyConstant.DATA, emptyList());
@@ -351,6 +370,7 @@ public class LeadServiceImpl implements LeadService {
 			dataMap.put(SERVICE_FALL_DATA,
 					TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE_DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
+			dataMap.put(DOMAIN_MASTER_DATA, domainMasterDaoService.getAllDomains());
 			dataMap.put(ASSIGN_DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
 			resultMap.put(SUCCESS, true);
 			resultMap.put(DATA, dataMap);
@@ -628,7 +648,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.setProposedSolution(dto.getProposedSolution());
 			lead.setStatus(CLOSE_AS_QUALIFIED);
 			lead.setDisqualifyAs(QUALIFIED);
-			setServiceFallsIntoAndLeadSourceToLead(dto.getServiceFallsMaster().getServiceName(), null, lead);
+			setServiceFallLeadSourceAndDomainToLead(dto.getServiceFallsMaster().getServiceName(), null, null, lead);
 			if (nonNull(leadDaoService.addLead(lead)))
 				result.put(MESSAGE, "Lead Qualified SuccessFully");
 			else
@@ -775,7 +795,8 @@ public class LeadServiceImpl implements LeadService {
 						.apply(companyMasterDaoService.save(companyMaster).orElseThrow(ResourceNotFoundException::new))
 						.ifPresent(contact::setCompanyMaster);
 			}
-			setServiceFallsIntoAndLeadSourceToLead(dto.getServiceFallsId(), dto.getLeadSourceId(), lead);
+			setServiceFallLeadSourceAndDomainToLead(dto.getServiceFallsId(), dto.getLeadSourceId(), dto.getDomainId(),
+					lead);
 			if (nonNull(contactDaoService.addContact(contact)) && nonNull(leadDaoService.addLead(lead)))
 				result.put(MESSAGE, "Leads Contact Updated Successfully !!");
 			else
@@ -965,6 +986,18 @@ public class LeadServiceImpl implements LeadService {
 				}
 			} else
 				leadSourceDaoService.getByName(OTHER).ifPresent(leads::setLeadSourceMaster);
+			if (nonNull(leadDto.getDomainId()) && !leadDto.getDomainId().isEmpty()) {
+				Optional<DomainMaster> domain = domainMasterDaoService.findByName(leadDto.getDomainId());
+				if (domain.isPresent())
+					domain.ifPresent(leads::setDomainMaster);
+				else {
+					DomainMaster newDomain = new DomainMaster();
+					newDomain.setDomainName(leadDto.getDomainId());
+					TO_DOMAIN.apply(
+							domainMasterDaoService.addDomain(newDomain).orElseThrow(ResourceNotFoundException::new))
+							.ifPresent(leads::setDomainMaster);
+				}
+			}
 		} catch (Exception e) {
 			log.error("error while building the lead Object...{}", e.getMessage());
 		}
@@ -1078,8 +1111,8 @@ public class LeadServiceImpl implements LeadService {
 							.orElseThrow(ResourceNotFoundException::new));
 	}
 
-	private void setServiceFallsIntoAndLeadSourceToLead(String serviceFallsName, String leadSourceName, Leads leads)
-			throws Exception {
+	private void setServiceFallLeadSourceAndDomainToLead(String serviceFallsName, String leadSourceName,
+			String domainName, Leads leads) throws Exception {
 		Pattern pattern = compile("^\\d+$");
 		if (nonNull(serviceFallsName) && pattern.matcher(serviceFallsName).matches())
 			serviceFallsDaoSevice.getServiceFallById(parseInt(serviceFallsName))
@@ -1100,6 +1133,16 @@ public class LeadServiceImpl implements LeadService {
 					.apply(leadSourceDaoService.save(leadSource).orElseThrow(
 							() -> new ResourceNotFoundException(LEAD_SOURCE_MASTER, LEAD_SOURCE_NAME, leadSourceName)))
 					.ifPresent(leads::setLeadSourceMaster);
+		}
+		if (nonNull(domainName) && pattern.matcher(domainName).matches())
+			TO_DOMAIN.apply(
+					domainMasterDaoService.getById(parseInt(domainName)).orElseThrow(ResourceNotFoundException::new))
+					.ifPresent(leads::setDomainMaster);
+		else {
+			DomainMaster domainMaster = new DomainMaster();
+			domainMaster.setDomainName(domainName);
+			TO_DOMAIN.apply(domainMasterDaoService.addDomain(domainMaster).orElseThrow(ResourceNotFoundException::new))
+					.ifPresent(leads::setDomainMaster);
 		}
 	}
 
