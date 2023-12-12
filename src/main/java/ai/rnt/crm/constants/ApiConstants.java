@@ -75,5 +75,7 @@ public final class ApiConstants {
 	
 	public static final String DOWNLOAD = SEPERATOR+"download";
 	
+	public static final String CONTACT = BASE + "contact" + SEPERATOR;
+	
 
 }

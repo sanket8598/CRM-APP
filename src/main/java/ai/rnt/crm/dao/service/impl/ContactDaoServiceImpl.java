@@ -2,6 +2,9 @@ package ai.rnt.crm.dao.service.impl;
 
 import static ai.rnt.crm.constants.CacheConstant.LEADS;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,4 +26,16 @@ public class ContactDaoServiceImpl implements ContactDaoService {
 	public Contacts addContact(Contacts contact) {
 		return contactRepository.save(contact);
 	}
+
+	@Override
+	public List<Contacts> contactsOfLead(Integer leadId) {
+		return contactRepository.findByLeadLeadId(leadId);
+	}
+
+	@Override
+	public Optional<Contacts> findById(Integer id){
+		return contactRepository.findById(id);
+	}
+	
+	
 }
