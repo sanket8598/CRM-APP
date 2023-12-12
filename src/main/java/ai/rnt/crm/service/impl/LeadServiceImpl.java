@@ -70,6 +70,7 @@ import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_QUALIFY_LEAD;
+import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER_DTOS;
@@ -261,7 +262,6 @@ public class LeadServiceImpl implements LeadService {
 				createMap.put(MESSAGE, "Lead Not Added !!");
 			return new ResponseEntity<>(createMap, CREATED);
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.info("Got Exception while creating new lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
@@ -365,14 +365,13 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData() {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
-			log.info("user looged in..{}", auditAwareUtil.getLoggedInStaffId());
+			resultMap.put(SUCCESS, true);
 			Map<String, Object> dataMap = new HashMap<>();
 			dataMap.put(SERVICE_FALL_DATA,
 					TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE_DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
-			dataMap.put(DOMAIN_MASTER_DATA, domainMasterDaoService.getAllDomains());
+			dataMap.put(DOMAIN_MASTER_DATA, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
 			dataMap.put(ASSIGN_DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
-			resultMap.put(SUCCESS, true);
 			resultMap.put(DATA, dataMap);
 			return new ResponseEntity<>(resultMap, FOUND);
 		} catch (Exception e) {
