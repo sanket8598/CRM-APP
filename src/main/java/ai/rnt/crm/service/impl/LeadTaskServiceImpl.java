@@ -62,7 +62,6 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadsId));
 			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leadTask::setAssignTo);
 			leadTask.setLead(lead);
-			leadTask.setStatus(SAVE);
 			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Added Successfully");
