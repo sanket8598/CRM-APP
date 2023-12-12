@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +27,6 @@ public interface CallDaoService extends CrudService<Call, CallDto> {
 	Optional<PhoneCallTask> getCallTaskById(Integer taskId);
 
 	List<PhoneCallTask> getAllTask();
+
+	List<PhoneCallTask> getTodaysCallTask(Date todayAsDate, String time);
 }

@@ -56,8 +56,8 @@ public class LeadsController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> saveLead(@RequestBody @Valid LeadDto dto) {
 		return leadService.createLead(dto);
 	}
-
-	// for the DashBoard Leads Data...
+ 
+	//for open view data
 	@GetMapping(value = { GET_LEADS_BY_STATUS, GET_ALL_LEADS })
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(
 			@PathVariable(name = "leadsStatus", required = false) String leadsStatus) {
@@ -82,7 +82,7 @@ public class LeadsController {
 		return leadService.getAllDropDownData();
 	}
 
-	// for the open views table data
+	// not in use
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping(DASHBOARD_ALL_LEADS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardData() {

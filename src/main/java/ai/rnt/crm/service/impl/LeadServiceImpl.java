@@ -262,6 +262,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(String leadsStatus) {
 		EnumMap<ApiResponse, Object> getAllLeads = new EnumMap<>(ApiResponse.class);
 		getAllLeads.put(SUCCESS, true);
@@ -292,29 +293,29 @@ public class LeadServiceImpl implements LeadService {
 				String secondaryField = filterMap.get(SECNDFIELD).toString();
 				if (auditAwareUtil.isAdmin()) {
 					dataMap.put(ALL_LEAD, allLeads.stream().map(
-							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField))
+							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
 							.collect(toList()));
 					dataMap.put(OPEN_LEAD, allLeads.stream().filter(OPEN_LEAD_FILTER).map(
-							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField))
+							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
 							.collect(toList()));
 					dataMap.put(CLOSE_LEAD, allLeads.stream().filter(CLOSE_LEAD_FILTER).map(
-							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField))
+							lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField, secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
 							.collect(toList()));
 				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
 					dataMap.put(ALL_LEAD,
 							allLeads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
 									.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
-											secondaryField))
+											secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
 									.collect(toList()));
 					dataMap.put(OPEN_LEAD, allLeads.stream()
 							.filter(l -> OPEN_LEAD_FILTER.test(l) && ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
 							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
-									secondaryField))
+									secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
 							.collect(toList()));
 					dataMap.put(CLOSE_LEAD, allLeads.stream()
 							.filter(l -> CLOSE_LEAD_FILTER.test(l) && ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
 							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
-									secondaryField))
+									secondaryField,lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
 							.collect(toList()));
 				} else
 					dataMap.put(ApiResponseKeyConstant.DATA, emptyList());
@@ -323,7 +324,7 @@ public class LeadServiceImpl implements LeadService {
 				getAllLeads.put(DATA, TO_LEAD_DTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
 			return new ResponseEntity<>(getAllLeads, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting leads dashboard data..{}", e.getMessage());
+			log.info("Got Exception while getting open view leads data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

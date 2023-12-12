@@ -5,6 +5,7 @@ import static javax.persistence.CascadeType.DETACH;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.GenerationType.IDENTITY;
+import static org.hibernate.annotations.LazyCollectionOption.FALSE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -39,6 +41,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Where(clause = "deleted_by is null")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) 
 public class Leads extends Auditable {
 
 	private static final long serialVersionUID = 1L;
@@ -46,12 +49,15 @@ public class Leads extends Auditable {
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "lead_id")
+	@EqualsAndHashCode.Include
 	private Integer leadId;
 
 	@Column(name = "topic")
+	@EqualsAndHashCode.Include
 	private String topic;
 
 	@Column(name = "status")
+	@EqualsAndHashCode.Include
 	private String status;
 
 	@JoinColumn(name = "assign_to", updatable = true)
@@ -60,31 +66,44 @@ public class Leads extends Auditable {
 	private EmployeeMaster employee;
 
 	@Column(name = "budget_amount")
+	@EqualsAndHashCode.Include
 	private String budgetAmount;
 
 
 	@Column(name = "customer_need")
+	@EqualsAndHashCode.Include
 	private String customerNeed;
 
 	@Column(name = "proposed_solution")
+	@EqualsAndHashCode.Include
 	private String proposedSolution;
 
 	@Column(name = "disqualify_as")
+	@EqualsAndHashCode.Include
 	private String disqualifyAs;
 
 	@Column(name = "disqualify_reason")
+	@EqualsAndHashCode.Include
 	private String disqualifyReason;
 
 	@Column(name = "pseudo_name")
+	@EqualsAndHashCode.Include
 	private String pseudoName;
 
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "lead_source_id")
+	@EqualsAndHashCode.Include
 	private LeadSourceMaster leadSourceMaster;
 
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "service_falls_id")
+	@EqualsAndHashCode.Include
 	private ServiceFallsMaster serviceFallsMaster;
+	
+	@OneToMany(mappedBy = "lead",orphanRemoval = true)
+	@LazyCollection(FALSE)
+	@EqualsAndHashCode.Include
+	private List<Contacts> contacts = new ArrayList<>();
 
 	@OneToMany(mappedBy = "lead", cascade = ALL)
 	private List<Email> emails = new ArrayList<>();
@@ -104,6 +123,4 @@ public class Leads extends Auditable {
 	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
 	private List<LeadTask> leadTasks = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "lead",orphanRemoval = true)
-	private List<Contacts> contacts = new ArrayList<>();
 }
