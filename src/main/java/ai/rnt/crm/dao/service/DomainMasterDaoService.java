@@ -10,8 +10,10 @@ public interface DomainMasterDaoService extends CrudService<DomainMaster, Domain
 
 	Optional<DomainMaster> findByName(String domainName);
 
-	Optional<DomainMasterDto> addDomain(DomainMaster domainMaster);
+	Optional<DomainMaster> addDomain(DomainMaster domainMaster);
 
 	List<DomainMaster> getAllDomains();
+
+	Optional<DomainMaster> findById(Integer domainId);
 
 }

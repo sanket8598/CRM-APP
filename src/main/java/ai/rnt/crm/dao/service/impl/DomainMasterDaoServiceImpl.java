@@ -2,7 +2,7 @@ package ai.rnt.crm.dao.service.impl;
 
 import static ai.rnt.crm.constants.CacheConstant.DOMAIN;
 import static ai.rnt.crm.constants.CacheConstant.DOMAIN_ID;
-import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTO;
+import static java.util.Optional.ofNullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
-import ai.rnt.crm.dto.DomainMasterDto;
 import ai.rnt.crm.entity.DomainMaster;
-import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.repository.DomainMasterRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -32,14 +30,14 @@ public class DomainMasterDaoServiceImpl implements DomainMasterDaoService{
 	}
 	@Override
 	@CacheEvict(value=DOMAIN,allEntries = true)
-	public Optional<DomainMasterDto> addDomain(DomainMaster domainMaster){
-		return TO_DOMAIN_DTO.apply(domainMasterRepository.save(domainMaster));
+	public Optional<DomainMaster> addDomain(DomainMaster domainMaster){
+		return ofNullable(domainMasterRepository.save(domainMaster));
 	}
 	
 	@Override
 	@Cacheable(value = DOMAIN, key = DOMAIN_ID)
-	public Optional<DomainMasterDto> getById(Integer domainId) {
-		return TO_DOMAIN_DTO.apply(domainMasterRepository.findById(domainId).orElseThrow(()->new ResourceNotFoundException("Domain","domainId",domainId)));
+	public Optional<DomainMaster> findById(Integer domainId) {
+		return domainMasterRepository.findById(domainId);
 	}
 	
 	@Override

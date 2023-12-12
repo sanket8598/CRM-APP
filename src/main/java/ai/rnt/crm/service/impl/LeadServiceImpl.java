@@ -59,7 +59,7 @@ import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
-import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN;
+import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.dto_mapper.LeadSortFilterDtoMapper.TO_LEAD_SORT_FILTER;
@@ -70,7 +70,6 @@ import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_QUALIFY_LEAD;
-import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER_DTOS;
@@ -992,9 +991,7 @@ public class LeadServiceImpl implements LeadService {
 				else {
 					DomainMaster newDomain = new DomainMaster();
 					newDomain.setDomainName(leadDto.getDomainId());
-					TO_DOMAIN.apply(
-							domainMasterDaoService.addDomain(newDomain).orElseThrow(ResourceNotFoundException::new))
-							.ifPresent(leads::setDomainMaster);
+							domainMasterDaoService.addDomain(newDomain).ifPresent(leads::setDomainMaster);
 				}
 			}
 		} catch (Exception e) {
@@ -1134,14 +1131,12 @@ public class LeadServiceImpl implements LeadService {
 					.ifPresent(leads::setLeadSourceMaster);
 		}
 		if (nonNull(domainName) && pattern.matcher(domainName).matches())
-			TO_DOMAIN.apply(
-					domainMasterDaoService.getById(parseInt(domainName)).orElseThrow(ResourceNotFoundException::new))
-					.ifPresent(leads::setDomainMaster);
+			
+					domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
 		else {
 			DomainMaster domainMaster = new DomainMaster();
 			domainMaster.setDomainName(domainName);
-			TO_DOMAIN.apply(domainMasterDaoService.addDomain(domainMaster).orElseThrow(ResourceNotFoundException::new))
-					.ifPresent(leads::setDomainMaster);
+			domainMasterDaoService.addDomain(domainMaster).ifPresent(leads::setDomainMaster);
 		}
 	}
 
