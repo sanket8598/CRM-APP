@@ -47,7 +47,7 @@ public class JWTTokenHelper {
 	private String secret;
 	
 
-	public static final long JWT_TOKEN_VALIDITY = 300 * 60 * 60; //18 minutes
+	public static final long JWT_TOKEN_VALIDITY = 500 * 60 * 60; //30 minutes
 	// Singleton instance of KeyPair
     private static final KeyPair keyPair = generateECKeyPair();
 	public String extractUsername(String token) {

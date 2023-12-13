@@ -49,7 +49,6 @@ public class ContactServiceImpl implements ContactService {
 			if (nonNull(contactDto.getName()) && contactDto.getName().contains(" ")) {
 				contact.setFirstName(contactDto.getName().split(" ")[0]);
 				contact.setLastName(contactDto.getName().split(" ")[1]);
-				;
 			}
 			contact.setCompanyMaster(company);
 			leadDaoService.getLeadById(leadId).ifPresent(lead -> contact.setLead(lead));
@@ -101,10 +100,17 @@ public class ContactServiceImpl implements ContactService {
 			contact.setDesignation(contactDto.getDesignation());
 			contact.setWorkEmail(contactDto.getWorkEmail());
 			contact.setLinkedinId(contactDto.getLinkedinId());
-			contact.setPrimary(contactDto.getPrimary());
 			contact.setBusinessCard(contactDto.getBusinessCard());
 			contact.setBusinessCardName(contactDto.getBusinessCardName());
 			contact.setBusinessCardType(contactDto.getBusinessCardType());
+			List<Contacts> existingContacts = contactDaoService.contactsOfLead(contact.getLead().getLeadId());
+			boolean isPrimary = existingContacts.stream().anyMatch(Contacts::getPrimary);
+			if (TRUE.equals(contactDto.getPrimary()) && isPrimary)
+				existingContacts.stream().filter(Contacts::getPrimary).forEach(con -> {
+					con.setPrimary(false);
+					contactDaoService.addContact(con);
+				});
+			contact.setPrimary(contactDto.getPrimary());
 			if (nonNull(contactDaoService.addContact(contact)))
 				contactMap.put(MESSAGE, "Contact Updated Successfully!!");
 			else {
