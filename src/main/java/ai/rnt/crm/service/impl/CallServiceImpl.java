@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.DateFormatterConstant.END_TIME;
+import static ai.rnt.crm.constants.DateFormatterConstant.START_TIME;
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_CALL;
@@ -70,6 +72,10 @@ public class CallServiceImpl implements CallService {
 			call.setLead(lead);
 			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
+			if (dto.isAllDay()) {
+				call.setStartTime(START_TIME);
+				call.setEndTime(END_TIME);
+			}
 			call.setStatus(SAVE);
 			if (nonNull(callDaoService.call(call)))
 				result.put(MESSAGE, "Call Added Successfully");
@@ -221,8 +227,7 @@ public class CallServiceImpl implements CallService {
 			if (checkDuplicateTask(callDaoService.getAllTask(), phoneCallTask)) {
 				result.put(SUCCESS, false);
 				result.put(MESSAGE, "Task Already Exists !!");
-			} 
-			else if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
+			} else if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Added Successfully..!!");
 			} else {
