@@ -44,7 +44,7 @@ public class ConvertDateFormatUtil {
 					.parse(from(toConvertDate.atZone(systemDefault()).toInstant()).toString()));
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format:", e.getMessage());
-			throw new CRMException("error while date conversion");
+			throw new CRMException("error while date conversion."+toConvertDate);
 		}
 	}
 
@@ -53,7 +53,7 @@ public class ConvertDateFormatUtil {
 			return DD_MMM_YYYY.format(DEFAULT_UTIL_DATE_FORMAT.parse(date.toString()));
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format in convertDateUtilDate:", e.getMessage());
-			throw new CRMException("error while date conversion");
+			throw new CRMException("error while date convertDateUtilDate."+date);
 		}
 	}
 
@@ -73,7 +73,7 @@ public class ConvertDateFormatUtil {
 			return DD_MMM_YYYY.format(YYYY_MM_DD.parse(date.toString()))+ " " +endTime;
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format in convertDateDateWithTime:", e.getMessage());
-			throw new CRMException("error while date conversion");
+			throw new CRMException("error while date convertDateDateWithTime.."+date);
 		}
 	}
 
