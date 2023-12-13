@@ -195,8 +195,13 @@ public class VisitServiceImpl implements VisitService {
 			visit.setDuration(dto.getDuration());
 			visit.setStartDate(dto.getStartDate());
 			visit.setEndDate(dto.getEndDate());
-			visit.setStartTime(dto.getStartTime());
-			visit.setEndTime(dto.getEndTime());
+			if (dto.isAllDay()) {
+				visit.setStartTime(START_TIME);
+				visit.setEndTime(END_TIME);
+			} else {
+				visit.setStartTime(dto.getStartTime());
+				visit.setEndTime(dto.getEndTime());
+			}
 			visit.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			visit.setAllDay(dto.isAllDay());
 			visit.setStatus(status);

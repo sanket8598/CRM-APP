@@ -73,24 +73,24 @@ public class MeetingServiceImpl implements MeetingService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			boolean saveStatus = false;
-			Meetings metting = TO_MEETING.apply(dto).orElseThrow(ResourceNotFoundException::new);
-			metting.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
-			metting.setAssignTo(employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
+			Meetings meeting = TO_MEETING.apply(dto).orElseThrow(ResourceNotFoundException::new);
+			meeting.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
+			meeting.setAssignTo(employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", auditAwareUtil.getLoggedInStaffId())));
 			if (dto.isAllDay()) {
-				metting.setStartTime(START_TIME);
-				metting.setEndTime(END_TIME);
+				meeting.setStartTime(START_TIME);
+				meeting.setEndTime(END_TIME);
 			}
-			metting.setMeetingStatus(SAVE);
-			leadDaoService.getLeadById(leadsId).ifPresent(metting::setLead);
+			meeting.setMeetingStatus(SAVE);
+			leadDaoService.getLeadById(leadsId).ifPresent(meeting::setLead);
 			if (isNull(dto.getMeetingAttachments()) || dto.getMeetingAttachments().isEmpty()) {
-				if (nonNull(meetingDaoService.addMeeting(metting)))
+				if (nonNull(meetingDaoService.addMeeting(meeting)))
 					saveStatus = true;
 			} else {
 				for (MeetingAttachmentsDto attach : dto.getMeetingAttachments()) {
 					MeetingAttachments meetingAttachments = TO_METTING_ATTACHMENT.apply(attach)
 							.orElseThrow(ResourceNotFoundException::new);
-					meetingAttachments.setMeetings(metting);
+					meetingAttachments.setMeetings(meeting);
 					if (nonNull(meetingAttachmetDaoService.addMeetingAttachment(meetingAttachments)))
 						saveStatus = true;
 				}
@@ -136,8 +136,13 @@ public class MeetingServiceImpl implements MeetingService {
 			meetings.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			meetings.setStartDate(dto.getStartDate());
 			meetings.setEndDate(dto.getEndDate());
-			meetings.setStartTime(dto.getStartTime());
-			meetings.setEndTime(dto.getEndTime());
+			if (dto.isAllDay()) {
+				meetings.setStartTime(START_TIME);
+				meetings.setEndTime(END_TIME);
+			} else {
+				meetings.setStartTime(dto.getStartTime());
+				meetings.setEndTime(dto.getEndTime());
+			}
 			meetings.setDuration(dto.getDuration());
 			meetings.setLocation(dto.getLocation());
 			meetings.setAllDay(dto.isAllDay());

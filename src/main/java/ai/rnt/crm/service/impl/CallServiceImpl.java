@@ -190,8 +190,13 @@ public class CallServiceImpl implements CallService {
 			call.setSubject(dto.getSubject());
 			call.setStartDate(dto.getStartDate());
 			call.setEndDate(dto.getEndDate());
-			call.setStartTime(dto.getStartTime());
-			call.setEndTime(dto.getEndTime());
+			if (dto.isAllDay()) {
+				call.setStartTime(START_TIME);
+				call.setEndTime(END_TIME);
+			} else {
+				call.setStartTime(dto.getStartTime());
+				call.setEndTime(dto.getEndTime());
+			}
 			call.setDirection(dto.getDirection());
 			call.setPhoneNo(dto.getPhoneNo());
 			call.setComment(dto.getComment());
