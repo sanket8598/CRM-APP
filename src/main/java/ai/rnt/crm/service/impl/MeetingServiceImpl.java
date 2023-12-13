@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.DateFormatterConstant.END_TIME;
+import static ai.rnt.crm.constants.DateFormatterConstant.START_TIME;
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT;
@@ -75,6 +77,10 @@ public class MeetingServiceImpl implements MeetingService {
 			metting.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			metting.setAssignTo(employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", auditAwareUtil.getLoggedInStaffId())));
+			if (dto.isAllDay()) {
+				metting.setStartTime(START_TIME);
+				metting.setEndTime(END_TIME);
+			}
 			metting.setMeetingStatus(SAVE);
 			leadDaoService.getLeadById(leadsId).ifPresent(metting::setLead);
 			if (isNull(dto.getMeetingAttachments()) || dto.getMeetingAttachments().isEmpty()) {

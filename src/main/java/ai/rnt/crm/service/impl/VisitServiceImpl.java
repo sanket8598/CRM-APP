@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.DateFormatterConstant.END_TIME;
+import static ai.rnt.crm.constants.DateFormatterConstant.START_TIME;
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_GET_VISIT_DTO;
@@ -74,6 +76,10 @@ public class VisitServiceImpl implements VisitService {
 			visit.setLead(lead);
 			visit.setVisitBy(employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
 					() -> new ResourceNotFoundException("Employee", "staffId", auditAwareUtil.getLoggedInStaffId())));
+			if (dto.isAllDay()) {
+				visit.setStartTime(START_TIME);
+				visit.setEndTime(END_TIME);
+			}
 			visit.setStatus(SAVE);
 			if (nonNull(visitDaoService.saveVisit(visit)))
 				result.put(MESSAGE, "Visit Added Successfully");
