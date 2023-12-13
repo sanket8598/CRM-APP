@@ -9,16 +9,16 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
 import java.util.List;
-
-import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.dao.service.ContactDaoService;
+import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.ContactDto;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
@@ -33,11 +33,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class ContactServiceImpl implements ContactService {
-
+	private final LeadDaoService leadDaoService;
 	private final ContactDaoService contactDaoService;
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addContact(@Valid ContactDto contactDto, Integer leadId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addContact(ContactDto contactDto, Integer leadId) {
 		EnumMap<ApiResponse, Object> contactMap = new EnumMap<>(ApiResponse.class);
 		try {
 			contactMap.put(SUCCESS, true);
@@ -46,8 +46,14 @@ public class ContactServiceImpl implements ContactService {
 					.map(Contacts::getCompanyMaster).findFirst().orElse(null);
 			boolean isPrimary = existingContacts.stream().anyMatch(Contacts::getPrimary);
 			Contacts contact = TO_CONTACT.apply(contactDto).orElseThrow(ResourceNotFoundException::new);
+			if (nonNull(contactDto.getName()) && contactDto.getName().contains(" ")) {
+				contact.setFirstName(contactDto.getName().split(" ")[0]);
+				contact.setLastName(contactDto.getName().split(" ")[1]);
+				;
+			}
 			contact.setCompanyMaster(company);
-			if (isPrimary || TRUE.equals(contact.getPrimary()))
+			leadDaoService.getLeadById(leadId).ifPresent(lead -> contact.setLead(lead));
+			if (TRUE.equals(contact.getPrimary()) && isPrimary)
 				existingContacts.stream().filter(Contacts::getPrimary).forEach(con -> {
 					con.setPrimary(false);
 					contactDaoService.addContact(con);
@@ -86,8 +92,10 @@ public class ContactServiceImpl implements ContactService {
 			contactMap.put(SUCCESS, true);
 			Contacts contact = contactDaoService.findById(contactId)
 					.orElseThrow(() -> new ResourceNotFoundException("Contact", "contactId", contactId));
-			contact.setFirstName(contactDto.getFirstName());
-			contact.setLastName(contactDto.getLastName());
+			if (nonNull(contactDto.getName()) && contactDto.getName().contains(" ")) {
+				contact.setFirstName(contactDto.getName().split(" ")[0]);
+				contact.setLastName(contactDto.getName().split(" ")[1]);
+			}
 			contact.setContactNumberPrimary(contactDto.getContactNumberPrimary());
 			contact.setContactNumberSecondary(contactDto.getContactNumberSecondary());
 			contact.setDesignation(contactDto.getDesignation());
@@ -103,7 +111,7 @@ public class ContactServiceImpl implements ContactService {
 				contactMap.put(SUCCESS, false);
 				contactMap.put(MESSAGE, "Contact Not Updated!!");
 			}
-			return new ResponseEntity<>(contactMap, CREATED);
+			return new ResponseEntity<>(contactMap, OK);
 		} catch (Exception e) {
 			log.error("error occured while updating the contact of a lead...{}", e.getMessage());
 			throw new CRMException(e);

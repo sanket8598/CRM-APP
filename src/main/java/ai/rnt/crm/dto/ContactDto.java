@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import static java.util.Objects.nonNull;
+
 import lombok.Data;
 
 @Data
@@ -32,6 +34,11 @@ public class ContactDto {
 	private String businessCardName;
 
 	private String businessCardType;
+	
+	private String name;
 
+	public String getName() {
+		return nonNull(name) && name.contains(" ") ? name:getFirstName() + " " + getLastName();
 
+	}
 }
