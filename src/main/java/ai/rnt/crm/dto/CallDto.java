@@ -43,10 +43,10 @@ public class CallDto {
 	private String duration;
 
 	@NotNull(message = "Start Date should not be null!!")
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date startDate;
 
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date endDate;
 
 	private String startTime;

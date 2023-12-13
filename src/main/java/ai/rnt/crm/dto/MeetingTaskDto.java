@@ -23,7 +23,7 @@ public class MeetingTaskDto {
 
 	private String priority;
 
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date dueDate;
 
 	private String dueTime;
@@ -37,6 +37,6 @@ public class MeetingTaskDto {
 //	@JsonFormat(pattern = "hh:mm aa")
 	private String remainderDueAt;
 
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date remainderDueOn;
 }
