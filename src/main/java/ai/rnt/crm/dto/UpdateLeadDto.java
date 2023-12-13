@@ -29,10 +29,13 @@ public class UpdateLeadDto {
 	@Pattern(regexp = "^[0-9,\\.]+$", message = "Please Enter Valid Budget Amount!!")
 	private String budgetAmount;
 	
+	@NotBlank(message = "Service Falls Into should not be null or empty!!")
 	private String serviceFallsId;
 	
+	@NotBlank(message = "Lead Source should not be null or empty!!")
 	private String leadSourceId;
 	
+	@NotBlank(message = "Domain should not be null or empty!!")
 	private String domainId;
 	private String companyWebsite;
 	private String companyName;
