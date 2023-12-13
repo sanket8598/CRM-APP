@@ -37,7 +37,7 @@ public class EmailUtil {
 
 	private static final Properties PROPERTIES = new Properties();
 	private static final String USERNAME = "nik.gaikwad@rnt.ai"; // change it
-	private static final String PASSWORD = "xcHsf$8y"; // change it
+	private static final String PASSWORD = "Ng@@1030"; // change it
 	private static final String HOST = "smtp.zoho.com";
 
 	static {
