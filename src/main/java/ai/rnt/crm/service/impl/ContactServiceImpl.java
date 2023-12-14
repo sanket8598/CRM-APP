@@ -7,6 +7,7 @@ import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.StringUtil.hasWhitespace;
 import static ai.rnt.crm.util.StringUtil.splitByWhitespace;
 import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.FALSE;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
@@ -112,13 +113,27 @@ public class ContactServiceImpl implements ContactService {
 			contact.setBusinessCard(contactDto.getBusinessCard());
 			contact.setBusinessCardName(contactDto.getBusinessCardName());
 			contact.setBusinessCardType(contactDto.getBusinessCardType());
+			
 			List<Contacts> existingContacts = contactDaoService.contactsOfLead(contact.getLead().getLeadId());
-			if (TRUE.equals(contactDto.getPrimary()) && existingContacts.stream().anyMatch(Contacts::getPrimary))
+			boolean isPrimary=existingContacts.stream().anyMatch(Contacts::getPrimary);
+			contact.setPrimary(contactDto.getPrimary());
+			if (TRUE.equals(contactDto.getPrimary()) && isPrimary)
 				existingContacts.stream().filter(Contacts::getPrimary).forEach(con -> {
 					con.setPrimary(false);
 					contactDaoService.addContact(con);
 				});
-			contact.setPrimary(contactDto.getPrimary());
+			else if (FALSE.equals(contactDto.getPrimary())) {
+				if(existingContacts.size()==1)
+				  existingContacts.stream().findFirst().ifPresent(con -> {
+					 con.setPrimary(true);
+					contactDaoService.addContact(con);
+				  });
+				 else
+					 existingContacts.stream().findFirst().ifPresent(con -> {
+						 con.setPrimary(false);
+						contactDaoService.addContact(con);
+				});
+			}
 			if (nonNull(contactDaoService.addContact(contact)))
 				contactMap.put(MESSAGE, "Contact Updated Successfully!!");
 			else {
