@@ -1,10 +1,11 @@
 package ai.rnt.crm.service.impl;
-
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.StringUtil.hasWhitespace;
+import static ai.rnt.crm.util.StringUtil.splitByWhitespace;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -44,15 +45,18 @@ public class ContactServiceImpl implements ContactService {
 			List<Contacts> existingContacts = contactDaoService.contactsOfLead(leadId);
 			CompanyMaster company = existingContacts.stream().filter(Contacts::getPrimary)
 					.map(Contacts::getCompanyMaster).findFirst().orElse(null);
-			boolean isPrimary = existingContacts.stream().anyMatch(Contacts::getPrimary);
 			Contacts contact = TO_CONTACT.apply(contactDto).orElseThrow(ResourceNotFoundException::new);
-			if (nonNull(contactDto.getName()) && contactDto.getName().contains(" ")) {
-				contact.setFirstName(contactDto.getName().split(" ")[0]);
-				contact.setLastName(contactDto.getName().split(" ")[1]);
+			if (nonNull(contactDto.getName())) {
+				String[] names = splitByWhitespace(contactDto.getName());
+				if(hasWhitespace(contactDto.getName()) && names.length==2) {
+				   contact.setFirstName(names[0]);
+				   contact.setLastName(names[1]);
+				}else
+					contact.setFirstName(contactDto.getName());
 			}
 			contact.setCompanyMaster(company);
-			leadDaoService.getLeadById(leadId).ifPresent(lead -> contact.setLead(lead));
-			if (TRUE.equals(contact.getPrimary()) && isPrimary)
+			leadDaoService.getLeadById(leadId).ifPresent(contact::setLead);
+			if (TRUE.equals(contact.getPrimary()) && existingContacts.stream().anyMatch(Contacts::getPrimary))
 				existingContacts.stream().filter(Contacts::getPrimary).forEach(con -> {
 					con.setPrimary(false);
 					contactDaoService.addContact(con);
@@ -91,10 +95,15 @@ public class ContactServiceImpl implements ContactService {
 			contactMap.put(SUCCESS, true);
 			Contacts contact = contactDaoService.findById(contactId)
 					.orElseThrow(() -> new ResourceNotFoundException("Contact", "contactId", contactId));
-			if (nonNull(contactDto.getName()) && contactDto.getName().contains(" ")) {
-				contact.setFirstName(contactDto.getName().split(" ")[0]);
-				contact.setLastName(contactDto.getName().split(" ")[1]);
+			if (nonNull(contactDto.getName())) {
+				String[] names = splitByWhitespace(contactDto.getName());
+				if(hasWhitespace(contactDto.getName()) && names.length==2) {
+				   contact.setFirstName(names[0]);
+				   contact.setLastName(names[1]);
+				}else
+					contact.setFirstName(contactDto.getName());
 			}
+
 			contact.setContactNumberPrimary(contactDto.getContactNumberPrimary());
 			contact.setContactNumberSecondary(contactDto.getContactNumberSecondary());
 			contact.setDesignation(contactDto.getDesignation());
@@ -104,8 +113,7 @@ public class ContactServiceImpl implements ContactService {
 			contact.setBusinessCardName(contactDto.getBusinessCardName());
 			contact.setBusinessCardType(contactDto.getBusinessCardType());
 			List<Contacts> existingContacts = contactDaoService.contactsOfLead(contact.getLead().getLeadId());
-			boolean isPrimary = existingContacts.stream().anyMatch(Contacts::getPrimary);
-			if (TRUE.equals(contactDto.getPrimary()) && isPrimary)
+			if (TRUE.equals(contactDto.getPrimary()) && existingContacts.stream().anyMatch(Contacts::getPrimary))
 				existingContacts.stream().filter(Contacts::getPrimary).forEach(con -> {
 					con.setPrimary(false);
 					contactDaoService.addContact(con);
