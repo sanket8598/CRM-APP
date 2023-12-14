@@ -8,8 +8,8 @@ import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_COUNT;
 import static ai.rnt.crm.constants.CRMConstants.COMPLETED_TASK_KEY;
 import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
 import static ai.rnt.crm.constants.CRMConstants.COUNT_BY_STATUS;
-import static ai.rnt.crm.constants.CRMConstants.DOMAIN_MASTER_DATA;
 import static ai.rnt.crm.constants.CRMConstants.DOMAINS;
+import static ai.rnt.crm.constants.CRMConstants.DOMAIN_MASTER_DATA;
 import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_COUNT;
 import static ai.rnt.crm.constants.CRMConstants.IN_PROGRESS_TASK_KEY;
@@ -278,10 +278,10 @@ public class LeadServiceImpl implements LeadService {
 				Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 				List<LeadImportant> impLead = leadDaoService.findLeadByEmployeeStaffId(loggedInStaffId);
 				List<Leads> allLeads = leadDaoService.getAllLeads().stream()
-						.peek(lead -> lead.setImportant(impLead.stream().map(LeadImportant::getLead)
-								.anyMatch(l -> l.getLeadId().equals(lead.getLeadId()))))
-						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate()))
-						.collect(Collectors.toList());
+						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())).collect(toList());
+				allLeads.stream().forEach(lead -> lead.setImportant(impLead.stream().map(LeadImportant::getLead)
+						.anyMatch(l -> l.getLeadId().equals(lead.getLeadId()))));
+
 				Comparator<Leads> importantLeads = (l1, l2) -> l2.getImportant().compareTo(l1.getImportant());
 				allLeads.sort(
 						importantLeads.thenComparing((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())));
@@ -993,7 +993,7 @@ public class LeadServiceImpl implements LeadService {
 				else {
 					DomainMaster newDomain = new DomainMaster();
 					newDomain.setDomainName(leadDto.getDomainId());
-							domainMasterDaoService.addDomain(newDomain).ifPresent(leads::setDomainMaster);
+					domainMasterDaoService.addDomain(newDomain).ifPresent(leads::setDomainMaster);
 				}
 			}
 		} catch (Exception e) {
@@ -1133,8 +1133,8 @@ public class LeadServiceImpl implements LeadService {
 					.ifPresent(leads::setLeadSourceMaster);
 		}
 		if (nonNull(domainName) && pattern.matcher(domainName).matches())
-			
-					domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
+
+			domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
 		else {
 			DomainMaster domainMaster = new DomainMaster();
 			domainMaster.setDomainName(domainName);

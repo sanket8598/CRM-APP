@@ -13,14 +13,14 @@ import ai.rnt.crm.enums.ApiResponse;
 
 public interface LeadTaskService {
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> addTask(@Valid LeadTaskDto dto, Integer leadsId);
+	ResponseEntity<EnumMap<ApiResponse, Object>> addLeadTask(@Valid LeadTaskDto dto, Integer leadsId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getLeadTask(Integer taskId);
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(GetLeadTaskDto dto, Integer taskId);
+	ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadTask(GetLeadTaskDto dto, Integer taskId);
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> assignTask(Map<String, Integer> map);
+	ResponseEntity<EnumMap<ApiResponse, Object>> assignLeadTask(Map<String, Integer> map);
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> deleteTask(Integer taskId);
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteLeadTask(Integer taskId);
 
 }

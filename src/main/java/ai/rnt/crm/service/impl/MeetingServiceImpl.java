@@ -22,6 +22,7 @@ import static org.springframework.http.HttpStatus.OK;
 import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -38,6 +39,7 @@ import ai.rnt.crm.dto.GetMeetingTaskDto;
 import ai.rnt.crm.dto.MeetingAttachmentsDto;
 import ai.rnt.crm.dto.MeetingDto;
 import ai.rnt.crm.dto.MeetingTaskDto;
+import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingAttachments;
 import ai.rnt.crm.entity.MeetingTask;
@@ -292,6 +294,30 @@ public class MeetingServiceImpl implements MeetingService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while updating the meeting task by id..{} " + taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignMeetingTask(Map<String, Integer> map) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		log.info("inside assign task staffId: {} taskId:{}", map.get("staffId"), map.get("taskId"));
+		try {
+			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(map.get("taskId"))
+					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", map.get("taskId")));
+			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			meetingTask.setAssignTo(employee);
+			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Assigned SuccessFully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Assigned");
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while assigning the MeetingTask..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

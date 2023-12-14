@@ -53,7 +53,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 	private final EmployeeService employeeService;
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addTask(@Valid LeadTaskDto dto, Integer leadsId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addLeadTask(@Valid LeadTaskDto dto, Integer leadsId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = TO_LEAD_TASK.apply(dto)
@@ -80,7 +80,21 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(GetLeadTaskDto dto, Integer taskId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadTask(Integer taskId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			result.put(DATA, TO_GET_LEAD_TASK_DTO.apply(leadTaskDaoService.getTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", taskId))));
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, FOUND);
+		} catch (Exception e) {
+			log.info("Got Exception while getting the lead task..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadTask(GetLeadTaskDto dto, Integer taskId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
@@ -111,7 +125,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignTask(Map<String, Integer> map) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLeadTask(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign task staffId: {} taskId:{}", map.get("staffId"), map.get("taskId"));
 		try {
@@ -135,7 +149,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteTask(Integer taskId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteLeadTask(Integer taskId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
@@ -152,20 +166,6 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
 			log.info("Got Exception while deleting the lead task..{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadTask(Integer taskId) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		try {
-			result.put(DATA, TO_GET_LEAD_TASK_DTO.apply(leadTaskDaoService.getTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", taskId))));
-			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, FOUND);
-		} catch (Exception e) {
-			log.info("Got Exception while getting the lead task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

@@ -94,81 +94,6 @@ public class VisitServiceImpl implements VisitService {
 	}
 
 	@Override
-	@Transactional
-	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(Integer visitId) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		try {
-			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
-			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
-					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
-			visit.getVisitTasks().stream().forEach(e -> {
-				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(LocalDateTime.now());
-				visitDaoService.addVisitTask(e);
-			});
-			visit.setDeletedBy(loggedInStaffId);
-			visit.setDeletedDate(LocalDateTime.now());
-			if (nonNull(visitDaoService.saveVisit(visit))) {
-				result.put(MESSAGE, "Visit deleted SuccessFully.");
-				result.put(SUCCESS, true);
-			} else {
-				result.put(MESSAGE, "Visit Not delete.");
-				result.put(SUCCESS, false);
-			}
-			return new ResponseEntity<>(result, OK);
-		} catch (Exception e) {
-			log.info("Got Exception while deleting the visit..{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> visitMarkAsCompleted(Integer visitId) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		try {
-			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
-					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
-			visit.setUpdatedDate(LocalDateTime.now());
-			visit.setStatus(COMPLETE);
-			if (nonNull(visitDaoService.saveVisit(visit))) {
-				result.put(MESSAGE, "Visit updated SuccessFully");
-				result.put(SUCCESS, true);
-			} else {
-				result.put(MESSAGE, "Visit Not updated");
-				result.put(SUCCESS, false);
-			}
-			return new ResponseEntity<>(result, OK);
-		} catch (Exception e) {
-			log.info("Got Exception while visitMarkAsCompleted..{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(Map<String, Integer> map) {
-		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
-		log.info("inside assign Visit staffId: {} visitId:{}", map.get("staffId"), map.get("visitId"));
-		try {
-			Visit visit = visitDaoService.getVisitsByVisitId(map.get("visitId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", map.get("visitId")));
-			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
-			visit.setVisitBy(employee);
-			if (nonNull(visitDaoService.saveVisit(visit))) {
-				resultMap.put(MESSAGE, "Visit Assigned SuccessFully");
-				resultMap.put(SUCCESS, true);
-			} else {
-				resultMap.put(MESSAGE, "Visit Not Assigned");
-				resultMap.put(SUCCESS, false);
-			}
-			return new ResponseEntity<>(resultMap, OK);
-		} catch (Exception e) {
-			log.info("Got Exception while assign the visit..{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editVisit(Integer visitId) {
 		EnumMap<ApiResponse, Object> visit = new EnumMap<>(ApiResponse.class);
 		try {
@@ -217,6 +142,81 @@ public class VisitServiceImpl implements VisitService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.info("Got Exception while update the visit..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(Map<String, Integer> map) {
+		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		log.info("inside assign Visit staffId: {} visitId:{}", map.get("staffId"), map.get("visitId"));
+		try {
+			Visit visit = visitDaoService.getVisitsByVisitId(map.get("visitId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", map.get("visitId")));
+			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			visit.setVisitBy(employee);
+			if (nonNull(visitDaoService.saveVisit(visit))) {
+				resultMap.put(MESSAGE, "Visit Assigned SuccessFully");
+				resultMap.put(SUCCESS, true);
+			} else {
+				resultMap.put(MESSAGE, "Visit Not Assigned");
+				resultMap.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(resultMap, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while assign the visit..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> visitMarkAsCompleted(Integer visitId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
+					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
+			visit.setUpdatedDate(LocalDateTime.now());
+			visit.setStatus(COMPLETE);
+			if (nonNull(visitDaoService.saveVisit(visit))) {
+				result.put(MESSAGE, "Visit updated SuccessFully");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Visit Not updated");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while visitMarkAsCompleted..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(Integer visitId) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
+			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
+					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
+			visit.getVisitTasks().stream().forEach(e -> {
+				e.setDeletedBy(loggedInStaffId);
+				e.setDeletedDate(LocalDateTime.now());
+				visitDaoService.addVisitTask(e);
+			});
+			visit.setDeletedBy(loggedInStaffId);
+			visit.setDeletedDate(LocalDateTime.now());
+			if (nonNull(visitDaoService.saveVisit(visit))) {
+				result.put(MESSAGE, "Visit deleted SuccessFully.");
+				result.put(SUCCESS, true);
+			} else {
+				result.put(MESSAGE, "Visit Not delete.");
+				result.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while deleting the visit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -289,6 +289,30 @@ public class VisitServiceImpl implements VisitService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while updating visit task by id..{}", +taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisitTask(Map<String, Integer> map) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		log.info("inside assign task staffId: {} taskId:{}", map.get("staffId"), map.get("taskId"));
+		try {
+			VisitTask visitTask = visitDaoService.getVisitTaskById(map.get("taskId"))
+					.orElseThrow(() -> new ResourceNotFoundException("VisitTask", "taskId", map.get("taskId")));
+			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			visitTask.setAssignTo(employee);
+			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Assigned SuccessFully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Assigned");
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while assigning the visitTask..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
