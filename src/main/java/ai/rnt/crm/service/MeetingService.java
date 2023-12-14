@@ -20,6 +20,8 @@ public interface MeetingService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> updateMeeting(MeetingDto dto, Integer meetingId, String status);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> assignMeeting(Map<String, Integer> map);
+
 	ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeeting(Integer meetingId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@Valid MeetingTaskDto dto, Integer leadsId,
