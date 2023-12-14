@@ -90,6 +90,61 @@ public class CallServiceImpl implements CallService {
 	}
 
 	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(Integer callId) {
+		EnumMap<ApiResponse, Object> call = new EnumMap<>(ApiResponse.class);
+		try {
+			call.put(DATA, TO_GET_CALL_DTO.apply(callDaoService.getCallById(callId)
+					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", callId))));
+			call.put(SUCCESS, true);
+			return new ResponseEntity<>(call, FOUND);
+		} catch (Exception e) {
+			log.info("Got exception while get call data for edit..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(CallDto dto, Integer callId, String status) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Call call = callDaoService.getCallById(callId)
+					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", dto.getCallId()));
+			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
+					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
+			call.setCallTo(dto.getCallTo());
+			call.setSubject(dto.getSubject());
+			call.setStartDate(dto.getStartDate());
+			call.setEndDate(dto.getEndDate());
+			if (dto.isAllDay()) {
+				call.setStartTime(START_TIME);
+				call.setEndTime(END_TIME);
+			} else {
+				call.setStartTime(dto.getStartTime());
+				call.setEndTime(dto.getEndTime());
+			}
+			call.setDirection(dto.getDirection());
+			call.setPhoneNo(dto.getPhoneNo());
+			call.setComment(dto.getComment());
+			call.setDuration(dto.getDuration());
+			call.setAllDay(dto.isAllDay());
+			call.setStatus(status);
+			call.setUpdatedDate(LocalDateTime.now());
+			if (nonNull(callDaoService.call(call))) {
+				if (status.equalsIgnoreCase(SAVE))
+					result.put(MESSAGE, "Call Updated Successfully");
+				else
+					result.put(MESSAGE, "Call Updated And Completed Successfully");
+			} else
+				result.put(MESSAGE, "Call Not Updated");
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.info("Got exception while update call..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign call staffId: {} callId:{}", map.get("staffId"), map.get("addCallId"));
@@ -165,61 +220,6 @@ public class CallServiceImpl implements CallService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(Integer callId) {
-		EnumMap<ApiResponse, Object> call = new EnumMap<>(ApiResponse.class);
-		try {
-			call.put(DATA, TO_GET_CALL_DTO.apply(callDaoService.getCallById(callId)
-					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", callId))));
-			call.put(SUCCESS, true);
-			return new ResponseEntity<>(call, FOUND);
-		} catch (Exception e) {
-			log.info("Got exception while get call data for edit..{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(CallDto dto, Integer callId, String status) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		try {
-			Call call = callDaoService.getCallById(callId)
-					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", dto.getCallId()));
-			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
-					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
-			call.setCallTo(dto.getCallTo());
-			call.setSubject(dto.getSubject());
-			call.setStartDate(dto.getStartDate());
-			call.setEndDate(dto.getEndDate());
-			if (dto.isAllDay()) {
-				call.setStartTime(START_TIME);
-				call.setEndTime(END_TIME);
-			} else {
-				call.setStartTime(dto.getStartTime());
-				call.setEndTime(dto.getEndTime());
-			}
-			call.setDirection(dto.getDirection());
-			call.setPhoneNo(dto.getPhoneNo());
-			call.setComment(dto.getComment());
-			call.setDuration(dto.getDuration());
-			call.setAllDay(dto.isAllDay());
-			call.setStatus(status);
-			call.setUpdatedDate(LocalDateTime.now());
-			if (nonNull(callDaoService.call(call))) {
-				if (status.equalsIgnoreCase(SAVE))
-					result.put(MESSAGE, "Call Updated Successfully");
-				else
-					result.put(MESSAGE, "Call Updated And Completed Successfully");
-			} else
-				result.put(MESSAGE, "Call Not Updated");
-			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, CREATED);
-		} catch (Exception e) {
-			log.info("Got exception while update call..{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@Valid CallTaskDto dto, Integer leadsId,
 			Integer callId) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
@@ -287,6 +287,30 @@ public class CallServiceImpl implements CallService {
 			return new ResponseEntity<>(callTask, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while updating phone call task by id..{}", +taskId, e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCallTask(Map<String, Integer> map) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		log.info("inside assign task staffId: {} taskId:{}", map.get("staffId"), map.get("taskId"));
+		try {
+			PhoneCallTask callTask = callDaoService.getCallTaskById(map.get("taskId"))
+					.orElseThrow(() -> new ResourceNotFoundException("PhoneCallTask", "taskId", map.get("taskId")));
+			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			callTask.setAssignTo(employee);
+			if (nonNull(callDaoService.addCallTask(callTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Assigned SuccessFully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Assigned");
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while assigning the PhoneCallTask task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

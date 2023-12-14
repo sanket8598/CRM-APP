@@ -45,21 +45,6 @@ public class VisitController {
 		return visitService.saveVisit(dto);
 	}
 
-	@DeleteMapping("/delete/{visitId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(@PathVariable Integer visitId) {
-		return visitService.deleteVisit(visitId);
-	}
-
-	@PutMapping("/updateVisit/{visitId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> visitMarkAsCompleted(@PathVariable Integer visitId) {
-		return visitService.visitMarkAsCompleted(visitId);
-	}
-
-	@PutMapping("/assignVisit")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(@RequestBody Map<String, Integer> map) {
-		return visitService.assignVisit(map);
-	}
-
 	@GetMapping("/edit/{visitId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editVisit(@PathVariable Integer visitId) {
 		return visitService.editVisit(visitId);
@@ -69,6 +54,21 @@ public class VisitController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisit(@RequestBody VisitDto dto,
 			@PathVariable(name = "visitId") Integer visitId, @PathVariable(name = "status") String status) {
 		return visitService.updateVisit(dto, visitId, status);
+	}
+
+	@PutMapping("/assignVisit")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(@RequestBody Map<String, Integer> map) {
+		return visitService.assignVisit(map);
+	}
+
+	@PutMapping("/updateVisit/{visitId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> visitMarkAsCompleted(@PathVariable Integer visitId) {
+		return visitService.visitMarkAsCompleted(visitId);
+	}
+
+	@DeleteMapping("/delete/{visitId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(@PathVariable Integer visitId) {
+		return visitService.deleteVisit(visitId);
 	}
 
 	@PostMapping("/task/{leadId}/{visitId}")
@@ -86,6 +86,11 @@ public class VisitController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisitTask(@RequestBody GetVisitTaskDto dto,
 			@PathVariable Integer taskId) {
 		return visitService.updateVisitTask(dto, taskId);
+	}
+
+	@PutMapping("/task/assign")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisitTask(@RequestBody Map<String, Integer> map) {
+		return visitService.assignVisitTask(map);
 	}
 
 	@DeleteMapping("/task/delete/{taskId}")

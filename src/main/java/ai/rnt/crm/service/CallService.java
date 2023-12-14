@@ -16,15 +16,15 @@ public interface CallService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> addCall(CallDto dto, Integer leadsId);
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Integer> map);
-
-    ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(Integer callId);
-
-	ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId);
-
 	ResponseEntity<EnumMap<ApiResponse, Object>> editCall(Integer callId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(CallDto dto, Integer callId, String status);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Integer> map);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(Integer callId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@Valid CallTaskDto dto, Integer leadsId, Integer callId);
 
@@ -32,5 +32,8 @@ public interface CallService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> updateCallTask(GetCallTaskDto dto, Integer taskId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> assignCallTask(Map<String, Integer> map);
+
 	ResponseEntity<EnumMap<ApiResponse, Object>> deleteCallTask(Integer taskId);
+
 }

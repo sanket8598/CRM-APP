@@ -45,6 +45,17 @@ public class CallController {
 		return callService.addCall(dto, leadsId);
 	}
 
+	@GetMapping("/edit/{callId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(@PathVariable Integer callId) {
+		return callService.editCall(callId);
+	}
+
+	@PutMapping("/update/{callId}/{status}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(@RequestBody CallDto dto,
+			@PathVariable(name = "callId") Integer callId, @PathVariable(name = "status") String status) {
+		return callService.updateCall(dto, callId, status);
+	}
+
 	@PutMapping("/assignCall")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(@RequestBody Map<String, Integer> map) {
 		return callService.assignCall(map);
@@ -58,17 +69,6 @@ public class CallController {
 	@DeleteMapping("/delete/{callId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(@PathVariable Integer callId) {
 		return callService.deleteCall(callId);
-	}
-
-	@GetMapping("/edit/{callId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(@PathVariable Integer callId) {
-		return callService.editCall(callId);
-	}
-
-	@PutMapping("/update/{callId}/{status}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(@RequestBody CallDto dto,
-			@PathVariable(name = "callId") Integer callId, @PathVariable(name = "status") String status) {
-		return callService.updateCall(dto, callId, status);
 	}
 
 	@PostMapping("/task/{leadId}/{callId}")
@@ -86,6 +86,11 @@ public class CallController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCallTask(@RequestBody GetCallTaskDto dto,
 			@PathVariable Integer taskId) {
 		return callService.updateCallTask(dto, taskId);
+	}
+
+	@PutMapping("/task/assign")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCallTask(@RequestBody Map<String, Integer> map) {
+		return callService.assignCallTask(map);
 	}
 
 	@DeleteMapping("/task/delete/{taskId}")

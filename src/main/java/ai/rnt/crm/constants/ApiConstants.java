@@ -58,7 +58,7 @@ public final class ApiConstants {
 	public static final String ALL_CITY = SEPERATOR + "allCity";
 
 	public static final String CALL = BASE + "call" + SEPERATOR;
-	
+
 	public static final String TASK = BASE + "lead" + SEPERATOR + "task" + SEPERATOR;
 
 	public static final String ADD_CALL = SEPERATOR + "add" + SEPERATOR + "{leadId}";
@@ -70,12 +70,11 @@ public final class ApiConstants {
 	public static final String ADD = SEPERATOR + "add";
 
 	public static final String MEETING = BASE + "meeting" + SEPERATOR;
-	
-	public static final String GET_ALL_MAIL_ID = GET_ADMIN_AND_USER +SEPERATOR+ "{email}";
-	
-	public static final String DOWNLOAD = SEPERATOR+"download";
-	
+
+	public static final String GET_ALL_MAIL_ID = GET_ADMIN_AND_USER + SEPERATOR + "{email}";
+
+	public static final String DOWNLOAD = SEPERATOR + "download";
+
 	public static final String CONTACT = BASE + "contact" + SEPERATOR;
-	
 
 }

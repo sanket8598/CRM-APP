@@ -3,6 +3,7 @@ package ai.rnt.crm.api.restcontroller;
 import static ai.rnt.crm.constants.ApiConstants.MEETING;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -75,6 +76,11 @@ public class MeetingController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(@RequestBody GetMeetingTaskDto dto,
 			@PathVariable Integer taskId) {
 		return meetingService.updateMeetingTask(dto, taskId);
+	}
+
+	@PutMapping("/task/assign")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignMeetingTask(@RequestBody Map<String, Integer> map) {
+		return meetingService.assignMeetingTask(map);
 	}
 
 	@DeleteMapping("/task/delete/{taskId}")

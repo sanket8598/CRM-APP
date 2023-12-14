@@ -33,9 +33,9 @@ public class LeadTaskController {
 	private final LeadTaskService leadTaskService;
 
 	@PostMapping("/add/{leadId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addTask(@RequestBody @Valid LeadTaskDto dto,
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addLeadTask(@RequestBody @Valid LeadTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId) {
-		return leadTaskService.addTask(dto, leadsId);
+		return leadTaskService.addLeadTask(dto, leadsId);
 	}
 
 	@GetMapping("/{taskId}")
@@ -44,19 +44,18 @@ public class LeadTaskController {
 	}
 
 	@PutMapping("/update/{taskId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateTask(@RequestBody GetLeadTaskDto dto,
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadTask(@RequestBody GetLeadTaskDto dto,
 			@PathVariable(name = "taskId") Integer taskId) {
-		return leadTaskService.updateTask(dto, taskId);
+		return leadTaskService.updateLeadTask(dto, taskId);
 	}
 
 	@PutMapping("/assign")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignTask(@RequestBody Map<String, Integer> map) {
-		return leadTaskService.assignTask(map);
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLeadTask(@RequestBody Map<String, Integer> map) {
+		return leadTaskService.assignLeadTask(map);
 	}
 
 	@DeleteMapping("/delete/{taskId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteTask(@PathVariable Integer taskId) {
-		return leadTaskService.deleteTask(taskId);
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteLeadTask(@PathVariable Integer taskId) {
+		return leadTaskService.deleteLeadTask(taskId);
 	}
-
 }
