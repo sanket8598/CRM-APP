@@ -1,6 +1,11 @@
 package ai.rnt.crm.api.restcontroller;
 
-import static ai.rnt.crm.constants.ApiConstants.TASK;
+import static ai.rnt.crm.constants.ApiConstants.LEAD_TASK;
+import static ai.rnt.crm.constants.ApiConstants.ADD_LEAD_TASK;
+import static ai.rnt.crm.constants.ApiConstants.GET_LEAD_TASK;
+import static ai.rnt.crm.constants.ApiConstants.UPDATE_LEAD_TASK;
+import static ai.rnt.crm.constants.ApiConstants.ASSIGN_LEAD_TASK;
+import static ai.rnt.crm.constants.ApiConstants.DELETE_LEAD_TASK;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -25,36 +30,36 @@ import ai.rnt.crm.service.LeadTaskService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping(TASK)
+@RequestMapping(LEAD_TASK)
 @CrossOrigin("*")
 @RequiredArgsConstructor
 public class LeadTaskController {
 
 	private final LeadTaskService leadTaskService;
 
-	@PostMapping("/add/{leadId}")
+	@PostMapping(ADD_LEAD_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addLeadTask(@RequestBody @Valid LeadTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId) {
 		return leadTaskService.addLeadTask(dto, leadsId);
 	}
 
-	@GetMapping("/{taskId}")
+	@GetMapping(GET_LEAD_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadTask(@PathVariable Integer taskId) {
 		return leadTaskService.getLeadTask(taskId);
 	}
 
-	@PutMapping("/update/{taskId}")
+	@PutMapping(UPDATE_LEAD_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadTask(@RequestBody GetLeadTaskDto dto,
 			@PathVariable(name = "taskId") Integer taskId) {
 		return leadTaskService.updateLeadTask(dto, taskId);
 	}
 
-	@PutMapping("/assign")
+	@PutMapping(ASSIGN_LEAD_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLeadTask(@RequestBody Map<String, Integer> map) {
 		return leadTaskService.assignLeadTask(map);
 	}
 
-	@DeleteMapping("/delete/{taskId}")
+	@DeleteMapping(DELETE_LEAD_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteLeadTask(@PathVariable Integer taskId) {
 		return leadTaskService.deleteLeadTask(taskId);
 	}

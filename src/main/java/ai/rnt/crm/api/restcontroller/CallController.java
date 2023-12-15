@@ -1,6 +1,16 @@
 package ai.rnt.crm.api.restcontroller;
 
+import static ai.rnt.crm.constants.ApiConstants.ADD_CALL;
+import static ai.rnt.crm.constants.ApiConstants.ADD_CALL_TASK;
+import static ai.rnt.crm.constants.ApiConstants.ASSIGN_CALL;
+import static ai.rnt.crm.constants.ApiConstants.ASSIGN_CALL_TASK;
 import static ai.rnt.crm.constants.ApiConstants.CALL;
+import static ai.rnt.crm.constants.ApiConstants.DELETE_CALL;
+import static ai.rnt.crm.constants.ApiConstants.DELETE_CALL_TASK;
+import static ai.rnt.crm.constants.ApiConstants.EDIT_CALL;
+import static ai.rnt.crm.constants.ApiConstants.GET_CALL_TASK;
+import static ai.rnt.crm.constants.ApiConstants.UPDATE_CALL;
+import static ai.rnt.crm.constants.ApiConstants.UPDATE_CALL_TASK;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -39,24 +49,24 @@ public class CallController {
 
 	private final CallService callService;
 
-	@PostMapping("/add/{leadId}")
+	@PostMapping(ADD_CALL)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(@RequestBody @Valid CallDto dto,
 			@PathVariable(name = "leadId") Integer leadsId) {
 		return callService.addCall(dto, leadsId);
 	}
 
-	@GetMapping("/edit/{callId}")
+	@GetMapping(EDIT_CALL)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(@PathVariable Integer callId) {
 		return callService.editCall(callId);
 	}
 
-	@PutMapping("/update/{callId}/{status}")
+	@PutMapping(UPDATE_CALL)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(@RequestBody CallDto dto,
 			@PathVariable(name = "callId") Integer callId, @PathVariable(name = "status") String status) {
 		return callService.updateCall(dto, callId, status);
 	}
 
-	@PutMapping("/assign")
+	@PutMapping(ASSIGN_CALL)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(@RequestBody Map<String, Integer> map) {
 		return callService.assignCall(map);
 	}
@@ -66,34 +76,34 @@ public class CallController {
 		return callService.markAsCompleted(callId);
 	}
 
-	@DeleteMapping("/delete/{callId}")
+	@DeleteMapping(DELETE_CALL)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(@PathVariable Integer callId) {
 		return callService.deleteCall(callId);
 	}
 
-	@PostMapping("/task/{leadId}/{callId}")
+	@PostMapping(ADD_CALL_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@RequestBody @Valid CallTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "callId") Integer callId) {
 		return callService.addCallTask(dto, leadsId, callId);
 	}
 
-	@GetMapping("/task/{taskId}")
+	@GetMapping(GET_CALL_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getCallTask(@PathVariable Integer taskId) {
 		return callService.getCallTask(taskId);
 	}
 
-	@PutMapping("/task/{taskId}")
+	@PutMapping(UPDATE_CALL_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCallTask(@RequestBody GetCallTaskDto dto,
 			@PathVariable Integer taskId) {
 		return callService.updateCallTask(dto, taskId);
 	}
 
-	@PutMapping("/task/assign")
+	@PutMapping(ASSIGN_CALL_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCallTask(@RequestBody Map<String, Integer> map) {
 		return callService.assignCallTask(map);
 	}
 
-	@DeleteMapping("/task/delete/{taskId}")
+	@DeleteMapping(DELETE_CALL_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCallTask(@PathVariable Integer taskId) {
 		return callService.deleteCallTask(taskId);
 	}
