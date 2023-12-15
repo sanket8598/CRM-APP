@@ -1,6 +1,11 @@
 package ai.rnt.crm.api.restcontroller;
 
+import static ai.rnt.crm.constants.ApiConstants.ADD_EMAIL;
+import static ai.rnt.crm.constants.ApiConstants.ASSIGN_EMAIL;
+import static ai.rnt.crm.constants.ApiConstants.DELETE_EMAIL;
 import static ai.rnt.crm.constants.ApiConstants.EMAIL;
+import static ai.rnt.crm.constants.ApiConstants.GET_EMAIL;
+import static ai.rnt.crm.constants.ApiConstants.UPDATE_EMAIL;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -37,38 +42,38 @@ public class EmailController {
 	 * @since 12/09/2023.
 	 * @return mail
 	 */
-	@PostMapping("/addEmail/{leadId}/{status}")
+	@PostMapping(ADD_EMAIL)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addEmail(@RequestBody EmailDto dto,
 			@PathVariable(name = "leadId") Integer leadId,
 			@PathVariable(name = "status", required = false) String status) {
 		return emailService.addEmail(dto, leadId, status);
 	}
 
-	@GetMapping("/getMailId/{addMailId}/{leadId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(@PathVariable Integer addMailId,
-			@PathVariable Integer leadId) {
-		return emailService.checkMailId(addMailId, leadId);
-	}
-
-	@DeleteMapping("/deleteEmail/{mailId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteEmail(@PathVariable Integer mailId) {
-		return emailService.deleteEmail(mailId);
-	}
-
-	@PutMapping("/assignEmail")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> assignEmail(@RequestBody Map<String, Integer> map) {
-		return emailService.assignEmail(map);
-	}
-
-	@GetMapping("/{mailId}")
+	@GetMapping(GET_EMAIL)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getEmail(@PathVariable Integer mailId) {
 		return emailService.getEmail(mailId);
 	}
 
-	@PutMapping("/update/{mailId}/{status}")
+	@PutMapping(UPDATE_EMAIL)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateEmail(@RequestBody EmailDto dto,
 			@PathVariable(name = "status", required = false) String status,
 			@PathVariable(name = "mailId") Integer mailId) {
-		return emailService.updateEmail(dto, status,mailId);
+		return emailService.updateEmail(dto, status, mailId);
+	}
+
+	@PutMapping(ASSIGN_EMAIL)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignEmail(@RequestBody Map<String, Integer> map) {
+		return emailService.assignEmail(map);
+	}
+
+	@DeleteMapping(DELETE_EMAIL)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteEmail(@PathVariable Integer mailId) {
+		return emailService.deleteEmail(mailId);
+	}
+
+	@GetMapping("/getMailId/{addMailId}/{leadId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(@PathVariable Integer addMailId,
+			@PathVariable Integer leadId) {
+		return emailService.checkMailId(addMailId, leadId);
 	}
 }

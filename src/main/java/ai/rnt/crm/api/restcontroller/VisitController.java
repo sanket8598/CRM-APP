@@ -1,6 +1,15 @@
 package ai.rnt.crm.api.restcontroller;
 
 import static ai.rnt.crm.constants.ApiConstants.ADD;
+import static ai.rnt.crm.constants.ApiConstants.ADD_VISIT_TASK;
+import static ai.rnt.crm.constants.ApiConstants.ASSIGN_TASK;
+import static ai.rnt.crm.constants.ApiConstants.ASSIGN_VISIT;
+import static ai.rnt.crm.constants.ApiConstants.DELETE_TASK;
+import static ai.rnt.crm.constants.ApiConstants.DELETE_VISIT;
+import static ai.rnt.crm.constants.ApiConstants.EDIT_VISIT;
+import static ai.rnt.crm.constants.ApiConstants.GET_VISIT_TASK;
+import static ai.rnt.crm.constants.ApiConstants.UPDATE_VISIT;
+import static ai.rnt.crm.constants.ApiConstants.UPDATE_VISIT_TASK;
 import static ai.rnt.crm.constants.ApiConstants.VISIT;
 
 import java.util.EnumMap;
@@ -45,18 +54,18 @@ public class VisitController {
 		return visitService.saveVisit(dto);
 	}
 
-	@GetMapping("/edit/{visitId}")
+	@GetMapping(EDIT_VISIT)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editVisit(@PathVariable Integer visitId) {
 		return visitService.editVisit(visitId);
 	}
 
-	@PutMapping("/update/{visitId}/{status}")
+	@PutMapping(UPDATE_VISIT)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisit(@RequestBody VisitDto dto,
 			@PathVariable(name = "visitId") Integer visitId, @PathVariable(name = "status") String status) {
 		return visitService.updateVisit(dto, visitId, status);
 	}
 
-	@PutMapping("/assign")
+	@PutMapping(ASSIGN_VISIT)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(@RequestBody Map<String, Integer> map) {
 		return visitService.assignVisit(map);
 	}
@@ -66,34 +75,34 @@ public class VisitController {
 		return visitService.visitMarkAsCompleted(visitId);
 	}
 
-	@DeleteMapping("/delete/{visitId}")
+	@DeleteMapping(DELETE_VISIT)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(@PathVariable Integer visitId) {
 		return visitService.deleteVisit(visitId);
 	}
 
-	@PostMapping("/task/{leadId}/{visitId}")
+	@PostMapping(ADD_VISIT_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addVisitTask(@RequestBody @Valid VisitTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "visitId") Integer visitId) {
 		return visitService.addVisitTask(dto, leadsId, visitId);
 	}
 
-	@GetMapping("/task/{taskId}")
+	@GetMapping(GET_VISIT_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getVisitTask(@PathVariable Integer taskId) {
 		return visitService.getVisitTask(taskId);
 	}
 
-	@PutMapping("/task/{taskId}")
+	@PutMapping(UPDATE_VISIT_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisitTask(@RequestBody GetVisitTaskDto dto,
 			@PathVariable Integer taskId) {
 		return visitService.updateVisitTask(dto, taskId);
 	}
 
-	@PutMapping("/task/assign")
+	@PutMapping(ASSIGN_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisitTask(@RequestBody Map<String, Integer> map) {
 		return visitService.assignVisitTask(map);
 	}
 
-	@DeleteMapping("/task/delete/{taskId}")
+	@DeleteMapping(DELETE_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisitTask(@PathVariable Integer taskId) {
 		return visitService.deleteVisitTask(taskId);
 	}

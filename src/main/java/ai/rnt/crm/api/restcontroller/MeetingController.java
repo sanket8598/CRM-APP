@@ -1,6 +1,16 @@
 package ai.rnt.crm.api.restcontroller;
 
+import static ai.rnt.crm.constants.ApiConstants.ADD_MEETING;
+import static ai.rnt.crm.constants.ApiConstants.ADD_MEETING_TASK;
+import static ai.rnt.crm.constants.ApiConstants.ASSIGN_MEETING;
+import static ai.rnt.crm.constants.ApiConstants.ASSIGN_MEETING_TASK;
+import static ai.rnt.crm.constants.ApiConstants.DELETE_MEETING;
+import static ai.rnt.crm.constants.ApiConstants.DELETE_MEETING_TASK;
+import static ai.rnt.crm.constants.ApiConstants.EDIT_MEETING;
+import static ai.rnt.crm.constants.ApiConstants.GET_MEETING_TASK;
 import static ai.rnt.crm.constants.ApiConstants.MEETING;
+import static ai.rnt.crm.constants.ApiConstants.UPDATE_MEETING;
+import static ai.rnt.crm.constants.ApiConstants.UPDATE_MEETING_TASK;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -39,56 +49,56 @@ public class MeetingController {
 
 	private final MeetingService meetingService;
 
-	@PostMapping("/add/{leadId}")
+	@PostMapping(ADD_MEETING)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeeting(@RequestBody @Valid MeetingDto dto,
 			@PathVariable(name = "leadId") Integer leadsId) {
 		return meetingService.addMeeting(dto, leadsId);
 	}
 
-	@GetMapping("/edit/{meetingId}")
+	@GetMapping(EDIT_MEETING)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editMeeting(@PathVariable Integer meetingId) {
 		return meetingService.editMeeting(meetingId);
 	}
 
-	@PutMapping("/update/{meetingId}/{status}")
+	@PutMapping(UPDATE_MEETING)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeeting(@RequestBody MeetingDto dto,
 			@PathVariable(name = "meetingId") Integer meetingId, @PathVariable(name = "status") String status) {
 		return meetingService.updateMeeting(dto, meetingId, status);
 	}
 
-	@PutMapping("/assign")
+	@PutMapping(ASSIGN_MEETING)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignMeeting(@RequestBody Map<String, Integer> map) {
 		return meetingService.assignMeeting(map);
 	}
 
-	@DeleteMapping("/delete/{meetingId}")
+	@DeleteMapping(DELETE_MEETING)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeeting(@PathVariable Integer meetingId) {
 		return meetingService.deleteMeeting(meetingId);
 	}
 
-	@PostMapping("/task/{leadId}/{meetingId}")
+	@PostMapping(ADD_MEETING_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@RequestBody @Valid MeetingTaskDto dto,
 			@PathVariable(name = "leadId") Integer leadsId, @PathVariable(name = "meetingId") Integer meetingId) {
 		return meetingService.addMeetingTask(dto, leadsId, meetingId);
 	}
 
-	@GetMapping("/task/{taskId}")
+	@GetMapping(GET_MEETING_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getMeetingTask(@PathVariable Integer taskId) {
 		return meetingService.getMeetingTask(taskId);
 	}
 
-	@PutMapping("/task/{taskId}")
+	@PutMapping(UPDATE_MEETING_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(@RequestBody GetMeetingTaskDto dto,
 			@PathVariable Integer taskId) {
 		return meetingService.updateMeetingTask(dto, taskId);
 	}
 
-	@PutMapping("/task/assign")
+	@PutMapping(ASSIGN_MEETING_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignMeetingTask(@RequestBody Map<String, Integer> map) {
 		return meetingService.assignMeetingTask(map);
 	}
 
-	@DeleteMapping("/task/delete/{taskId}")
+	@DeleteMapping(DELETE_MEETING_TASK)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeetingTask(@PathVariable Integer taskId) {
 		return meetingService.deleteMeetingTask(taskId);
 	}

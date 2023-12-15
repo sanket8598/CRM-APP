@@ -1,5 +1,6 @@
 package ai.rnt.crm.api.restcontroller;
 
+import static ai.rnt.crm.constants.ApiConstants.COMPANIES;
 import static ai.rnt.crm.constants.ApiConstants.COMPANY;
 
 import java.util.EnumMap;
@@ -22,7 +23,7 @@ public class CompanyController {
 
 	private final CompanyService companyService;
 
-	@GetMapping("/companies")
+	@GetMapping(COMPANIES)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllCompany() {
 		return companyService.getAllCompany();
 	}
