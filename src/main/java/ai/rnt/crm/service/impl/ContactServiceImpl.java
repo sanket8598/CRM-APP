@@ -1,4 +1,5 @@
 package ai.rnt.crm.service.impl;
+
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
@@ -6,8 +7,10 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.StringUtil.hasWhitespace;
 import static ai.rnt.crm.util.StringUtil.splitByWhitespace;
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
@@ -48,10 +51,10 @@ public class ContactServiceImpl implements ContactService {
 			Contacts contact = TO_CONTACT.apply(contactDto).orElseThrow(ResourceNotFoundException::new);
 			if (nonNull(contactDto.getName())) {
 				String[] names = splitByWhitespace(contactDto.getName());
-				if(hasWhitespace(contactDto.getName()) && names.length==2) {
-				   contact.setFirstName(names[0]);
-				   contact.setLastName(names[1]);
-				}else
+				if (hasWhitespace(contactDto.getName()) && names.length == 2) {
+					contact.setFirstName(names[0]);
+					contact.setLastName(names[1]);
+				} else
 					contact.setFirstName(contactDto.getName());
 			}
 			contact.setCompanyMaster(company);
@@ -97,10 +100,10 @@ public class ContactServiceImpl implements ContactService {
 					.orElseThrow(() -> new ResourceNotFoundException("Contact", "contactId", contactId));
 			if (nonNull(contactDto.getName())) {
 				String[] names = splitByWhitespace(contactDto.getName());
-				if(hasWhitespace(contactDto.getName()) && names.length==2) {
-				   contact.setFirstName(names[0]);
-				   contact.setLastName(names[1]);
-				}else
+				if (hasWhitespace(contactDto.getName()) && names.length == 2) {
+					contact.setFirstName(names[0]);
+					contact.setLastName(names[1]);
+				} else
 					contact.setFirstName(contactDto.getName());
 			}
 
@@ -112,12 +115,26 @@ public class ContactServiceImpl implements ContactService {
 			contact.setBusinessCard(contactDto.getBusinessCard());
 			contact.setBusinessCardName(contactDto.getBusinessCardName());
 			contact.setBusinessCardType(contactDto.getBusinessCardType());
+
 			List<Contacts> existingContacts = contactDaoService.contactsOfLead(contact.getLead().getLeadId());
-			if (TRUE.equals(contactDto.getPrimary()) && existingContacts.stream().anyMatch(Contacts::getPrimary))
+			boolean isPrimary = existingContacts.stream().anyMatch(Contacts::getPrimary);
+
+			if (TRUE.equals(contactDto.getPrimary()) && isPrimary)
 				existingContacts.stream().filter(Contacts::getPrimary).forEach(con -> {
 					con.setPrimary(false);
 					contactDaoService.addContact(con);
 				});
+			else if (FALSE.equals(contactDto.getPrimary())) {
+				if (existingContacts.size() == 1) {
+					contactMap.put(SUCCESS, false);
+					contactMap.put(MESSAGE, "Cannot unmark the only contact as primary!!");
+					return new ResponseEntity<>(contactMap, BAD_REQUEST);
+				} else if (!isPrimary)
+					existingContacts.stream().findFirst().ifPresent(con -> {
+						con.setPrimary(true);
+						contactDaoService.addContact(con);
+					});
+			}
 			contact.setPrimary(contactDto.getPrimary());
 			if (nonNull(contactDaoService.addContact(contact)))
 				contactMap.put(MESSAGE, "Contact Updated Successfully!!");

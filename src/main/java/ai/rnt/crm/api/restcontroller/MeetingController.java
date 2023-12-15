@@ -56,6 +56,11 @@ public class MeetingController {
 		return meetingService.updateMeeting(dto, meetingId, status);
 	}
 
+	@PutMapping("/assign")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignMeeting(@RequestBody Map<String, Integer> map) {
+		return meetingService.assignMeeting(map);
+	}
+
 	@DeleteMapping("/delete/{meetingId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeeting(@PathVariable Integer meetingId) {
 		return meetingService.deleteMeeting(meetingId);

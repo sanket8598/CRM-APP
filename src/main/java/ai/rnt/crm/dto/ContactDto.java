@@ -1,6 +1,5 @@
 package ai.rnt.crm.dto;
 
-import static ai.rnt.crm.util.StringUtil.hasWhitespace;
 import static java.util.Objects.nonNull;
 
 import lombok.Data;
@@ -39,7 +38,7 @@ public class ContactDto {
 	private String name;
 
 	public String getName() {
-		return nonNull(name) && hasWhitespace(name) ? name:getFirstName() + " " + getLastName();
+		return nonNull(name)? name:getFirstName() + " " +getLastName();
 
 	}
 }

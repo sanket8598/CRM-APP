@@ -344,4 +344,36 @@ public class MeetingServiceImpl implements MeetingService {
 			throw new CRMException(e);
 		}
 	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignMeeting(Map<String, Integer> map) {
+		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		log.info("inside assign meeting staffId: {} meetingId:{}", map.get("staffId"), map.get("meetingId"));
+		try {
+			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
+			Meetings meetings = meetingDaoService.getMeetingById(map.get("meetingId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Meetings", "meetingId", map.get("meetingId")));
+			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			meetings.getMeetingTasks().stream().forEach(e -> {
+				if (nonNull(e.getAssignTo().equals(loggedInStaffId))) {
+					e.setAssignTo(employee);
+					meetingDaoService.addMeetingTask(e);
+				}
+			});
+			meetings.setAssignTo(employee);
+			if (nonNull(meetingDaoService.addMeeting(meetings))) {
+				resultMap.put(SUCCESS, true);
+				resultMap.put(MESSAGE, "Meeting Assigned SuccessFully");
+			} else {
+				resultMap.put(SUCCESS, false);
+				resultMap.put(MESSAGE, "Meeting Not Assigned");
+			}
+			return new ResponseEntity<>(resultMap, OK);
+		} catch (Exception e) {
+			log.info("Got Exception while assign the Meeting..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
 }

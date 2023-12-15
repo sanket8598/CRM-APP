@@ -29,7 +29,7 @@ public class ContactDaoServiceImpl implements ContactDaoService {
 
 	@Override
 	public List<Contacts> contactsOfLead(Integer leadId) {
-		return contactRepository.findByLeadLeadId(leadId);
+		return contactRepository.findByLeadLeadIdOrderByCreatedDate(leadId);
 	}
 
 	@Override
