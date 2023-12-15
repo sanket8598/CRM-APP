@@ -96,48 +96,57 @@ public class ContactServiceImpl implements ContactService {
 		EnumMap<ApiResponse, Object> contactMap = new EnumMap<>(ApiResponse.class);
 		try {
 			contactMap.put(SUCCESS, true);
-			contactDaoService.findById(contactId)
-		    .ifPresent(existingContact -> {
-		        if (nonNull(contactDto.getName())) {
-		            String[] names = splitByWhitespace(contactDto.getName());
-		            existingContact.setFirstName(names[0]);
-		            if (names.length == 2)
-		                existingContact.setLastName(names[1]);
-		        }
-		        existingContact.setContactNumberPrimary(contactDto.getContactNumberPrimary());
-		        existingContact.setContactNumberSecondary(contactDto.getContactNumberSecondary());
-				existingContact.setDesignation(contactDto.getDesignation());
-				existingContact.setWorkEmail(contactDto.getWorkEmail());
-				existingContact.setLinkedinId(contactDto.getLinkedinId());
-				existingContact.setBusinessCard(contactDto.getBusinessCard());
-				existingContact.setBusinessCardName(contactDto.getBusinessCardName());
-				existingContact.setBusinessCardType(contactDto.getBusinessCardType());
-		        List<Contacts> existingContacts = contactDaoService.contactsOfLead(existingContact.getLead().getLeadId());
-		        if (nonNull(existingContact)) {
-		            updateExistingPrimaryContacts(contactDaoService, existingContacts, contactDto.getPrimary());
-		            existingContact.setPrimary(contactDto.getPrimary());
-			        existingContact = contactDaoService.addContact(existingContact);
-		            contactMap.put(MESSAGE, "Contact Updated Successfully!!");
-		        } else {
-		            contactMap.put(SUCCESS, false);
-		            contactMap.put(MESSAGE, "Contact Not Updated!!");
-		        }
-		    });
+			Contacts contact = contactDaoService.findById(contactId)
+					.orElseThrow(() -> new ResourceNotFoundException("Contact", "contactId", contactId));
+			if (nonNull(contactDto.getName())) {
+				String[] names = splitByWhitespace(contactDto.getName());
+				if (hasWhitespace(contactDto.getName()) && names.length == 2) {
+					contact.setFirstName(names[0]);
+					contact.setLastName(names[1]);
+				} else
+					contact.setFirstName(contactDto.getName());
+			}
+
+			contact.setContactNumberPrimary(contactDto.getContactNumberPrimary());
+			contact.setContactNumberSecondary(contactDto.getContactNumberSecondary());
+			contact.setDesignation(contactDto.getDesignation());
+			contact.setWorkEmail(contactDto.getWorkEmail());
+			contact.setLinkedinId(contactDto.getLinkedinId());
+			contact.setBusinessCard(contactDto.getBusinessCard());
+			contact.setBusinessCardName(contactDto.getBusinessCardName());
+			contact.setBusinessCardType(contactDto.getBusinessCardType());
+
+			List<Contacts> existingContacts = contactDaoService.contactsOfLead(contact.getLead().getLeadId());
+			boolean isPrimary = existingContacts.stream().anyMatch(Contacts::getPrimary);
+
+			if (TRUE.equals(contactDto.getPrimary()) && isPrimary)
+				existingContacts.stream().filter(Contacts::getPrimary).forEach(con -> {
+					con.setPrimary(false);
+					contactDaoService.addContact(con);
+				});
+			else if (FALSE.equals(contactDto.getPrimary())) {
+				if (existingContacts.size() == 1) {
+					contactMap.put(SUCCESS, false);
+					contactMap.put(MESSAGE, "Cannot unmark the only contact as primary!!");
+					return new ResponseEntity<>(contactMap, BAD_REQUEST);
+				} else if (!isPrimary)
+					existingContacts.stream().findFirst().ifPresent(con -> {
+						con.setPrimary(true);
+						contactDaoService.addContact(con);
+					});
+			}
+			contact.setPrimary(contactDto.getPrimary());
+			if (nonNull(contactDaoService.addContact(contact)))
+				contactMap.put(MESSAGE, "Contact Updated Successfully!!");
+			else {
+				contactMap.put(SUCCESS, false);
+				contactMap.put(MESSAGE, "Contact Not Updated!!");
+			}
 			return new ResponseEntity<>(contactMap, OK);
 		} catch (Exception e) {
 			log.error("error occured while updating the contact of a lead...{}", e.getMessage());
 			throw new CRMException(e);
 		}
-	}
-	
-	private void updateExistingPrimaryContacts(ContactDaoService daoService, List<Contacts> existingContacts, boolean newPrimary) {
-	    if (newPrimary && existingContacts.stream().anyMatch(Contacts::getPrimary)) {
-	        existingContacts.stream().filter(Contacts::getPrimary).forEach(daoService::addContact);
-	    } else if (!newPrimary && existingContacts.size() == 1) {
-	        throw new CRMException("Cannot unmark the only contact as primary!!");
-	    } else if (!newPrimary && !existingContacts.stream().anyMatch(Contacts::getPrimary)) {
-	    	existingContacts.stream().findFirst().ifPresent(daoService::addContact);
-	    }
 	}
 
 }
