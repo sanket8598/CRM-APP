@@ -56,7 +56,7 @@ public class CallController {
 		return callService.updateCall(dto, callId, status);
 	}
 
-	@PutMapping("/assignCall")
+	@PutMapping("/assign")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(@RequestBody Map<String, Integer> map) {
 		return callService.assignCall(map);
 	}

@@ -56,7 +56,7 @@ public class VisitController {
 		return visitService.updateVisit(dto, visitId, status);
 	}
 
-	@PutMapping("/assignVisit")
+	@PutMapping("/assign")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(@RequestBody Map<String, Integer> map) {
 		return visitService.assignVisit(map);
 	}
