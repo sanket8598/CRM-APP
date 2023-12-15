@@ -147,6 +147,7 @@ public class VisitServiceImpl implements VisitService {
 	}
 
 	@Override
+	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign Visit staffId: {} visitId:{}", map.get("staffId"), map.get("visitId"));
@@ -155,6 +156,11 @@ public class VisitServiceImpl implements VisitService {
 					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", map.get("visitId")));
 			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
 					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			visit.getVisitTasks().stream()
+					.filter(e -> visit.getVisitBy().getStaffId().equals(e.getAssignTo().getStaffId())).forEach(e -> {
+						e.setAssignTo(employee);
+						visitDaoService.addVisitTask(e);
+					});
 			visit.setVisitBy(employee);
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				resultMap.put(MESSAGE, "Visit Assigned SuccessFully");
