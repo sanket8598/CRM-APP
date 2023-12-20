@@ -1,8 +1,10 @@
 package ai.rnt.crm.entity;
 
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.LazyCollection;
@@ -46,7 +49,7 @@ public class PhoneCallTask extends Auditable {
 
 	@Column(name = "task_due_date")
 	private Date dueDate;
-	
+
 	@Column(name = "task_due_time")
 	private String dueTime;
 
@@ -62,7 +65,7 @@ public class PhoneCallTask extends Auditable {
 	@Column(name = "remainder_due_at")
 	private String remainderDueAt;
 
-	@Column(name = "remainder_due_on",columnDefinition = "date")
+	@Column(name = "remainder_due_on", columnDefinition = "date")
 	private Date remainderDueOn;
 
 	@JoinColumn(name = "task_assign_to", updatable = true)
@@ -74,5 +77,8 @@ public class PhoneCallTask extends Auditable {
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private Call call;
+
+	@OneToMany(mappedBy = "callTask", cascade = ALL)
+	private List<TaskNotifications> taskNotifications;
 
 }

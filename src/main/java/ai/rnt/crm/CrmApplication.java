@@ -13,7 +13,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 @EnableJpaRepositories
 @EnableCaching
 @EnableScheduling
-@EnableWebSocketMessageBroker
+//@EnableWebSocketMessageBroker
 public class CrmApplication {
 
 	public static void main(String[] args) {

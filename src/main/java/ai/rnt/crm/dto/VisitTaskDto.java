@@ -16,7 +16,7 @@ import lombok.Data;
 @Data
 public class VisitTaskDto {
 
-	private Integer vistitTaskId;
+	private Integer visitTaskId;
 
 	private String subject;
 
@@ -40,5 +40,5 @@ public class VisitTaskDto {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date remainderDueOn;
 
-	private EmployeeMaster assinTo;
+	private EmployeeDto assinTo;
 }

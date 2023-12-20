@@ -11,7 +11,9 @@ import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.GetLeadTaskDto;
 import ai.rnt.crm.dto.LeadTaskDto;
+import ai.rnt.crm.dto.TaskNotificationsDto;
 import ai.rnt.crm.entity.LeadTask;
+import ai.rnt.crm.entity.TaskNotifications;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = PRIVATE)
@@ -57,4 +59,10 @@ public class LeadTaskDtoMapper {
 
 	public static final Function<LeadTask, Optional<GetLeadTaskDto>> TO_GET_LEAD_TASK_DTO = e -> evalMapper(e,
 			GetLeadTaskDto.class);
+
+	public static final Function<TaskNotifications, Optional<TaskNotificationsDto>> TO_GET_NOTIFICATION_DTO = e -> evalMapper(
+			e, TaskNotificationsDto.class);
+	
+	public static final Function<Collection<TaskNotifications>, List<TaskNotificationsDto>> TO_GET_NOTIFICATION_DTOS = e -> e.stream()
+			.map(dm -> TO_GET_NOTIFICATION_DTO.apply(dm).get()).collect(Collectors.toList());
 }
