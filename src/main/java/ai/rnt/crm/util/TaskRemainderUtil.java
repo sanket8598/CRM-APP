@@ -51,8 +51,6 @@ public class TaskRemainderUtil {
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
 
-	private final AuditAwareUtil auditAwareUtil;
-
 	private final EmployeeService employeeService;
 
 	@Scheduled(cron = "0 * * * * ?") // for every minute.

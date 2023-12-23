@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "crm_task_notifications")
+@Table(name = "crm_task_notification")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,7 +30,7 @@ public class TaskNotifications extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "notif_id")
+	@Column(name = "task_notif_id")
 	private Integer notifId;
 
 	@JoinColumn(name = "call_task_id", updatable = true)
