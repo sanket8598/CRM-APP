@@ -19,7 +19,7 @@ public class GetMeetingTaskDto {
 
 	private String priority;
 
-	@JsonFormat(pattern = "dd-MMM-yyyy")
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date dueDate;
 
 	private String dueTime;

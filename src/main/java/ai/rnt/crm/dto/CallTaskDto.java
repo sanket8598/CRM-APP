@@ -40,6 +40,6 @@ public class CallTaskDto {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date remainderDueOn;
 
-	private EmployeeMaster assignTo;
+	private EmployeeDto assignTo;
 
 }
