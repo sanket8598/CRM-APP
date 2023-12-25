@@ -8,6 +8,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 import static org.hibernate.annotations.LazyCollectionOption.FALSE;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -24,6 +25,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -78,6 +81,18 @@ public class Leads extends Auditable {
 
 	@Column(name = "pseudo_name")
 	private String pseudoName;
+	
+	@Column(name = "is_follow_up_remainder")
+    private Boolean isFollowUpRemainder;
+	
+	@Column(name = "remainder_via")
+	private String remainderVia;
+
+	@Column(name = "remainder_due_at")
+	private String remainderDueAt;
+
+	@Column(name = "remainder_due_on")
+	private Date  remainderDueOn;
 
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "lead_source_id")
