@@ -50,6 +50,7 @@ import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.MeetingService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.MeetingUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -69,6 +70,7 @@ public class MeetingServiceImpl implements MeetingService {
 	private final LeadDaoService leadDaoService;
 	private final AuditAwareUtil auditAwareUtil;
 	private final EmployeeService employeeService;
+	private final MeetingUtil meetingUtil;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeeting(@Valid MeetingDto dto, Integer leadsId) {
@@ -98,6 +100,8 @@ public class MeetingServiceImpl implements MeetingService {
 				}
 			}
 			if (saveStatus) {
+				if (nonNull(dto.getMeetingMode()) && dto.getMeetingMode().equalsIgnoreCase("Online"))
+					meetingUtil.scheduleMeetingInOutlook(dto);
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Meeting Added Successfully..!!");
 			} else {
