@@ -50,6 +50,7 @@ import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.DISQUALIFIED_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.EMAIL;
+import static ai.rnt.crm.constants.StatusConstants.FOLLOW_UP;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
 import static ai.rnt.crm.constants.StatusConstants.MEETING;
 import static ai.rnt.crm.constants.StatusConstants.OPEN;
@@ -101,6 +102,7 @@ import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
+import static java.lang.Boolean.TRUE;
 import static java.lang.Integer.parseInt;
 import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.parse;
@@ -646,8 +648,14 @@ public class LeadServiceImpl implements LeadService {
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			lead.setCustomerNeed(dto.getCustomerNeed());
 			lead.setProposedSolution(dto.getProposedSolution());
+			lead.setDisqualifyAs(TRUE.equals(dto.getIsFollowUpRemainder()) ? FOLLOW_UP : QUALIFIED);
+			if (nonNull(dto.getIsFollowUpRemainder()) && TRUE.equals(dto.getIsFollowUpRemainder())) {
+				lead.setIsFollowUpRemainder(dto.getIsFollowUpRemainder());
+				lead.setRemainderVia(dto.getRemainderVia());
+				lead.setRemainderDueAt(dto.getRemainderDueAt());
+				lead.setRemainderDueOn(dto.getRemainderDueOn());
+			}
 			lead.setStatus(CLOSE_AS_QUALIFIED);
-			lead.setDisqualifyAs(QUALIFIED);
 			setServiceFallLeadSourceAndDomainToLead(dto.getServiceFallsMaster().getServiceName(), null, null, lead);
 			if (nonNull(leadDaoService.addLead(lead)))
 				result.put(MESSAGE, "Lead Qualified SuccessFully");
