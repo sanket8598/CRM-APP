@@ -1134,7 +1134,10 @@ public class LeadServiceImpl implements LeadService {
 			leadSourceDaoService.getLeadSourceById(parseInt(leadSourceName)).ifPresent(leads::setLeadSourceMaster);
 		else {
 			LeadSourceMaster leadSource = new LeadSourceMaster();
-			leadSource.setSourceName(leadSourceName);
+			if (isNull(leadSourceName) || leadSourceName.isEmpty())
+				leadSource.setSourceName("Other");
+			else
+				leadSource.setSourceName(leadSourceName);
 			TO_LEAD_SOURCE
 					.apply(leadSourceDaoService.save(leadSource).orElseThrow(
 							() -> new ResourceNotFoundException(LEAD_SOURCE_MASTER, LEAD_SOURCE_NAME, leadSourceName)))
@@ -1143,8 +1146,8 @@ public class LeadServiceImpl implements LeadService {
 		if (nonNull(domainName) && pattern.matcher(domainName).matches())
 			domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
 		else {
-			if(isNull(domainName) || domainName.isEmpty())
-				domainName="Other";
+			if (isNull(domainName) || domainName.isEmpty())
+				domainName = "Other";
 			DomainMaster domainMaster = new DomainMaster();
 			domainMaster.setDomainName(domainName);
 			domainMasterDaoService.addDomain(domainMaster).ifPresent(leads::setDomainMaster);
