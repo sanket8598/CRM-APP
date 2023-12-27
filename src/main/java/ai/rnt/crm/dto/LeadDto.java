@@ -35,7 +35,7 @@ public class LeadDto {
 	@NotBlank(message = "Service Falls Into should not be null or empty!!")
 	private String serviceFallsId;
 	
-	@NotBlank(message = "Domain should not be null or empty!!")
+	//@NotBlank(message = "Domain should not be null or empty!!")
 	private String domainId;
 
 	private String companyName;

@@ -1141,9 +1141,10 @@ public class LeadServiceImpl implements LeadService {
 					.ifPresent(leads::setLeadSourceMaster);
 		}
 		if (nonNull(domainName) && pattern.matcher(domainName).matches())
-
 			domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
 		else {
+			if(isNull(domainName) || domainName.isEmpty())
+				domainName="Other";
 			DomainMaster domainMaster = new DomainMaster();
 			domainMaster.setDomainName(domainName);
 			domainMasterDaoService.addDomain(domainMaster).ifPresent(leads::setDomainMaster);
