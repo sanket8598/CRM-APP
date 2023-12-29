@@ -805,6 +805,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			setServiceFallLeadSourceAndDomainToLead(dto.getServiceFallsId(), dto.getLeadSourceId(), dto.getDomainId(),
 					lead);
+			contact.setLinkedinId(dto.getLinkedinId());
 			if (nonNull(contactDaoService.addContact(contact)) && nonNull(leadDaoService.addLead(lead)))
 				result.put(MESSAGE, "Leads Contact Updated Successfully !!");
 			else
@@ -928,6 +929,8 @@ public class LeadServiceImpl implements LeadService {
 										? leadDto.getPseudoName().split(" ")
 										: auditAwareUtil.getLoggedInUserName().split(" "));
 						leads.setPseudoName(null);// because we added the assign to person name from excel data object
+						leads.setStatus(OPEN);
+						leads.setDisqualifyAs(OPEN);
 						if (checkDuplicateLead(leadDaoService.getAllLeads(), leads))
 							return 0;
 						return nonNull(leadDaoService.addLead(leads)) ? 1 : 0;
@@ -964,8 +967,8 @@ public class LeadServiceImpl implements LeadService {
 	public Leads buildLeadObj(LeadDto leadDto) {
 		Leads leads = TO_LEAD.apply(leadDto).orElseThrow(ResourceNotFoundException::new);
 		try {
-			leads.setStatus(OPEN);
-			leads.setDisqualifyAs(OPEN);
+			//leads.setStatus(OPEN);
+			//leads.setDisqualifyAs(OPEN);
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
 			setContactDetailsToLead(existCompany, leadDto, leads);
 			if (nonNull(leadDto.getServiceFallsId()) && !leadDto.getServiceFallsId().isEmpty()) {

@@ -48,5 +48,7 @@ public class UpdateLeadDto {
 	private String customerNeed;
 	private String proposedSolution;
 	private String pseudoName;
+	private String linkedinId;
+	
 
 }
