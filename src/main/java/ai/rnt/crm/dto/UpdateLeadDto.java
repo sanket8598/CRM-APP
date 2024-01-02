@@ -35,7 +35,6 @@ public class UpdateLeadDto {
 	@NotBlank(message = "Lead Source should not be null or empty!!")
 	private String leadSourceId;
 	
-	@NotBlank(message = "Domain should not be null or empty!!")
 	private String domainId;
 	private String companyWebsite;
 	private String companyName;

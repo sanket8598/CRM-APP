@@ -5,6 +5,7 @@ import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.ContactUtil.isDuplicateContact;
 import static ai.rnt.crm.util.StringUtil.hasWhitespace;
 import static ai.rnt.crm.util.StringUtil.splitByWhitespace;
 import static java.lang.Boolean.FALSE;
@@ -64,11 +65,11 @@ public class ContactServiceImpl implements ContactService {
 					con.setPrimary(false);
 					contactDaoService.addContact(con);
 				});
-			if (nonNull(contactDaoService.addContact(contact)))
-				contactMap.put(MESSAGE, "Contact Added Successfully!!");
+			if (!isDuplicateContact(existingContacts,contact) && nonNull(contactDaoService.addContact(contact)))
+				contactMap.put(MESSAGE, "Contact Added Successfully !!");
 			else {
 				contactMap.put(SUCCESS, false);
-				contactMap.put(MESSAGE, "Contact Not Added!!");
+				contactMap.put(MESSAGE, "Contact Already Exist !!");
 			}
 			return new ResponseEntity<>(contactMap, CREATED);
 		} catch (Exception e) {

@@ -68,7 +68,7 @@ public class ReadExcelUtil {
 						if (nonNull(error) && !error.isEmpty()) {
 							dataExcel.put(FLAG, false);
 							dataExcel.put(MSG, error);
-							return;//to break inner as well as outer loop
+							return;// to break inner as well as outer loop
 						}
 					}
 				});
@@ -90,10 +90,10 @@ public class ReadExcelUtil {
 		try {
 			Row row = sheet.getRow(0);
 			if (nonNull(row))
-				rangeClosed(0, row.getPhysicalNumberOfCells()).filter(i-> nonNull(row.getCell(i)))
+				rangeClosed(0, row.getPhysicalNumberOfCells()).filter(i -> nonNull(row.getCell(i)))
 						.forEach(r -> headerList.add(row.getCell(r).getStringCellValue()));
 		} catch (Exception e) {
-			log.error("Exception Occured while fetching the excel header: {}",e.getMessage());
+			log.error("Exception Occured while fetching the excel header: {}", e.getMessage());
 		}
 		return headerList;
 	}
@@ -182,10 +182,7 @@ public class ReadExcelUtil {
 			leadDto.setLeadSourceId(data);
 			break;
 		case 11:
-			if (nonNull(data) && !data.isEmpty())
-				leadDto.setDomainId(data);
-			else
-				errorList.append("Please Enter The Domain On Row No: " + rowNum);
+			leadDto.setDomainId(data);
 			break;
 		case 12:
 			leadDto.setPseudoName(data);
