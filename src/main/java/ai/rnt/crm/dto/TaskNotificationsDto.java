@@ -9,6 +9,5 @@ public class TaskNotificationsDto {
 	private CallTaskDto callTask;
 	private VisitTaskDto visitTask;
 	private MeetingTaskDto meetingTask;
-	private String notifMessage;
 	private boolean notifStatus;
 }

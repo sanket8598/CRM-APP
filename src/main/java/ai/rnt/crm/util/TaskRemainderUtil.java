@@ -1,8 +1,8 @@
 package ai.rnt.crm.util;
 
-import static ai.rnt.crm.util.EmailUtil.sendCallTaskRemainderMail;
-import static ai.rnt.crm.util.EmailUtil.sendMeetingTaskRemainderMail;
-import static ai.rnt.crm.util.EmailUtil.sendVisitTaskRemainderMail;
+import static ai.rnt.crm.util.EmailUtil.sendCallTaskReminderMail;
+import static ai.rnt.crm.util.EmailUtil.sendMeetingTaskReminderMail;
+import static ai.rnt.crm.util.EmailUtil.sendVisitTaskReminderMail;
 import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
@@ -17,7 +17,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dao.service.CallDaoService;
-import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.entity.MeetingTask;
@@ -26,7 +25,6 @@ import ai.rnt.crm.entity.TaskNotifications;
 import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
-import ai.rnt.crm.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,14 +45,10 @@ public class TaskRemainderUtil {
 
 	private final MeetingDaoService meetingDaoService;
 
-	private final EmployeeDaoService employeeDaoService;
-
 	private final TaskNotificationsUtil taskNotificationsUtil;
 
-	private final EmployeeService employeeService;
-
-	@Scheduled(cron = "0 * * * * ?") // for every minute.
-	public void remainderForCallTask() throws Exception {
+	// @Scheduled(cron = "0 * * * * ?") // for every minute.
+	public void reminderForTask() throws Exception {
 		try {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = Date.from(todayDate.atZone(ZoneId.systemDefault()).toInstant());
@@ -62,58 +56,52 @@ public class TaskRemainderUtil {
 
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
-				String emailId = employeeDaoService.getEmailId(e.getAssignTo().getStaffId());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Both")) {
-					sendCallTaskRemainderMail(emailId);
-					callNotification(e.getCallTaskId(), e.getAssignTo().getStaffId(), e.getSubject());
+					sendCallTaskReminderMail(e);
+					callNotification(e.getCallTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Email"))
-					sendCallTaskRemainderMail(emailId);
+					sendCallTaskReminderMail(e);
 
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Notifications"))
-					callNotification(e.getCallTaskId(), e.getAssignTo().getStaffId(), e.getSubject());
+					callNotification(e.getCallTaskId());
 			});
 
 			List<VisitTask> visitTaskList = visitDaoService.getTodaysAllVisitTask(todayAsDate, time);
 			visitTaskList.forEach(e -> {
-				String emailId = employeeDaoService.getEmailId(e.getAssignTo().getStaffId());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Both")) {
-					sendVisitTaskRemainderMail(emailId);
-					visitNotification(e.getVisitTaskId(), e.getAssignTo().getStaffId(), e.getSubject());
+					sendVisitTaskReminderMail(e);
+					visitNotification(e.getVisitTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Email"))
-					sendVisitTaskRemainderMail(emailId);
+					sendVisitTaskReminderMail(e);
 
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Notifications"))
-					visitNotification(e.getVisitTaskId(), e.getAssignTo().getStaffId(), e.getSubject());
+					visitNotification(e.getVisitTaskId());
 			});
 
 			List<MeetingTask> meetingTasksList = meetingDaoService.getTodaysMeetingTask(todayAsDate, time);
 			meetingTasksList.forEach(e -> {
-				String emailId = employeeDaoService.getEmailId(e.getAssignTo().getStaffId());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Both")) {
-					sendMeetingTaskRemainderMail(emailId);
-					meetingNotification(e.getMeetingTaskId(), e.getAssignTo().getStaffId(), e.getSubject());
+					sendMeetingTaskReminderMail(e);
+					meetingNotification(e.getMeetingTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Email"))
-					sendMeetingTaskRemainderMail(emailId);
+					sendMeetingTaskReminderMail(e);
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase("Notifications"))
-					meetingNotification(e.getMeetingTaskId(), e.getAssignTo().getStaffId(), e.getSubject());
+					meetingNotification(e.getMeetingTaskId());
 			});
-
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);
 			throw new CRMException(e);
 		}
 	}
 
-	public void callNotification(Integer callTaskId, Integer assignTo, String subject) {
+	public void callNotification(Integer callTaskId) {
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
 			taskNotifications.setCallTask(callDaoService.getCallTaskById(callTaskId)
 					.orElseThrow(() -> new ResourceNotFoundException("PhoneCallTask", "taskId", callTaskId)));
 			taskNotifications.setCreatedBy(1375);
-			taskNotifications.setNotifTo(employeeService.getById(assignTo)
-					.orElseThrow(() -> new ResourceNotFoundException("EmployeeMaster", "StaffId", assignTo)));
+			taskNotifications.setNotifTo(taskNotifications.getCallTask().getAssignTo());
 			taskNotifications.setNotifStatus(true);
-			taskNotifications.setNotifMessage(subject);
 			taskNotificationsUtil.sendCallTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending callTask notification..{}", e);
@@ -121,16 +109,14 @@ public class TaskRemainderUtil {
 		}
 	}
 
-	public void visitNotification(Integer visitTaskId, Integer assignTo, String subject) {
+	public void visitNotification(Integer visitTaskId) {
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
 			taskNotifications.setVisitTask(visitDaoService.getVisitTaskById(visitTaskId)
 					.orElseThrow(() -> new ResourceNotFoundException("VisitTask", "taskId", visitTaskId)));
 			taskNotifications.setCreatedBy(1375);
-			taskNotifications.setNotifTo(employeeService.getById(assignTo)
-					.orElseThrow(() -> new ResourceNotFoundException("EmployeeMaster", "StaffId", assignTo)));
+			taskNotifications.setNotifTo(taskNotifications.getVisitTask().getAssignTo());
 			taskNotifications.setNotifStatus(true);
-			taskNotifications.setNotifMessage(subject);
 			taskNotificationsUtil.sendVisitTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending visitTask notification..{}", e);
@@ -138,16 +124,14 @@ public class TaskRemainderUtil {
 		}
 	}
 
-	public void meetingNotification(Integer meetingTaskId, Integer assignTo, String subject) {
+	public void meetingNotification(Integer meetingTaskId) {
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
 			taskNotifications.setMeetingTask(meetingDaoService.getMeetingTaskById(meetingTaskId)
 					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", meetingTaskId)));
 			taskNotifications.setCreatedBy(1375);
-			taskNotifications.setNotifTo(employeeService.getById(assignTo)
-					.orElseThrow(() -> new ResourceNotFoundException("EmployeeMaster", "StaffId", assignTo)));
+			taskNotifications.setNotifTo(taskNotifications.getMeetingTask().getAssignTo());
 			taskNotifications.setNotifStatus(true);
-			taskNotifications.setNotifMessage(subject);
 			taskNotificationsUtil.sendMeetingTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending meetingTask notification..{}", e);

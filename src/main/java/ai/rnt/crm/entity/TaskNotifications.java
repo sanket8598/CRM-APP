@@ -49,9 +49,6 @@ public class TaskNotifications extends Auditable {
 	@ManyToOne
 	private EmployeeMaster notifTo;
 
-	@Column(name = "notif_msg")
-	private String notifMessage;
-
 	@Column(name = "notif_status")
 	private boolean notifStatus;
 }
