@@ -1,7 +1,11 @@
 package ai.rnt.crm.entity;
 
+import static ai.rnt.crm.constants.DateFormatterConstant.TIME_12_HRS;
+import static ai.rnt.crm.constants.DateFormatterConstant.TIME_24_HRS;
+import static java.util.Objects.nonNull;
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.text.ParseException;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -11,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -74,4 +79,28 @@ public class LeadTask extends Auditable {
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private Leads lead;
+	
+	@Transient
+	public String getDueTime12Hours() {
+		if (nonNull(getDueTime())) {
+			try {
+				return TIME_12_HRS.format(TIME_24_HRS.parse(getDueTime()));
+			} catch (ParseException e) {
+				return getDueTime();
+			}
+		}
+		return null;
+	}
+
+	@Transient
+	private String getRemainderDueAt12Hours() {
+		if (nonNull(getRemainderDueAt())) {
+			try {
+				return TIME_12_HRS.format(TIME_24_HRS.parse(getRemainderDueAt()));
+			} catch (ParseException e) {
+				return getRemainderDueAt();
+			}
+		}
+		return null;
+	}
 }

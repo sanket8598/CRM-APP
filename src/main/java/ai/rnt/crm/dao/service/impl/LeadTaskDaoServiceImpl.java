@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,5 +32,10 @@ public class LeadTaskDaoServiceImpl implements LeadTaskDaoService {
 	@Override
 	public List<LeadTask> getAllTask() {
 		return leadTaskRepository.findAll();
+	}
+
+	@Override
+	public List<LeadTask> getTodaysLeadTask(Date todayAsDate, String time) {
+		return leadTaskRepository.findByRemainderDueOnAndRemainderDueAtAndRemainderOn(todayAsDate, time, true);
 	}
 }

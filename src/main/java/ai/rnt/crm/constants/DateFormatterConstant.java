@@ -15,6 +15,8 @@ public final class DateFormatterConstant {
 	public static final SimpleDateFormat DD_MMM_YYYY = new SimpleDateFormat("dd-MMM-yyyy");
 	public static final SimpleDateFormat YYYY_MM_DD = new SimpleDateFormat("yyyy-MM-dd");
 	public static final SimpleDateFormat DATE_TIME_WITH_AM_AND_PM = new SimpleDateFormat("dd-MMM-yyyy hh:mm a");
+	public static final SimpleDateFormat TIME_24_HRS = new SimpleDateFormat("HH:mm");
+	public static final SimpleDateFormat TIME_12_HRS = new SimpleDateFormat("hh:mm a");
 	public static final String START_TIME = "12:00 AM";
 	public static final String END_TIME = "11:59 PM";
 

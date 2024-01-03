@@ -23,4 +23,12 @@ public class TaskNotificationsUtil {
 	public void sendMeetingTaskNotification(TaskNotifications taskNotifications) {
 		taskNotificationsRepository.save(taskNotifications);
 	}
+
+	public void sendFollowUpLeadNotification(TaskNotifications taskNotifications) {
+		taskNotificationsRepository.save(taskNotifications);
+	}
+
+	public void sendLeadTaskNotification(TaskNotifications taskNotifications) {
+		taskNotificationsRepository.save(taskNotifications);
+	}
 }

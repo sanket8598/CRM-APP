@@ -26,9 +26,15 @@ public class GetCallDto {
 	private Date endDate;
 
 	private String startTime;
+	
 	private String endTime;
+	
+	private String startTime12Hours;
+
+	private String endTime12Hours;
+	
 	private boolean allDay;
 
 	private List<GetCallTaskDto> callTasks;
-
+	
 }

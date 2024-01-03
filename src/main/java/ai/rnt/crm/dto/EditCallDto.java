@@ -19,5 +19,5 @@ public class EditCallDto extends TimeLineActivityDto {
 	private String comment;
 	private String duration;
 	private String dueDate;
-
+	private boolean overDue;
 }

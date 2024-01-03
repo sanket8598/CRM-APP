@@ -94,7 +94,7 @@ public class LeadsPredicates {
 	 * @since version 1.0
 	 */
 	public static final Predicate<Call> ACTIVITY_CALL = call -> ACTIVE_CALL.test(call)
-			&& !UPNEXT.test(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
+			&& !UPNEXT.test(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
 	/*
 	 * * This Predicate return true if it the email is completed for the Timeline.
 	 * 
@@ -116,7 +116,7 @@ public class LeadsPredicates {
 	 * @since version 1.0
 	 */
 	public static final Predicate<Visit> ACTIVITY_VISIT = visit -> ACTIVE_VISIT.test(visit)
-			&& !UPNEXT.test(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime()));
+			&& !UPNEXT.test(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
 
 	/*
 	 * * This Predicate return true if it the email is for the TimeLine.
@@ -139,7 +139,7 @@ public class LeadsPredicates {
 	 * @since version 1.0
 	 */
 	public static final Predicate<Meetings> ACTIVITY_MEETING = meeting -> ACTIVE_MEETING.test(meeting)
-			&& !UPNEXT.test(convertDateDateWithTime(meeting.getStartDate(), meeting.getStartTime()));
+			&& !UPNEXT.test(convertDateDateWithTime(meeting.getStartDate(), meeting.getStartTime12Hours()));
 
 	/*
 	 * * This Predicate return true if it the call is for the upNext.
@@ -147,20 +147,20 @@ public class LeadsPredicates {
 	 * @since version 1.0
 	 */
 	public static final Predicate<Call> UPNEXT_CALL = call -> ACTIVE_CALL.test(call)
-			&& UPNEXT.test(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
+			&& UPNEXT.test(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
 	/*
 	 * * This Predicate return true if it the visit is for the upNext.
 	 * 
 	 * @since version 1.0
 	 */
 	public static final Predicate<Visit> UPNEXT_VISIT = visit -> ACTIVE_VISIT.test(visit)
-			&& UPNEXT.test(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime()));
+			&& UPNEXT.test(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
 	/*
 	 * * This Predicate return true if it the meeting is for the upNext.
 	 * 
 	 * @since version 1.0
 	 */
 	public static final Predicate<Meetings> UPNEXT_MEETING = meeting -> ACTIVE_MEETING.test(meeting)
-			&& UPNEXT.test(convertDateDateWithTime(meeting.getStartDate(), meeting.getStartTime()));
+			&& UPNEXT.test(convertDateDateWithTime(meeting.getStartDate(), meeting.getStartTime12Hours()));
 
 }
