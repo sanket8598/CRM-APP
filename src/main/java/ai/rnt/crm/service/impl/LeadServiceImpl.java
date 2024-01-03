@@ -94,6 +94,7 @@ import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_VISIT;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_CALL;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_MEETING;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_VISIT;
+import static ai.rnt.crm.functional.predicates.OverDueActivity.OVER_DUE;
 import static ai.rnt.crm.functional.predicates.TaskPredicates.COMPLETED_TASK;
 import static ai.rnt.crm.functional.predicates.TaskPredicates.IN_PROGRESS_TASK;
 import static ai.rnt.crm.functional.predicates.TaskPredicates.NOT_STARTED_TASK;
@@ -535,10 +536,11 @@ public class LeadServiceImpl implements LeadService {
 				callDto.setType(CALL);
 				callDto.setBody(call.getComment());
 				callDto.setShortName(shortName(call.getCallTo()));
-				callDto.setDueDate(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
+				callDto.setDueDate(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
 				callDto.setCreatedOn(convertDate(call.getCreatedDate()));
 				TO_EMPLOYEE.apply(call.getCallFrom())
 				.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
+				callDto.setOverDue(OVER_DUE.test(callDto.getDueDate()));
 				return callDto;
 			}).collect(toList());
 			activity.addAll(emails.stream().filter(ACTIVITY_EMAIL).map(email -> {
@@ -559,10 +561,11 @@ public class LeadServiceImpl implements LeadService {
 				editVisitDto.setSubject(visit.getSubject());
 				editVisitDto.setType(VISIT);
 				editVisitDto.setBody(visit.getContent());
-				editVisitDto.setDueDate(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime()));
+				editVisitDto.setDueDate(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
 				employeeService.getById(visit.getCreatedBy()).ifPresent(
 						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
 				editVisitDto.setCreatedOn(convertDate(visit.getCreatedDate()));
+				editVisitDto.setOverDue(OVER_DUE.test(editVisitDto.getDueDate()));
 				return editVisitDto;
 			}).collect(toList()));
 			activity.addAll(meetings.stream().filter(ACTIVITY_MEETING).map(meet -> {
@@ -573,9 +576,10 @@ public class LeadServiceImpl implements LeadService {
 						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
 				meetDto.setSubject(meet.getMeetingTitle());
 				meetDto.setBody(meet.getDescription());
-				meetDto.setDueDate(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime()));
+				meetDto.setDueDate(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
 				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
 				meetDto.setCreatedOn(convertDate(meet.getCreatedDate()));
+				meetDto.setOverDue(OVER_DUE.test(meetDto.getDueDate()));
 				return meetDto;
 			}).collect(toList()));
 			activity.sort((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
@@ -586,7 +590,7 @@ public class LeadServiceImpl implements LeadService {
 				callDto.setSubject(call.getSubject());
 				callDto.setType(CALL);
 				callDto.setBody(call.getComment());
-				callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime()));
+				callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
 				TO_EMPLOYEE.apply(call.getCallFrom())
 				.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 				return callDto;
@@ -613,7 +617,7 @@ public class LeadServiceImpl implements LeadService {
 				meetDto.setSubject(meet.getMeetingTitle());
 				meetDto.setBody(meet.getDescription());
 				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-				meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime()));
+				meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
 				return meetDto;
 			}).collect(toList()));
 			upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)

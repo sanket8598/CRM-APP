@@ -33,6 +33,10 @@ public class GetVisitDto {
 	private String startTime;
 
 	private String endTime;
+	
+	private String startTime12Hours;
+
+	private String endTime12Hours;
 
 	private boolean allDay;
 

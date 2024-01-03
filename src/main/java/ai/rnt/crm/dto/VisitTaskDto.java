@@ -4,7 +4,6 @@ import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import ai.rnt.crm.entity.EmployeeMaster;
 import lombok.Data;
 
 /**

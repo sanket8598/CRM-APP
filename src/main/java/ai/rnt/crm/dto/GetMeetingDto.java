@@ -25,6 +25,10 @@ public class GetMeetingDto {
 	private String startTime;
 
 	private String endTime;
+	
+	private String startTime12Hours;
+
+	private String endTime12Hours;
 
 	private boolean allDay;
 
@@ -37,5 +41,5 @@ public class GetMeetingDto {
 	private List<MeetingAttachmentsDto> meetingAttachments;
 
 	private List<GetMeetingTaskDto> meetingTasks;
-
+	
 }
