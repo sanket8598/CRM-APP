@@ -1033,7 +1033,7 @@ public class LeadServiceImpl implements LeadService {
 	public List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
 		return calls.stream().flatMap(call -> call.getCallTasks().stream())
 				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,
-						convertDateDateWithTime(e.getDueDate(), e.getDueTime()),
+						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId()))
 				.collect(toList());
 	}
@@ -1041,7 +1041,7 @@ public class LeadServiceImpl implements LeadService {
 	public List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
 				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,
-						convertDateDateWithTime(e.getDueDate(), e.getDueTime()),
+						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId()))
 				.collect(toList());
 	}
@@ -1049,7 +1049,7 @@ public class LeadServiceImpl implements LeadService {
 	public List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
 		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
 				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,
-						convertDateDateWithTime(e.getDueDate(), e.getDueTime()),
+						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getMeetings().getMeetingId()))
 				.collect(toList());
 	}
@@ -1057,7 +1057,7 @@ public class LeadServiceImpl implements LeadService {
 	public List<MainTaskDto> getLeadRelatedTasks(Leads lead) {
 		return lead.getLeadTasks().stream()
 				.map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(), LEAD,
-						convertDateDateWithTime(e.getDueDate(), e.getDueTime()),
+						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId()))
 				.collect(toList());
 	}
