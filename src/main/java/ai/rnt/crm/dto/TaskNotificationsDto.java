@@ -9,5 +9,7 @@ public class TaskNotificationsDto {
 	private CallTaskDto callTask;
 	private VisitTaskDto visitTask;
 	private MeetingTaskDto meetingTask;
+	private LeadTaskDto leadTask;
+	private LeadDto leads;
 	private boolean notifStatus;
 }

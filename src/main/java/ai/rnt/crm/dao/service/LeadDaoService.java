@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,5 +25,7 @@ public interface LeadDaoService extends CrudService<Leads, LeadDto> {
 	boolean deleteImportantLead(Integer leadId,Integer staffId);
 
 	List<LeadImportant> findLeadByEmployeeStaffId(Integer loggedInStaffId);
+
+	List<Leads> getFollowUpLeads(Date todayAsDate, String time);
 
 }

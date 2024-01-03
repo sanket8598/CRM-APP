@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,5 +14,7 @@ public interface LeadTaskDaoService extends CrudService<LeadTask, LeadTaskDto> {
 	Optional<LeadTask> getTaskById(Integer taskId);
 
 	List<LeadTask> getAllTask();
+
+	List<LeadTask> getTodaysLeadTask(Date todayAsDate, String time);
 
 }

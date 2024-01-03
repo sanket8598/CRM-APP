@@ -10,8 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
 
 import lombok.Getter;
@@ -45,6 +43,14 @@ public class TaskNotifications extends Auditable {
 	@ManyToOne
 	private MeetingTask meetingTask;
 	
+	@JoinColumn(name = "lead_task_id", updatable = true)
+	@ManyToOne
+	private LeadTask leadTask;
+
+	@JoinColumn(name = "lead_id", updatable = true)
+	@ManyToOne
+	private Leads leads;
+
 	@JoinColumn(name = "notif_to", updatable = true)
 	@ManyToOne
 	private EmployeeMaster notifTo;

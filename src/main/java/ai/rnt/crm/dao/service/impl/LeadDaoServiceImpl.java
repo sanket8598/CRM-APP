@@ -4,6 +4,7 @@ import static ai.rnt.crm.constants.CacheConstant.LEADS;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,5 +74,10 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 	@Override
 	public List<LeadImportant> findLeadByEmployeeStaffId(Integer loggedInStaffId) {
 		return impLeadRepositroy.findByEmployeeStaffId(loggedInStaffId);
+	}
+
+	@Override
+	public List<Leads> getFollowUpLeads(Date todayAsDate, String time) {
+		return leadsRepository.findByRemainderDueOnAndRemainderDueAtAndIsFollowUpRemainder(todayAsDate, time, true);
 	}
 }
