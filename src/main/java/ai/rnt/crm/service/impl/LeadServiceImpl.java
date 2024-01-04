@@ -42,6 +42,7 @@ import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
 import static ai.rnt.crm.constants.MessageConstants.MSG;
 import static ai.rnt.crm.constants.MessageConstants.NO_ACTIVITY;
 import static ai.rnt.crm.constants.MessageConstants.WAIT_FOR;
+import static ai.rnt.crm.constants.MessageConstants.DONE_FOR_DAY;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
@@ -1179,6 +1180,7 @@ public class LeadServiceImpl implements LeadService {
 					});
 					if (count == 1 && !data.getKey().equals(0L))
 						upNextDataMap.put(MSG, String.format(WAIT_FOR, data.getKey()));
+					upNextDataMap.put(MSG, DONE_FOR_DAY);
 					count++;
 				}
 				upNextDataMap.put(UPNEXT_DATA_KEY, upNextData);

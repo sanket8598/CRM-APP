@@ -1,12 +1,13 @@
 package ai.rnt.crm.dto;
 
+import static javax.persistence.TemporalType.DATE;
+
 import java.util.Date;
 
+import javax.persistence.Temporal;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import ai.rnt.crm.validation.PhoneNumValid;
 import lombok.Data;
@@ -43,10 +44,10 @@ public class CallDto {
 	private String duration;
 
 	@NotNull(message = "Start Date should not be null!!")
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@Temporal(DATE)
 	private Date startDate;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@Temporal(DATE)
 	private Date endDate;
 
 	private String startTime;

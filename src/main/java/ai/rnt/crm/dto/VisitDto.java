@@ -1,8 +1,11 @@
 package ai.rnt.crm.dto;
 
+import static javax.persistence.TemporalType.DATE;
+
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Temporal;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -31,10 +34,10 @@ public class VisitDto {
 	private String duration;
 
 	@NotNull(message = "Start Date should not be null!!")
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@Temporal(DATE)
 	private Date startDate;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@Temporal(DATE)
 	private Date endDate;
 	
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
