@@ -605,7 +605,7 @@ public class LeadServiceImpl implements LeadService {
 				editVisitDto.setBody(visit.getContent());
 				employeeService.getById(visit.getCreatedBy()).ifPresent(
 						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				editVisitDto.setCreatedOn(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime()));
+				editVisitDto.setCreatedOn(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
 				return editVisitDto;
 			}).collect(toList()));
 			upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
