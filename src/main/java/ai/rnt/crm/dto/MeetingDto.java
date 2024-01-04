@@ -1,7 +1,11 @@
 package ai.rnt.crm.dto;
 
+import static javax.persistence.TemporalType.DATE;
+
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.Temporal;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -22,10 +26,10 @@ public class MeetingDto {
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 	private List<String> participates;
 
-	@JsonFormat(pattern="yyyy-MM-dd")
+	@Temporal(DATE)
 	private Date startDate;
 
-	@JsonFormat(pattern="yyyy-MM-dd")
+	@Temporal(DATE)
 	private Date endDate;
 
 	private String startTime;
