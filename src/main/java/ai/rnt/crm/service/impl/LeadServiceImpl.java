@@ -1135,6 +1135,8 @@ public class LeadServiceImpl implements LeadService {
 		if (nonNull(serviceFallsName) && pattern.matcher(serviceFallsName).matches())
 			serviceFallsDaoSevice.getServiceFallById(parseInt(serviceFallsName))
 					.ifPresent(leads::setServiceFallsMaster);
+		else if (isNull(serviceFallsName) || serviceFallsName.isEmpty() || OTHER.equals(serviceFallsName))
+			serviceFallsDaoSevice.findByName(OTHER).ifPresent(leads::setServiceFallsMaster);
 		else {
 			ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
 			serviceFalls.setServiceName(serviceFallsName);
@@ -1144,11 +1146,10 @@ public class LeadServiceImpl implements LeadService {
 		}
 		if (nonNull(leadSourceName) && pattern.matcher(leadSourceName).matches())
 			leadSourceDaoService.getLeadSourceById(parseInt(leadSourceName)).ifPresent(leads::setLeadSourceMaster);
+		else if (isNull(leadSourceName) || leadSourceName.isEmpty() || OTHER.equals(leadSourceName))
+			leadSourceDaoService.getByName(OTHER).ifPresent(leads::setLeadSourceMaster);
 		else {
 			LeadSourceMaster leadSource = new LeadSourceMaster();
-			if (isNull(leadSourceName) || leadSourceName.isEmpty())
-				leadSource.setSourceName(OTHER);
-			else
 				leadSource.setSourceName(leadSourceName);
 			TO_LEAD_SOURCE
 					.apply(leadSourceDaoService.save(leadSource).orElseThrow(
