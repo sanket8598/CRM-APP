@@ -49,8 +49,8 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailUtil {
 
 	private static final Properties PROPERTIES = new Properties();
-	private static final String USERNAME = "s.wakankar@rnt.ai"; // change it
-	private static final String PASSWORD = "12345@Sanket"; // change it
+	private static final String USERNAME = "rntapps@rabbitandtortoise.com"; // change it
+	private static final String PASSWORD = "RntDesc@2023"; // change it
 	private static final String HOST = "smtp.zoho.com";
 
 	static {

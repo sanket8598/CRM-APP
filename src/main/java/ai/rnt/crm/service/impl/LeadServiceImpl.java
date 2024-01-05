@@ -500,7 +500,7 @@ public class LeadServiceImpl implements LeadService {
 				editEmailDto.setSubject(email.getSubject());
 				editEmailDto.setBody(email.getContent());
 				editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
-				editEmailDto.setCreatedOn(convertDate(email.getUpdatedDate()));
+				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
 				editEmailDto.setShortName(shortName(email.getMailFrom()));
 				return editEmailDto;
 			}).collect(toList()));
