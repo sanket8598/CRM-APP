@@ -1035,7 +1035,7 @@ public class LeadServiceImpl implements LeadService {
 		return calls.stream().flatMap(call -> call.getCallTasks().stream())
 				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
-						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId(), e.isRemainderOn()))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId(), e.isRemainderOn(),e.getCall().getStatus()))
 				.collect(toList());
 	}
 
@@ -1043,7 +1043,7 @@ public class LeadServiceImpl implements LeadService {
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
 				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
-						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId(), e.isRemainderOn()))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId(), e.isRemainderOn(),e.getVisit().getStatus()))
 				.collect(toList());
 	}
 
@@ -1052,7 +1052,7 @@ public class LeadServiceImpl implements LeadService {
 				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getMeetings().getMeetingId(),
-						e.isRemainderOn()))
+						e.isRemainderOn(),e.getMeetings().getMeetingStatus()))
 				.collect(toList());
 	}
 
@@ -1060,7 +1060,7 @@ public class LeadServiceImpl implements LeadService {
 		return lead.getLeadTasks().stream()
 				.map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(), LEAD,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
-						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId(), e.isRemainderOn()))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId(), e.isRemainderOn(),e.getLead().getStatus()))
 				.collect(toList());
 	}
 
@@ -1172,6 +1172,8 @@ public class LeadServiceImpl implements LeadService {
 		if (nonNull(upNextActivities) && !upNextActivities.isEmpty()) {
 			Long lowestDayDiff = upNextActivities.keySet().stream().min(naturalOrder()).orElse(null);
 			if (nonNull(lowestDayDiff)) {
+				if(upNextActivities.size()==1)
+					upNextDataMap.put(MSG, DONE_FOR_DAY);
 				int count = 0;
 				List<TimeLineActivityDto> upNextData = new ArrayList<>();
 				for (Map.Entry<Long, List<TimeLineActivityDto>> data : upNextActivities.entrySet()) {
@@ -1181,7 +1183,6 @@ public class LeadServiceImpl implements LeadService {
 					});
 					if (count == 1 && !data.getKey().equals(0L))
 						upNextDataMap.put(MSG, String.format(WAIT_FOR, data.getKey()));
-					upNextDataMap.put(MSG, DONE_FOR_DAY);
 					count++;
 				}
 				upNextDataMap.put(UPNEXT_DATA_KEY, upNextData);

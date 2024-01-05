@@ -20,8 +20,10 @@ public  class MainTaskDto {
 	
 	private boolean remainderOn;
 	
+	private String parentStatus;
+	
 
-	public MainTaskDto(Integer id, String subject, String status, String type,String dueDate,EmployeeDto assignTo,Integer parentId,Boolean remainderOn) {
+	public MainTaskDto(Integer id, String subject, String status, String type,String dueDate,EmployeeDto assignTo,Integer parentId,Boolean remainderOn,String parentStatus) {
 		super();
 		this.id = id;
 		this.subject = subject;
@@ -31,6 +33,7 @@ public  class MainTaskDto {
 		this.assignTo = assignTo;
 		this.parentId = parentId;
 		this.remainderOn = remainderOn;
+		this.parentStatus = parentStatus;
 	}
 
 	public MainTaskDto() {
