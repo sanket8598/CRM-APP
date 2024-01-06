@@ -24,7 +24,7 @@ public class ExcelFieldValidationUtil {
 	}
 
 	public static boolean isValidPhoneNumber(String number) {
-		return nonNull(number) && Pattern.compile("^\\+?\\d{10,14}$").matcher(number).matches();
+		return nonNull(number) && Pattern.compile("^\\+?\\d{11,13}$").matcher(number).matches();
 	}
 
 	public static boolean isValidDesignation(String designation) {

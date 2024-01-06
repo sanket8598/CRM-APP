@@ -9,6 +9,7 @@ import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidBudgetAmount;
 import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidDesignation;
 import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidEmail;
 import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidFnameLname;
+import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidPhoneNumber;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.IntStream.range;
@@ -137,7 +138,11 @@ public class ReadExcelUtil {
 				errorList.append("Please Enter The Email Address On Row No: " + rowNum);
 			break;
 		case 3:
-			leadDto.setPhoneNumber(nonNull(data) && !data.isEmpty() ? "+" + data : data);
+			if (nonNull(data) && !data.isEmpty())
+				if (isValidPhoneNumber("+" + data))
+					leadDto.setPhoneNumber("+" + data);
+				else
+					errorList.append("Please Enter Valid Phone Number On Row No: " + rowNum);
 			break;
 		case 4:
 			if (nonNull(data) && !data.isEmpty())
