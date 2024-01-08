@@ -18,6 +18,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -122,29 +123,24 @@ public class ContactServiceImpl implements ContactService {
 
 			List<Contacts> existingContacts = contactDaoService.contactsOfLead(contact.getLead().getLeadId());
 			boolean isPrimary = existingContacts.stream().anyMatch(Contacts::getPrimary);
-
+			Optional<Contacts> primaryContact = existingContacts.stream().filter(Contacts::getPrimary).findFirst();
 			if (TRUE.equals(contactDto.getPrimary()) && isPrimary)
 				existingContacts.stream().filter(Contacts::getPrimary).forEach(con -> {
 					con.setPrimary(false);
 					contactDaoService.addContact(con);
 				});
-			else if (FALSE.equals(contactDto.getPrimary())) {
-				if (existingContacts.size() == 1) {
-					contactMap.put(SUCCESS, false);
-					contactMap.put(MESSAGE, "Cannot unmark the only contact as primary!!");
-					return new ResponseEntity<>(contactMap, BAD_REQUEST);
-				} else if (!isPrimary)
-					existingContacts.stream().findFirst().ifPresent(con -> {
-						con.setPrimary(true);
-						contactDaoService.addContact(con);
-					});
+			else if (FALSE.equals(contactDto.getPrimary()) && (existingContacts.size() == 1
+					|| (primaryContact.isPresent() && primaryContact.get().getContactId().equals(contactId)))) {
+				contactMap.put(SUCCESS, false);
+				contactMap.put(MESSAGE, "Cannot unmark the only contact as primary !!");
+				return new ResponseEntity<>(contactMap, BAD_REQUEST);
 			}
 			contact.setPrimary(contactDto.getPrimary());
 			if (nonNull(contactDaoService.addContact(contact)))
-				contactMap.put(MESSAGE, "Contact Updated Successfully!!");
+				contactMap.put(MESSAGE, "Contact Updated Successfully !!");
 			else {
 				contactMap.put(SUCCESS, false);
-				contactMap.put(MESSAGE, "Contact Not Updated!!");
+				contactMap.put(MESSAGE, "Contact Not Updated !!");
 			}
 			return new ResponseEntity<>(contactMap, OK);
 		} catch (Exception e) {
