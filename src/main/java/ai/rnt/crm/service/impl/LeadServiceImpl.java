@@ -59,7 +59,6 @@ import static ai.rnt.crm.constants.StatusConstants.OPEN_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.QUALIFIED_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.VISIT;
-import static ai.rnt.crm.dto.CompanyDto.builder;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
@@ -789,7 +788,7 @@ public class LeadServiceImpl implements LeadService {
 						.ifPresent(contact::setCompanyMaster);
 			} else {
 				CompanyMaster companyMaster = TO_COMPANY
-						.apply(builder().companyName(dto.getCompanyName())
+						.apply(CompanyDto.builder().companyName(dto.getCompanyName())
 								.companyWebsite(dto.getCompanyWebsite()).build())
 						.orElseThrow(ResourceNotFoundException::new);
 				if (findByCountryName.isPresent())
