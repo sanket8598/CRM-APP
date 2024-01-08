@@ -19,11 +19,14 @@ import ai.rnt.crm.functional.custominterface.LeadsCardMapper;
 import ai.rnt.crm.functional.custominterface.PrimaryFieldMapper;
 import ai.rnt.crm.functional.custominterface.SecondaryFieldMapper;
 import ai.rnt.crm.util.LeadsCardUtil;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class LeadsCardMapperImpl implements LeadsCardMapper {
 
 	@Override
 	public LeadsCardDto mapLeadToLeadsCardDto(Leads lead, String primaryField, String secondaryField,Contacts contacts) {
+		log.info("inside mapLeadToLeadsCardDto method... {} {} {} {}",lead,primaryField,secondaryField,contacts);
 		LeadsCardDto leadsCardDto = new LeadsCardDto();
 		leadsCardDto.setLeadId(lead.getLeadId());
 		leadsCardDto.setDisqualifyAs(lead.getDisqualifyAs());
@@ -39,6 +42,7 @@ public class LeadsCardMapperImpl implements LeadsCardMapper {
 	}
 
 	private PrimaryFieldMapper getPrimaryFieldMapper(String primaryField) {
+		log.info("inside getPrimaryFieldMapper method...{} ",primaryField);
 		switch (primaryField) {
 		case LEAD_NAME:
 			return (lead, contacts, leadsCardDto) -> {
@@ -68,6 +72,7 @@ public class LeadsCardMapperImpl implements LeadsCardMapper {
 	}
 
 	private SecondaryFieldMapper getSecondaryFieldMapper(String secondaryField) {
+		log.info("inside getSecondaryFieldMapper method...{} ",secondaryField);
 		switch (secondaryField) {
 		case LEAD_NAME:
 			return (lead, contacts, leadsCardDto) -> {

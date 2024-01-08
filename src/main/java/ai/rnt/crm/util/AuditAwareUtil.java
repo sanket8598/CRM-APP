@@ -14,14 +14,17 @@ import org.springframework.stereotype.Component;
 import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.UserDetail;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AuditAwareUtil {
 	
 	private final JWTTokenHelper helper;
 
 	public Integer getLoggedInStaffId() {
+		log.info("inside getLoggedInStaffId method... ");
 		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
 				&& nonNull(getContext().getAuthentication().getDetails())) {
 			UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
@@ -31,6 +34,7 @@ public class AuditAwareUtil {
 	}
 
 	public String getLoggedInUserRole() {
+		log.info("inside getLoggedInUserRole method... ");
 		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
 				&& nonNull(getContext().getAuthentication().getDetails())) {
 			UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
@@ -41,6 +45,7 @@ public class AuditAwareUtil {
 	}
 
 	public String getLoggedInUserName() {
+		log.info("inside getLoggedInUserName method... ");
 		if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
 				&& nonNull(getContext().getAuthentication().getPrincipal())) {
 			return helper.getfullNameOfLoggedInUser(getContext().getAuthentication().getPrincipal().toString());
