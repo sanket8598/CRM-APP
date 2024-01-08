@@ -26,13 +26,14 @@ public class StateServiceImpl implements StateService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllState() {
+		log.info("inside the getAllState method...");
 		EnumMap<ApiResponse, Object> allState = new EnumMap<>(ApiResponse.class);
 		try {
 			allState.put(SUCCESS, true);
 			allState.put(DATA, TO_STATE_DTOS.apply(stateDaoService.getAllState()));
 			return new ResponseEntity<>(allState, FOUND);
 		} catch (Exception e) {
-		log.info("Got Exception while getting the state..{}",e.getMessage());
+			log.info("Got Exception while getting the state..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

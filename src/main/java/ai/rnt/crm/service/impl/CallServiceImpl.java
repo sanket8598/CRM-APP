@@ -12,12 +12,12 @@ import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.TaskUtil.checkDuplicateTask;
+import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
@@ -63,6 +63,7 @@ public class CallServiceImpl implements CallService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(CallDto dto, Integer leadsId) {
+		log.info("inside the add call method...{}", leadsId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Call call = TO_CALL.apply(dto)
@@ -91,6 +92,7 @@ public class CallServiceImpl implements CallService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editCall(Integer callId) {
+		log.info("inside the edit call method...{}", callId);
 		EnumMap<ApiResponse, Object> call = new EnumMap<>(ApiResponse.class);
 		try {
 			call.put(DATA, TO_GET_CALL_DTO.apply(callDaoService.getCallById(callId)
@@ -105,6 +107,7 @@ public class CallServiceImpl implements CallService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(CallDto dto, Integer callId, String status) {
+		log.info("inside the update call method...{} {}", callId, status);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Call call = callDaoService.getCallById(callId)
@@ -128,7 +131,7 @@ public class CallServiceImpl implements CallService {
 			call.setDuration(dto.getDuration());
 			call.setAllDay(dto.isAllDay());
 			call.setStatus(status);
-			call.setUpdatedDate(LocalDateTime.now());
+			call.setUpdatedDate(now());
 			if (nonNull(callDaoService.call(call))) {
 				if (status.equalsIgnoreCase(SAVE))
 					result.put(MESSAGE, "Call Updated Successfully");
@@ -176,11 +179,12 @@ public class CallServiceImpl implements CallService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(Integer callId) {
+		log.info("inside the markasComplete call method...{}", callId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Call call = callDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException("Call", "callId", callId));
-			call.setUpdatedDate(LocalDateTime.now());
+			call.setUpdatedDate(now());
 			call.setStatus(COMPLETE);
 			if (nonNull(callDaoService.call(call))) {
 				result.put(MESSAGE, "Call updated SuccessFully");
@@ -199,6 +203,7 @@ public class CallServiceImpl implements CallService {
 	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId) {
+		log.info("inside the delete call method...{}", callId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
@@ -206,11 +211,11 @@ public class CallServiceImpl implements CallService {
 					.orElseThrow(() -> new ResourceNotFoundException("Call", "callId", callId));
 			call.getCallTasks().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(LocalDateTime.now());
+				e.setDeletedDate(now());
 				callDaoService.addCallTask(e);
 			});
 			call.setDeletedBy(loggedInStaffId);
-			call.setDeletedDate(LocalDateTime.now());
+			call.setDeletedDate(now());
 			if (nonNull(callDaoService.call(call))) {
 				result.put(MESSAGE, "Call deleted SuccessFully.");
 				result.put(SUCCESS, true);
@@ -228,6 +233,7 @@ public class CallServiceImpl implements CallService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@Valid CallTaskDto dto, Integer leadsId,
 			Integer callId) {
+		log.info("inside the add call task method...{} {}", leadsId, callId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			PhoneCallTask phoneCallTask = TO_CALL_TASK.apply(dto).orElseThrow(ResourceNotFoundException::new);
@@ -254,6 +260,7 @@ public class CallServiceImpl implements CallService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getCallTask(Integer taskId) {
+		log.info("inside the getCallTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> callTask = new EnumMap<>(ApiResponse.class);
 		try {
 			callTask.put(DATA, TO_GET_CALL_TASK_DTO.apply(callDaoService.getCallTaskById(taskId)
@@ -268,6 +275,7 @@ public class CallServiceImpl implements CallService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCallTask(GetCallTaskDto dto, Integer taskId) {
+		log.info("inside the updateCallTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> callTask = new EnumMap<>(ApiResponse.class);
 		try {
 			PhoneCallTask phoneCallTask = callDaoService.getCallTaskById(taskId).orElseThrow(
@@ -282,7 +290,7 @@ public class CallServiceImpl implements CallService {
 			phoneCallTask.setRemainderVia(dto.getRemainderVia());
 			phoneCallTask.setRemainderDueAt(dto.getRemainderDueAt());
 			phoneCallTask.setDescription(dto.getDescription());
-			phoneCallTask.setUpdatedDate(LocalDateTime.now());
+			phoneCallTask.setUpdatedDate(now());
 			if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
 				callTask.put(SUCCESS, true);
 				callTask.put(MESSAGE, "Task Updated Successfully..!!");
@@ -323,12 +331,13 @@ public class CallServiceImpl implements CallService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCallTask(Integer taskId) {
+		log.info("inside the deleteCallTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> deleteTask = new EnumMap<>(ApiResponse.class);
 		try {
 			PhoneCallTask callTask = callDaoService.getCallTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException("PhoneCallTask", "taskId", taskId));
 			callTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			callTask.setDeletedDate(LocalDateTime.now());
+			callTask.setDeletedDate(now());
 			if (nonNull(callDaoService.addCallTask(callTask))) {
 				deleteTask.put(MESSAGE, "Call Task Deleted SuccessFully.");
 				deleteTask.put(SUCCESS, true);

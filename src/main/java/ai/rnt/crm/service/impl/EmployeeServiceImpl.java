@@ -3,6 +3,9 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EmployeeMaster;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
+import static ai.rnt.crm.enums.ApiResponse.DATA;
+import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static org.springframework.http.HttpStatus.FOUND;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -10,7 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -47,11 +49,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public Optional<EmployeeDto> getEmployeeByUserId(String userId) {
+		log.info("inside the getEmployeeByUserId method...{}",userId);
 		return TO_EMPLOYEE.apply(employeeDaoService.getEmployeebyUserId(userId).orElseThrow(()->new ResourceNotFoundException("Employee", "userId", userId)));
 	}
 
 	@Override
 	public Optional<EmployeeMaster> getById(Integer assignTo) {
+		log.info("inside the getById method...{}",assignTo);
 		try {
 			return TO_EmployeeMaster.apply(employeeDaoService.getById(assignTo).get());
 		} catch (Exception e) {
@@ -62,16 +66,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser(String email) {
+		log.info("inside the getAdminAndUser method...{}",email);
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try{
-			resultMap.put(ApiResponse.SUCCESS, true);
+			resultMap.put(SUCCESS, true);
 			if(Objects.nonNull(email)) {
 				Map<String,Object> emailMap=new HashMap<>();
 				emailMap.put("Emails", employeeDaoService.activeEmployeeEmailIds());
-			  resultMap.put(ApiResponse.DATA, emailMap);
+			  resultMap.put(DATA, emailMap);
 			}else
-			 resultMap.put(ApiResponse.DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
-			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
+			 resultMap.put(DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
+			return new ResponseEntity<>(resultMap, FOUND);
 		}catch (Exception e) {
 			log.info("Got Exception while getting admin and user..{}" ,e.getMessage());
 			throw new CRMException(e);
@@ -82,6 +87,5 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public Optional<EmployeeMaster> findByName(String firstName, String lastName) {
 		return employeeDaoService.findByName(firstName,lastName);
 	}
-
 }
 //@formatter:on

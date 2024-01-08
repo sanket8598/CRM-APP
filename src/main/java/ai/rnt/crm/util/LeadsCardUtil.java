@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LeadsCardUtil {
 
 	public static String shortName(String fName, String lName) {
+		log.info("inside the shortName method...{} {}", fName, lName);
 		try {
 			Pattern pattern = compile("^.");
 			Matcher firstNameMatcher = pattern.matcher(fName);
@@ -42,11 +43,12 @@ public class LeadsCardUtil {
 	}
 
 	public static String shortName(String fullName) {
+		log.info("inside the shortName method...{}", fullName);
 		Matcher firstNameMatcher = null;
 		Matcher lastNameMatcher = null;
 		Pattern pattern = compile("^.");
 		try {
-			if (Objects.nonNull(fullName) && fullName.trim().contains(" ")) {
+			if (nonNull(fullName) && fullName.trim().contains(" ")) {
 				String[] result = fullName.split(" ");
 				firstNameMatcher = pattern.matcher(result[0]);
 				lastNameMatcher = pattern.matcher(result[1]);
@@ -73,6 +75,7 @@ public class LeadsCardUtil {
 	 */
 
 	public static boolean checkDuplicateLead(List<Leads> allLeads, Leads newLead) {
+		log.info("inside the checkDuplicateLead method...");
 		Contacts primaryContact = newLead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null);
 		return (nonNull(primaryContact) && allLeads.stream().flatMap(lead -> lead.getContacts().stream())
 				.filter(Objects::nonNull)
@@ -104,5 +107,4 @@ public class LeadsCardUtil {
 										? newLead.getServiceFallsMaster().getServiceFallsId()
 										: null));
 	}
-
 }

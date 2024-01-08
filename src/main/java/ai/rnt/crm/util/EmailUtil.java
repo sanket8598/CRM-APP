@@ -61,6 +61,7 @@ public class EmailUtil {
 	}
 
 	public static boolean sendEmail(Email sendEmail) throws AddressException {
+		log.info("inside the sendEmail method...");
 		try {
 			// create a message with headers
 			Message msg = new MimeMessage(getSession());
@@ -122,6 +123,7 @@ public class EmailUtil {
 
 	public static Message sendWithAttachments(Message msg, String content, List<Attachment> list)
 			throws MessagingException {
+		log.info("inside the sendWithAttachments method...}");
 		try {
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
 			MimeMultipart multipart = new MimeMultipart();
@@ -152,6 +154,7 @@ public class EmailUtil {
 	}
 
 	public static void sendCallTaskReminderMail(PhoneCallTask callTask) {
+		log.info("inside the sendCallTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
 
@@ -181,6 +184,7 @@ public class EmailUtil {
 	}
 
 	public static void sendVisitTaskReminderMail(VisitTask visitTask) {
+		log.info("inside the sendVisitTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
 
@@ -207,6 +211,7 @@ public class EmailUtil {
 	}
 
 	public static void sendMeetingTaskReminderMail(MeetingTask meetingTask) {
+		log.info("inside the sendMeetingTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
 
@@ -234,6 +239,7 @@ public class EmailUtil {
 	}
 
 	public static void sendLeadTaskReminderMail(LeadTask leadTask) {
+		log.info("inside the sendLeadTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
 
@@ -260,6 +266,7 @@ public class EmailUtil {
 	}
 
 	public static void sendFollowUpLeadReminderMail(Leads leads) {
+		log.info("inside the sendFollowUpLeadReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
 			InternetAddress[] recipientAddress = new InternetAddress[1];
@@ -289,6 +296,7 @@ public class EmailUtil {
 	}
 
 	private static String formatDate(Date date) {
+		log.info("inside the formatDate method...{}", date);
 		try {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MMM-yyyy");
 			return outputFormat.format(date);

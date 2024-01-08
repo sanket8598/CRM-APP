@@ -59,6 +59,7 @@ import static ai.rnt.crm.constants.StatusConstants.OPEN_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.QUALIFIED_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.VISIT;
+import static ai.rnt.crm.dto.CompanyDto.builder;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
@@ -106,6 +107,7 @@ import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.parse;
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -243,6 +245,7 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> createLead(LeadDto leadDto) {
+		log.info("inside the createLead method...");
 		EnumMap<ApiResponse, Object> createMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads leads = TO_LEAD.apply(leadDto).orElseThrow(ResourceNotFoundException::new);
@@ -357,6 +360,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllLeadSource() {
+		log.info("inside the getAllLeadSource method...");
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
 			resultMap.put(SUCCESS, true);
@@ -370,6 +374,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData() {
+		log.info("inside the getAllDropDownData method...");
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
 			resultMap.put(SUCCESS, true);
@@ -389,6 +394,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardData() {
+		log.info("inside the getLeadDashboardData method...");
 		EnumMap<ApiResponse, Object> leadsDashboardData = new EnumMap<>(ApiResponse.class);
 		try {
 			leadsDashboardData.put(SUCCESS, true);
@@ -402,6 +408,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadDashboardDataByStatus(String leadsStatus) {
+		log.info("inside the getLeadDashboardDataByStatus method...{}", leadsStatus);
 		EnumMap<ApiResponse, Object> leadsDataByStatus = new EnumMap<>(ApiResponse.class);
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
@@ -459,6 +466,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editLead(Integer leadId) {
+		log.info("inside the editLead method...{}", leadId);
 		EnumMap<ApiResponse, Object> lead = new EnumMap<>(ApiResponse.class);
 		try {
 			Map<String, Object> dataMap = new LinkedHashMap<>();
@@ -648,6 +656,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(Integer leadId, QualifyLeadDto dto) {
+		log.info("inside the qualifyLead method...{}", leadId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			result.put(SUCCESS, true);
@@ -702,6 +711,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> disQualifyLead(Integer leadId, LeadDto dto) {
+		log.info("inside the disQualifyLead method...{}", leadId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId)
@@ -725,6 +735,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(Integer leadId, UpdateLeadDto dto) {
+		log.info("inside the updateLeadContact method...{}", leadId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		CountryMaster country = new CountryMaster();
 		StateMaster state = new StateMaster();
@@ -778,7 +789,7 @@ public class LeadServiceImpl implements LeadService {
 						.ifPresent(contact::setCompanyMaster);
 			} else {
 				CompanyMaster companyMaster = TO_COMPANY
-						.apply(CompanyDto.builder().companyName(dto.getCompanyName())
+						.apply(builder().companyName(dto.getCompanyName())
 								.companyWebsite(dto.getCompanyWebsite()).build())
 						.orElseThrow(ResourceNotFoundException::new);
 				if (findByCountryName.isPresent())
@@ -828,6 +839,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(Integer leadId, boolean status) {
+		log.info("inside the importantLead method...{} {}", leadId, status);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		result.put(SUCCESS, true);
 		try {
@@ -858,6 +870,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(Integer leadId) {
+		log.info("inside the reactiveLead method...{}", leadId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId)
@@ -881,6 +894,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addSortFilterForLeads(LeadSortFilterDto sortFilter) {
+		log.info("inside the addSortFilterForLeads method...");
 		try {
 			EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
@@ -904,6 +918,7 @@ public class LeadServiceImpl implements LeadService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getForQualifyLead(Integer leadId) {
+		log.info("inside the getForQualifyLead method...{}", leadId);
 		try {
 			EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 			result.put(DATA, TO_QUALIFY_LEAD.apply(leadDaoService.getLeadById(leadId)
@@ -920,6 +935,7 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file) {
+		log.info("inside the uploadExcel method...");
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			result.put(SUCCESS, false);
@@ -963,6 +979,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public boolean isValidExcel(Sheet sheet) throws IOException {
+		log.info("inside the isValidExcel method...");
 		List<String> dbHeaderNames = excelHeaderDaoService.getExcelHeadersFromDB().stream()
 				.map(ExcelHeaderMaster::getHeaderName).filter(Objects::nonNull).map(String::trim).collect(toList());
 		List<String> excelHeader = readExcelUtil.readExcelHeaders(sheet).stream().filter(Objects::nonNull)
@@ -972,6 +989,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public Contacts buildLeadObj(LeadDto leadDto) {
+		log.info("inside the buildLeadObj method...");
 		Leads leads = TO_LEAD.apply(leadDto).orElseThrow(ResourceNotFoundException::new);
 		Contacts contact = null;
 		try {
@@ -1023,6 +1041,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public void setAssignToNameForTheLead(Leads leads, String[] split) {
+		log.info("inside the setAssignToNameForTheLead method...");
 		String firstName;
 		String lastName = null;
 		if (split.length > 1) {
@@ -1034,40 +1053,48 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
+		log.info("inside the getCallRelatedTasks method...");
 		return calls.stream().flatMap(call -> call.getCallTasks().stream())
 				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
-						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId(), e.isRemainderOn(),e.getCall().getStatus()))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId(), e.isRemainderOn(),
+						e.getCall().getStatus()))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
+		log.info("inside the getVistRelatedTasks method...");
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
 				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
-						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId(), e.isRemainderOn(),e.getVisit().getStatus()))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId(), e.isRemainderOn(),
+						e.getVisit().getStatus()))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
+		log.info("inside the getMeetingRelatedTasks method...");
 		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
 				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getMeetings().getMeetingId(),
-						e.isRemainderOn(),e.getMeetings().getMeetingStatus()))
+						e.isRemainderOn(), e.getMeetings().getMeetingStatus()))
 				.collect(toList());
 	}
 
 	public List<MainTaskDto> getLeadRelatedTasks(Leads lead) {
+		log.info("inside the getLeadRelatedTasks method...");
 		return lead.getLeadTasks().stream()
 				.map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(), LEAD,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
-						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId(), e.isRemainderOn(),e.getLead().getStatus()))
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId(), e.isRemainderOn(),
+						e.getLead().getStatus()))
 				.collect(toList());
 	}
 
 	public Map<String, Object> getTaskDataMap(List<Call> calls, List<Visit> visits, List<Meetings> meetings,
 			Leads lead) {
+		log.info("inside the getTaskDataMap method...");
 		Map<String, Object> taskData = new HashMap<>();
 		Map<String, Object> taskCount = new HashMap<>();
 		List<MainTaskDto> allTask = getCallRelatedTasks(calls);
@@ -1093,6 +1120,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public Contacts setContactDetailsToLead(Optional<CompanyDto> existCompany, LeadDto leadDto, Leads leads) {
+		log.info("inside the setContactDetailsToLead method...");
 		Contacts contact = new Contacts();
 		contact.setFirstName(leadDto.getFirstName());
 		contact.setLastName(leadDto.getLastName());
@@ -1110,6 +1138,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public void setCompanyDetailsToContact(Optional<CompanyDto> existCompany, LeadDto leadDto, Contacts contact) {
+		log.info("inside the setCompanyDetailsToContact method...");
 		if (existCompany.isPresent()) {
 			existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
 			contact.setCompanyMaster(
@@ -1133,6 +1162,8 @@ public class LeadServiceImpl implements LeadService {
 
 	private void setServiceFallLeadSourceAndDomainToLead(String serviceFallsName, String leadSourceName,
 			String domainName, Leads leads) throws Exception {
+		log.info("inside the setServiceFallLeadSourceAndDomainToLead method...{} {} {}", serviceFallsName,
+				leadSourceName, domainName);
 		Pattern pattern = compile("^\\d+$");
 		if (nonNull(serviceFallsName) && pattern.matcher(serviceFallsName).matches())
 			serviceFallsDaoSevice.getServiceFallById(parseInt(serviceFallsName))
@@ -1152,7 +1183,7 @@ public class LeadServiceImpl implements LeadService {
 			leadSourceDaoService.getByName(OTHER).ifPresent(leads::setLeadSourceMaster);
 		else {
 			LeadSourceMaster leadSource = new LeadSourceMaster();
-				leadSource.setSourceName(leadSourceName);
+			leadSource.setSourceName(leadSourceName);
 			TO_LEAD_SOURCE
 					.apply(leadSourceDaoService.save(leadSource).orElseThrow(
 							() -> new ResourceNotFoundException(LEAD_SOURCE_MASTER, LEAD_SOURCE_NAME, leadSourceName)))
@@ -1170,12 +1201,13 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	private Map<String, Object> upNextActivities(LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities) {
+		log.info("inside the upNextActivities method...");
 		Map<String, Object> upNextDataMap = new HashMap<>();
 		upNextDataMap.put(MSG, NO_ACTIVITY);
 		if (nonNull(upNextActivities) && !upNextActivities.isEmpty()) {
 			Long lowestDayDiff = upNextActivities.keySet().stream().min(naturalOrder()).orElse(null);
 			if (nonNull(lowestDayDiff)) {
-				if(upNextActivities.size()==1)
+				if (upNextActivities.size() == 1)
 					upNextDataMap.put(MSG, DONE_FOR_DAY);
 				int count = 0;
 				List<TimeLineActivityDto> upNextData = new ArrayList<>();
@@ -1185,7 +1217,7 @@ public class LeadServiceImpl implements LeadService {
 						upNextData.add(e);
 					});
 					if (count == 1 && !data.getKey().equals(0L))
-						upNextDataMap.put(MSG, String.format(WAIT_FOR, data.getKey()));
+						upNextDataMap.put(MSG, format(WAIT_FOR, data.getKey()));
 					count++;
 				}
 				upNextDataMap.put(UPNEXT_DATA_KEY, upNextData);

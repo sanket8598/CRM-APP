@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TaskUtil {
 
 	public static boolean checkDuplicateTask(List<PhoneCallTask> allTask, PhoneCallTask phoneCallTask) {
+		log.info("inside the call checkDuplicateTask method...{}");
 		boolean status = false;
 		try {
 			if (isNull(allTask) || allTask.isEmpty())
@@ -53,6 +54,7 @@ public class TaskUtil {
 	}
 
 	public static boolean checkDuplicateVisitTask(List<VisitTask> allTask, VisitTask visitTask) {
+		log.info("inside the checkDuplicateVisitTask method...{}");
 		boolean status = false;
 		try {
 			if (isNull(allTask) || allTask.isEmpty())
@@ -79,6 +81,7 @@ public class TaskUtil {
 	}
 
 	public static boolean checkDuplicateLeadTask(List<LeadTask> allTask, LeadTask leadTask) {
+		log.info("inside the checkDuplicateLeadTask method...{}");
 		boolean status = false;
 		try {
 			if (isNull(allTask) || allTask.isEmpty())
@@ -105,6 +108,7 @@ public class TaskUtil {
 	}
 
 	public static boolean checkDuplicateMeetingTask(List<MeetingTask> allMeetingTask, MeetingTask meetingTask) {
+		log.info("inside the checkDuplicateMeetingTask method...{}");
 		boolean status = false;
 		try {
 			if (isNull(allMeetingTask) || allMeetingTask.isEmpty())
@@ -132,6 +136,7 @@ public class TaskUtil {
 	}
 
 	private static boolean compareDatesIgnoringTime(Date oldDate, Date newDate) {
+		log.info("inside the compareDatesIgnoringTime method...{}");
 		return oldDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
 				.equals(newDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 	}

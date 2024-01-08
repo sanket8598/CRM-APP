@@ -8,12 +8,14 @@ import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.EmailUtil.sendEmail;
+import static java.lang.Boolean.TRUE;
+import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -22,7 +24,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +66,7 @@ public class EmailServiceImpl implements EmailService {
 	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addEmail(EmailDto dto, Integer leadId, String status) {
+		log.info("inside the addEmail method...{} {}", leadId, status);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			boolean saveStatus = false;
@@ -121,9 +123,10 @@ public class EmailServiceImpl implements EmailService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(Integer addMailId, Integer leadId) {
+		log.info("inside the checkMailId method...{} {}", addMailId, leadId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			if (Boolean.TRUE.equals(emailDaoService.emailPresentForLeadLeadId(addMailId, leadId))) {
+			if (TRUE.equals(emailDaoService.emailPresentForLeadLeadId(addMailId, leadId))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "This email is already saved");
 				result.put(DATA, addMailId);
@@ -135,11 +138,12 @@ public class EmailServiceImpl implements EmailService {
 			log.error("error occured while checking add email for the Lead Id..{}", e.getMessage());
 			throw new CRMException(e);
 		}
-		return new ResponseEntity<>(result, HttpStatus.OK);
+		return new ResponseEntity<>(result, OK);
 	}
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteEmail(Integer mailId) {
+		log.info("inside the deleteEmail method...{}", mailId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		Email updatedEmail = null;
 		try {
@@ -152,9 +156,9 @@ public class EmailServiceImpl implements EmailService {
 				if (nonNull(attachment) && !attachment.isEmpty()) {
 					List<Attachment> attach = attachment.stream().map(e -> {
 						e.setDeletedBy(details.getStaffId());
-						e.setDeletedDate(LocalDateTime.now());
+						e.setDeletedDate(now());
 						e.getMail().setDeletedBy(details.getStaffId());
-						e.getMail().setDeletedDate(LocalDateTime.now());
+						e.getMail().setDeletedDate(now());
 						e.setMail(e.getMail());
 						return e;
 					}).collect(Collectors.toList());
@@ -164,7 +168,7 @@ public class EmailServiceImpl implements EmailService {
 					}
 				} else {
 					mail.setDeletedBy(details.getStaffId());
-					mail.setDeletedDate(LocalDateTime.now());
+					mail.setDeletedDate(now());
 					updatedEmail = emailDaoService.email(mail);
 				}
 			}
@@ -207,6 +211,7 @@ public class EmailServiceImpl implements EmailService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getEmail(Integer mailId) {
+		log.info("inside the getEmail method...{}", mailId);
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Email email = emailDaoService.findById(mailId);
@@ -234,6 +239,7 @@ public class EmailServiceImpl implements EmailService {
 	@Transactional
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateEmail(EmailDto dto, String status, Integer mailId) {
+		log.info("inside the updateEmail method...{} {}", mailId, status);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			boolean saveStatus = false;
@@ -258,7 +264,7 @@ public class EmailServiceImpl implements EmailService {
 							Attachment data = attachmentDaoService.findById(existingAttachment.getEmailAttchId())
 									.orElse(null);
 							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-							data.setDeletedDate(LocalDateTime.now());
+							data.setDeletedDate(now());
 							attachmentDaoService.addAttachment(data);
 						}
 					}
@@ -273,7 +279,7 @@ public class EmailServiceImpl implements EmailService {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Updated Successfully");
 			} else if (SEND.equalsIgnoreCase(status)) {
-				boolean sendEmailStatus = EmailUtil.sendEmail(sendEmail);
+				boolean sendEmailStatus = sendEmail(sendEmail);
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Updated and Sent Successfully!!");

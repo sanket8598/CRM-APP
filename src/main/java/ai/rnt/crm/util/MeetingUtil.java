@@ -1,14 +1,15 @@
 package ai.rnt.crm.util;
 
 import static java.util.Objects.nonNull;
+import static java.util.TimeZone.getTimeZone;
 import static javax.mail.Message.RecipientType.TO;
 import static javax.mail.Transport.send;
+import static javax.mail.internet.InternetAddress.parse;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
-import java.util.TimeZone;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,7 @@ public class MeetingUtil {
 	}
 
 	public void scheduleMeetingInOutlook(MeetingDto dto) throws Exception {
+		log.info("inside the scheduleMeetingInOutlook method...{}");
 		try {
 			Message msg = new MimeMessage(getSession());
 			msg.setFrom(new InternetAddress(USERNAME));
@@ -69,7 +71,7 @@ public class MeetingUtil {
 			String toMail = null;
 			if (nonNull(dto.getParticipates())) {
 				toMail = dto.getParticipates().stream().collect(Collectors.joining(","));
-				msg.setRecipients(TO, InternetAddress.parse(toMail));
+				msg.setRecipients(TO, parse(toMail));
 			}
 			msg.setSubject(dto.getMeetingTitle());
 			// msg.setHeader("Content-class", "urn:content-classes:calendarmessage");
@@ -98,6 +100,7 @@ public class MeetingUtil {
 	}
 
 	private String getBufferString(MeetingDto dto) {
+		log.info("inside the meetingUtil getBufferString method...{}");
 		StringBuilder sb = new StringBuilder();
 		String dtStamp = formatDate(dto.getStartDate());
 		StringBuilder buffer = sb.append("BEGIN:VCALENDAR\n" + "PRODID: Asset View 2.0\n" + "VERSION:2.0\n"
@@ -115,6 +118,7 @@ public class MeetingUtil {
 	}
 
 	private String extractDstartDend(MeetingDto dto) {
+		log.info("inside the meetingUtil extractDstartDend method...{}");
 		StringBuilder res = new StringBuilder();
 		if (dto.isAllDay()) {
 			res.append("DTSTART;VALUE=DATE:" + formatDate(dto.getStartDate()) + "\n"); // Format DTSTART for all-day
@@ -136,6 +140,7 @@ public class MeetingUtil {
 	}
 
 	private MimeBodyPart createAttachment(MeetingAttachmentsDto attachment) throws MessagingException, IOException {
+		log.info("inside the meetingUtil createAttachment method...");
 		MimeBodyPart attachmentPart = new MimeBodyPart();
 		DataSource source = new ByteArrayDataSource(attachment.getMeetingAttachmentData(), "application/octet-stream");
 		attachmentPart.setDataHandler(new DataHandler(source));
@@ -144,8 +149,9 @@ public class MeetingUtil {
 	}
 
 	private String formatDate(Date date) {
+		log.info("inside the meetingUtil formatDate method...{}", date);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+		dateFormat.setTimeZone(getTimeZone("UTC"));
 		return dateFormat.format(date);
 	}
 }

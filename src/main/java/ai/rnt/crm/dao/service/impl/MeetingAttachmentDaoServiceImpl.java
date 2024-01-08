@@ -36,7 +36,5 @@ public class MeetingAttachmentDaoServiceImpl implements MeetingAttachmentDaoServ
 	@Override
 	public void removeExistingMeetingAttachment(MeetingAttachments data) {
 		meetingAttachmentRepository.delete(data);
-		
 	}
-
 }

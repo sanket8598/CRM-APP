@@ -19,10 +19,12 @@ import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.repository.ImpLeadRepository;
 import ai.rnt.crm.repository.LeadsRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class LeadDaoServiceImpl implements LeadDaoService {
 	private final LeadsRepository leadsRepository;
 	private final ImpLeadRepository impLeadRepositroy;
@@ -58,11 +60,13 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 
 	@Override
 	public Optional<LeadImportant> addImportantLead(LeadImportant leadImportant) {
+		log.info("inside the addImportantLead method...");
 		return ofNullable(impLeadRepositroy.save(leadImportant));
 	}
 
 	@Override
 	public boolean deleteImportantLead(Integer leadId,Integer staffId) {
+		log.info("inside the deleteImportantLead method...{} {}",leadId,staffId);
 		 Optional<LeadImportant> impLead = impLeadRepositroy.findByLeadLeadIdAndEmployeeStaffId(leadId,staffId); 
 		 if(impLead.isPresent() && nonNull(impLead)){
 			 impLeadRepositroy.deleteById(impLead.get().getId());

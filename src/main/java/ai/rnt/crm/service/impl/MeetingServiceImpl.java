@@ -13,13 +13,13 @@ import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.TaskUtil.checkDuplicateMeetingTask;
+import static java.time.LocalDateTime.now;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +74,7 @@ public class MeetingServiceImpl implements MeetingService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeeting(@Valid MeetingDto dto, Integer leadsId) {
+		log.info("inside the addMeeting method...{}", leadsId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			boolean saveStatus = false;
@@ -117,6 +118,7 @@ public class MeetingServiceImpl implements MeetingService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editMeeting(Integer meetingId) {
+		log.info("inside the editMeeting method...{}", meetingId);
 		EnumMap<ApiResponse, Object> meeting = new EnumMap<>(ApiResponse.class);
 		try {
 			meeting.put(SUCCESS, true);
@@ -132,6 +134,7 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeeting(MeetingDto dto, Integer meetingId,
 			String status) {
+		log.info("inside the updateMeeting method...{} {}", meetingId, status);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			boolean meetingStatus = false;
@@ -167,7 +170,7 @@ public class MeetingServiceImpl implements MeetingService {
 							MeetingAttachments data = meetingAttachmetDaoService
 									.findById(existingAttachment.getMeetingAttchId()).orElse(null);
 							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-							data.setDeletedDate(LocalDateTime.now());
+							data.setDeletedDate(now());
 							meetingAttachmetDaoService.removeExistingMeetingAttachment(data);
 						}
 					}
@@ -199,6 +202,7 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeeting(Integer meetingId) {
+		log.info("inside the deleteMeeting method...{}", meetingId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
@@ -206,16 +210,16 @@ public class MeetingServiceImpl implements MeetingService {
 					.orElseThrow(() -> new ResourceNotFoundException("Meetings", "meetingId", meetingId));
 			meetings.getMeetingTasks().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(LocalDateTime.now());
+				e.setDeletedDate(now());
 				meetingDaoService.addMeetingTask(e);
 			});
 			meetings.getMeetingAttachments().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(LocalDateTime.now());
+				e.setDeletedDate(now());
 				meetingAttachmetDaoService.addMeetingAttachment(e);
 			});
 			meetings.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			meetings.setDeletedDate(LocalDateTime.now());
+			meetings.setDeletedDate(now());
 			if (nonNull(meetingDaoService.addMeeting(meetings))) {
 				result.put(MESSAGE, "Meeting deleted SuccessFully.");
 				result.put(SUCCESS, true);
@@ -233,6 +237,7 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@Valid MeetingTaskDto dto, Integer leadsId,
 			Integer meetingId) {
+		log.info("inside the addMeetingTask method...{} {}", leadsId, meetingId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			MeetingTask meetingTask = TO_MEETING_TASK.apply(dto).orElseThrow(ResourceNotFoundException::new);
@@ -259,6 +264,7 @@ public class MeetingServiceImpl implements MeetingService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getMeetingTask(Integer taskId) {
+		log.info("inside the getMeetingTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> meetingTask = new EnumMap<>(ApiResponse.class);
 		try {
 			meetingTask.put(SUCCESS, true);
@@ -273,6 +279,7 @@ public class MeetingServiceImpl implements MeetingService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(GetMeetingTaskDto dto, Integer taskId) {
+		log.info("inside the updateMeetingTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
@@ -287,7 +294,7 @@ public class MeetingServiceImpl implements MeetingService {
 			meetingTask.setRemainderDueOn(dto.getRemainderDueOn());
 			meetingTask.setRemainderVia(dto.getRemainderVia());
 			meetingTask.setDescription(dto.getDescription());
-			meetingTask.setUpdatedDate(LocalDateTime.now());
+			meetingTask.setUpdatedDate(now());
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Updated Successfully..!!");
@@ -328,12 +335,13 @@ public class MeetingServiceImpl implements MeetingService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeetingTask(Integer taskId) {
+		log.info("inside the deleteMeetingTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", taskId));
 			meetingTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			meetingTask.setDeletedDate(LocalDateTime.now());
+			meetingTask.setDeletedDate(now());
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
 				result.put(MESSAGE, "Meeting Task Deleted SuccessFully.");
 				result.put(SUCCESS, true);

@@ -5,11 +5,13 @@ import static ai.rnt.crm.constants.ExcelConstants.ERROR;
 import static ai.rnt.crm.constants.ExcelConstants.FLAG;
 import static ai.rnt.crm.constants.ExcelConstants.LEAD_DATA;
 import static ai.rnt.crm.constants.MessageConstants.MSG;
+import static ai.rnt.crm.util.CurrencyUtil.commaSepAmount;
 import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidBudgetAmount;
 import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidDesignation;
 import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidEmail;
 import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidFnameLname;
 import static ai.rnt.crm.util.ExcelFieldValidationUtil.isValidPhoneNumber;
+import static java.lang.Double.parseDouble;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.stream.IntStream.range;
@@ -48,6 +50,7 @@ public class ReadExcelUtil {
 
 	public Map<String, Object> readExcelFile(Workbook workbook, Sheet sheet)
 			throws EncryptedDocumentException, InvalidFormatException, IOException {
+		log.info("inside the readExcelFile method...{}");
 		Map<String, Object> dataExcel = new HashMap<>();
 		List<LeadDto> excelLeads = new ArrayList<>();
 		dataExcel.put(FLAG, true);
@@ -87,6 +90,7 @@ public class ReadExcelUtil {
 	}
 
 	public List<String> readExcelHeaders(Sheet sheet) throws IOException {
+		log.info("inside the readExcelHeaders method...{}");
 		List<String> headerList = new ArrayList<>();
 		try {
 			Row row = sheet.getRow(0);
@@ -107,6 +111,7 @@ public class ReadExcelUtil {
 	}
 
 	private Map<String, Object> createLeadFromExcelData(String data, int fieldCount, LeadDto leadDto, int rowNum) {
+		log.info("inside the createLeadFromExcelData method...{}");
 		StringBuilder errorList = new StringBuilder();
 		Map<String, Object> dataMap = new HashMap<>();
 		switch (fieldCount) {
@@ -173,7 +178,7 @@ public class ReadExcelUtil {
 			break;
 		case 8:
 			if (isValidBudgetAmount(data))
-				leadDto.setBudgetAmount(CurrencyUtil.commaSepAmount(Double.parseDouble(data)));
+				leadDto.setBudgetAmount(commaSepAmount(parseDouble(data)));
 			else
 				errorList.append("Please Enter The Valid Budget Amount On Row No: " + rowNum);
 			break;

@@ -4,6 +4,7 @@ import static ai.rnt.crm.constants.RoleConstants.CRM_ADMIN;
 import static ai.rnt.crm.constants.RoleConstants.CRM_USER;
 import static ai.rnt.crm.constants.RoleConstants.NO_ROLE;
 import static java.util.Objects.isNull;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,11 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@NoArgsConstructor(access = PRIVATE)
+@Slf4j
 public class RoleUtil {
 
 	/**
@@ -56,9 +62,8 @@ public class RoleUtil {
 	};
 
 	public static final String getSingleRole(List<String> roles) {
+		log.info("inside the getSingleRole method...{}");
 		return roles.stream().filter(CHECK_ADMIN).findFirst()
-				.orElse(roles.stream().filter(CHECK_USER).findFirst()
-				.orElse(NO_ROLE));
+				.orElse(roles.stream().filter(CHECK_USER).findFirst().orElse(NO_ROLE));
 	}
-
 }
