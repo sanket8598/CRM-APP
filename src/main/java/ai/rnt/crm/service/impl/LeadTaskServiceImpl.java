@@ -6,12 +6,12 @@ import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.TaskUtil.checkDuplicateLeadTask;
+import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -54,6 +54,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addLeadTask(@Valid LeadTaskDto dto, Integer leadsId) {
+		log.info("inside the addLeadTask method...{}", leadsId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = TO_LEAD_TASK.apply(dto)
@@ -81,6 +82,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadTask(Integer taskId) {
+		log.info("inside the getLeadTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			result.put(DATA, TO_GET_LEAD_TASK_DTO.apply(leadTaskDaoService.getTaskById(taskId)
@@ -95,6 +97,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadTask(GetLeadTaskDto dto, Integer taskId) {
+		log.info("inside the updateLeadTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
@@ -150,12 +153,13 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteLeadTask(Integer taskId) {
+		log.info("inside the deleteLeadTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", taskId));
 			leadTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			leadTask.setDeletedDate(LocalDateTime.now());
+			leadTask.setDeletedDate(now());
 			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task deleted SuccessFully");

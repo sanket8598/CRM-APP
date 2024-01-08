@@ -5,13 +5,14 @@ import static ai.rnt.crm.util.EmailUtil.sendFollowUpLeadReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendLeadTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendMeetingTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendVisitTaskReminderMail;
+import static java.time.LocalTime.now;
+import static java.time.ZoneId.systemDefault;
+import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Date.from;
 import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -64,10 +65,11 @@ public class TaskRemainderUtil {
 
 	// @Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
+		log.info("inside the reminderForTask method...{}");
 		try {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
-			Date todayAsDate = Date.from(todayDate.atZone(ZoneId.systemDefault()).toInstant());
-			String time = LocalTime.now().format(DateTimeFormatter.ofPattern("hh:mm a"));
+			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
+			String time = now().format(ofPattern("hh:mm a"));
 
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
@@ -133,6 +135,7 @@ public class TaskRemainderUtil {
 	}
 
 	public void callNotification(Integer callTaskId) {
+		log.info("inside callNotification method...{}", callTaskId);
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
 			taskNotifications.setCallTask(callDaoService.getCallTaskById(callTaskId)
@@ -148,6 +151,7 @@ public class TaskRemainderUtil {
 	}
 
 	public void visitNotification(Integer visitTaskId) {
+		log.info("inside visitNotification method...{}", visitTaskId);
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
 			taskNotifications.setVisitTask(visitDaoService.getVisitTaskById(visitTaskId)
@@ -163,6 +167,7 @@ public class TaskRemainderUtil {
 	}
 
 	public void meetingNotification(Integer meetingTaskId) {
+		log.info("inside meetingNotification method...{}", meetingTaskId);
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
 			taskNotifications.setMeetingTask(meetingDaoService.getMeetingTaskById(meetingTaskId)
@@ -178,6 +183,7 @@ public class TaskRemainderUtil {
 	}
 
 	private void leadNotification(Integer leadTaskId) {
+		log.info("inside leadNotification method...{}", leadTaskId);
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
 			taskNotifications.setLeadTask(leadTaskDaoService.getTaskById(leadTaskId)
@@ -193,6 +199,7 @@ public class TaskRemainderUtil {
 	}
 
 	private void followUpLeadNotification(Integer leadId) {
+		log.info("inside followUpLeadNotification method...{}", leadId);
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
 			taskNotifications.setLeads(leadDaoService.getLeadById(leadId)

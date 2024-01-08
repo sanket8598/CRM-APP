@@ -26,6 +26,7 @@ public class CountryServiceImpl implements CountryService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllCountry() {
+		log.info("inside the getAllCountry method...{}");
 		EnumMap<ApiResponse, Object> allCountry = new EnumMap<>(ApiResponse.class);
 		try {
 			allCountry.put(SUCCESS, true);

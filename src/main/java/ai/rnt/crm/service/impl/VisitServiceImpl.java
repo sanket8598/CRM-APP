@@ -12,12 +12,12 @@ import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.TaskUtil.checkDuplicateVisitTask;
+import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.time.LocalDateTime;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
@@ -95,6 +95,7 @@ public class VisitServiceImpl implements VisitService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editVisit(Integer visitId) {
+		log.info("inside editVisit method...{}", visitId);
 		EnumMap<ApiResponse, Object> visit = new EnumMap<>(ApiResponse.class);
 		try {
 			visit.put(SUCCESS, true);
@@ -109,6 +110,7 @@ public class VisitServiceImpl implements VisitService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisit(VisitDto dto, Integer visitId, String status) {
+		log.info("inside updateVisit method...{} {}", visitId, status);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
@@ -130,7 +132,7 @@ public class VisitServiceImpl implements VisitService {
 			visit.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			visit.setAllDay(dto.isAllDay());
 			visit.setStatus(status);
-			visit.setUpdatedDate(LocalDateTime.now());
+			visit.setUpdatedDate(now());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				if (status.equalsIgnoreCase(SAVE))
 					result.put(MESSAGE, "Visit Updated Successfully");
@@ -178,11 +180,12 @@ public class VisitServiceImpl implements VisitService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> visitMarkAsCompleted(Integer visitId) {
+		log.info("inside visitMarkAsCompleted method...{}", visitId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
 					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
-			visit.setUpdatedDate(LocalDateTime.now());
+			visit.setUpdatedDate(now());
 			visit.setStatus(COMPLETE);
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit updated SuccessFully");
@@ -201,6 +204,7 @@ public class VisitServiceImpl implements VisitService {
 	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisit(Integer visitId) {
+		log.info("inside deleteVisit method...{}", visitId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
@@ -208,11 +212,11 @@ public class VisitServiceImpl implements VisitService {
 					.orElseThrow(() -> new ResourceNotFoundException("Visit", "visitId", visitId));
 			visit.getVisitTasks().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(LocalDateTime.now());
+				e.setDeletedDate(now());
 				visitDaoService.addVisitTask(e);
 			});
 			visit.setDeletedBy(loggedInStaffId);
-			visit.setDeletedDate(LocalDateTime.now());
+			visit.setDeletedDate(now());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit deleted SuccessFully.");
 				result.put(SUCCESS, true);
@@ -230,6 +234,7 @@ public class VisitServiceImpl implements VisitService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addVisitTask(@Valid VisitTaskDto dto, Integer leadsId,
 			Integer visitId) {
+		log.info("inside addVisitTask method...{} {}", leadsId, visitId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			VisitTask visitTask = TO_VISIT_TASK.apply(dto).orElseThrow(ResourceNotFoundException::new);
@@ -256,6 +261,7 @@ public class VisitServiceImpl implements VisitService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getVisitTask(Integer taskId) {
+		log.info("inside getVisitTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> visitTask = new EnumMap<>(ApiResponse.class);
 		try {
 			visitTask.put(SUCCESS, true);
@@ -270,6 +276,7 @@ public class VisitServiceImpl implements VisitService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateVisitTask(GetVisitTaskDto dto, Integer taskId) {
+		log.info("inside updateVisitTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			VisitTask visitTask = visitDaoService.getVisitTaskById(taskId)
@@ -284,7 +291,7 @@ public class VisitServiceImpl implements VisitService {
 			visitTask.setRemainderOn(dto.isRemainderOn());
 			visitTask.setRemainderVia(dto.getRemainderVia());
 			visitTask.setDescription(dto.getDescription());
-			visitTask.setUpdatedDate(LocalDateTime.now());
+			visitTask.setUpdatedDate(now());
 			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Updated Successfully..!!");
@@ -325,12 +332,13 @@ public class VisitServiceImpl implements VisitService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteVisitTask(Integer taskId) {
+		log.info("inside deleteVisitTask method...{}", taskId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			VisitTask visitTask = visitDaoService.getVisitTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException("VisitTask", "taskId", taskId));
 			visitTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			visitTask.setDeletedDate(LocalDateTime.now());
+			visitTask.setDeletedDate(now());
 			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
 				result.put(MESSAGE, "Visit Task Deleted SuccessFully.");
 				result.put(SUCCESS, true);

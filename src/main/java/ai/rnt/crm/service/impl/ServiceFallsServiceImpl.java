@@ -22,13 +22,15 @@ public class ServiceFallsServiceImpl implements ServiceFallsService {
 
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
 
-	/**@author Nikhil Gaikwad
+	/**
+	 * @author Nikhil Gaikwad
 	 * @Version 1.0
-	 * @since 07-09-2023 
+	 * @since 07-09-2023
 	 *
 	 */
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllSerciveFalls() {
+		log.info("inside the getAllSerciveFalls method...");
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
 		try {
 			resultMap.put(ApiResponse.SUCCESS, true);
@@ -36,7 +38,7 @@ public class ServiceFallsServiceImpl implements ServiceFallsService {
 					TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			return new ResponseEntity<>(resultMap, HttpStatus.FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting the service falls data..{}" ,e.getMessage());
+			log.info("Got Exception while getting the service falls data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

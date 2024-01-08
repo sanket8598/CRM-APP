@@ -30,6 +30,7 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getNotification(Integer staffId) {
+		log.info("inside the getNotification method...{}", staffId);
 		EnumMap<ApiResponse, Object> notification = new EnumMap<>(ApiResponse.class);
 		try {
 			Map<String, Object> countData = new HashMap<>();

@@ -43,6 +43,7 @@ public class ContactServiceImpl implements ContactService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addContact(ContactDto contactDto, Integer leadId) {
+		log.info("inside the addContact method...{}", leadId);
 		EnumMap<ApiResponse, Object> contactMap = new EnumMap<>(ApiResponse.class);
 		try {
 			contactMap.put(SUCCESS, true);
@@ -65,7 +66,7 @@ public class ContactServiceImpl implements ContactService {
 					con.setPrimary(false);
 					contactDaoService.addContact(con);
 				});
-			if (!isDuplicateContact(existingContacts,contact) && nonNull(contactDaoService.addContact(contact)))
+			if (!isDuplicateContact(existingContacts, contact) && nonNull(contactDaoService.addContact(contact)))
 				contactMap.put(MESSAGE, "Contact Added Successfully !!");
 			else {
 				contactMap.put(SUCCESS, false);
@@ -80,6 +81,7 @@ public class ContactServiceImpl implements ContactService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getContact(Integer contactId) {
+		log.info("inside the getContact method...{}", contactId);
 		EnumMap<ApiResponse, Object> contactMap = new EnumMap<>(ApiResponse.class);
 		try {
 			contactMap.put(SUCCESS, true);
@@ -94,6 +96,7 @@ public class ContactServiceImpl implements ContactService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateContact(ContactDto contactDto, Integer contactId) {
+		log.info("inside the updateContact method...{}", contactId);
 		EnumMap<ApiResponse, Object> contactMap = new EnumMap<>(ApiResponse.class);
 		try {
 			contactMap.put(SUCCESS, true);
@@ -149,5 +152,4 @@ public class ContactServiceImpl implements ContactService {
 			throw new CRMException(e);
 		}
 	}
-
 }

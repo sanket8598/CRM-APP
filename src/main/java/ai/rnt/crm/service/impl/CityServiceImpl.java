@@ -31,6 +31,7 @@ public class CityServiceImpl implements CityService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllCity() {
+		log.info("inside the getAllCity method...{}");
 		EnumMap<ApiResponse, Object> allCity = new EnumMap<>(ApiResponse.class);
 		try {
 			allCity.put(SUCCESS, true);

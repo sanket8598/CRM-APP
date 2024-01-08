@@ -6,12 +6,14 @@ import static ai.rnt.crm.constants.DateFormatterConstant.DEFAULT_UTIL_DATE_FORMA
 import static ai.rnt.crm.constants.DateFormatterConstant.YYYY_MM_DD;
 import static java.time.ZoneId.systemDefault;
 import static java.util.Date.from;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 import ai.rnt.crm.exception.CRMException;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,11 +26,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 
 @Slf4j
+@NoArgsConstructor(access = PRIVATE)
 public class ConvertDateFormatUtil {
-
-	private ConvertDateFormatUtil() {
-
-	}
 
 	/**
 	 * @author Sanket Wakankar
@@ -39,21 +38,23 @@ public class ConvertDateFormatUtil {
 	 */
 
 	public static String convertDate(LocalDateTime toConvertDate) {
+		log.info("inside the convertDate method...{}", toConvertDate);
 		try {
-			return DATE_TIME_WITH_AM_AND_PM.format(DEFAULT_UTIL_DATE_FORMAT
-					.parse(from(toConvertDate.atZone(systemDefault()).toInstant()).toString()));
+			return DATE_TIME_WITH_AM_AND_PM.format(
+					DEFAULT_UTIL_DATE_FORMAT.parse(from(toConvertDate.atZone(systemDefault()).toInstant()).toString()));
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format:", e.getMessage());
-			throw new CRMException("error while date conversion."+toConvertDate);
+			throw new CRMException("error while date conversion." + toConvertDate);
 		}
 	}
 
 	public static String convertDateUtilDate(Date date) throws ParseException {
+		log.info("inside the convertDateUtilDate method...{}", date);
 		try {
 			return DD_MMM_YYYY.format(DEFAULT_UTIL_DATE_FORMAT.parse(date.toString()));
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format in convertDateUtilDate:", e.getMessage());
-			throw new CRMException("error while date convertDateUtilDate."+date);
+			throw new CRMException("error while date convertDateUtilDate." + date);
 		}
 	}
 
@@ -69,12 +70,12 @@ public class ConvertDateFormatUtil {
 	 * @return String
 	 */
 	public static String convertDateDateWithTime(Date date, String endTime) {
+		log.info("inside the convertDateDateWithTime method...{} {}", date, endTime);
 		try {
-			return DD_MMM_YYYY.format(YYYY_MM_DD.parse(date.toString()))+ " " +endTime;
+			return DD_MMM_YYYY.format(YYYY_MM_DD.parse(date.toString())) + " " + endTime;
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format in convertDateDateWithTime:", e.getMessage());
-			throw new CRMException("error while date convertDateDateWithTime.."+date);
+			throw new CRMException("error while date convertDateDateWithTime.." + date);
 		}
 	}
-
 }

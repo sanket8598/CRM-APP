@@ -60,5 +60,4 @@ public class AuditAwareUtil {
 	public boolean isUser() {
 		return CHECK_USER.test(getLoggedInUserRole());
 	}
-
 }
