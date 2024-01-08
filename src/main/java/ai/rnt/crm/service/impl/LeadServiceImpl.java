@@ -275,14 +275,16 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	@Transactional(readOnly = true)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(String leadsStatus) {
+		log.info("inside the open view dashboard data getLeadsByStatus method... ");
 		EnumMap<ApiResponse, Object> getAllLeads = new EnumMap<>(ApiResponse.class);
 		getAllLeads.put(SUCCESS, true);
 		try {
 			if (isNull(leadsStatus)) {
 				Map<String, Object> dataMap = new HashMap<>();
+				List<Leads> leads = leadDaoService.getAllLeads();
 				Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 				List<LeadImportant> impLead = leadDaoService.findLeadByEmployeeStaffId(loggedInStaffId);
-				List<Leads> allLeads = leadDaoService.getAllLeads().stream()
+				List<Leads> allLeads = leads.stream()
 						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())).collect(toList());
 				allLeads.stream().forEach(lead -> lead.setImportant(impLead.stream().map(LeadImportant::getLead)
 						.anyMatch(l -> l.getLeadId().equals(lead.getLeadId()))));
@@ -302,7 +304,7 @@ public class LeadServiceImpl implements LeadService {
 				String secondaryField = filterMap.get(SECNDFIELD).toString();
 				if (auditAwareUtil.isAdmin()) {
 					dataMap.put(
-							ALL_LEAD, allLeads
+							ALL_LEAD, leads
 									.stream().map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead,
 											primaryField, secondaryField, lead.getContacts().stream()
 													.filter(Contacts::getPrimary).findFirst().orElse(null)))
@@ -315,7 +317,7 @@ public class LeadServiceImpl implements LeadService {
 															.filter(Contacts::getPrimary).findFirst().orElse(null)))
 									.collect(toList()));
 					dataMap.put(
-							CLOSE_LEAD, allLeads
+							CLOSE_LEAD, leads
 									.stream().filter(CLOSE_LEAD_FILTER).map(
 											lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
 													secondaryField, lead.getContacts().stream()
@@ -323,7 +325,7 @@ public class LeadServiceImpl implements LeadService {
 									.collect(toList()));
 				} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
 					dataMap.put(
-							ALL_LEAD, allLeads
+							ALL_LEAD, leads
 									.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId)).map(
 											lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
 													secondaryField, lead.getContacts().stream()
@@ -335,7 +337,7 @@ public class LeadServiceImpl implements LeadService {
 									secondaryField,
 									lead.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null)))
 							.collect(toList()));
-					dataMap.put(CLOSE_LEAD, allLeads.stream()
+					dataMap.put(CLOSE_LEAD, leads.stream()
 							.filter(l -> CLOSE_LEAD_FILTER.test(l) && ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
 							.map(lead -> new LeadsCardMapperImpl().mapLeadToLeadsCardDto(lead, primaryField,
 									secondaryField,
