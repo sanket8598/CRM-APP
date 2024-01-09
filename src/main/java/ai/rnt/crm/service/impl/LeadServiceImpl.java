@@ -252,8 +252,9 @@ public class LeadServiceImpl implements LeadService {
 			leads.setStatus(OPEN);
 			leads.setDisqualifyAs(OPEN);
 			leads.setPseudoName(auditAwareUtil.getLoggedInUserName());
-			setServiceFallLeadSourceAndDomainToLead(leadDto.getServiceFallsId(), leadDto.getLeadSourceId(),
-					leadDto.getDomainId(), leads);
+			setServiceFallToLead(leadDto.getServiceFallsId(), leads);
+			setLeadSourceToLead(leadDto.getLeadSourceId(), leads);
+			setDomainToLead(leadDto.getDomainId(), leads);
 			if (nonNull(leadDto.getAssignTo()))
 				employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
 			else
@@ -672,7 +673,7 @@ public class LeadServiceImpl implements LeadService {
 				lead.setRemainderDueOn(dto.getRemainderDueOn());
 			}
 			lead.setStatus(CLOSE_AS_QUALIFIED);
-			setServiceFallLeadSourceAndDomainToLead(dto.getServiceFallsMaster().getServiceName(), null, null, lead);
+			setServiceFallToLead(dto.getServiceFallsMaster().getServiceName(), lead);
 			if (nonNull(leadDaoService.addLead(lead)))
 				result.put(MESSAGE, "Lead Qualified SuccessFully");
 			else
@@ -821,8 +822,9 @@ public class LeadServiceImpl implements LeadService {
 						.apply(companyMasterDaoService.save(companyMaster).orElseThrow(ResourceNotFoundException::new))
 						.ifPresent(contact::setCompanyMaster);
 			}
-			setServiceFallLeadSourceAndDomainToLead(dto.getServiceFallsId(), dto.getLeadSourceId(), dto.getDomainId(),
-					lead);
+			setServiceFallToLead(dto.getServiceFallsId(), lead);
+			setLeadSourceToLead(dto.getLeadSourceId(), lead);
+			setDomainToLead(dto.getDomainId(), lead);
 			contact.setLinkedinId(dto.getLinkedinId());
 			if (nonNull(contactDaoService.addContact(contact)) && nonNull(leadDaoService.addLead(lead)))
 				result.put(MESSAGE, "Leads Contact Updated Successfully !!");
@@ -1159,10 +1161,8 @@ public class LeadServiceImpl implements LeadService {
 							.orElseThrow(ResourceNotFoundException::new));
 	}
 
-	private void setServiceFallLeadSourceAndDomainToLead(String serviceFallsName, String leadSourceName,
-			String domainName, Leads leads) throws Exception {
-		log.info("inside the setServiceFallLeadSourceAndDomainToLead method...{} {} {}", serviceFallsName,
-				leadSourceName, domainName);
+	private void setServiceFallToLead(String serviceFallsName, Leads leads) throws Exception {
+		log.info("inside the setServiceFallToLead method...{}", serviceFallsName);
 		Pattern pattern = compile("^\\d+$");
 		if (nonNull(serviceFallsName) && pattern.matcher(serviceFallsName).matches())
 			serviceFallsDaoSevice.getServiceFallById(parseInt(serviceFallsName))
@@ -1176,6 +1176,11 @@ public class LeadServiceImpl implements LeadService {
 					() -> new ResourceNotFoundException(SERVICE_FALLS_MASTER, SERVICE_FALL_ID, serviceFallsName)))
 					.ifPresent(leads::setServiceFallsMaster);
 		}
+	}
+
+	private void setLeadSourceToLead(String leadSourceName, Leads leads) throws Exception {
+		log.info("inside the setLeadSourceToLead method...{} ", leadSourceName);
+		Pattern pattern = compile("^\\d+$");
 		if (nonNull(leadSourceName) && pattern.matcher(leadSourceName).matches())
 			leadSourceDaoService.getLeadSourceById(parseInt(leadSourceName)).ifPresent(leads::setLeadSourceMaster);
 		else if (isNull(leadSourceName) || leadSourceName.isEmpty() || OTHER.equals(leadSourceName))
@@ -1188,6 +1193,12 @@ public class LeadServiceImpl implements LeadService {
 							() -> new ResourceNotFoundException(LEAD_SOURCE_MASTER, LEAD_SOURCE_NAME, leadSourceName)))
 					.ifPresent(leads::setLeadSourceMaster);
 		}
+
+	}
+
+	private void setDomainToLead(String domainName, Leads leads) throws Exception {
+		log.info("inside the setDomainToLead method...{} ", domainName);
+		Pattern pattern = compile("^\\d+$");
 		if (nonNull(domainName) && pattern.matcher(domainName).matches())
 			domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
 		else if (isNull(domainName) || domainName.isEmpty() || OTHER.equals(domainName))

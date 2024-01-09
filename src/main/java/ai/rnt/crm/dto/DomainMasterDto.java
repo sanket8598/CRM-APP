@@ -8,9 +8,4 @@ public class DomainMasterDto {
 	private Integer domainId;
 	
 	private String domainName;
-	
-	private String domainDesc;
-	
-	private String domainImg;
-
 }

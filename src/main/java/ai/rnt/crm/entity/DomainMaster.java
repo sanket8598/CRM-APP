@@ -36,13 +36,6 @@ public class DomainMaster extends Auditable{
 	@Column(name="domain_name")
 	private String domainName;
 	
-	@Column(name="domain_description")
-	private String domainDesc;
-	
-	@Column(name="domain_image",columnDefinition = "LONGTEXT")
-	private String domainImg;
-	 
 	@OneToMany(mappedBy = "domainMaster")
 	private List<Leads> leads=new ArrayList<>();
-
 }
