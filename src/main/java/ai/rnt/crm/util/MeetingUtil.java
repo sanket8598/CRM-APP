@@ -1,5 +1,8 @@
 package ai.rnt.crm.util;
 
+import static java.time.LocalDateTime.ofInstant;
+import static java.time.LocalTime.parse;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Objects.nonNull;
 import static java.util.TimeZone.getTimeZone;
 import static javax.mail.Message.RecipientType.TO;
@@ -8,7 +11,12 @@ import static javax.mail.internet.InternetAddress.parse;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -124,8 +132,8 @@ public class MeetingUtil {
 			res.append("DTSTART;VALUE=DATE:" + formatDate(dto.getStartDate()) + "\n"); // Format DTSTART for all-day
 			res.append("DTEND;VALUE=DATE:" + formatDate(dto.getEndDate()) + "\n");
 		} else {
-			res.append("DTSTART:" + formatDate(dto.getStartDate()) + "\n");
-			res.append("DTEND:" + formatDate(dto.getEndDate()) + "\n");
+			res.append("DTSTART:" + formatDateTime(dto.getStartDate(), dto.getStartTime()) + "\n");
+			res.append("DTEND:" + formatDateTime(dto.getEndDate(), dto.getEndTime()) + "\n");
 		}
 		return res.toString();
 	}
@@ -153,5 +161,18 @@ public class MeetingUtil {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		dateFormat.setTimeZone(getTimeZone("UTC"));
 		return dateFormat.format(date);
+	}
+
+	private String formatDateTime(Date date, String time) {
+		log.info("inside the meetingUtil formatDateTime method...{}", date);
+		LocalDateTime dateTime = ofInstant(date.toInstant(), ZoneId.of("UTC")).toLocalDate().atTime(parseTime(time));
+		DateTimeFormatter formatter = ofPattern("yyyyMMdd'T'HHmmss");
+		return dateTime.format(formatter);
+	}
+
+	private LocalTime parseTime(String time) {
+		log.info("inside the meetingUtil parseTime method...{}", time);
+		DateTimeFormatter formatter = ofPattern("h:mm a", Locale.US);
+		return parse(time, formatter);
 	}
 }
