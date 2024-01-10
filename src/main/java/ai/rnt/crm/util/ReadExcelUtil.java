@@ -111,7 +111,7 @@ public class ReadExcelUtil {
 	}
 
 	private Map<String, Object> createLeadFromExcelData(String data, int fieldCount, LeadDto leadDto, int rowNum) {
-		log.info("inside the createLeadFromExcelData method...{}");
+		log.info("inside the createLeadFromExcelData method...{}",data);
 		StringBuilder errorList = new StringBuilder();
 		Map<String, Object> dataMap = new HashMap<>();
 		switch (fieldCount) {
@@ -144,8 +144,8 @@ public class ReadExcelUtil {
 			break;
 		case 3:
 			if (nonNull(data) && !data.isEmpty())
-				if (isValidPhoneNumber("+" + data))
-					leadDto.setPhoneNumber("+" + data);
+				if (isValidPhoneNumber("+" + data.replace("'","")))
+					leadDto.setPhoneNumber("+" + data.replace("'",""));
 				else
 					errorList.append("Please Enter Valid Phone Number On Row No: " + rowNum);
 			break;
