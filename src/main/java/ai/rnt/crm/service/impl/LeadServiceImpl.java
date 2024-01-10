@@ -39,7 +39,7 @@ import static ai.rnt.crm.constants.ExcelConstants.FLAG;
 import static ai.rnt.crm.constants.ExcelConstants.LEAD_DATA;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
-import static ai.rnt.crm.constants.MessageConstants.DONE_FOR_DAY;
+import static ai.rnt.crm.constants.MessageConstants.SOON_MORE;
 import static ai.rnt.crm.constants.MessageConstants.MSG;
 import static ai.rnt.crm.constants.MessageConstants.NO_ACTIVITY;
 import static ai.rnt.crm.constants.MessageConstants.WAIT_FOR;
@@ -1231,7 +1231,7 @@ public class LeadServiceImpl implements LeadService {
 			Long lowestDayDiff = upNextActivities.keySet().stream().min(naturalOrder()).orElse(null);
 			if (nonNull(lowestDayDiff)) {
 				if (upNextActivities.size() == 1)
-					upNextDataMap.put(MSG, DONE_FOR_DAY);
+					upNextDataMap.put(MSG, SOON_MORE);
 				int count = 0;
 				List<TimeLineActivityDto> upNextData = new ArrayList<>();
 				for (Map.Entry<Long, List<TimeLineActivityDto>> data : upNextActivities.entrySet()) {
