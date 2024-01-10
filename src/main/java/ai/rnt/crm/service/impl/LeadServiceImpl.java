@@ -1103,23 +1103,23 @@ public class LeadServiceImpl implements LeadService {
 		allTask.addAll(getMeetingRelatedTasks(meetings));
 		allTask.addAll(getLeadRelatedTasks(lead));
 		List<MainTaskDto> notStartedTask = allTask.stream().filter(NOT_STARTED_TASK)
-				.sorted((t1, t2) -> parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
-						.compareTo(parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)))
+				.sorted((t1, t2) -> parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
+						.compareTo(parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)))
 				.collect(toList());
 		List<MainTaskDto> inProgressTask = allTask.stream().filter(IN_PROGRESS_TASK)
-				.sorted((t1, t2) -> parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
-						.compareTo(parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)))
+				.sorted((t1, t2) -> parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
+						.compareTo(parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)))
 				.collect(toList());
 		List<MainTaskDto> onHoldTask = allTask.stream().filter(ON_HOLD_TASK)
-				.sorted((t1, t2) -> parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
-						.compareTo(parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)))
+				.sorted((t1, t2) -> parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
+						.compareTo(parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)))
 				.collect(toList());
 		List<MainTaskDto> completedTask = allTask.stream().filter(COMPLETED_TASK)
-				.sorted((t1, t2) -> parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
-						.compareTo(parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)))
+				.sorted((t1, t2) -> parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
+						.compareTo(parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)))
 				.collect(toList());
-		taskData.put(ALL_TASK, allTask.stream().sorted((t1, t2) -> parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
-				.compareTo(parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM))).collect(toList()));
+		taskData.put(ALL_TASK, allTask.stream().sorted((t1, t2) -> parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
+				.compareTo(parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM))).collect(toList()));
 		taskData.put(COMPLETED_TASK_KEY, completedTask);
 		taskData.put(IN_PROGRESS_TASK_KEY, inProgressTask);
 		taskData.put(ON_HOLD_TASK_KEY, onHoldTask);
