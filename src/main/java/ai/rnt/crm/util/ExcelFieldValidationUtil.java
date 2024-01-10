@@ -29,7 +29,7 @@ public class ExcelFieldValidationUtil {
 
 	public static boolean isValidPhoneNumber(String number) {
 		log.info("inside the isValidPhoneNumber method...{}", number);
-		return nonNull(number) && compile("^\\+?\\d{11,13}$").matcher(number).matches();
+		return nonNull(number) && compile("^\\+?\\d{10,13}$").matcher(number).matches();
 	}
 
 	public static boolean isValidDesignation(String designation) {
