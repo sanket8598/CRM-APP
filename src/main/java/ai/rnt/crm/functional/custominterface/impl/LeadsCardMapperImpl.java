@@ -3,12 +3,12 @@ package ai.rnt.crm.functional.custominterface.impl;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.BUDGET_AMOUNT;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.COMPANY_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.DESIGNATION;
+import static ai.rnt.crm.constants.LeadEntityFieldConstant.DOMAIN;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_ASSIGN_USERNAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_SOURCE;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.SERVICE_FALLS_INTO;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
-import static ai.rnt.crm.constants.LeadEntityFieldConstant.DOMAIN;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static java.util.Objects.nonNull;
 

@@ -1,7 +1,7 @@
 package ai.rnt.crm.api.restcontroller;
 
-import static ai.rnt.crm.constants.ApiConstants.STATE;
 import static ai.rnt.crm.constants.ApiConstants.ALL_STATE;
+import static ai.rnt.crm.constants.ApiConstants.STATE;
 
 import java.util.EnumMap;
 

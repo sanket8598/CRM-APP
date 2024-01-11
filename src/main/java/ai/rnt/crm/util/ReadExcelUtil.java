@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -49,7 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ReadExcelUtil {
 
 	public Map<String, Object> readExcelFile(Workbook workbook, Sheet sheet)
-			throws EncryptedDocumentException, InvalidFormatException, IOException {
+			throws InvalidFormatException, IOException {
 		log.info("inside the readExcelFile method...{}");
 		Map<String, Object> dataExcel = new HashMap<>();
 		List<LeadDto> excelLeads = new ArrayList<>();
@@ -63,7 +62,7 @@ public class ReadExcelUtil {
 					Cell cell = row.getCell(j);
 					String data = "";
 					if (cell.getCellTypeEnum().equals(NUMERIC))
-						data = cell.getNumericCellValue() + "";
+						data = Double.toString(cell.getNumericCellValue());
 					else
 						data = cell.getStringCellValue() + "";
 					Map<String, Object> excelMap = createLeadFromExcelData(data, j, leadDto, i + 1);

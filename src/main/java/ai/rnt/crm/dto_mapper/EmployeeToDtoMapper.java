@@ -1,12 +1,12 @@
 package ai.rnt.crm.dto_mapper;
 
+import static ai.rnt.crm.dto_mapper.RoleDtoMapper.TO_Roles;
+import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static ai.rnt.crm.util.FunctionUtil.evalMapper;
-import static ai.rnt.crm.dto_mapper.RoleDtoMapper.TO_Roles;
 
 import ai.rnt.crm.dto.EmployeeDto;
 import ai.rnt.crm.entity.EmployeeMaster;

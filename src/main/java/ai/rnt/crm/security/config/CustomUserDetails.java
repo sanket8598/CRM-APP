@@ -45,7 +45,7 @@ public class CustomUserDetails implements UserDetailsService {
 	 * @Version 1.0
 	 */
 	@Override
-	public UserDetail loadUserByUsername(String userId) throws UsernameNotFoundException {
+	public UserDetail loadUserByUsername(String userId) {
 		try {
 			EmployeeDto user = employeeService.getEmployeeByUserId(userId)
 					.orElseThrow(() -> new ResourceNotFoundException("Employee", "userId", userId));
