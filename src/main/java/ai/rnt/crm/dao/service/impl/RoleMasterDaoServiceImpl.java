@@ -1,11 +1,12 @@
 package ai.rnt.crm.dao.service.impl;
 
-import static ai.rnt.crm.util.RoleUtil.APP_ROLES;
 import static ai.rnt.crm.constants.CacheConstant.ROLES;
+import static ai.rnt.crm.util.RoleUtil.APP_ROLES;
+import static java.util.Objects.isNull;
+
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import static java.util.Objects.isNull;
 import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.Cacheable;

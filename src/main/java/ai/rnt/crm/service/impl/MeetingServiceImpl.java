@@ -101,7 +101,7 @@ public class MeetingServiceImpl implements MeetingService {
 				}
 			}
 			if (saveStatus) {
-				if (nonNull(dto.getMeetingMode()) && dto.getMeetingMode().equalsIgnoreCase("Online"))
+				if (nonNull(dto.getMeetingMode()) && "Online".equalsIgnoreCase(dto.getMeetingMode()))
 					meetingUtil.scheduleMeetingInOutlook(dto);
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Meeting Added Successfully..!!");

@@ -1,7 +1,7 @@
 package ai.rnt.crm.entity;
 
-import static javax.persistence.GenerationType.IDENTITY;
 import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
 import java.util.List;

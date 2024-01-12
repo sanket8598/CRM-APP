@@ -1,7 +1,7 @@
 package ai.rnt.crm.api.restcontroller;
 
-import static ai.rnt.crm.constants.ApiConstants.COUNTRY;
 import static ai.rnt.crm.constants.ApiConstants.ALL_COUNTRIES;
+import static ai.rnt.crm.constants.ApiConstants.COUNTRY;
 
 import java.util.EnumMap;
 
