@@ -70,7 +70,8 @@ public class TaskRemainderUtil {
 		try {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
-			String time = now().format(ofPattern("HH:mm"));
+			LocalDateTime currentTime = now().plusHours(5).plusMinutes(30);
+			String time = currentTime.format(ofPattern("HH:mm"));
 
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
