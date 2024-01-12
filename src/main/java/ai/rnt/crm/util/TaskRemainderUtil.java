@@ -5,14 +5,17 @@ import static ai.rnt.crm.util.EmailUtil.sendFollowUpLeadReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendLeadTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendMeetingTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendVisitTaskReminderMail;
-import static java.time.LocalTime.now;
+import static java.time.OffsetDateTime.now;
 import static java.time.ZoneId.systemDefault;
+import static java.time.ZoneOffset.ofHoursMinutes;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Date.from;
 import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 
@@ -64,15 +67,19 @@ public class TaskRemainderUtil {
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
 
-	 @Scheduled(cron = "0 * * * * ?") // for every minute.
+	@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
 		log.info("inside the reminderForTask method...{}");
 		try {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
-			String time = now().format(ofPattern("hh:mm a"));
+			// String localServerTimetime = now().format(ofPattern("hh:mm"));
+			ZoneOffset urpianOffset = ofHoursMinutes(5, 30);
+			OffsetDateTime urpianTime = now(urpianOffset);
+			OffsetDateTime adjustedTime = urpianTime.minusHours(5).minusMinutes(30);
+			String uatServerTime = adjustedTime.toLocalTime().format(ofPattern("hh:mm"));
 
-			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
+			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, uatServerTime);
 			callTaskList.forEach(e -> {
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
 					sendCallTaskReminderMail(e);
@@ -84,7 +91,7 @@ public class TaskRemainderUtil {
 					callNotification(e.getCallTaskId());
 			});
 
-			List<VisitTask> visitTaskList = visitDaoService.getTodaysAllVisitTask(todayAsDate, time);
+			List<VisitTask> visitTaskList = visitDaoService.getTodaysAllVisitTask(todayAsDate, uatServerTime);
 			visitTaskList.forEach(e -> {
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
 					sendVisitTaskReminderMail(e);
@@ -96,7 +103,7 @@ public class TaskRemainderUtil {
 					visitNotification(e.getVisitTaskId());
 			});
 
-			List<MeetingTask> meetingTasksList = meetingDaoService.getTodaysMeetingTask(todayAsDate, time);
+			List<MeetingTask> meetingTasksList = meetingDaoService.getTodaysMeetingTask(todayAsDate, uatServerTime);
 			meetingTasksList.forEach(e -> {
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
 					sendMeetingTaskReminderMail(e);
@@ -107,7 +114,7 @@ public class TaskRemainderUtil {
 					meetingNotification(e.getMeetingTaskId());
 			});
 
-			List<LeadTask> leadTasksList = leadTaskDaoService.getTodaysLeadTask(todayAsDate, time);
+			List<LeadTask> leadTasksList = leadTaskDaoService.getTodaysLeadTask(todayAsDate, uatServerTime);
 			leadTasksList.forEach(e -> {
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
 					sendLeadTaskReminderMail(e);
@@ -118,7 +125,7 @@ public class TaskRemainderUtil {
 					leadNotification(e.getLeadTaskId());
 			});
 
-			List<Leads> followUpLeads = leadDaoService.getFollowUpLeads(todayAsDate, time);
+			List<Leads> followUpLeads = leadDaoService.getFollowUpLeads(todayAsDate, uatServerTime);
 			followUpLeads.forEach(e -> {
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
 					sendFollowUpLeadReminderMail(e);
