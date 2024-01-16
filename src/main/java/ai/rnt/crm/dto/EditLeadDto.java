@@ -38,6 +38,8 @@ public class EditLeadDto {
 	
 	private String pseudoName;
 	
+	private Integer dropDownAssignTo;
+	
 	private ContactDto primaryContact;
 	
 	public String getShortName() {
