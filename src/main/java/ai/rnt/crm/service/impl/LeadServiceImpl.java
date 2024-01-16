@@ -479,6 +479,7 @@ public class LeadServiceImpl implements LeadService {
 						.apply(leadById.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 								.orElseThrow(() -> new ResourceNotFoundException("Priamry Contact")))
 						.orElseThrow(ResourceNotFoundException::new));
+				e.setDropDownAssignTo(leadById.getEmployee().getStaffId());
 				e.setMessage("Assigned To " + leadById.getEmployee().getFirstName() + " "
 						+ leadById.getEmployee().getLastName());
 				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy())
