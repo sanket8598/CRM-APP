@@ -82,7 +82,7 @@ public class Visit extends Auditable {
 	@Column(name = "status")
 	private String status;
 
-	@Column(name = "participates")
+	@Column(name = "participants")
 	private String participates;
 
 	@ManyToOne(fetch = FetchType.LAZY)
