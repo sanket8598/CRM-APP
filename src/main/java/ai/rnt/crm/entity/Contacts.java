@@ -38,10 +38,10 @@ public class Contacts extends Auditable {
 	@Column(name = "crm_contact_id")
 	private Integer contactId;
 
-	@Column(name = "fname")
+	@Column(name = "f_name")
 	private String firstName;
 
-	@Column(name = "lname")
+	@Column(name = "l_name")
 	private String lastName;
 
 	@Column(name = "designation")
