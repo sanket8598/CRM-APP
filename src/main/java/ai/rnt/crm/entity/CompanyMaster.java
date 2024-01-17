@@ -63,7 +63,7 @@ public class CompanyMaster extends Auditable {
 	@JoinColumn(name = "city_id")
 	private CityMaster city;
 
-	@Column(name = "zipcode")
+	@Column(name = "zip_code")
 	private String zipCode;
 	
 	@OneToMany(mappedBy="companyMaster",cascade =ALL)
