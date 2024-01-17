@@ -54,7 +54,7 @@ public class Meetings extends Auditable {
 	@Column(name = "mtg_title")
 	private String meetingTitle;
 
-	@Column(name = "participates")
+	@Column(name = "participants")
 	private String participates;
 
 	@Column(name = "mtg_start_date", columnDefinition = "date")
