@@ -1145,6 +1145,7 @@ public class LeadServiceImpl implements LeadService {
 		contact.setBusinessCard(leadDto.getBusinessCard());
 		contact.setBusinessCardName(leadDto.getBusinessCardName());
 		contact.setBusinessCardType(leadDto.getBusinessCardType());
+		contact.setLinkedinId(leadDto.getLinkedinId());	
 		contact.setPrimary(true);
 		setCompanyDetailsToContact(existCompany, leadDto, contact);
 		contact.setLead(leads);

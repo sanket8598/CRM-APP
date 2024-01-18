@@ -63,5 +63,7 @@ public class LeadDto {
 	private String pseudoName;
 	
 	private String location;
+	
+	private String linkedinId;
 
 }
