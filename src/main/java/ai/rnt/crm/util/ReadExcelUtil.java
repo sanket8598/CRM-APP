@@ -158,42 +158,48 @@ public class ReadExcelUtil {
 				errorList.append("Please Enter the Designation On Row No: " + rowNum);
 			break;
 		case 5:
+			leadDto.setLinkedinId(data);
+			break;
+		case 6:
 			if (nonNull(data) && !data.isEmpty())
 				leadDto.setTopic(data);
 			else
-				errorList.append("Please Enter The Topic On Row No: " + rowNum);
+				errorList.append("Please Enter The Requirement On Row No: " + rowNum);
 			break;
-		case 6:
+		case 7:
 			if (nonNull(data) && !data.isEmpty())
 				leadDto.setCompanyName(data);
 			else
 				errorList.append("Please Enter The Company Name On Row No: " + rowNum);
 			break;
-		case 7:
+		case 8:
 			if (nonNull(data) && !data.isEmpty())
 				leadDto.setCompanyWebsite(data);
 			else
 				errorList.append("Please Enter The Company Website On Row No: " + rowNum);
 			break;
-		case 8:
+		case 9:
+			leadDto.setLocation(data);
+			break;	
+		case 10:
 			if (isValidBudgetAmount(data))
 				leadDto.setBudgetAmount(commaSepAmount(parseDouble(data)));
 			else
 				errorList.append("Please Enter The Valid Budget Amount On Row No: " + rowNum);
 			break;
-		case 9:
+		case 11:
 			if (nonNull(data) && !data.isEmpty())
 				leadDto.setServiceFallsId(data);
 			else
 				errorList.append("Please Enter The Service Falls Into On Row No: " + rowNum);
 			break;
-		case 10:
+		case 12:
 			leadDto.setLeadSourceId(data);
 			break;
-		case 11:
+		case 13:
 			leadDto.setDomainId(data);
 			break;
-		case 12:
+		case 14:
 			leadDto.setPseudoName(data);
 			break;
 		default:
