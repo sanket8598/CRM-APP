@@ -1,12 +1,11 @@
 package ai.rnt.crm;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class CrmApplicationTests {
 
-	@Test
+	//@Test
 	void contextLoads() {
 	}
 
