@@ -99,7 +99,7 @@ public class PhoneCallTask extends Auditable {
 	}
 
 	@Transient
-	private String getRemainderDueAt12Hours() {
+	public String getRemainderDueAt12Hours() {
 		if (nonNull(getRemainderDueAt())) {
 			try {
 				return TIME_12_HRS.format(TIME_24_HRS.parse(getRemainderDueAt()));
