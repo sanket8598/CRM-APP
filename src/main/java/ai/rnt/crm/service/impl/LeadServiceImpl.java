@@ -1156,23 +1156,29 @@ public class LeadServiceImpl implements LeadService {
 		log.info("inside the setCompanyDetailsToContact method...");
 		if (existCompany.isPresent()) {
 			existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
+			CompanyMaster company = TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
+			.orElseThrow(ResourceNotFoundException::new);
+			setLocationToCompany(leadDto.getLocation(), company);
 			contact.setCompanyMaster(
 					TO_COMPANY
 							.apply(companyMasterDaoService
-									.save(TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
-											.orElseThrow(ResourceNotFoundException::new))
+									.save(company)
 									.orElseThrow(ResourceNotFoundException::new))
 							.orElseThrow(ResourceNotFoundException::new));
-		} else
+		} else {
+			CompanyMaster company = TO_COMPANY
+			.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
+					.companyWebsite(leadDto.getCompanyWebsite()).build())
+			.orElseThrow(ResourceNotFoundException::new);
+			setLocationToCompany(leadDto.getLocation(), company);
 			contact.setCompanyMaster(
 					TO_COMPANY
 							.apply(companyMasterDaoService
-									.save(TO_COMPANY
-											.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
-													.companyWebsite(leadDto.getCompanyWebsite()).build())
-											.orElseThrow(ResourceNotFoundException::new))
+									.save(company)
 									.orElseThrow(ResourceNotFoundException::new))
 							.orElseThrow(ResourceNotFoundException::new));
+		}
+		
 	}
 
 	private void setServiceFallToLead(String serviceFallsName, Leads leads) throws Exception {
@@ -1223,6 +1229,23 @@ public class LeadServiceImpl implements LeadService {
 			domainMasterDaoService.addDomain(domainMaster).ifPresent(leads::setDomainMaster);
 		}
 	}
+	
+	
+	
+	private void setLocationToCompany(String location, CompanyMaster company) {
+		log.info("inside the setLocationToCompany method...{} ", location);
+		if (nonNull(location) && !location.isEmpty()) {
+			Optional<CountryMaster> country = countryDaoService.findByCountryName(location);
+			if (country.isPresent())
+				country.ifPresent(company::setCountry);
+			else {
+				CountryMaster countryMaster = new CountryMaster();
+				countryMaster.setCountry(location);
+				company.setCountry(countryDaoService.addCountry(countryMaster));
+			}
+		}
+	}
+
 
 	private Map<String, Object> upNextActivities(LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities) {
 		log.info("inside the upNextActivities method...");
