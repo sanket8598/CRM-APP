@@ -1,5 +1,6 @@
 package ai.rnt.crm.util;
 
+import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
 import static ai.rnt.crm.util.EmailUtil.sendCallTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendEmail;
 import static ai.rnt.crm.util.EmailUtil.sendFollowUpLeadReminderMail;
@@ -14,11 +15,16 @@ import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.mail.internet.AddressException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +34,7 @@ import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadTaskDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.dto.EmailDto;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
@@ -70,6 +77,9 @@ public class TaskRemainderUtil {
 	private final EmailDaoService emailDaoService;
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
+	
+	@Value("${spring.profiles.active}")
+    private String activeProfile;
 
 	@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
@@ -77,9 +87,12 @@ public class TaskRemainderUtil {
 		try {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
-			LocalDateTime currentTime = now().plusHours(5).plusMinutes(30);
+			LocalDateTime currentTime = null;
+			if("uat".equalsIgnoreCase(activeProfile))
+				 currentTime = now().plusHours(5).plusMinutes(30);
+			else 
+				currentTime = now();
 			String time = currentTime.format(ofPattern("HH:mm"));
-			
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
@@ -138,12 +151,24 @@ public class TaskRemainderUtil {
 			});
 
 			List<Email> emails = emailDaoService.isScheduledEmails(todayAsDate, time);
-			emails.forEach(e -> {
-				try {
-					sendEmail(e);
-				} catch (AddressException e1) {
-					log.info("Got exception while sending the scheduled emails...{}", e1);
-				}
+			emails.forEach(email -> {
+				Optional<EmailDto> newEmail = TO_EMAIL_DTO.apply(email);
+				newEmail.ifPresent(e -> {
+					e.setBcc(nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()
+							? Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+					e.setCc(nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
+							? Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+					e.setMailTo(nonNull(email.getToMail()) && !email.getToMail().isEmpty()
+							? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+					try {
+						sendEmail(e);
+					} catch (AddressException e1) {
+						log.error("Got exception while sending the scheduled emails...{}", e1);
+					}
+				});
 			});
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);

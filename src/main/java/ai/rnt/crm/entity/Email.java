@@ -18,6 +18,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Where;
 
 import lombok.Getter;
@@ -79,6 +81,7 @@ public class Email extends Auditable {
 	private Leads lead;
 	
 	@OneToMany(mappedBy = "mail",cascade = {REMOVE,REFRESH},orphanRemoval = true)
+	@Fetch(FetchMode.JOIN)
 	private List<Attachment> attachment = new ArrayList<>();
 
 }

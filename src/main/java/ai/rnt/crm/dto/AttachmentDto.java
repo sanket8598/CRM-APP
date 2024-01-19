@@ -3,13 +3,15 @@ package ai.rnt.crm.dto;
 import static java.util.Objects.nonNull;
 
 import ai.rnt.crm.util.ContentTypeUtil;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 /**
  * @author Nikhil Gaikwad
  * @version 1.0
  * @since 12/09/2023.
  */
-@Data
+@Getter
+@Setter
 public class AttachmentDto {
 
 	private Integer emailAttchId;

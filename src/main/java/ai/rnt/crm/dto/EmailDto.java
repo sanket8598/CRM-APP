@@ -8,7 +8,8 @@ import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Sanket Wakankar
@@ -16,7 +17,8 @@ import lombok.Data;
  * @since 12/09/2023.
  */
 
-@Data
+@Getter
+@Setter
 public class EmailDto {
 
 	private Integer mailId;
