@@ -4,6 +4,10 @@ import lombok.Data;
 
 @Data
 public abstract class TimeLineActivityDto {
+	
 	private String createdOn;
+	
 	private boolean waitTwoDays;
+	
+	private Boolean overDue;
 }
