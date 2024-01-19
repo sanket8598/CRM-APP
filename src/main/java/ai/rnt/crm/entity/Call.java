@@ -97,7 +97,7 @@ public class Call extends Auditable {
 	@Column(name = "status")
 	private String status;
 
-	@ManyToOne(cascade = MERGE, fetch = LAZY)
+	@ManyToOne(cascade = MERGE)
 	@JoinColumn(name = "lead_id")
 	private Leads lead;
 

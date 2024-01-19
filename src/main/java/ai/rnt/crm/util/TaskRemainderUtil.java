@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
+import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadTaskDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
@@ -75,6 +76,8 @@ public class TaskRemainderUtil {
 	private final LeadDaoService leadDaoService;
 
 	private final EmailDaoService emailDaoService;
+	
+	private final EmployeeDaoService employeeDaoService;
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
 	
@@ -95,11 +98,14 @@ public class TaskRemainderUtil {
 			String time = currentTime.format(ofPattern("HH:mm"));
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
+				String emailId = null;
+				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
+					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendCallTaskReminderMail(e);
+					sendCallTaskReminderMail(e,emailId);
 					callNotification(e.getCallTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendCallTaskReminderMail(e);
+					sendCallTaskReminderMail(e,emailId);
 
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					callNotification(e.getCallTaskId());
@@ -107,11 +113,14 @@ public class TaskRemainderUtil {
 
 			List<VisitTask> visitTaskList = visitDaoService.getTodaysAllVisitTask(todayAsDate, time);
 			visitTaskList.forEach(e -> {
+				String emailId = null;
+				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
+					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendVisitTaskReminderMail(e);
+					sendVisitTaskReminderMail(e,emailId);
 					visitNotification(e.getVisitTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendVisitTaskReminderMail(e);
+					sendVisitTaskReminderMail(e,emailId);
 
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					visitNotification(e.getVisitTaskId());
@@ -119,33 +128,42 @@ public class TaskRemainderUtil {
 
 			List<MeetingTask> meetingTasksList = meetingDaoService.getTodaysMeetingTask(todayAsDate, time);
 			meetingTasksList.forEach(e -> {
+				String emailId = null;
+				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
+					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendMeetingTaskReminderMail(e);
+					sendMeetingTaskReminderMail(e,emailId);
 					meetingNotification(e.getMeetingTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendMeetingTaskReminderMail(e);
+					sendMeetingTaskReminderMail(e,emailId);
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					meetingNotification(e.getMeetingTaskId());
 			});
 
 			List<LeadTask> leadTasksList = leadTaskDaoService.getTodaysLeadTask(todayAsDate, time);
 			leadTasksList.forEach(e -> {
+				String emailId = null;
+				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
+					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendLeadTaskReminderMail(e);
+					sendLeadTaskReminderMail(e,emailId);
 					leadNotification(e.getLeadTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendLeadTaskReminderMail(e);
+					sendLeadTaskReminderMail(e,emailId);
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					leadNotification(e.getLeadTaskId());
 			});
 
 			List<Leads> followUpLeads = leadDaoService.getFollowUpLeads(todayAsDate, time);
 			followUpLeads.forEach(e -> {
+				String emailId = null;
+				if (!e.getEmployee().getStaffId().equals(e.getCreatedBy()))
+					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendFollowUpLeadReminderMail(e);
+					sendFollowUpLeadReminderMail(e,emailId);
 					followUpLeadNotification(e.getLeadId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendFollowUpLeadReminderMail(e);
+					sendFollowUpLeadReminderMail(e,emailId);
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					followUpLeadNotification(e.getLeadId());
 			});
