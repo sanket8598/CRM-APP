@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service;
 
+import java.util.Date;
 import java.util.List;
 
 import ai.rnt.crm.dto.EmailDto;
@@ -20,5 +21,7 @@ public interface EmailDaoService extends CrudService<Email, EmailDto> {
 	Email findById(Integer addMailId);
 
 	Boolean emailPresentForLeadLeadId(Integer addMailId, Integer leadId);
+
+	List<Email> isScheduledEmails(Date todayAsDate, String time);
 
 }

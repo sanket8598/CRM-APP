@@ -49,8 +49,8 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailUtil {
 
 	private static final Properties PROPERTIES = new Properties();
-	private static final String USERNAME = "s.wakankar@rnt.ai"; // change it
-	private static final String PASSWORD = "12345@Sanket"; // change it
+	private static final String USERNAME = "nik.gaikwad@rnt.ai"; // change it
+	private static final String PASSWORD = "%tb9bbRg"; // change it
 	private static final String HOST = "smtp.zoho.com";
 
 	static {
@@ -101,8 +101,10 @@ public class EmailUtil {
 					.append("<br>");
 			if (sendEmail.getAttachment().isEmpty())
 				msg = sendAsPlainText(msg, content.toString());
+
 			else
 				msg = sendWithAttachments(msg, content.toString(), sendEmail.getAttachment());
+
 			// send the message
 			send(msg);
 			return true;
@@ -253,9 +255,9 @@ public class EmailUtil {
 					.append(String.format("%s",
 							"Dear " + leadTask.getAssignTo().getFirstName() + " " + leadTask.getAssignTo().getLastName()
 									+ ",<br><br>")
-							+ "I hope this email finds you well. This is a friendly reminder about the Task for the "
+							+ "I hope this email finds you well. This is a friendly reminder about the Task for the. "
 							+ "The task is scheduled for completion by " + formatDate(leadTask.getDueDate()) + " At "
-							+ leadTask.getDueTime() + ".")
+							+ leadTask.getDueTime12Hours() + ".")
 					.append("<br><br>").append("Regards,").append("<br>").append("RNT-CRM Team.");
 			msg.setContent(content.toString(), "text/html");
 			send(msg);

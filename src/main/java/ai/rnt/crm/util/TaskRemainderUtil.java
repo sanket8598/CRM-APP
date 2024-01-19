@@ -1,6 +1,7 @@
 package ai.rnt.crm.util;
 
 import static ai.rnt.crm.util.EmailUtil.sendCallTaskReminderMail;
+import static ai.rnt.crm.util.EmailUtil.sendEmail;
 import static ai.rnt.crm.util.EmailUtil.sendFollowUpLeadReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendLeadTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendMeetingTaskReminderMail;
@@ -16,14 +17,18 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
+import javax.mail.internet.AddressException;
+
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dao.service.CallDaoService;
+import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadTaskDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
@@ -62,6 +67,8 @@ public class TaskRemainderUtil {
 
 	private final LeadDaoService leadDaoService;
 
+	private final EmailDaoService emailDaoService;
+
 	private final TaskNotificationsUtil taskNotificationsUtil;
 
 	@Scheduled(cron = "0 * * * * ?") // for every minute.
@@ -72,7 +79,7 @@ public class TaskRemainderUtil {
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
 			LocalDateTime currentTime = now().plusHours(5).plusMinutes(30);
 			String time = currentTime.format(ofPattern("HH:mm"));
-
+			
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
@@ -130,6 +137,14 @@ public class TaskRemainderUtil {
 					followUpLeadNotification(e.getLeadId());
 			});
 
+			List<Email> emails = emailDaoService.isScheduledEmails(todayAsDate, time);
+			emails.forEach(e -> {
+				try {
+					sendEmail(e);
+				} catch (AddressException e1) {
+					log.info("Got exception while sending the scheduled emails...{}", e1);
+				}
+			});
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);
 			throw new CRMException(e);

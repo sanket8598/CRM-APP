@@ -5,6 +5,7 @@ import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -63,6 +64,15 @@ public class Email extends Auditable {
 	private String content;
 	
 	private String status;
+	
+	@Column(name = "is_scheduled")
+	private Boolean scheduled;
+	
+	@Column(name = "scheduled_on")
+	private Date scheduledOn;
+	
+	@Column(name = "scheduled_at")
+	private String scheduledAt;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="lead_id")
