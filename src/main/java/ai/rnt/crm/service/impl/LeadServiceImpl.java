@@ -595,9 +595,8 @@ public class LeadServiceImpl implements LeadService {
 				return meetDto;
 			}).collect(toList()));
 			Comparator<TimeLineActivityDto> overDueActivity = (a1, a2) -> a2.getOverDue().compareTo(a1.getOverDue());
-			activity.sort(
-					overDueActivity.thenComparing((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
-							.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))));
+			activity.sort(overDueActivity.thenComparing((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
+					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))));
 			List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
 				EditCallDto callDto = new EditCallDto();
 				callDto.setId(call.getCallId());
@@ -1062,7 +1061,9 @@ public class LeadServiceImpl implements LeadService {
 				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId(), e.isRemainderOn(),
-						e.getCall().getStatus(),e.isRemainderOn()?convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours()):null))
+						e.getCall().getStatus(),
+						e.isRemainderOn() ? convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())
+								: null))
 				.collect(toList());
 	}
 
@@ -1072,7 +1073,9 @@ public class LeadServiceImpl implements LeadService {
 				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId(), e.isRemainderOn(),
-						e.getVisit().getStatus(),e.isRemainderOn()?convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours()):null))
+						e.getVisit().getStatus(),
+						e.isRemainderOn() ? convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())
+								: null))
 				.collect(toList());
 	}
 
@@ -1082,7 +1085,9 @@ public class LeadServiceImpl implements LeadService {
 				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getMeetings().getMeetingId(),
-						e.isRemainderOn(), e.getMeetings().getMeetingStatus(),e.isRemainderOn()?convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours()):null))
+						e.isRemainderOn(), e.getMeetings().getMeetingStatus(),
+						e.isRemainderOn() ? convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())
+								: null))
 				.collect(toList());
 	}
 
@@ -1092,7 +1097,9 @@ public class LeadServiceImpl implements LeadService {
 				.map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(), LEAD,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId(), e.isRemainderOn(),
-						e.getLead().getStatus(),e.isRemainderOn()?convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours()):null))
+						e.getLead().getStatus(),
+						e.isRemainderOn() ? convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())
+								: null))
 				.collect(toList());
 	}
 
@@ -1147,7 +1154,7 @@ public class LeadServiceImpl implements LeadService {
 		contact.setBusinessCard(leadDto.getBusinessCard());
 		contact.setBusinessCardName(leadDto.getBusinessCardName());
 		contact.setBusinessCardType(leadDto.getBusinessCardType());
-		contact.setLinkedinId(leadDto.getLinkedinId());	
+		contact.setLinkedinId(leadDto.getLinkedinId());
 		contact.setPrimary(true);
 		setCompanyDetailsToContact(existCompany, leadDto, contact);
 		contact.setLead(leads);
@@ -1160,28 +1167,22 @@ public class LeadServiceImpl implements LeadService {
 		if (existCompany.isPresent()) {
 			existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
 			CompanyMaster company = TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
-			.orElseThrow(ResourceNotFoundException::new);
+					.orElseThrow(ResourceNotFoundException::new);
 			setLocationToCompany(leadDto.getLocation(), company);
 			contact.setCompanyMaster(
-					TO_COMPANY
-							.apply(companyMasterDaoService
-									.save(company)
-									.orElseThrow(ResourceNotFoundException::new))
+					TO_COMPANY.apply(companyMasterDaoService.save(company).orElseThrow(ResourceNotFoundException::new))
 							.orElseThrow(ResourceNotFoundException::new));
 		} else {
 			CompanyMaster company = TO_COMPANY
-			.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
-					.companyWebsite(leadDto.getCompanyWebsite()).build())
-			.orElseThrow(ResourceNotFoundException::new);
+					.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
+							.companyWebsite(leadDto.getCompanyWebsite()).build())
+					.orElseThrow(ResourceNotFoundException::new);
 			setLocationToCompany(leadDto.getLocation(), company);
 			contact.setCompanyMaster(
-					TO_COMPANY
-							.apply(companyMasterDaoService
-									.save(company)
-									.orElseThrow(ResourceNotFoundException::new))
+					TO_COMPANY.apply(companyMasterDaoService.save(company).orElseThrow(ResourceNotFoundException::new))
 							.orElseThrow(ResourceNotFoundException::new));
 		}
-		
+
 	}
 
 	private void setServiceFallToLead(String serviceFallsName, Leads leads) throws Exception {
@@ -1232,9 +1233,7 @@ public class LeadServiceImpl implements LeadService {
 			domainMasterDaoService.addDomain(domainMaster).ifPresent(leads::setDomainMaster);
 		}
 	}
-	
-	
-	
+
 	private void setLocationToCompany(String location, CompanyMaster company) {
 		log.info("inside the setLocationToCompany method...{} ", location);
 		if (nonNull(location) && !location.isEmpty()) {
@@ -1248,7 +1247,6 @@ public class LeadServiceImpl implements LeadService {
 			}
 		}
 	}
-
 
 	private Map<String, Object> upNextActivities(LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities) {
 		log.info("inside the upNextActivities method...");
