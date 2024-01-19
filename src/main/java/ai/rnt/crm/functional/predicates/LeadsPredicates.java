@@ -79,7 +79,7 @@ public class LeadsPredicates {
 	 * @since version 1.0
 	 */
 	public static final BiPredicate<Leads, Integer> ASSIGNED_TO_FILTER = (l, loggedInStaffId) -> l.getEmployee()
-			.getStaffId().equals(loggedInStaffId);
+			.getStaffId().equals(loggedInStaffId) || l.getCreatedBy().equals(loggedInStaffId);
 
 	/*
 	 * * This Predicate return true if it the call is completed for the Timeline.

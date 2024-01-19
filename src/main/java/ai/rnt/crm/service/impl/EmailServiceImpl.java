@@ -43,7 +43,6 @@ import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.service.EmailService;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
-import ai.rnt.crm.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -97,7 +96,19 @@ public class EmailServiceImpl implements EmailService {
 				result.put(MESSAGE, "Email Added Successfully");
 				result.put(DATA, sendEmail.getMailId());
 			} else if (SEND.equalsIgnoreCase(status)) {
-				boolean sendEmailStatus = EmailUtil.sendEmail(sendEmail);
+				Optional<EmailDto> mailDto = TO_EMAIL_DTO.apply(sendEmail);
+				mailDto.ifPresent(e -> {
+					e.setBcc(nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()
+							? Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+					e.setCc(nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
+							? Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+					e.setMailTo(nonNull(email.getToMail()) && !email.getToMail().isEmpty()
+							? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+				});
+				boolean sendEmailStatus = sendEmail(mailDto.get());
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Saved and Sent Successfully!!");
@@ -279,7 +290,7 @@ public class EmailServiceImpl implements EmailService {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Updated Successfully");
 			} else if (SEND.equalsIgnoreCase(status)) {
-				boolean sendEmailStatus = sendEmail(sendEmail);
+				boolean sendEmailStatus = sendEmail(TO_EMAIL_DTO.apply(sendEmail).orElseThrow(ResourceNotFoundException::new));
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Updated and Sent Successfully!!");

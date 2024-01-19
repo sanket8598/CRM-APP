@@ -12,8 +12,6 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.activation.DataHandler;
 import javax.mail.Authenticator;
@@ -31,9 +29,9 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.springframework.stereotype.Component;
 
-import ai.rnt.crm.entity.Attachment;
+import ai.rnt.crm.dto.AttachmentDto;
+import ai.rnt.crm.dto.EmailDto;
 import ai.rnt.crm.entity.Contacts;
-import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
@@ -49,8 +47,8 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailUtil {
 
 	private static final Properties PROPERTIES = new Properties();
-	private static final String USERNAME = "s.wakankar@rnt.ai"; // change it
-	private static final String PASSWORD = "12345@Sanket"; // change it
+	private static final String USERNAME = "nik.gaikwad@rnt.ai"; // change it
+	private static final String PASSWORD = "%tb9bbRg"; // change it
 	private static final String HOST = "smtp.zoho.com";
 
 	static {
@@ -60,49 +58,47 @@ public class EmailUtil {
 		PROPERTIES.put("mail.smtp.starttls.enable", true);
 	}
 
-	public static boolean sendEmail(Email sendEmail) throws AddressException {
+	public static boolean sendEmail(EmailDto email) throws AddressException {
 		log.info("inside the sendEmail method...");
 		try {
 			// create a message with headers
 			Message msg = new MimeMessage(getSession());
 			msg.setFrom(new InternetAddress(USERNAME));// change it to mail from.
 
-			List<String> recipientList = Stream.of(sendEmail.getToMail().split(",")).map(String::trim)
-					.collect(Collectors.toList());
+			List<String> recipientList = email.getMailTo();
 			InternetAddress[] recipientAddress = new InternetAddress[recipientList.size()];
 			int counter = 0;
 			for (String recipient : recipientList)
 				recipientAddress[counter++] = new InternetAddress(recipient.trim());
 			msg.setRecipients(TO, recipientAddress);
 
-			if (nonNull(sendEmail.getCcMail()) && !sendEmail.getCcMail().isEmpty()) {
-				List<String> ccAddresses = Stream.of(sendEmail.getCcMail().split(",")).map(String::trim)
-						.collect(Collectors.toList());
+			if (nonNull(email.getCc()) && !email.getCc().isEmpty()) {
+				List<String> ccAddresses = email.getCc();
 				InternetAddress[] ccAddressList = new InternetAddress[ccAddresses.size()];
 				int count = 0;
 				for (String cc : ccAddresses)
 					ccAddressList[count++] = new InternetAddress(cc.trim());
 				msg.setRecipients(CC, ccAddressList);
 			}
-			if (nonNull(sendEmail.getBccMail()) && !sendEmail.getBccMail().isEmpty()) {
-				List<String> bccAddress = Stream.of(sendEmail.getBccMail().split(",")).map(String::trim)
-						.collect(Collectors.toList());
+			if (nonNull(email.getBcc()) && !email.getBcc().isEmpty()) {
+				List<String> bccAddress = email.getBcc();
 				InternetAddress[] bccAddressList = new InternetAddress[bccAddress.size()];
 				int index = 0;
 				for (String bcc : bccAddress)
 					bccAddressList[index++] = new InternetAddress(bcc.trim());
 				msg.setRecipients(BCC, bccAddressList);
 			}
-			msg.setSubject(sendEmail.getSubject());
+			msg.setSubject(email.getSubject());
 			msg.setSentDate(new Date());
 			// create body of the mail
-			StringBuilder content = new StringBuilder().append("<br>")
-					.append(String.format("%s", sendEmail.getContent())).append("<br><br>").append("Regards,")
-					.append("<br>");
-			if (sendEmail.getAttachment().isEmpty())
+			StringBuilder content = new StringBuilder().append("<br>").append(String.format("%s", email.getContent()))
+					.append("<br><br>").append("Regards,").append("<br>");
+			if (email.getAttachment().isEmpty())
 				msg = sendAsPlainText(msg, content.toString());
+
 			else
-				msg = sendWithAttachments(msg, content.toString(), sendEmail.getAttachment());
+				msg = sendWithAttachments(msg, content.toString(), email.getAttachment());
+
 			// send the message
 			send(msg);
 			return true;
@@ -121,13 +117,13 @@ public class EmailUtil {
 		});
 	}
 
-	public static Message sendWithAttachments(Message msg, String content, List<Attachment> list)
+	public static Message sendWithAttachments(Message msg, String content, List<AttachmentDto> list)
 			throws MessagingException {
 		log.info("inside the sendWithAttachments method...}");
 		try {
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
 			MimeMultipart multipart = new MimeMultipart();
-			for (Attachment data : list) {
+			for (AttachmentDto data : list) {
 				if (nonNull(data.getAttachmentData())) {
 					MimeBodyPart attachemntBodyPart = new MimeBodyPart();
 					attachemntBodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(
@@ -153,13 +149,15 @@ public class EmailUtil {
 		return msg;
 	}
 
-	public static void sendCallTaskReminderMail(PhoneCallTask callTask) {
+	public static void sendCallTaskReminderMail(PhoneCallTask callTask, String emailId) {
 		log.info("inside the sendCallTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
 
-			InternetAddress[] recipientAddress = new InternetAddress[1];
+			InternetAddress[] recipientAddress = new InternetAddress[2];
 			recipientAddress[0] = new InternetAddress(callTask.getAssignTo().getEmailId());
+			if (nonNull(emailId) && !emailId.isEmpty())
+				recipientAddress[1] = new InternetAddress(emailId);
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject("Task Reminder : " + callTask.getSubject() + " - " + formatDate(callTask.getDueDate()));
@@ -171,8 +169,8 @@ public class EmailUtil {
 							+ "I hope this email finds you well. This is a friendly reminder about the Task  for the "
 							+ callTask.getCall().getLead().getTopic() + " by "
 							+ callTask.getCall().getLead().getEmployee().getFirstName() + " "
-							+ callTask.getCall().getLead().getEmployee().getLastName()
-							+ "The task is scheduled for completion by " + formatDate(callTask.getDueDate()) + " At "
+							+ callTask.getCall().getLead().getEmployee().getLastName() + "."
+							+ " The task is scheduled for completion by " + formatDate(callTask.getDueDate()) + " At "
 							+ callTask.getDueTime() + ".")
 					.append("<br><br>").append("Regards,").append("<br>").append("RNT-CRM Team.");
 			msg.setContent(content.toString(), "text/html");
@@ -183,13 +181,15 @@ public class EmailUtil {
 		}
 	}
 
-	public static void sendVisitTaskReminderMail(VisitTask visitTask) {
+	public static void sendVisitTaskReminderMail(VisitTask visitTask, String emailId) {
 		log.info("inside the sendVisitTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
 
-			InternetAddress[] recipientAddress = new InternetAddress[1];
+			InternetAddress[] recipientAddress = new InternetAddress[2];
 			recipientAddress[0] = new InternetAddress(visitTask.getAssignTo().getEmailId());
+			if (nonNull(emailId) && !emailId.isEmpty())
+				recipientAddress[1] = new InternetAddress(emailId);
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject("Task Reminder : " + visitTask.getSubject() + " - " + formatDate(visitTask.getDueDate()));
@@ -210,13 +210,15 @@ public class EmailUtil {
 		}
 	}
 
-	public static void sendMeetingTaskReminderMail(MeetingTask meetingTask) {
+	public static void sendMeetingTaskReminderMail(MeetingTask meetingTask, String emailId) {
 		log.info("inside the sendMeetingTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
 
-			InternetAddress[] recipientAddress = new InternetAddress[1];
+			InternetAddress[] recipientAddress = new InternetAddress[2];
 			recipientAddress[0] = new InternetAddress(meetingTask.getAssignTo().getEmailId());
+			if (nonNull(emailId) && !emailId.isEmpty())
+				recipientAddress[1] = new InternetAddress(emailId);
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(
@@ -238,13 +240,15 @@ public class EmailUtil {
 		}
 	}
 
-	public static void sendLeadTaskReminderMail(LeadTask leadTask) {
+	public static void sendLeadTaskReminderMail(LeadTask leadTask, String emailId) {
 		log.info("inside the sendLeadTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
 
-			InternetAddress[] recipientAddress = new InternetAddress[1];
+			InternetAddress[] recipientAddress = new InternetAddress[2];
 			recipientAddress[0] = new InternetAddress(leadTask.getAssignTo().getEmailId());
+			if (nonNull(emailId) && !emailId.isEmpty())
+				recipientAddress[1] = new InternetAddress(emailId);
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject("Task Reminder : " + leadTask.getSubject() + " - " + formatDate(leadTask.getDueDate()));
@@ -253,9 +257,9 @@ public class EmailUtil {
 					.append(String.format("%s",
 							"Dear " + leadTask.getAssignTo().getFirstName() + " " + leadTask.getAssignTo().getLastName()
 									+ ",<br><br>")
-							+ "I hope this email finds you well. This is a friendly reminder about the Task for the "
+							+ "I hope this email finds you well. This is a friendly reminder about the Task for the. "
 							+ "The task is scheduled for completion by " + formatDate(leadTask.getDueDate()) + " At "
-							+ leadTask.getDueTime() + ".")
+							+ leadTask.getDueTime12Hours() + ".")
 					.append("<br><br>").append("Regards,").append("<br>").append("RNT-CRM Team.");
 			msg.setContent(content.toString(), "text/html");
 			send(msg);
@@ -265,12 +269,14 @@ public class EmailUtil {
 		}
 	}
 
-	public static void sendFollowUpLeadReminderMail(Leads leads) {
+	public static void sendFollowUpLeadReminderMail(Leads leads, String emailId) {
 		log.info("inside the sendFollowUpLeadReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
-			InternetAddress[] recipientAddress = new InternetAddress[1];
+			InternetAddress[] recipientAddress = new InternetAddress[2];
 			recipientAddress[0] = new InternetAddress(leads.getEmployee().getEmailId());
+			if (nonNull(emailId) && !emailId.isEmpty())
+				recipientAddress[1] = new InternetAddress(emailId);
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject("Follow-Up Reminder : " + leads.getTopic() + " by "
