@@ -1060,7 +1060,7 @@ public class LeadServiceImpl implements LeadService {
 				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId(), e.isRemainderOn(),
-						e.getCall().getStatus(),convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())))
+						e.getCall().getStatus(),e.isRemainderOn()?convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours()):null))
 				.collect(toList());
 	}
 
@@ -1070,7 +1070,7 @@ public class LeadServiceImpl implements LeadService {
 				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId(), e.isRemainderOn(),
-						e.getVisit().getStatus(),convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())))
+						e.getVisit().getStatus(),e.isRemainderOn()?convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours()):null))
 				.collect(toList());
 	}
 
@@ -1080,7 +1080,7 @@ public class LeadServiceImpl implements LeadService {
 				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getMeetings().getMeetingId(),
-						e.isRemainderOn(), e.getMeetings().getMeetingStatus(),convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())))
+						e.isRemainderOn(), e.getMeetings().getMeetingStatus(),e.isRemainderOn()?convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours()):null))
 				.collect(toList());
 	}
 
@@ -1090,7 +1090,7 @@ public class LeadServiceImpl implements LeadService {
 				.map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(), LEAD,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId(), e.isRemainderOn(),
-						e.getLead().getStatus(),convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())))
+						e.getLead().getStatus(),e.isRemainderOn()?convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours()):null))
 				.collect(toList());
 	}
 
