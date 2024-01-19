@@ -22,6 +22,4 @@ public class EditMeetingDto extends TimeLineActivityDto{
 	private String dueDate;
 	
 	private List<MeetingAttachmentsDto> attachments;
-	
-	private boolean overDue;
 }

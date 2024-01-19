@@ -27,6 +27,4 @@ public class EditVisitDto extends TimeLineActivityDto {
 	
 	private String dueDate;
 	
-	private boolean overDue;
-	
 }
