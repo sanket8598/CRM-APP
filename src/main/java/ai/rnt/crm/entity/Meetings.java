@@ -91,7 +91,7 @@ public class Meetings extends Auditable {
 	@JoinColumn(name = "mtg_assign_to", updatable = true, nullable = false)
 	private EmployeeMaster assignTo;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "lead_id")
 	private Leads lead;
 
