@@ -492,6 +492,7 @@ public class LeadServiceImpl implements LeadService {
 			List<Meetings> meetings = meetingDaoService.getMeetingByLeadId(leadId);
 			List<TimeLineActivityDto> timeLine = new ArrayList<>();
 			List<EditCallDto> list = calls.stream().filter(TIMELINE_CALL).map(call -> {
+				log.info("inside the timeline call filter...{}");
 				EditCallDto callDto = new EditCallDto();
 				callDto.setId(call.getCallId());
 				callDto.setSubject(call.getSubject());
@@ -505,6 +506,7 @@ public class LeadServiceImpl implements LeadService {
 			}).collect(toList());
 			timeLine.addAll(list);
 			timeLine.addAll(emails.stream().filter(TIMELINE_EMAIL).map(email -> {
+				log.info("inside the timeline emial filter...{}");
 				EditEmailDto editEmailDto = new EditEmailDto();
 				editEmailDto.setId(email.getMailId());
 				editEmailDto.setType(EMAIL);
@@ -516,6 +518,7 @@ public class LeadServiceImpl implements LeadService {
 				return editEmailDto;
 			}).collect(toList()));
 			timeLine.addAll(visits.stream().filter(TIMELINE_VISIT).map(visit -> {
+				log.info("inside the timeline visit filter...{}");
 				EditVisitDto visitDto = new EditVisitDto();
 				visitDto.setId(visit.getVisitId());
 				visitDto.setLocation(visit.getLocation());
@@ -528,6 +531,7 @@ public class LeadServiceImpl implements LeadService {
 				return visitDto;
 			}).collect(toList()));
 			timeLine.addAll(meetings.stream().filter(TIMELINE_MEETING).map(meet -> {
+				log.info("inside the timeline meeting filter...{}");
 				EditMeetingDto meetDto = new EditMeetingDto();
 				meetDto.setId(meet.getMeetingId());
 				meetDto.setType(MEETING);
@@ -542,6 +546,7 @@ public class LeadServiceImpl implements LeadService {
 			timeLine.sort((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 			List<TimeLineActivityDto> activity = calls.stream().filter(ACTIVITY_CALL).map(call -> {
+				log.info("inside the activity call filter...{}");
 				EditCallDto callDto = new EditCallDto();
 				callDto.setId(call.getCallId());
 				callDto.setSubject(call.getSubject());
@@ -556,6 +561,7 @@ public class LeadServiceImpl implements LeadService {
 				return callDto;
 			}).collect(toList());
 			activity.addAll(emails.stream().filter(ACTIVITY_EMAIL).map(email -> {
+				log.info("inside the activity emial filter...{}");
 				EditEmailDto editEmailDto = new EditEmailDto();
 				editEmailDto.setId(email.getMailId());
 				editEmailDto.setType(EMAIL);
@@ -567,6 +573,7 @@ public class LeadServiceImpl implements LeadService {
 				return editEmailDto;
 			}).collect(toList()));
 			activity.addAll(visits.stream().filter(ACTIVITY_VISIT).map(visit -> {
+				log.info("inside the activity visit filter...{}");
 				EditVisitDto editVisitDto = new EditVisitDto();
 				editVisitDto.setId(visit.getVisitId());
 				editVisitDto.setLocation(visit.getLocation());
@@ -581,6 +588,7 @@ public class LeadServiceImpl implements LeadService {
 				return editVisitDto;
 			}).collect(toList()));
 			activity.addAll(meetings.stream().filter(ACTIVITY_MEETING).map(meet -> {
+				log.info("inside the activity meeting filter...{}");
 				EditMeetingDto meetDto = new EditMeetingDto();
 				meetDto.setId(meet.getMeetingId());
 				meetDto.setType(MEETING);
@@ -598,6 +606,7 @@ public class LeadServiceImpl implements LeadService {
 			activity.sort(overDueActivity.thenComparing((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))));
 			List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
+				log.info("inside the upnecxt call filter...{}");
 				EditCallDto callDto = new EditCallDto();
 				callDto.setId(call.getCallId());
 				callDto.setSubject(call.getSubject());
@@ -610,6 +619,7 @@ public class LeadServiceImpl implements LeadService {
 			}).collect(toList());
 
 			upNext.addAll(visits.stream().filter(UPNEXT_VISIT).map(visit -> {
+				log.info("inside the upnecxt visit filter...{}");
 				EditVisitDto editVisitDto = new EditVisitDto();
 				editVisitDto.setId(visit.getVisitId());
 				editVisitDto.setLocation(visit.getLocation());
@@ -622,6 +632,7 @@ public class LeadServiceImpl implements LeadService {
 				return editVisitDto;
 			}).collect(toList()));
 			upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
+				log.info("inside the upnecxt meeting filter...{}");
 				EditMeetingDto meetDto = new EditMeetingDto();
 				meetDto.setId(meet.getMeetingId());
 				meetDto.setType(MEETING);
@@ -651,7 +662,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.put(DATA, dataMap);
 			return new ResponseEntity<>(lead, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while editing the lead data..{}", e.getMessage());
+			log.error("Got Exception while editing the lead data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
