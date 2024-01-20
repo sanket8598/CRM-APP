@@ -492,7 +492,6 @@ public class LeadServiceImpl implements LeadService {
 			List<Meetings> meetings = meetingDaoService.getMeetingByLeadId(leadId);
 			List<TimeLineActivityDto> timeLine = new ArrayList<>();
 			List<EditCallDto> list = calls.stream().filter(TIMELINE_CALL).map(call -> {
-				log.info("inside the timeline call filter...{}",call);
 				EditCallDto callDto = new EditCallDto();
 				callDto.setId(call.getCallId());
 				callDto.setSubject(call.getSubject());
@@ -506,7 +505,6 @@ public class LeadServiceImpl implements LeadService {
 			}).collect(toList());
 			timeLine.addAll(list);
 			timeLine.addAll(emails.stream().filter(TIMELINE_EMAIL).map(email -> {
-				log.info("inside the timeline email filter...{}",email);
 				EditEmailDto editEmailDto = new EditEmailDto();
 				editEmailDto.setId(email.getMailId());
 				editEmailDto.setType(EMAIL);
@@ -518,7 +516,6 @@ public class LeadServiceImpl implements LeadService {
 				return editEmailDto;
 			}).collect(toList()));
 			timeLine.addAll(visits.stream().filter(TIMELINE_VISIT).map(visit -> {
-				log.info("inside the timeline visit filter...{}",visit);
 				EditVisitDto visitDto = new EditVisitDto();
 				visitDto.setId(visit.getVisitId());
 				visitDto.setLocation(visit.getLocation());
@@ -531,7 +528,6 @@ public class LeadServiceImpl implements LeadService {
 				return visitDto;
 			}).collect(toList()));
 			timeLine.addAll(meetings.stream().filter(TIMELINE_MEETING).map(meet -> {
-				log.info("inside the timeline meeting filter...{}",meet);
 				EditMeetingDto meetDto = new EditMeetingDto();
 				meetDto.setId(meet.getMeetingId());
 				meetDto.setType(MEETING);
@@ -543,11 +539,9 @@ public class LeadServiceImpl implements LeadService {
 				meetDto.setCreatedOn(convertDate(meet.getUpdatedDate()));
 				return meetDto;
 			}).collect(toList()));
-			log.info("timeline has beeen completed ");
 			timeLine.sort((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 			List<TimeLineActivityDto> activity = calls.stream().filter(ACTIVITY_CALL).map(call -> {
-				log.info("inside the activity call filter...{}",call);
 				EditCallDto callDto = new EditCallDto();
 				callDto.setId(call.getCallId());
 				callDto.setSubject(call.getSubject());
@@ -562,7 +556,6 @@ public class LeadServiceImpl implements LeadService {
 				return callDto;
 			}).collect(toList());
 			activity.addAll(emails.stream().filter(ACTIVITY_EMAIL).map(email -> {
-				log.info("inside the activity email filter...{}",email);
 				EditEmailDto editEmailDto = new EditEmailDto();
 				editEmailDto.setId(email.getMailId());
 				editEmailDto.setType(EMAIL);
@@ -571,11 +564,10 @@ public class LeadServiceImpl implements LeadService {
 				editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
 				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
 				editEmailDto.setShortName(shortName(email.getMailFrom()));
-				log.info("inside the activity email filter completed");
+				editEmailDto.setOverDue(false);
 				return editEmailDto;
 			}).collect(toList()));
 			activity.addAll(visits.stream().filter(ACTIVITY_VISIT).map(visit -> {
-				log.info("inside the activity visit filter...{}",visit);
 				EditVisitDto editVisitDto = new EditVisitDto();
 				editVisitDto.setId(visit.getVisitId());
 				editVisitDto.setLocation(visit.getLocation());
@@ -590,7 +582,6 @@ public class LeadServiceImpl implements LeadService {
 				return editVisitDto;
 			}).collect(toList()));
 			activity.addAll(meetings.stream().filter(ACTIVITY_MEETING).map(meet -> {
-				log.info("inside the activity meeting filter...{}",meet);
 				EditMeetingDto meetDto = new EditMeetingDto();
 				meetDto.setId(meet.getMeetingId());
 				meetDto.setType(MEETING);
@@ -604,12 +595,10 @@ public class LeadServiceImpl implements LeadService {
 				meetDto.setOverDue(OVER_DUE.test(meetDto.getDueDate()));
 				return meetDto;
 			}).collect(toList()));
-			log.info("activity has beeen completed ");
 			Comparator<TimeLineActivityDto> overDueActivity = (a1, a2) -> a2.getOverDue().compareTo(a1.getOverDue());
 			activity.sort(overDueActivity.thenComparing((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))));
 			List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
-				log.info("inside the upnext call filter...{}",call);
 				EditCallDto callDto = new EditCallDto();
 				callDto.setId(call.getCallId());
 				callDto.setSubject(call.getSubject());
@@ -622,7 +611,6 @@ public class LeadServiceImpl implements LeadService {
 			}).collect(toList());
 
 			upNext.addAll(visits.stream().filter(UPNEXT_VISIT).map(visit -> {
-				log.info("inside the upnext visit filter...{}",visit);
 				EditVisitDto editVisitDto = new EditVisitDto();
 				editVisitDto.setId(visit.getVisitId());
 				editVisitDto.setLocation(visit.getLocation());
@@ -635,7 +623,6 @@ public class LeadServiceImpl implements LeadService {
 				return editVisitDto;
 			}).collect(toList()));
 			upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
-				log.info("inside the upnext meeting filter...{}",meet);
 				EditMeetingDto meetDto = new EditMeetingDto();
 				meetDto.setId(meet.getMeetingId());
 				meetDto.setType(MEETING);
@@ -647,30 +634,20 @@ public class LeadServiceImpl implements LeadService {
 				meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
 				return meetDto;
 			}).collect(toList()));
-			log.info("upnext has beeen completed ");
 			upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 			LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities = upNext.stream()
 					.collect(groupingBy(e -> DAYS.between(now(), parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
 					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
 							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
-			log.info("inside the map put for final Data");
 			dataMap.put(LEAD_INFO, dto);
-			log.info("inside the map put for final Data 1");
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
-			log.info("inside the map put for final Data 2");
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
-			log.info("inside the map put for final Data 3");
 			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
-			log.info("inside the map put for final Data 4");
 			dataMap.put(TIMELINE, timeLine);
-			log.info("inside the map put for final Data 5");
 			dataMap.put(ACTIVITY, activity);
-			log.info("inside the map put for final Data 6");
 			dataMap.put(UPNEXT_DATA, upNextActivities(upNextActivities));
-			log.info("inside the map put for final Data 7");
 			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, leadById));
-			log.info("inside the map put for final Data 8");
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);
 			return new ResponseEntity<>(lead, FOUND);
