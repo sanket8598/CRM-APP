@@ -92,7 +92,7 @@ public class EmailUtil {
 			msg.setSentDate(new Date());
 			// create body of the mail
 			StringBuilder content = new StringBuilder().append("<br>").append(String.format("%s", email.getContent()))
-					.append("<br><br>").append("Regards,").append("<br>");
+					.append("<br><br>").append("Regards,").append("<br>").append("Rabbit & Tortoise Technology.");
 			if (email.getAttachment().isEmpty())
 				msg = sendAsPlainText(msg, content.toString());
 
@@ -138,7 +138,7 @@ public class EmailUtil {
 			msg.setContent(multipart);
 			return msg;
 		} catch (Exception e) {
-			log.info("Got Exception while sendWithAttachments the mail..{}", e.getMessage());
+			log.error("Got Exception while sendWithAttachments the mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -154,10 +154,12 @@ public class EmailUtil {
 		try {
 			Message msg = new MimeMessage(getSession());
 
-			InternetAddress[] recipientAddress = new InternetAddress[2];
+			InternetAddress[] recipientAddress = new InternetAddress[1];
 			recipientAddress[0] = new InternetAddress(callTask.getAssignTo().getEmailId());
-			if (nonNull(emailId) && !emailId.isEmpty())
+			if (nonNull(emailId) && !emailId.isEmpty()) {
+				recipientAddress = new InternetAddress[2];
 				recipientAddress[1] = new InternetAddress(emailId);
+			}
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject("Task Reminder : " + callTask.getSubject() + " - " + formatDate(callTask.getDueDate()));
@@ -168,15 +170,15 @@ public class EmailUtil {
 									+ ",<br><br>")
 							+ "I hope this email finds you well. This is a friendly reminder about the Task  for the "
 							+ callTask.getCall().getLead().getTopic() + " by "
-							+ callTask.getCall().getLead().getEmployee().getFirstName() + " "
-							+ callTask.getCall().getLead().getEmployee().getLastName() + "."
-							+ " The task is scheduled for completion by " + formatDate(callTask.getDueDate()) + " At "
-							+ callTask.getDueTime() + ".")
-					.append("<br><br>").append("Regards,").append("<br>").append("RNT-CRM Team.");
+							+ callTask.getCall().getLead().getContacts().stream().filter(Contacts::getPrimary)
+									.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("")
+							+ "." + " The task is scheduled for completion by " + formatDate(callTask.getDueDate())
+							+ " At " + callTask.getDueTime() + ".")
+					.append("<br><br>").append("Regards,").append("<br>").append("Rabbit & Tortoise Technology.");
 			msg.setContent(content.toString(), "text/html");
 			send(msg);
 		} catch (Exception e) {
-			log.info("Got Exception while sending call task reminder mail..{}", e.getMessage());
+			log.error("Got Exception while sending call task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -185,11 +187,12 @@ public class EmailUtil {
 		log.info("inside the sendVisitTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
-
-			InternetAddress[] recipientAddress = new InternetAddress[2];
+			InternetAddress[] recipientAddress = new InternetAddress[1];
 			recipientAddress[0] = new InternetAddress(visitTask.getAssignTo().getEmailId());
-			if (nonNull(emailId) && !emailId.isEmpty())
+			if (nonNull(emailId) && !emailId.isEmpty()) {
+				recipientAddress = new InternetAddress[2];
 				recipientAddress[1] = new InternetAddress(emailId);
+			}
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject("Task Reminder : " + visitTask.getSubject() + " - " + formatDate(visitTask.getDueDate()));
@@ -199,13 +202,16 @@ public class EmailUtil {
 							"Dear " + visitTask.getAssignTo().getFirstName() + " "
 									+ visitTask.getAssignTo().getLastName() + ",<br><br>")
 							+ "I hope this email finds you well. This is a friendly reminder about the Task for the "
-							+ "The task is scheduled for completion by " + formatDate(visitTask.getDueDate()) + " At "
-							+ visitTask.getDueTime() + ".")
-					.append("<br><br>").append("Regards,").append("<br>").append("RNT-CRM Team.");
+							+ visitTask.getVisit().getSubject() + " by "
+							+ visitTask.getVisit().getLead().getContacts().stream().filter(Contacts::getPrimary)
+									.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("")
+							+ "." + " The task is scheduled for completion by " + formatDate(visitTask.getDueDate())
+							+ " At " + visitTask.getDueTime12Hours() + ".")
+					.append("<br><br>").append("Regards,").append("<br>").append("Rabbit & Tortoise Technology.");
 			msg.setContent(content.toString(), "text/html");
 			send(msg);
 		} catch (Exception e) {
-			log.info("Got Exception while sending visit task reminder mail..{}", e.getMessage());
+			log.error("Got Exception while sending visit task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -215,10 +221,12 @@ public class EmailUtil {
 		try {
 			Message msg = new MimeMessage(getSession());
 
-			InternetAddress[] recipientAddress = new InternetAddress[2];
+			InternetAddress[] recipientAddress = new InternetAddress[1];
 			recipientAddress[0] = new InternetAddress(meetingTask.getAssignTo().getEmailId());
-			if (nonNull(emailId) && !emailId.isEmpty())
+			if (nonNull(emailId) && !emailId.isEmpty()) {
+				recipientAddress = new InternetAddress[2];
 				recipientAddress[1] = new InternetAddress(emailId);
+			}
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(
@@ -229,13 +237,16 @@ public class EmailUtil {
 							"Dear " + meetingTask.getAssignTo().getFirstName() + " "
 									+ meetingTask.getAssignTo().getLastName() + ",<br><br>")
 							+ "I hope this email finds you well. This is a friendly reminder about the Task for the "
-							+ "The task is scheduled for completion by " + formatDate(meetingTask.getDueDate()) + " At "
-							+ meetingTask.getDueTime() + ".")
-					.append("<br><br>").append("Regards,").append("<br>").append("RNT-CRM Team.");
+							+ meetingTask.getMeetings().getMeetingTitle() + " by "
+							+ meetingTask.getMeetings().getLead().getContacts().stream().filter(Contacts::getPrimary)
+							.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("")
+							+ "." + " The task is scheduled for completion by " + formatDate(meetingTask.getDueDate())
+							+ " At " + meetingTask.getDueTime12Hours() + ".")
+					.append("<br><br>").append("Regards,").append("<br>").append("Rabbit & Tortoise Technology.");
 			msg.setContent(content.toString(), "text/html");
 			send(msg);
 		} catch (Exception e) {
-			log.info("Got Exception while sending meeting task reminder mail..{}", e.getMessage());
+			log.error("Got Exception while sending meeting task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -245,10 +256,12 @@ public class EmailUtil {
 		try {
 			Message msg = new MimeMessage(getSession());
 
-			InternetAddress[] recipientAddress = new InternetAddress[2];
+			InternetAddress[] recipientAddress = new InternetAddress[1];
 			recipientAddress[0] = new InternetAddress(leadTask.getAssignTo().getEmailId());
-			if (nonNull(emailId) && !emailId.isEmpty())
+			if (nonNull(emailId) && !emailId.isEmpty()) {
+				recipientAddress = new InternetAddress[2];
 				recipientAddress[1] = new InternetAddress(emailId);
+			}
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject("Task Reminder : " + leadTask.getSubject() + " - " + formatDate(leadTask.getDueDate()));
@@ -257,14 +270,17 @@ public class EmailUtil {
 					.append(String.format("%s",
 							"Dear " + leadTask.getAssignTo().getFirstName() + " " + leadTask.getAssignTo().getLastName()
 									+ ",<br><br>")
-							+ "I hope this email finds you well. This is a friendly reminder about the Task for the. "
-							+ "The task is scheduled for completion by " + formatDate(leadTask.getDueDate()) + " At "
-							+ leadTask.getDueTime12Hours() + ".")
-					.append("<br><br>").append("Regards,").append("<br>").append("RNT-CRM Team.");
+							+ "I hope this email finds you well. This is a friendly reminder about the Task for the "
+							+ leadTask.getLead().getTopic() + " by "
+							+ leadTask.getLead().getContacts().stream().filter(Contacts::getPrimary).findAny()
+									.map(con -> con.getFirstName() + " " + con.getLastName()).toString()
+							+ "." + " The task is scheduled for completion by " + formatDate(leadTask.getDueDate())
+							+ " At " + leadTask.getDueTime12Hours() + ".")
+					.append("<br><br>").append("Regards,").append("<br>").append("Rabbit & Tortoise Technology.");
 			msg.setContent(content.toString(), "text/html");
 			send(msg);
 		} catch (Exception e) {
-			log.info("Got Exception while sending lead task reminder mail..{}", e.getMessage());
+			log.error("Got Exception while sending lead task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -273,30 +289,31 @@ public class EmailUtil {
 		log.info("inside the sendFollowUpLeadReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
-			InternetAddress[] recipientAddress = new InternetAddress[2];
+			InternetAddress[] recipientAddress = new InternetAddress[1];
 			recipientAddress[0] = new InternetAddress(leads.getEmployee().getEmailId());
-			if (nonNull(emailId) && !emailId.isEmpty())
+			if (nonNull(emailId) && !emailId.isEmpty()) {
+				recipientAddress = new InternetAddress[2];
 				recipientAddress[1] = new InternetAddress(emailId);
+			}
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject("Follow-Up Reminder : " + leads.getTopic() + " by "
-					+ leads.getContacts().stream().filter(Contacts::getPrimary).map(e -> {
-						return e.getFirstName() + " " + e.getLastName();
-					}).findFirst().orElse(null) + formatDate(leads.getRemainderDueOn()) + " At "
-					+ leads.getRemainderDueAt());
+					+ leads.getContacts().stream().filter(Contacts::getPrimary).findAny()
+							.map(e -> e.getFirstName() + " " + e.getLastName()).toString()
+					+ "-" + formatDate(leads.getRemainderDueOn()) + " At " + leads.getRemainderDueAt());
 			msg.setSentDate(new Date());
 			StringBuilder content = new StringBuilder().append("<br>").append(String.format("%s",
 					"Dear " + leads.getEmployee().getFirstName() + " " + leads.getEmployee().getLastName()
 							+ ",<br><br>")
 					+ "I hope this email finds you well. This is a friendly reminder about the follow-up for the lead: "
-					+ leads.getTopic() + " by " + leads.getContacts().stream().filter(Contacts::getPrimary).map(e -> {
-						return e.getFirstName() + " " + e.getLastName();
-					}).findFirst().orElse(null) + ".").append("<br><br>").append("Regards,").append("<br>")
-					.append("RNT-CRM Team.");
+					+ leads.getTopic() + " by "
+					+ leads.getContacts().stream().filter(Contacts::getPrimary).findAny()
+							.map(e -> e.getFirstName() + " " + e.getLastName()).toString()
+					+ ".").append("<br><br>").append("Regards,").append("<br>").append("Rabbit & Tortoise Technology.");
 			msg.setContent(content.toString(), "text/html");
 			send(msg);
 		} catch (Exception e) {
-			log.info("Got Exception while sending follow up lead reminder mail..{}", e.getMessage());
+			log.error("Got Exception while sending follow up lead reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -307,7 +324,7 @@ public class EmailUtil {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MMM-yyyy");
 			return outputFormat.format(date);
 		} catch (Exception e) {
-			log.info("Got Exception while converting task due date..{}" + e.getMessage());
+			log.error("Got Exception while converting task due date..{}" + e.getMessage());
 			throw new CRMException(e);
 		}
 	}

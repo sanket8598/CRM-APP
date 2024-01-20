@@ -1,5 +1,7 @@
 package ai.rnt.crm.util;
 
+import static ai.rnt.crm.constants.StatusConstants.SEND;
+import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
 import static ai.rnt.crm.util.EmailUtil.sendCallTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendEmail;
@@ -76,13 +78,13 @@ public class TaskRemainderUtil {
 	private final LeadDaoService leadDaoService;
 
 	private final EmailDaoService emailDaoService;
-	
+
 	private final EmployeeDaoService employeeDaoService;
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
-	
+
 	@Value("${spring.profiles.active}")
-    private String activeProfile;
+	private String activeProfile;
 
 	@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
@@ -91,24 +93,24 @@ public class TaskRemainderUtil {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
 			LocalDateTime currentTime = null;
-			if("uat".equalsIgnoreCase(activeProfile)) {
-				log.info("inside the if block reminderForTask method...{}",activeProfile);
-				 currentTime = now().plusHours(5).plusMinutes(30);
-			}else 
+			if ("uat".equalsIgnoreCase(activeProfile)) {
+				log.info("inside the if block reminderForTask method...{}", activeProfile);
+				currentTime = now().plusHours(5).plusMinutes(30);
+			} else
 				currentTime = now();
 			String time = currentTime.format(ofPattern("HH:mm"));
-			log.info("inside the time is in reminderForTask method...{}",currentTime);
-			log.info("inside the currenttime is in reminderForTask method...{}",time);
+			log.info("inside the time is in reminderForTask method...{}", currentTime);
+			log.info("inside the currenttime is in reminderForTask method...{}", time);
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
 				String emailId = null;
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendCallTaskReminderMail(e,emailId);
+					sendCallTaskReminderMail(e, emailId);
 					callNotification(e.getCallTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendCallTaskReminderMail(e,emailId);
+					sendCallTaskReminderMail(e, emailId);
 
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					callNotification(e.getCallTaskId());
@@ -120,10 +122,10 @@ public class TaskRemainderUtil {
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendVisitTaskReminderMail(e,emailId);
+					sendVisitTaskReminderMail(e, emailId);
 					visitNotification(e.getVisitTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendVisitTaskReminderMail(e,emailId);
+					sendVisitTaskReminderMail(e, emailId);
 
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					visitNotification(e.getVisitTaskId());
@@ -135,10 +137,10 @@ public class TaskRemainderUtil {
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendMeetingTaskReminderMail(e,emailId);
+					sendMeetingTaskReminderMail(e, emailId);
 					meetingNotification(e.getMeetingTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendMeetingTaskReminderMail(e,emailId);
+					sendMeetingTaskReminderMail(e, emailId);
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					meetingNotification(e.getMeetingTaskId());
 			});
@@ -149,10 +151,10 @@ public class TaskRemainderUtil {
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendLeadTaskReminderMail(e,emailId);
+					sendLeadTaskReminderMail(e, emailId);
 					leadNotification(e.getLeadTaskId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendLeadTaskReminderMail(e,emailId);
+					sendLeadTaskReminderMail(e, emailId);
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					leadNotification(e.getLeadTaskId());
 			});
@@ -163,10 +165,10 @@ public class TaskRemainderUtil {
 				if (!e.getEmployee().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
-					sendFollowUpLeadReminderMail(e,emailId);
+					sendFollowUpLeadReminderMail(e, emailId);
 					followUpLeadNotification(e.getLeadId());
 				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
-					sendFollowUpLeadReminderMail(e,emailId);
+					sendFollowUpLeadReminderMail(e, emailId);
 				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
 					followUpLeadNotification(e.getLeadId());
 			});
@@ -185,7 +187,11 @@ public class TaskRemainderUtil {
 							? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
 							: Collections.emptyList());
 					try {
-						sendEmail(e);
+						if (sendEmail(e))
+							TO_EMAIL.apply(e).ifPresent(em -> {
+								em.setStatus(SEND);
+								emailDaoService.email(em);
+							});
 					} catch (AddressException e1) {
 						log.error("Got exception while sending the scheduled emails...{}", e1);
 					}

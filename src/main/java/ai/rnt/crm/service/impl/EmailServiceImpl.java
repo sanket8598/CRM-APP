@@ -192,7 +192,7 @@ public class EmailServiceImpl implements EmailService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while deleting the mail..{}", e.getMessage());
+			log.error("Got Exception while deleting the mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -215,7 +215,7 @@ public class EmailServiceImpl implements EmailService {
 			}
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while assign the mail..{}", e.getMessage());
+			log.error("Got Exception while assign the mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -242,7 +242,7 @@ public class EmailServiceImpl implements EmailService {
 			resultMap.put(SUCCESS, true);
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while getting mail..{}", e.getMessage());
+			log.error("Got Exception while getting mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -263,6 +263,10 @@ public class EmailServiceImpl implements EmailService {
 			email.setSubject(dto.getSubject());
 			email.setMailFrom(dto.getMailFrom());
 			email.setStatus(status);
+			email.setScheduled(dto.getScheduled());
+			email.setScheduledOn(dto.getScheduledOn());
+			email.setScheduledAt(dto.getScheduledAt());
+
 			if (dto.getAttachment().isEmpty()) {
 				sendEmail = emailDaoService.email(email);
 				saveStatus = nonNull(sendEmail);
@@ -290,7 +294,8 @@ public class EmailServiceImpl implements EmailService {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Updated Successfully");
 			} else if (SEND.equalsIgnoreCase(status)) {
-				boolean sendEmailStatus = sendEmail(TO_EMAIL_DTO.apply(sendEmail).orElseThrow(ResourceNotFoundException::new));
+				boolean sendEmailStatus = sendEmail(
+						TO_EMAIL_DTO.apply(sendEmail).orElseThrow(ResourceNotFoundException::new));
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Updated and Sent Successfully!!");
