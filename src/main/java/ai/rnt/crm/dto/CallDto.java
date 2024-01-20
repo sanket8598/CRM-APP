@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import ai.rnt.crm.validation.PhoneNumValid;
+import ai.rnt.crm.validation.ValidCallDirection;
 import lombok.Data;
 
 /**
@@ -29,6 +30,7 @@ public class CallDto {
 
 	private String subject;
 
+	@ValidCallDirection(message = "Please Enter Valid Call Direction!!")
 	private String direction;
 
 	@NotBlank(message = "Phone Number should not be null or empty!!")
