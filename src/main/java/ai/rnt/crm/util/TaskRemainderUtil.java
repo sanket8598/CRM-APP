@@ -91,11 +91,14 @@ public class TaskRemainderUtil {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
 			LocalDateTime currentTime = null;
-			if("uat".equalsIgnoreCase(activeProfile))
+			if("uat".equalsIgnoreCase(activeProfile)) {
+				log.info("inside the if block reminderForTask method...{}",activeProfile);
 				 currentTime = now().plusHours(5).plusMinutes(30);
-			else 
+			}else 
 				currentTime = now();
 			String time = currentTime.format(ofPattern("HH:mm"));
+			log.info("inside the time is in reminderForTask method...{}",currentTime);
+			log.info("inside the currenttime is in reminderForTask method...{}",time);
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
 				String emailId = null;
