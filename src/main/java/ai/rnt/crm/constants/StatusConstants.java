@@ -39,4 +39,11 @@ public final class StatusConstants {
 	public static final String MEETING = "Meeting";
 	public static final String LEAD = "Lead";
 	
+	public static final String LOW = "Low";
+	public static final String MEDIUM = "Medium";
+	public static final String HIGH = "High";
+	
+	public static final String INCOMING = "Incoming";
+	public static final String OUTGOING = "Outgoing";
+	
 }
