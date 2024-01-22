@@ -23,4 +23,7 @@ public class EditEmailDto extends TimeLineActivityDto{
 	private String shortName;
 	
 	private String status;
+	
+	private String scheduledDate;
+	
 }
