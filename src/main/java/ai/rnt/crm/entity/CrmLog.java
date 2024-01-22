@@ -39,7 +39,7 @@ public class CrmLog extends Auditable {
 	private Integer crmContactId;
 
 	@Column(name = "comm_type")
-	private String CommType;
+	private String commType;
 
 	@Column(name = "to_msg")
 	private String toMessage;

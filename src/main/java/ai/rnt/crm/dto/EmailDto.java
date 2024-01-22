@@ -1,9 +1,13 @@
 package ai.rnt.crm.dto;
 
+import static javax.persistence.TemporalType.DATE;
+
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Temporal;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -41,6 +45,8 @@ public class EmailDto {
 
 	private Boolean scheduled;
 
+	@Temporal(DATE)
+	@FutureOrPresent(message="Date must not be smaller than today's date!!")
 	private Date scheduledOn;
 
 	private String scheduledAt;

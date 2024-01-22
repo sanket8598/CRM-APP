@@ -85,7 +85,7 @@ public class CallServiceImpl implements CallService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
-			log.info("Got Exception while adding the call..{}", e.getMessage());
+			log.error("Got Exception while adding the call..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -100,7 +100,7 @@ public class CallServiceImpl implements CallService {
 			call.put(SUCCESS, true);
 			return new ResponseEntity<>(call, FOUND);
 		} catch (Exception e) {
-			log.info("Got exception while get call data for edit..{}", e.getMessage());
+			log.error("Got exception while get call data for edit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -142,7 +142,7 @@ public class CallServiceImpl implements CallService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
-			log.info("Got exception while update call..{}", e.getMessage());
+			log.error("Got exception while update call..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -172,7 +172,7 @@ public class CallServiceImpl implements CallService {
 			}
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while assign the call..{}", e.getMessage());
+			log.error("Got Exception while assign the call..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -195,7 +195,7 @@ public class CallServiceImpl implements CallService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while markAsCompleted the call..{}", e.getMessage());
+			log.error("Got Exception while markAsCompleted the call..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -225,7 +225,7 @@ public class CallServiceImpl implements CallService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while delete the call..{}", e.getMessage());
+			log.error("Got Exception while delete the call..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -324,7 +324,7 @@ public class CallServiceImpl implements CallService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while assigning the PhoneCallTask task..{}", e.getMessage());
+			log.error("Got Exception while assigning the PhoneCallTask task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

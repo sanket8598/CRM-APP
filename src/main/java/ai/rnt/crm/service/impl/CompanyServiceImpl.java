@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 public class CompanyServiceImpl implements CompanyService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllCompany() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -94,9 +94,8 @@ public class LeadsCardMapperImpl implements LeadsCardMapper {
 								: null);
 			};
 		case DESIGNATION:
-			return (lead, contacts, leadsCardDto) -> {
-				leadsCardDto.setSecondaryField(contacts.getDesignation());
-			};
+			return (lead, contacts, leadsCardDto) -> leadsCardDto.setSecondaryField(contacts.getDesignation());
+
 		case BUDGET_AMOUNT:
 			return (lead, contacts, leadsCardDto) -> leadsCardDto.setSecondaryField(lead.getBudgetAmount());
 		case SERVICE_FALLS_INTO:

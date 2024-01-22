@@ -38,9 +38,7 @@ public class DomainMasterDtoMapper {
 	 * @since 15-09-2023
 	 * @version 1.0
 	 */
-	public static final Function<Collection<DomainMaster>, List<DomainMasterDto>> TO_DOMAIN_DTOS = e -> {
-		return e.stream().map(dm -> TO_DOMAIN_DTO.apply(dm).get()).collect(Collectors.toList());
-	};
+	public static final Function<Collection<DomainMaster>, List<DomainMasterDto>> TO_DOMAIN_DTOS = e -> e.stream().map(dm -> TO_DOMAIN_DTO.apply(dm).get()).collect(Collectors.toList());
 
 	public static final Function<DomainMasterDto, Optional<DomainMaster>> TO_DOMAIN = e -> evalMapper(e,
 			DomainMaster.class);
