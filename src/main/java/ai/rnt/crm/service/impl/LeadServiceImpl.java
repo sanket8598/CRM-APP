@@ -497,6 +497,7 @@ public class LeadServiceImpl implements LeadService {
 				callDto.setSubject(call.getSubject());
 				callDto.setType(CALL);
 				callDto.setBody(call.getComment());
+				callDto.setStatus(call.getStatus());
 				callDto.setCreatedOn(convertDate(call.getUpdatedDate()));
 				callDto.setShortName(shortName(call.getCallTo()));
 				TO_EMPLOYEE.apply(call.getCallFrom())
@@ -513,6 +514,7 @@ public class LeadServiceImpl implements LeadService {
 				editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
 				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
 				editEmailDto.setShortName(shortName(email.getMailFrom()));
+				editEmailDto.setStatus(email.getStatus());
 				return editEmailDto;
 			}).collect(toList()));
 			timeLine.addAll(visits.stream().filter(TIMELINE_VISIT).map(visit -> {
@@ -522,6 +524,7 @@ public class LeadServiceImpl implements LeadService {
 				visitDto.setSubject(visit.getSubject());
 				visitDto.setType(VISIT);
 				visitDto.setBody(visit.getContent());
+				visitDto.setStatus(visit.getStatus());
 				employeeService.getById(visit.getCreatedBy()).ifPresent(
 						byId -> visitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
 				visitDto.setCreatedOn(convertDate(visit.getUpdatedDate()));
@@ -535,6 +538,7 @@ public class LeadServiceImpl implements LeadService {
 						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
 				meetDto.setSubject(meet.getMeetingTitle());
 				meetDto.setBody(meet.getDescription());
+				meetDto.setStatus(meet.getMeetingStatus());
 				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
 				meetDto.setCreatedOn(convertDate(meet.getUpdatedDate()));
 				return meetDto;

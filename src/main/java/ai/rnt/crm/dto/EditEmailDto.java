@@ -21,4 +21,6 @@ public class EditEmailDto extends TimeLineActivityDto{
 	private List<AttachmentDto> attachments;
 	
 	private String shortName;
+	
+	private String status;
 }
