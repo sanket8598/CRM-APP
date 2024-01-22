@@ -1,5 +1,8 @@
 package ai.rnt.crm.validation;
 
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
+
 import java.util.Objects;
 
 import javax.validation.ConstraintValidator;
@@ -14,13 +17,15 @@ public class ExcelFileValidator implements ConstraintValidator<ValidFile, Multip
 
 	@Override
 	public void initialize(ValidFile constraintAnnotation) {
-	}
+ }
 
 	@Override
 	public boolean isValid(MultipartFile multipartFile, ConstraintValidatorContext context) {
 		log.info("entered inside the excel file custom validation annotation...");
+		if(isNull(multipartFile) || multipartFile.isEmpty())
+			return false;
 		String contentType = multipartFile.getContentType();
-		return Objects.nonNull(contentType) && isSupportedContentType(contentType);
+		return nonNull(contentType) && isSupportedContentType(contentType);
 	}
 
 	private boolean isSupportedContentType(String contentType) {
