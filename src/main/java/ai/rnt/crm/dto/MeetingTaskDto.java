@@ -1,11 +1,13 @@
 package ai.rnt.crm.dto;
 
+import static javax.persistence.TemporalType.DATE;
+
 import java.util.Date;
 
+import javax.persistence.Temporal;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import ai.rnt.crm.validation.ValidTaskPriority;
 import ai.rnt.crm.validation.ValidTaskStatus;
@@ -32,8 +34,9 @@ public class MeetingTaskDto {
 	@ValidTaskPriority(message = "Please Enter Valid Task Priority!!")
 	private String priority;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@Temporal(DATE)
 	@NotNull(message="Due Date should not be null!!")
+	@FutureOrPresent(message="Date must not be smaller than today's date!!")
 	private Date dueDate;
 
 	@NotBlank(message = "Due time should not be null or empty!!")
@@ -45,9 +48,9 @@ public class MeetingTaskDto {
 
 	private String remainderVia;
 
-//	@JsonFormat(pattern = "hh:mm aa")
 	private String remainderDueAt;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
+	@Temporal(DATE)
+	@FutureOrPresent(message="Date must not be smaller than today's date!!")
 	private Date remainderDueOn;
 }
