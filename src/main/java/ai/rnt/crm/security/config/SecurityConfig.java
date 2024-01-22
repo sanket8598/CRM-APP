@@ -37,8 +37,8 @@ import lombok.extern.slf4j.Slf4j;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig implements WebMvcConfigurer {
 
-	@Autowired
 	@Qualifier("handlerExceptionResolver")
+	@Autowired
 	private HandlerExceptionResolver exceptionResolver;
 	private final CustomUserDetails customUserDetails;
 	private final JWTAuthenticationEntryPoint authenticationEntryPoint;

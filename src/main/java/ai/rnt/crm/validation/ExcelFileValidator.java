@@ -14,7 +14,6 @@ public class ExcelFileValidator implements ConstraintValidator<ValidFile, Multip
 
 	@Override
 	public void initialize(ValidFile constraintAnnotation) {
-		// TODO document why this method is empty
 	}
 
 	@Override

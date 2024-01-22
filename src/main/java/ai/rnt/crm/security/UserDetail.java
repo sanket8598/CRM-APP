@@ -5,6 +5,7 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@EqualsAndHashCode(callSuper=true)
 public class UserDetail extends User {
 
 	private static final long serialVersionUID = 338308531428207638L;

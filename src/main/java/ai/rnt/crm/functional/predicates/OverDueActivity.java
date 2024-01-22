@@ -4,9 +4,12 @@ import static ai.rnt.crm.constants.DateFormatterConstant.DATE_TIME_WITH_AM_OR_PM
 import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.parse;
 import static java.util.Objects.isNull;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.function.Predicate;
 
+import lombok.NoArgsConstructor;
+@NoArgsConstructor(access = PRIVATE)
 public class OverDueActivity {
 	
 	/*

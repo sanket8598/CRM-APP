@@ -21,15 +21,12 @@ public class RoleDtoMapper {
 	 * <br><b>Return</b> Role
 	 * @since version 1.0 
 	 */
-	public static final Function<RoleMaster, Optional<Role>> TO_Role = e -> {
-		return evalMapper(e, Role.class);
-		};
+	public static final Function<RoleMaster, Optional<Role>> TO_Role = e -> evalMapper(e, Role.class);
 	/**
 	 * @since 21-08-2023
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<RoleMaster>, List<Role>> TO_Roles= e ->{
-		return e.stream().map(dm -> TO_Role.apply(dm).get()).collect(Collectors.toList());
-	};
+	public static final Function<Collection<RoleMaster>, List<Role>> TO_Roles= e -> e.stream().map(dm -> TO_Role.apply(dm).get()).collect(Collectors.toList());
+
 }

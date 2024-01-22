@@ -75,12 +75,7 @@ public class LeadsDtoMapper {
 	public static final Function<Collection<Leads>, List<LeadDashboardDto>> TO_DASHBOARD_LEADDTOS = e -> e.stream()
 			.map(dm -> TO_DASHBOARD_LEADDTO.apply(dm).get()).collect(Collectors.toList());
 
-	public static final Function<Leads, Optional<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTO = e -> {
-		Optional<LeadsCardDto> leadDashboardDto = evalMapper(e, LeadsCardDto.class);
-		// leadDashboardDto.ifPresent(l->l.setShortName(LeadsCardUtil.shortName(e.getFirstName(),
-		// e.getLastName())));
-		return leadDashboardDto;
-	};
+	public static final Function<Leads, Optional<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTO = e -> evalMapper(e, LeadsCardDto.class);
 
 	public static final Function<Collection<Leads>, List<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTOS = e -> e.stream()
 			.map(dm -> TO_DASHBOARD_CARDS_LEADDTO.apply(dm).get()).collect(Collectors.toList());

@@ -82,7 +82,6 @@ public class MeetingUtil {
 				msg.setRecipients(TO, parse(toMail));
 			}
 			msg.setSubject(dto.getMeetingTitle());
-			// msg.setHeader("Content-class", "urn:content-classes:calendarmessage");
 			String content = getBufferString(dto);
 			BodyPart messageBodyPart = new MimeBodyPart();
 			messageBodyPart.setHeader("Content-Class", "urn:content-  classes:calendarmessage");
@@ -98,7 +97,6 @@ public class MeetingUtil {
 				}
 			}
 			bc.setContent(dto.getDescription(), "text/html");
-			// multipart.addBodyPart(bc);
 			multipart.addBodyPart(messageBodyPart);
 			msg.setContent(multipart);
 			send(msg);

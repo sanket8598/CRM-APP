@@ -558,6 +558,7 @@ public class LeadServiceImpl implements LeadService {
 				TO_EMPLOYEE.apply(call.getCallFrom())
 						.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
 				callDto.setOverDue(OVER_DUE.test(callDto.getDueDate()));
+				callDto.setStatus(call.getStatus());
 				return callDto;
 			}).collect(toList());
 			activity.addAll(emails.stream().filter(ACTIVITY_EMAIL).map(email -> {
@@ -570,7 +571,9 @@ public class LeadServiceImpl implements LeadService {
 				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
 				editEmailDto.setShortName(shortName(email.getMailFrom()));
 				editEmailDto.setOverDue(false);
-				editEmailDto.setScheduledDate(convertDateDateWithTime(email.getScheduledOn(),email.getScheduledAtTime12Hours()));
+				editEmailDto.setStatus(email.getStatus());
+				editEmailDto.setScheduledDate(
+						convertDateDateWithTime(email.getScheduledOn(), email.getScheduledAtTime12Hours()));
 				return editEmailDto;
 			}).collect(toList()));
 			activity.addAll(visits.stream().filter(ACTIVITY_VISIT).map(visit -> {
@@ -585,6 +588,7 @@ public class LeadServiceImpl implements LeadService {
 						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
 				editVisitDto.setCreatedOn(convertDate(visit.getCreatedDate()));
 				editVisitDto.setOverDue(OVER_DUE.test(editVisitDto.getDueDate()));
+				editVisitDto.setStatus(visit.getStatus());
 				return editVisitDto;
 			}).collect(toList()));
 			activity.addAll(meetings.stream().filter(ACTIVITY_MEETING).map(meet -> {
@@ -599,6 +603,7 @@ public class LeadServiceImpl implements LeadService {
 				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
 				meetDto.setCreatedOn(convertDate(meet.getCreatedDate()));
 				meetDto.setOverDue(OVER_DUE.test(meetDto.getDueDate()));
+				meetDto.setStatus(meet.getMeetingStatus());
 				return meetDto;
 			}).collect(toList()));
 			Comparator<TimeLineActivityDto> overDueActivity = (a1, a2) -> a2.getOverDue().compareTo(a1.getOverDue());
@@ -613,6 +618,7 @@ public class LeadServiceImpl implements LeadService {
 				callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
 				TO_EMPLOYEE.apply(call.getCallFrom())
 						.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
+				callDto.setStatus(call.getStatus());
 				return callDto;
 			}).collect(toList());
 
@@ -626,6 +632,7 @@ public class LeadServiceImpl implements LeadService {
 				employeeService.getById(visit.getCreatedBy()).ifPresent(
 						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
 				editVisitDto.setCreatedOn(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
+				editVisitDto.setStatus(visit.getStatus());
 				return editVisitDto;
 			}).collect(toList()));
 			upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
@@ -638,6 +645,7 @@ public class LeadServiceImpl implements LeadService {
 				meetDto.setBody(meet.getDescription());
 				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
 				meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
+				meetDto.setStatus(meet.getMeetingStatus());
 				return meetDto;
 			}).collect(toList()));
 			upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
@@ -1253,7 +1261,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	private Map<String, Object> upNextActivities(LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities) {
-		log.info("inside the upNextActivities method...{}",upNextActivities);
+		log.info("inside the upNextActivities method...{}", upNextActivities);
 		Map<String, Object> upNextDataMap = new HashMap<>();
 		upNextDataMap.put(MSG, NO_ACTIVITY);
 		if (nonNull(upNextActivities) && !upNextActivities.isEmpty()) {

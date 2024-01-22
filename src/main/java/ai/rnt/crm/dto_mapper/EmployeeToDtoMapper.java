@@ -32,9 +32,7 @@ public class EmployeeToDtoMapper {
 	 * @version 1.0
 	 *
 	 */
-	public static final Function<Collection<EmployeeMaster>, Collection<EmployeeDto>> TO_Employees = e ->{
-		return e.stream().map(dm -> TO_EMPLOYEE.apply(dm).get()).collect(Collectors.toList());
-	};
+	public static final Function<Collection<EmployeeMaster>, Collection<EmployeeDto>> TO_Employees = e -> e.stream().map(dm -> TO_EMPLOYEE.apply(dm).get()).collect(Collectors.toList());
 	
 	public static final Function<EmployeeDto, Optional<EmployeeMaster>> TO_EmployeeMaster = e -> evalMapper(e, EmployeeMaster.class);
 
