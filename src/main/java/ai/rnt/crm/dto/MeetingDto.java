@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Temporal;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -21,9 +23,11 @@ public class MeetingDto {
 
 	private Integer meetingId;
 
+	@NotBlank(message = "Title should not be null or empty!!")
 	private String meetingTitle;
 
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+	@NotNull(message="Attendees should not be null!!")
 	private List<String> participates;
 
 	@Temporal(DATE)

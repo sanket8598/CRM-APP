@@ -5,7 +5,6 @@ import static ai.rnt.crm.constants.DateFormatterConstant.TIME_24_HRS;
 import static java.util.Objects.nonNull;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.text.ParseException;

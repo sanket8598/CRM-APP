@@ -28,6 +28,7 @@ public class CallDto {
 
 	private String callTo;
 
+	@NotBlank(message = "Subject should not be null or empty!!")
 	private String subject;
 
 	@ValidCallDirection(message = "Please Enter Valid Call Direction!!")
