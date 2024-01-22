@@ -43,6 +43,7 @@ import static ai.rnt.crm.constants.MessageConstants.MSG;
 import static ai.rnt.crm.constants.MessageConstants.NO_ACTIVITY;
 import static ai.rnt.crm.constants.MessageConstants.SOON_MORE;
 import static ai.rnt.crm.constants.MessageConstants.WAIT_FOR;
+import static ai.rnt.crm.constants.RegexConstant.IS_DIGIT;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
@@ -104,6 +105,7 @@ import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
+import static ai.rnt.crm.util.XSSUtil.sanitize;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
@@ -137,7 +139,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Sheet;
@@ -270,7 +271,7 @@ public class LeadServiceImpl implements LeadService {
 				createMap.put(MESSAGE, "Lead Not Added !!");
 			return new ResponseEntity<>(createMap, CREATED);
 		} catch (Exception e) {
-			log.info("Got Exception while creating new lead..{}", e.getMessage());
+			log.error("Got Exception while creating new lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -353,7 +354,7 @@ public class LeadServiceImpl implements LeadService {
 				getAllLeads.put(DATA, TO_LEAD_DTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
 			return new ResponseEntity<>(getAllLeads, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting open view leads data..{}", e.getMessage());
+			log.error("Got Exception while getting open view leads data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -367,7 +368,7 @@ public class LeadServiceImpl implements LeadService {
 			resultMap.put(DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			return new ResponseEntity<>(resultMap, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting lead source..{}", e.getMessage());
+			log.error("Got Exception while getting lead source..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -387,7 +388,7 @@ public class LeadServiceImpl implements LeadService {
 			resultMap.put(DATA, dataMap);
 			return new ResponseEntity<>(resultMap, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting all dropdown data..{}", e.getMessage());
+			log.error("Got Exception while getting all dropdown data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -401,7 +402,7 @@ public class LeadServiceImpl implements LeadService {
 			leadsDashboardData.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadDashboardData()));
 			return new ResponseEntity<>(leadsDashboardData, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting lead DashboardData..{}", e.getMessage());
+			log.error("Got Exception while getting lead DashboardData..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -459,7 +460,7 @@ public class LeadServiceImpl implements LeadService {
 			leadsDataByStatus.put(SUCCESS, true);
 			return new ResponseEntity<>(leadsDataByStatus, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting LeadDashboardDataByStatus..{}", e.getMessage());
+			log.error("Got Exception while getting LeadDashboardDataByStatus..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -688,7 +689,7 @@ public class LeadServiceImpl implements LeadService {
 				result.put(SUCCESS, false);
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while qualifying the lead..{}", e.getMessage());
+			log.error("Got Exception while qualifying the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -712,7 +713,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while assigning the lead..{}", e.getMessage());
+			log.error("Got Exception while assigning the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -736,7 +737,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while disQualifyLead the lead..{}", e.getMessage());
+			log.error("Got Exception while disQualifyLead the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -841,7 +842,7 @@ public class LeadServiceImpl implements LeadService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
-			log.info("Got Exception while updateLeadContact..{}", e.getMessage());
+			log.error("Got Exception while updateLeadContact..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -896,7 +897,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while reactivating the lead..{}", e.getMessage());
+			log.error("Got Exception while reactivating the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -920,7 +921,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
-			log.info("Got Exception while adding the sort filter for lead..{}", e.getMessage());
+			log.error("Got Exception while adding the sort filter for lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -935,7 +936,7 @@ public class LeadServiceImpl implements LeadService {
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting the Qualified lead for edit..{}", e.getMessage());
+			log.error("Got Exception while getting the Qualified lead for edit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -982,7 +983,7 @@ public class LeadServiceImpl implements LeadService {
 				return new ResponseEntity<>(result, BAD_REQUEST);
 			}
 		} catch (Exception e) {
-			log.info("Got Exception while uploading the Excel of lead..{}", e.getMessage());
+			log.error("Got Exception while uploading the Excel of lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -1193,15 +1194,14 @@ public class LeadServiceImpl implements LeadService {
 
 	private void setServiceFallToLead(String serviceFallsName, Leads leads) throws Exception {
 		log.info("inside the setServiceFallToLead method...{}", serviceFallsName);
-		Pattern pattern = compile("^\\d+$");
-		if (nonNull(serviceFallsName) && pattern.matcher(serviceFallsName).matches())
+		if (nonNull(serviceFallsName) && compile(IS_DIGIT).matcher(serviceFallsName).matches())
 			serviceFallsDaoSevice.getServiceFallById(parseInt(serviceFallsName))
 					.ifPresent(leads::setServiceFallsMaster);
 		else if (isNull(serviceFallsName) || serviceFallsName.isEmpty() || OTHER.equals(serviceFallsName))
 			serviceFallsDaoSevice.findByName(OTHER).ifPresent(leads::setServiceFallsMaster);
 		else {
 			ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
-			serviceFalls.setServiceName(serviceFallsName);
+			serviceFalls.setServiceName(sanitize(serviceFallsName));
 			TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).orElseThrow(
 					() -> new ResourceNotFoundException(SERVICE_FALLS_MASTER, SERVICE_FALL_ID, serviceFallsName)))
 					.ifPresent(leads::setServiceFallsMaster);
@@ -1210,14 +1210,13 @@ public class LeadServiceImpl implements LeadService {
 
 	private void setLeadSourceToLead(String leadSourceName, Leads leads) throws Exception {
 		log.info("inside the setLeadSourceToLead method...{} ", leadSourceName);
-		Pattern pattern = compile("^\\d+$");
-		if (nonNull(leadSourceName) && pattern.matcher(leadSourceName).matches())
+		if (nonNull(leadSourceName) && compile(IS_DIGIT).matcher(leadSourceName).matches())
 			leadSourceDaoService.getLeadSourceById(parseInt(leadSourceName)).ifPresent(leads::setLeadSourceMaster);
 		else if (isNull(leadSourceName) || leadSourceName.isEmpty() || OTHER.equals(leadSourceName))
 			leadSourceDaoService.getByName(OTHER).ifPresent(leads::setLeadSourceMaster);
 		else {
 			LeadSourceMaster leadSource = new LeadSourceMaster();
-			leadSource.setSourceName(leadSourceName);
+			leadSource.setSourceName(sanitize(leadSourceName));
 			TO_LEAD_SOURCE
 					.apply(leadSourceDaoService.save(leadSource).orElseThrow(
 							() -> new ResourceNotFoundException(LEAD_SOURCE_MASTER, LEAD_SOURCE_NAME, leadSourceName)))
@@ -1228,14 +1227,13 @@ public class LeadServiceImpl implements LeadService {
 
 	private void setDomainToLead(String domainName, Leads leads) throws Exception {
 		log.info("inside the setDomainToLead method...{} ", domainName);
-		Pattern pattern = compile("^\\d+$");
-		if (nonNull(domainName) && pattern.matcher(domainName).matches())
+		if (nonNull(domainName) && compile(IS_DIGIT).matcher(domainName).matches())
 			domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
 		else if (isNull(domainName) || domainName.isEmpty() || OTHER.equals(domainName))
 			domainMasterDaoService.findByName(OTHER).ifPresent(leads::setDomainMaster);
 		else {
 			DomainMaster domainMaster = new DomainMaster();
-			domainMaster.setDomainName(domainName);
+			domainMaster.setDomainName(sanitize(domainName));
 			domainMasterDaoService.addDomain(domainMaster).ifPresent(leads::setDomainMaster);
 		}
 	}
@@ -1248,7 +1246,7 @@ public class LeadServiceImpl implements LeadService {
 				country.ifPresent(company::setCountry);
 			else {
 				CountryMaster countryMaster = new CountryMaster();
-				countryMaster.setCountry(location);
+				countryMaster.setCountry(sanitize(location));
 				company.setCountry(countryDaoService.addCountry(countryMaster));
 			}
 		}
