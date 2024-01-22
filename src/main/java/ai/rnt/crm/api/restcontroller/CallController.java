@@ -66,7 +66,7 @@ public class CallController {
 	@PutMapping(UPDATE_CALL)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(@RequestBody CallDto dto,
 			@Min(1) @PathVariable(name = "callId") Integer callId,
-			@Min(1) @NotBlank(message = "Status should not be null!!") @PathVariable(name = "status") String status) {
+		    @NotBlank(message = "Status should not be null!!") @PathVariable(name = "status") String status) {
 		return callService.updateCall(dto, callId, status);
 	}
 
