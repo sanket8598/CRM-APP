@@ -43,31 +43,31 @@ public class EmployeeMaster extends Auditable {
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "Staff_ID")
+	@Column(name = "staff_id")
 	private Integer staffId;
 
-	@Column(name = "Password")
+	@Column(name = "password")
 	private String password;
 
 	@Column(name = "user_id")
 	private String userId;
 
-	@Column(name = "F_Name")
+	@Column(name = "f_name")
 	private String firstName; // first_name
 
-	@Column(name = "M_Name")
+	@Column(name = "m_name")
 	private String middleName; // middle_name
 
-	@Column(name = "L_Name")
+	@Column(name = "l_name")
 	private String lastName;
 
-	@Column(name = "Email_Id")
+	@Column(name = "email_id")
 	private String emailId;
 
-	@Column(name = "Manager_ID")
+	@Column(name = "manager_id")
 	private Integer managerId;
 
-	@Column(name = "Emp_Job_Title")
+	@Column(name = "emp_job_title")
 	private String employeeJobTitle;
 
 
@@ -94,8 +94,5 @@ public class EmployeeMaster extends Auditable {
 		this.departureDate = departureDate;
 		this.emailId = emailId;
 	}
-	
-	
-
 }
 //@formatter:on
