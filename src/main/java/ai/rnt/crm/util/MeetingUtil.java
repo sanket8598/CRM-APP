@@ -1,24 +1,24 @@
 package ai.rnt.crm.util;
 
+import static java.lang.String.format;
 import static java.time.LocalDateTime.ofInstant;
 import static java.time.LocalTime.parse;
+import static java.time.ZoneId.of;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Locale.US;
 import static java.util.Objects.nonNull;
 import static java.util.TimeZone.getTimeZone;
+import static java.util.UUID.randomUUID;
+import static java.util.stream.Collectors.joining;
 import static javax.mail.Message.RecipientType.TO;
 import static javax.mail.Transport.send;
 import static javax.mail.internet.InternetAddress.parse;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
@@ -56,8 +56,8 @@ import lombok.extern.slf4j.Slf4j;
 public class MeetingUtil {
 
 	private static final Properties PROPERTIES = new Properties();
-	private static final String USERNAME = "s.wakankar@rnt.ai"; // change it
-	private static final String PASSWORD = "12345@Sanket"; // change it
+	private static final String USERNAME = "nik.gaikwad@rnt.ai"; // change it
+	private static final String PASSWORD = "%tb9bbRg"; // change it
 	private static final String HOST = "smtp.zoho.com";
 
 	static {
@@ -113,11 +113,10 @@ public class MeetingUtil {
 		String dtStamp = formatDate(dto.getStartDate());
 		StringBuilder buffer = sb.append("BEGIN:VCALENDAR\n" + "PRODID: Asset View 2.0\n" + "VERSION:2.0\n"
 				+ "METHOD:REQUEST\n" + "BEGIN:VEVENT\n" + "DTSTAMP:" + dtStamp + "\n" + extractDstartDend(dto) + "UID:"
-				+ UUID.randomUUID().toString() + "\n" + "DESCRIPTION:" + dto.getDescription() + "\n"
+				+ randomUUID().toString() + "\n" + "DESCRIPTION:" + dto.getDescription() + "\n"
 				+ "X-ALT-DESC;FMTTYPE=text/html:" + dto.getDescription() + "\n" + "SUMMARY:" + dto.getMeetingTitle()
 				+ "\n" + "ORGANIZER:MAILTO:" + USERNAME + "\n"
-				+ String.format("ATTENDEE;CN=%s;RSVP=TRUE:mailto:%s",
-						dto.getParticipates().stream().collect(Collectors.joining(",")),
+				+ format("ATTENDEE;CN=%s;RSVP=TRUE:mailto:%s", dto.getParticipates().stream().collect(joining(",")),
 						"\n" + "X-MICROSOFT-CDO-BUSYSTATUS:FREE" + "\n" + "BEGIN:VALARM\n" + "ACTION:DISPLAY\n"
 								+ "DESCRIPTION:Reminder\n" + "TRIGGER:-P1D\n" + "END:VALARM\n" + "END:VEVENT\n"
 								+ "END:VCALENDAR"));
@@ -159,20 +158,18 @@ public class MeetingUtil {
 	private String formatDate(Date date) {
 		log.info("inside the meetingUtil formatDate method...{}", date);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		dateFormat.setTimeZone(getTimeZone("UTC"));
+		dateFormat.setTimeZone(getTimeZone("UTC+05:30"));
 		return dateFormat.format(date);
 	}
 
 	private String formatDateTime(Date date, String time) {
 		log.info("inside the meetingUtil formatDateTime method...{}", date);
-		LocalDateTime dateTime = ofInstant(date.toInstant(), ZoneId.of("UTC")).toLocalDate().atTime(parseTime(time));
-		DateTimeFormatter formatter = ofPattern("yyyyMMdd'T'HHmmss");
-		return dateTime.format(formatter);
+		return ofInstant(date.toInstant(), of("UTC+05:30")).toLocalDate().atTime(parseTime(time))
+				.format(ofPattern("yyyyMMdd'T'HHmmss"));
 	}
 
 	private LocalTime parseTime(String time) {
 		log.info("inside the meetingUtil parseTime method...{}", time);
-		DateTimeFormatter formatter = ofPattern("h:mm a", Locale.US);
-		return parse(time, formatter);
+		return parse(time, ofPattern("HH:mm", US));
 	}
 }
