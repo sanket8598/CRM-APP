@@ -21,5 +21,7 @@ public class EditMeetingDto extends TimeLineActivityDto{
 	
 	private String dueDate;
 	
+	private String status;
+	
 	private List<MeetingAttachmentsDto> attachments;
 }
