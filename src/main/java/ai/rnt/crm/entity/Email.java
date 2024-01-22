@@ -1,9 +1,13 @@
 package ai.rnt.crm.entity;
 
+import static ai.rnt.crm.constants.DateFormatterConstant.TIME_12_HRS;
+import static ai.rnt.crm.constants.DateFormatterConstant.TIME_24_HRS;
+import static java.util.Objects.nonNull;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,6 +21,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -83,5 +88,17 @@ public class Email extends Auditable {
 	@OneToMany(mappedBy = "mail",cascade = {REMOVE,REFRESH},orphanRemoval = true)
 	@Fetch(FetchMode.JOIN)
 	private List<Attachment> attachment = new ArrayList<>();
+	
+	@Transient
+	public String getScheduledAtTime12Hours() {
+		if (nonNull(getScheduledAt())) {
+			try {
+				return TIME_12_HRS.format(TIME_24_HRS.parse(getScheduledAt()));
+			} catch (ParseException e) {
+				return getScheduledAt();
+			}
+		}
+		return null;
+	}
 
 }

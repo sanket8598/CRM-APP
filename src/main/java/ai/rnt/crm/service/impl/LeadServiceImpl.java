@@ -569,6 +569,7 @@ public class LeadServiceImpl implements LeadService {
 				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
 				editEmailDto.setShortName(shortName(email.getMailFrom()));
 				editEmailDto.setOverDue(false);
+				editEmailDto.setScheduledDate(convertDateDateWithTime(email.getScheduledOn(),email.getScheduledAtTime12Hours()));
 				return editEmailDto;
 			}).collect(toList()));
 			activity.addAll(visits.stream().filter(ACTIVITY_VISIT).map(visit -> {
