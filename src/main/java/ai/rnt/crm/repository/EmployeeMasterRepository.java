@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.projection.EmailIdProjection;
+import ai.rnt.crm.projection.StaffIdProjection;
 
 public interface EmployeeMasterRepository extends JpaRepository<EmployeeMaster, Integer> {
 
@@ -19,4 +20,6 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMaster, 
 			LocalDate deparatureDateShouldSmaller);
 
 	EmailIdProjection findEmailIdByStaffId(Integer staffId);
+
+	StaffIdProjection findTopStaffIdByEmailId(String email);
 }
