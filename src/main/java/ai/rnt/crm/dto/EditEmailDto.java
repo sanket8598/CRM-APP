@@ -24,5 +24,7 @@ public class EditEmailDto extends TimeLineActivityDto {
 	private String status;
 
 	private String scheduledDate;
+	
+	private Integer assignTo;
 
 }

@@ -18,4 +18,6 @@ public interface EmployeeService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser(String mail);
 
 	Optional<EmployeeMaster> findByName(String firstName, String lastName);
+
+	Integer findByEmailId(String email);
 }

@@ -53,4 +53,9 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 	public String getEmailId(Integer staffId) {
 		return employeeMasterRepository.findEmailIdByStaffId(staffId).getEmailId();
 	}
+
+	@Override
+	public Integer findTopStaffIdByEmailId(String email) {
+		return employeeMasterRepository.findTopStaffIdByEmailId(email).getStaffId();
+	}
 }

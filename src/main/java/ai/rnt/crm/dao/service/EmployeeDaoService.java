@@ -16,4 +16,6 @@ public interface EmployeeDaoService extends CrudService<EmployeeMaster, Employee
 
 	String getEmailId(Integer staffId);
 
+	Integer findTopStaffIdByEmailId(String email);
+
 }
