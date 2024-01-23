@@ -1,5 +1,6 @@
 package ai.rnt.crm.util;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static java.util.regex.Pattern.compile;
 import static lombok.AccessLevel.PRIVATE;
@@ -28,6 +29,8 @@ public class LeadsCardUtil {
 	public static String shortName(String fName, String lName) {
 		log.info("inside the shortName method...{} {}", fName, lName);
 		try {
+			if(isNull(fName) || isNull(lName))
+				return null;
 			Pattern pattern = compile("^.");
 			Matcher firstNameMatcher = pattern.matcher(fName);
 			Matcher lastNameMatcher = pattern.matcher(lName);
@@ -40,6 +43,7 @@ public class LeadsCardUtil {
 			log.error("Got exception while concating the fname and lname..{}", e.getMessage());
 			throw new CRMException(e);
 		}
+		
 	}
 
 	public static String shortName(String fullName) {
