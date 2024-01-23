@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.DateFormatterConstant.END_TIME;
 import static ai.rnt.crm.constants.DateFormatterConstant.START_TIME;
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
@@ -61,18 +63,24 @@ public class CallServiceImpl implements CallService {
 	private final EmployeeService employeeService;
 	private final AuditAwareUtil auditAwareUtil;
 
+	private static final String ADD_CALL = "AddCall";
+	private static final String TASK_ID = "taskId";
+	private static final String PHONE_CALL_TASK = "PhoneCallTask";
+	private static final String ADD_CALL_ID = "addCallId";
+	private static final String CALL_ID = "callId";
+
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(CallDto dto, Integer leadsId) {
 		log.info("inside the add call method...{}", leadsId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Call call = TO_CALL.apply(dto)
-					.orElseThrow(() -> new ResourceNotFoundException("Call", "callId", dto.getCallId()));
+					.orElseThrow(() -> new ResourceNotFoundException("Call", CALL_ID, dto.getCallId()));
 			Leads lead = leadDaoService.getLeadById(leadsId)
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadsId));
 			call.setLead(lead);
 			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
-					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
+					() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, dto.getCallFrom().getStaffId())));
 			if (dto.isAllDay()) {
 				call.setStartTime(START_TIME);
 				call.setEndTime(END_TIME);
@@ -96,7 +104,7 @@ public class CallServiceImpl implements CallService {
 		EnumMap<ApiResponse, Object> call = new EnumMap<>(ApiResponse.class);
 		try {
 			call.put(DATA, TO_GET_CALL_DTO.apply(callDaoService.getCallById(callId)
-					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", callId))));
+					.orElseThrow(() -> new ResourceNotFoundException(ADD_CALL, CALL_ID, callId))));
 			call.put(SUCCESS, true);
 			return new ResponseEntity<>(call, FOUND);
 		} catch (Exception e) {
@@ -111,9 +119,9 @@ public class CallServiceImpl implements CallService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Call call = callDaoService.getCallById(callId)
-					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", dto.getCallId()));
+					.orElseThrow(() -> new ResourceNotFoundException(ADD_CALL, CALL_ID, dto.getCallId()));
 			call.setCallFrom(employeeService.getById(dto.getCallFrom().getStaffId()).orElseThrow(
-					() -> new ResourceNotFoundException("Employee", "staffId", dto.getCallFrom().getStaffId())));
+					() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, dto.getCallFrom().getStaffId())));
 			call.setCallTo(dto.getCallTo());
 			call.setSubject(dto.getSubject());
 			call.setStartDate(dto.getStartDate());
@@ -151,12 +159,12 @@ public class CallServiceImpl implements CallService {
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
-		log.info("inside assign call staffId: {} callId:{}", map.get("staffId"), map.get("addCallId"));
+		log.info("inside assign call staffId: {} callId:{}", map.get(STAFF_ID), map.get(ADD_CALL_ID));
 		try {
-			Call call = callDaoService.getCallById(map.get("addCallId"))
-					.orElseThrow(() -> new ResourceNotFoundException("AddCall", "callId", map.get("addCallId")));
-			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			Call call = callDaoService.getCallById(map.get(ADD_CALL_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(ADD_CALL, CALL_ID, map.get(ADD_CALL_ID)));
+			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			call.getCallTasks().stream()
 					.filter(e -> call.getCallFrom().getStaffId().equals(e.getAssignTo().getStaffId())).forEach(e -> {
 						e.setAssignTo(employee);
@@ -183,7 +191,7 @@ public class CallServiceImpl implements CallService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			Call call = callDaoService.getCallById(callId)
-					.orElseThrow(() -> new ResourceNotFoundException("Call", "callId", callId));
+					.orElseThrow(() -> new ResourceNotFoundException("Call", CALL_ID, callId));
 			call.setUpdatedDate(now());
 			call.setStatus(COMPLETE);
 			if (nonNull(callDaoService.call(call))) {
@@ -208,7 +216,7 @@ public class CallServiceImpl implements CallService {
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			Call call = callDaoService.getCallById(callId)
-					.orElseThrow(() -> new ResourceNotFoundException("Call", "callId", callId));
+					.orElseThrow(() -> new ResourceNotFoundException("Call", CALL_ID, callId));
 			call.getCallTasks().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
 				e.setDeletedDate(now());
@@ -264,7 +272,7 @@ public class CallServiceImpl implements CallService {
 		EnumMap<ApiResponse, Object> callTask = new EnumMap<>(ApiResponse.class);
 		try {
 			callTask.put(DATA, TO_GET_CALL_TASK_DTO.apply(callDaoService.getCallTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("PhoneCallTask", "taskId", taskId))));
+					.orElseThrow(() -> new ResourceNotFoundException(PHONE_CALL_TASK, TASK_ID, taskId))));
 			callTask.put(SUCCESS, true);
 			return new ResponseEntity<>(callTask, FOUND);
 		} catch (Exception e) {
@@ -279,7 +287,7 @@ public class CallServiceImpl implements CallService {
 		EnumMap<ApiResponse, Object> callTask = new EnumMap<>(ApiResponse.class);
 		try {
 			PhoneCallTask phoneCallTask = callDaoService.getCallTaskById(taskId).orElseThrow(
-					() -> new ResourceNotFoundException("PhoneCallTask", "callTaskId", dto.getCallTaskId()));
+					() -> new ResourceNotFoundException(PHONE_CALL_TASK, "callTaskId", dto.getCallTaskId()));
 			phoneCallTask.setSubject(dto.getSubject());
 			phoneCallTask.setStatus(dto.getStatus());
 			phoneCallTask.setDueDate(dto.getUpdateDueDate());
@@ -308,12 +316,12 @@ public class CallServiceImpl implements CallService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCallTask(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		log.info("inside assign task staffId: {} taskId:{}", map.get("staffId"), map.get("taskId"));
+		log.info("inside assign task staffId: {} taskId:{}", map.get(STAFF_ID), map.get(TASK_ID));
 		try {
-			PhoneCallTask callTask = callDaoService.getCallTaskById(map.get("taskId"))
-					.orElseThrow(() -> new ResourceNotFoundException("PhoneCallTask", "taskId", map.get("taskId")));
-			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			PhoneCallTask callTask = callDaoService.getCallTaskById(map.get(TASK_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(PHONE_CALL_TASK, TASK_ID, map.get(TASK_ID)));
+			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			callTask.setAssignTo(employee);
 			if (nonNull(callDaoService.addCallTask(callTask))) {
 				result.put(SUCCESS, true);
@@ -335,7 +343,7 @@ public class CallServiceImpl implements CallService {
 		EnumMap<ApiResponse, Object> deleteTask = new EnumMap<>(ApiResponse.class);
 		try {
 			PhoneCallTask callTask = callDaoService.getCallTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("PhoneCallTask", "taskId", taskId));
+					.orElseThrow(() -> new ResourceNotFoundException(PHONE_CALL_TASK, TASK_ID, taskId));
 			callTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
 			callTask.setDeletedDate(now());
 			if (nonNull(callDaoService.addCallTask(callTask))) {

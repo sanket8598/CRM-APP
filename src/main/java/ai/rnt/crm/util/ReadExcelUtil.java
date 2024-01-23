@@ -182,7 +182,7 @@ public class ReadExcelUtil {
 			leadDto.setLocation(data);
 			break;	
 		case 10:
-			if (nonNull(data)) {
+			if (nonNull(data) && !data.isEmpty()) {
 				if (isValidBudgetAmount(data))
 					leadDto.setBudgetAmount(commaSepAmount(parseDouble(data)));
 				else

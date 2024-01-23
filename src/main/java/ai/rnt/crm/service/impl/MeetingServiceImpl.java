@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.DateFormatterConstant.END_TIME;
 import static ai.rnt.crm.constants.DateFormatterConstant.START_TIME;
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
@@ -72,6 +74,11 @@ public class MeetingServiceImpl implements MeetingService {
 	private final EmployeeService employeeService;
 	private final MeetingUtil meetingUtil;
 
+	public static final String MEETINGS = "Meetings";
+	public static final String MEETING_TASK = "MeetingTask";
+	public static final String MEETING_ID = "meetingId";
+	public static final String TASK_ID = "taskId";
+
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeeting(@Valid MeetingDto dto, Integer leadsId) {
 		log.info("inside the addMeeting method...{}", leadsId);
@@ -81,7 +88,7 @@ public class MeetingServiceImpl implements MeetingService {
 			Meetings meeting = TO_MEETING.apply(dto).orElseThrow(ResourceNotFoundException::new);
 			meeting.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			meeting.setAssignTo(employeeService.getById(auditAwareUtil.getLoggedInStaffId()).orElseThrow(
-					() -> new ResourceNotFoundException("Employee", "staffId", auditAwareUtil.getLoggedInStaffId())));
+					() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, auditAwareUtil.getLoggedInStaffId())));
 			if (dto.isAllDay()) {
 				meeting.setStartTime(START_TIME);
 				meeting.setEndTime(END_TIME);
@@ -123,10 +130,10 @@ public class MeetingServiceImpl implements MeetingService {
 		try {
 			meeting.put(SUCCESS, true);
 			meeting.put(DATA, TO_GET_MEETING_DTO.apply(meetingDaoService.getMeetingById(meetingId)
-					.orElseThrow(() -> new ResourceNotFoundException("Meeting", "meetingId", meetingId))));
+					.orElseThrow(() -> new ResourceNotFoundException("Meeting", MEETING_ID, meetingId))));
 			return new ResponseEntity<>(meeting, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while geting meeting for edit..{}", e.getMessage());
+			log.error("Got Exception while geting meeting for edit..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -140,7 +147,7 @@ public class MeetingServiceImpl implements MeetingService {
 			boolean meetingStatus = false;
 			Meetings saveMeeting = null;
 			Meetings meetings = meetingDaoService.getMeetingById(meetingId)
-					.orElseThrow(() -> new ResourceNotFoundException("Meetings", "meetingId", meetingId));
+					.orElseThrow(() -> new ResourceNotFoundException(MEETINGS, MEETING_ID, meetingId));
 			meetings.setMeetingTitle(dto.getMeetingTitle());
 			meetings.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			meetings.setStartDate(dto.getStartDate());
@@ -207,7 +214,7 @@ public class MeetingServiceImpl implements MeetingService {
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			Meetings meetings = meetingDaoService.getMeetingById(meetingId)
-					.orElseThrow(() -> new ResourceNotFoundException("Meetings", "meetingId", meetingId));
+					.orElseThrow(() -> new ResourceNotFoundException(MEETINGS, MEETING_ID, meetingId));
 			meetings.getMeetingTasks().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
 				e.setDeletedDate(now());
@@ -269,7 +276,7 @@ public class MeetingServiceImpl implements MeetingService {
 		try {
 			meetingTask.put(SUCCESS, true);
 			meetingTask.put(DATA, TO_GET_MEETING_TASK_DTO.apply(meetingDaoService.getMeetingTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "meetingTaskId", taskId))));
+					.orElseThrow(() -> new ResourceNotFoundException(MEETING_TASK, "meetingTaskId", taskId))));
 			return new ResponseEntity<>(meetingTask, FOUND);
 		} catch (Exception e) {
 			log.error("Got Exception while getting the meeting task by id..{} " + taskId, e.getMessage());
@@ -283,7 +290,7 @@ public class MeetingServiceImpl implements MeetingService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", taskId));
+					.orElseThrow(() -> new ResourceNotFoundException(MEETING_TASK, TASK_ID, taskId));
 			meetingTask.setSubject(dto.getSubject());
 			meetingTask.setStatus(dto.getStatus());
 			meetingTask.setPriority(dto.getPriority());
@@ -312,12 +319,12 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignMeetingTask(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		log.info("inside assign task staffId: {} taskId:{}", map.get("staffId"), map.get("taskId"));
+		log.info("inside assign task staffId: {} taskId:{}", map.get(STAFF_ID), map.get(TASK_ID));
 		try {
-			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(map.get("taskId"))
-					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", map.get("taskId")));
-			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(map.get(TASK_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(MEETING_TASK, TASK_ID, map.get(TASK_ID)));
+			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			meetingTask.setAssignTo(employee);
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
 				result.put(SUCCESS, true);
@@ -328,7 +335,7 @@ public class MeetingServiceImpl implements MeetingService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while assigning the MeetingTask..{}", e.getMessage());
+			log.error("Got Exception while assigning the MeetingTask..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -339,7 +346,7 @@ public class MeetingServiceImpl implements MeetingService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("MeetingTask", "taskId", taskId));
+					.orElseThrow(() -> new ResourceNotFoundException(MEETING_TASK, TASK_ID, taskId));
 			meetingTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
 			meetingTask.setDeletedDate(now());
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
@@ -361,12 +368,12 @@ public class MeetingServiceImpl implements MeetingService {
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignMeeting(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
-		log.info("inside assign meeting staffId: {} meetingId:{}", map.get("staffId"), map.get("meetingId"));
+		log.info("inside assign meeting staffId: {} meetingId:{}", map.get(STAFF_ID), map.get(MEETING_ID));
 		try {
-			Meetings meetings = meetingDaoService.getMeetingById(map.get("meetingId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Meetings", "meetingId", map.get("meetingId")));
-			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			Meetings meetings = meetingDaoService.getMeetingById(map.get(MEETING_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(MEETINGS, MEETING_ID, map.get(MEETING_ID)));
+			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			meetings.getMeetingTasks().stream()
 					.filter(e -> meetings.getAssignTo().getStaffId().equals(e.getAssignTo().getStaffId())).map(e -> {
 						e.setAssignTo(employee);
@@ -382,7 +389,7 @@ public class MeetingServiceImpl implements MeetingService {
 			}
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while assign the Meeting..{}", e.getMessage());
+			log.error("Got Exception while assign the Meeting..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

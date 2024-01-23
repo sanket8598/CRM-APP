@@ -1,5 +1,6 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT;
@@ -200,11 +201,11 @@ public class EmailServiceImpl implements EmailService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignEmail(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
-		log.info("inside assign Email staffId: {} addMailId:{}", map.get("staffId"), map.get("addMailId"));
+		log.info("inside assign Email staffId: {} addMailId:{}", map.get(STAFF_ID), map.get("addMailId"));
 		try {
 			Email email = emailDaoService.findById(map.get("addMailId"));
-			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
+					.orElseThrow(() -> new ResourceNotFoundException("Employee", STAFF_ID, map.get(STAFF_ID)));
 			email.setMailFrom(employee.getEmailId());
 			if (nonNull(emailDaoService.email(email))) {
 				resultMap.put(MESSAGE, "Email Assigned SuccessFully");

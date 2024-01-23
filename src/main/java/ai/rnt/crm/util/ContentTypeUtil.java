@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = PRIVATE)
 public class ContentTypeUtil {
 
+	private static final String IMAGE = "IMAGE";
+
 	private static Map<String, String> map;
 	static {
 		map = new HashMap<>();
@@ -29,13 +31,13 @@ public class ContentTypeUtil {
 		map.put("text/html", "HTML");
 		map.put("text/calendar", "ICALANDER");
 		map.put("application/java-archive", "JAR");
-		map.put("image/vnd.microsoft.icon", "IMAGE");
-		map.put("image/bmp", "IMAGE");
-		map.put("image/avif", "IMAGE");
-		map.put("image/jpeg", "IMAGE");
-		map.put("image/png", "IMAGE");
-		map.put("image/webp", "IMAGE");
-		map.put("image/svg+xml", "IMAGE");
+		map.put("image/vnd.microsoft.icon", IMAGE);
+		map.put("image/bmp", IMAGE);
+		map.put("image/avif", IMAGE);
+		map.put("image/jpeg", IMAGE);
+		map.put("image/png", IMAGE);
+		map.put("image/webp", IMAGE);
+		map.put("image/svg+xml", IMAGE);
 		map.put("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "EXCEL");
 		map.put("application/vnd.ms-excel", "EXCEL");
 		map.put("text/plain", "PLAIN TEXT");
