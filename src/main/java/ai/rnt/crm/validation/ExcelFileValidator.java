@@ -3,8 +3,6 @@ package ai.rnt.crm.validation;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
-import java.util.Objects;
-
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
