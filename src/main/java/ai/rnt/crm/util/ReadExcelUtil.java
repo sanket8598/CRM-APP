@@ -182,10 +182,12 @@ public class ReadExcelUtil {
 			leadDto.setLocation(data);
 			break;	
 		case 10:
-			if (isValidBudgetAmount(data))
-				leadDto.setBudgetAmount(commaSepAmount(parseDouble(data)));
-			else
-				errorList.append("Please Enter The Valid Budget Amount On Row No: " + rowNum);
+			if (nonNull(data)) {
+				if (isValidBudgetAmount(data))
+					leadDto.setBudgetAmount(commaSepAmount(parseDouble(data)));
+				else
+					errorList.append("Please Enter The Valid Budget Amount On Row No: " + rowNum);
+			}
 			break;
 		case 11:
 			if (nonNull(data) && !data.isEmpty())
