@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
+
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -27,6 +29,8 @@ public class GetCallTaskDto {
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date updateDueDate;
 	
+	private String dueTime12Hours;
+	
 	private boolean remainderOn;
 
 	private String remainderVia;
@@ -35,5 +39,8 @@ public class GetCallTaskDto {
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date remainderDueOn;
-
+	
+	public String getCallTaskDueDate() {
+		return convertDateDateWithTime(getDueDate(),getDueTime12Hours());
+	}
 }
