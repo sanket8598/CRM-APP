@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_GET_LEAD_TASK_DTO;
 import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_LEAD_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
@@ -52,13 +54,16 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 	private final AuditAwareUtil auditAwareUtil;
 	private final EmployeeService employeeService;
 
+	public static final String TASK_ID = "taskId";
+	public static final String LEAD_TASK = "LeadTask";
+
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addLeadTask(@Valid LeadTaskDto dto, Integer leadsId) {
 		log.info("inside the addLeadTask method...{}", leadsId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = TO_LEAD_TASK.apply(dto)
-					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "leadTaskId", dto.getLeadTaskId()));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD_TASK, "leadTaskId", dto.getLeadTaskId()));
 			Leads lead = leadDaoService.getLeadById(leadsId)
 					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadsId));
 			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leadTask::setAssignTo);
@@ -75,7 +80,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			}
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
-			log.info("Got Exception while adding the task..{}", e.getMessage());
+			log.error("Got Exception while adding the task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -86,11 +91,11 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			result.put(DATA, TO_GET_LEAD_TASK_DTO.apply(leadTaskDaoService.getTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", taskId))));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD_TASK, TASK_ID, taskId))));
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, FOUND);
 		} catch (Exception e) {
-			log.info("Got Exception while getting the lead task..{}", e.getMessage());
+			log.error("Got Exception while getting the lead task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -101,7 +106,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", taskId));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD_TASK, TASK_ID, taskId));
 			leadTask.setSubject(dto.getSubject());
 			leadTask.setStatus(dto.getStatus());
 			leadTask.setPriority(dto.getPriority());
@@ -122,7 +127,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			return new ResponseEntity<>(result, CREATED);
 
 		} catch (Exception e) {
-			log.info("Got Exception while updating the lead task..{}", e.getMessage());
+			log.error("Got Exception while updating the lead task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -130,12 +135,12 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignLeadTask(Map<String, Integer> map) {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		log.info("inside assign task staffId: {} taskId:{}", map.get("staffId"), map.get("taskId"));
+		log.info("inside assign task staffId: {} taskId:{}", map.get(STAFF_ID), map.get(TASK_ID));
 		try {
-			LeadTask leadTask = leadTaskDaoService.getTaskById(map.get("taskId"))
-					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", map.get("taskId")));
-			EmployeeMaster employee = employeeService.getById(map.get("staffId"))
-					.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", map.get("staffId")));
+			LeadTask leadTask = leadTaskDaoService.getTaskById(map.get(TASK_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD_TASK, TASK_ID, map.get(TASK_ID)));
+			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			leadTask.setAssignTo(employee);
 			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
 				result.put(SUCCESS, true);
@@ -146,7 +151,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while assigning the lead task..{}", e.getMessage());
+			log.error("Got Exception while assigning the lead task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -157,7 +162,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
 			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
-					.orElseThrow(() -> new ResourceNotFoundException("LeadTask", "taskId", taskId));
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD_TASK, TASK_ID, taskId));
 			leadTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
 			leadTask.setDeletedDate(now());
 			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
@@ -169,7 +174,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			}
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
-			log.info("Got Exception while deleting the lead task..{}", e.getMessage());
+			log.error("Got Exception while deleting the lead task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
