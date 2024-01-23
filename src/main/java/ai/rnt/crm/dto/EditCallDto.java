@@ -20,4 +20,5 @@ public class EditCallDto extends TimeLineActivityDto {
 	private String duration;
 	private String dueDate;
 	private String status;
+	private Integer assignTo;
 }

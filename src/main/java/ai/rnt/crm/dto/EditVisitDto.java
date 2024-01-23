@@ -29,4 +29,6 @@ public class EditVisitDto extends TimeLineActivityDto {
 	
 	private String status;
 	
+	private Integer assignTo;
+	
 }
