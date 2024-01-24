@@ -612,8 +612,8 @@ public class LeadServiceImpl implements LeadService {
 				return meetDto;
 			}).collect(toList()));
 			Comparator<TimeLineActivityDto> overDueActivity = (a1, a2) -> a2.getOverDue().compareTo(a1.getOverDue());
-			activity.sort(overDueActivity.thenComparing((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
-					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))));
+			activity.sort(overDueActivity.thenComparing((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
+					.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))));
 			List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
 				EditCallDto callDto = new EditCallDto();
 				callDto.setId(call.getCallId());
