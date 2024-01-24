@@ -294,7 +294,7 @@ public class CallServiceImpl implements CallService {
 			phoneCallTask.setDueTime(dto.getDueTime());
 			phoneCallTask.setPriority(dto.getPriority());
 			phoneCallTask.setRemainderOn(dto.isRemainderOn());
-			phoneCallTask.setRemainderDueOn(dto.getRemainderDueOn());
+			phoneCallTask.setRemainderDueOn(dto.getUpdatedRemainderDueOn());
 			phoneCallTask.setRemainderVia(dto.getRemainderVia());
 			phoneCallTask.setRemainderDueAt(dto.getRemainderDueAt());
 			phoneCallTask.setDescription(dto.getDescription());
