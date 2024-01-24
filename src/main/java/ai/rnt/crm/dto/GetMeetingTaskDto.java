@@ -1,12 +1,14 @@
 package ai.rnt.crm.dto;
 
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
+import static javax.persistence.TemporalType.DATE;
 
 import java.util.Date;
 
+import javax.persistence.Temporal;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import ai.rnt.crm.util.ConvertDateFormatUtil;
 import lombok.Data;
 
 @Data
@@ -27,9 +29,9 @@ public class GetMeetingTaskDto {
 
 	private String dueTime;
 
-	@JsonFormat(pattern = "dd-MM-yyyy")
+	@Temporal(DATE)
 	private Date updateDueDate;
-	
+
 	private String dueTime12Hours;
 
 	private boolean remainderOn;
@@ -40,8 +42,11 @@ public class GetMeetingTaskDto {
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private Date remainderDueOn;
-	
+
+	@Temporal(DATE)
+	private Date updatedRemainderDueOn;
+
 	public String getMeetingTaskDueDate() {
-		return convertDateDateWithTime(getDueDate(),getDueTime12Hours());
+		return convertDateDateWithTime(getDueDate(), getDueTime12Hours());
 	}
 }

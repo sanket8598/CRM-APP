@@ -298,7 +298,7 @@ public class MeetingServiceImpl implements MeetingService {
 			meetingTask.setDueTime(dto.getDueTime());
 			meetingTask.setRemainderOn(dto.isRemainderOn());
 			meetingTask.setRemainderDueAt(dto.getRemainderDueAt());
-			meetingTask.setRemainderDueOn(dto.getRemainderDueOn());
+			meetingTask.setRemainderDueOn(dto.getUpdatedRemainderDueOn());
 			meetingTask.setRemainderVia(dto.getRemainderVia());
 			meetingTask.setDescription(dto.getDescription());
 			meetingTask.setUpdatedDate(now());

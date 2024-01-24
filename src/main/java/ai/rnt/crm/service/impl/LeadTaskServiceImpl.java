@@ -113,7 +113,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			leadTask.setDueDate(dto.getUpdateDueDate());
 			leadTask.setDueTime(dto.getDueTime());
 			leadTask.setRemainderOn(dto.isRemainderOn());
-			leadTask.setRemainderDueOn(dto.getRemainderDueOn());
+			leadTask.setRemainderDueOn(dto.getUpdatedRemainderDueOn());
 			leadTask.setRemainderDueAt(dto.getRemainderDueAt());
 			leadTask.setRemainderVia(dto.getRemainderVia());
 			leadTask.setDescription(dto.getDescription());
