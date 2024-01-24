@@ -175,8 +175,10 @@ public class ReadExcelUtil {
 		case 8:
 			if (nonNull(data) && !data.isEmpty())
 				leadDto.setCompanyWebsite(data);
-			else
-				errorList.append("Please Enter The Company Website On Row No: " + rowNum);
+			/*
+			 * else errorList.append("Please Enter The Company Website On Row No: " +
+			 * rowNum);
+			 */
 			break;
 		case 9:
 			leadDto.setLocation(data);
@@ -193,7 +195,8 @@ public class ReadExcelUtil {
 			if (nonNull(data) && !data.isEmpty())
 				leadDto.setServiceFallsId(data);
 			else
-				errorList.append("Please Enter The Service Falls Into On Row No: " + rowNum);
+				leadDto.setServiceFallsId("Other");
+//				errorList.append("Please Enter The Service Falls Into On Row No: " + rowNum);
 			break;
 		case 12:
 			leadDto.setLeadSourceId(data);
