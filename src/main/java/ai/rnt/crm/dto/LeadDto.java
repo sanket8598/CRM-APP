@@ -16,9 +16,10 @@ public class LeadDto {
 	@NotBlank(message = "Last Name should not be null or empty!!")
 	private String lastName;
 
-	//@Size(min = 10, max = 14)
-	//@Pattern(regexp ="^(\+\d{1,2}\s?)?(\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4})$", message = "Please Enter a valid Phone Number!!")
-	//@PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
+	// @Size(min = 10, max = 14)
+	// @Pattern(regexp ="^(\+\d{1,2}\s?)?(\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4})$",
+	// message = "Please Enter a valid Phone Number!!")
+	// @PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
 	private String phoneNumber;
 
 	private String topic;
@@ -32,24 +33,24 @@ public class LeadDto {
 	@NotBlank(message = "Lead Source should not be null or empty!!")
 	private String leadSourceId;
 
-	@NotBlank(message = "Service Falls Into should not be null or empty!!")
 	private String serviceFallsId;
-	
-	//@NotBlank(message = "Domain should not be null or empty!!")
+
+	// @NotBlank(message = "Domain should not be null or empty!!")
 	private String domainId;
 
 	private String companyName;
 
 	private String businessCard;
-	
+
 	private String businessCardName;
-	
+
 	private String businessCardType;
 
-	//@Pattern(regexp = "^[0-9,\\.]+$", message = "Please Enter Valid Budget Amount!!")
+	// @Pattern(regexp = "^[0-9,\\.]+$", message = "Please Enter Valid Budget
+	// Amount!!")
 	private String budgetAmount;
 
-	//@NotNull(message = "Please select the Assign To!!")
+	// @NotNull(message = "Please select the Assign To!!")
 	private Integer assignTo;
 
 	private String status;
@@ -61,9 +62,9 @@ public class LeadDto {
 	private String designation;
 
 	private String pseudoName;
-	
+
 	private String location;
-	
+
 	private String linkedinId;
 
 }
