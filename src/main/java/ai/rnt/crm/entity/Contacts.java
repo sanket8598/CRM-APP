@@ -72,7 +72,7 @@ public class Contacts extends Auditable {
 	private String businessCardType;
 	
 	@ManyToOne(cascade=ALL)
-	@JoinColumn(name = "lead_Id",nullable = true)
+	@JoinColumn(name = "lead_id",nullable = true)
 	private Leads lead;
 
 	@ManyToOne
