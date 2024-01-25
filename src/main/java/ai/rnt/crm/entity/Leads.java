@@ -1,5 +1,8 @@
 package ai.rnt.crm.entity;
 
+import static ai.rnt.crm.constants.DateFormatterConstant.TIME_12_HRS;
+import static ai.rnt.crm.constants.DateFormatterConstant.TIME_24_HRS;
+import static java.util.Objects.nonNull;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.DETACH;
 import static javax.persistence.CascadeType.MERGE;
@@ -7,6 +10,7 @@ import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.GenerationType.IDENTITY;
 import static org.hibernate.annotations.LazyCollectionOption.FALSE;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,7 +68,6 @@ public class Leads extends Auditable {
 	@Column(name = "budget_amount")
 	private String budgetAmount;
 
-
 	@Column(name = "customer_need")
 	private String customerNeed;
 
@@ -79,10 +82,10 @@ public class Leads extends Auditable {
 
 	@Column(name = "pseudo_name")
 	private String pseudoName;
-	
+
 	@Column(name = "is_follow_up_remainder")
-    private Boolean isFollowUpRemainder;
-	
+	private Boolean isFollowUpRemainder;
+
 	@Column(name = "remainder_via")
 	private String remainderVia;
 
@@ -90,7 +93,7 @@ public class Leads extends Auditable {
 	private String remainderDueAt;
 
 	@Column(name = "remainder_due_on")
-	private Date  remainderDueOn;
+	private Date remainderDueOn;
 
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "lead_source_id")
@@ -99,12 +102,12 @@ public class Leads extends Auditable {
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "service_falls_id")
 	private ServiceFallsMaster serviceFallsMaster;
-	
+
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "domain_id")
 	private DomainMaster domainMaster;
-	
-	@OneToMany(mappedBy = "lead",orphanRemoval = true)
+
+	@OneToMany(mappedBy = "lead", orphanRemoval = true)
 	@LazyCollection(FALSE)
 	private List<Contacts> contacts = new ArrayList<>();
 
@@ -125,5 +128,16 @@ public class Leads extends Auditable {
 
 	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
 	private List<LeadTask> leadTasks = new ArrayList<>();
-	
+
+	@Transient
+	public String getRemainderDueAt12Hours() {
+		if (nonNull(getRemainderDueAt())) {
+			try {
+				return TIME_12_HRS.format(TIME_24_HRS.parse(getRemainderDueAt()));
+			} catch (ParseException e) {
+				return getRemainderDueAt();
+			}
+		}
+		return null;
+	}
 }

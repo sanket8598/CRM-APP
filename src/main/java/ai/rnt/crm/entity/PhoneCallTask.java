@@ -52,7 +52,7 @@ public class PhoneCallTask extends Auditable {
 	@Column(name = "task_priority")
 	private String priority;
 
-	@Column(name = "task_due_date")
+	@Column(name = "task_due_date", columnDefinition = "date")
 	private Date dueDate;
 
 	@Column(name = "task_due_time")

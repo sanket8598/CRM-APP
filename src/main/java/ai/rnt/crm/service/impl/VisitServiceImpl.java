@@ -294,7 +294,7 @@ public class VisitServiceImpl implements VisitService {
 			visitTask.setDueDate(dto.getUpdateDueDate());
 			visitTask.setDueTime(dto.getDueTime());
 			visitTask.setRemainderDueAt(dto.getRemainderDueAt());
-			visitTask.setRemainderDueOn(dto.getRemainderDueOn());
+			visitTask.setRemainderDueOn(dto.getUpdatedRemainderDueOn());
 			visitTask.setRemainderOn(dto.isRemainderOn());
 			visitTask.setRemainderVia(dto.getRemainderVia());
 			visitTask.setDescription(dto.getDescription());
