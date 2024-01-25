@@ -163,27 +163,27 @@ public class EmailUtil {
 		log.info("inside the sendCallTaskReminderMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
-
 			InternetAddress[] recipientAddress = new InternetAddress[1];
 			recipientAddress[0] = new InternetAddress(callTask.getAssignTo().getEmailId());
 			if (nonNull(emailId) && !emailId.isEmpty()) {
 				recipientAddress = new InternetAddress[2];
+				recipientAddress[0] = new InternetAddress(callTask.getAssignTo().getEmailId());
 				recipientAddress[1] = new InternetAddress(emailId);
 			}
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(TASK_REMINDER + callTask.getSubject() + " - " + formatDate(callTask.getDueDate()));
 			msg.setSentDate(new Date());
+			String leadName = callTask.getCall().getLead().getContacts().stream().filter(Contacts::getPrimary)
+					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
 					.append(String.format("%s",
 							DEAR + callTask.getAssignTo().getFirstName() + " " + callTask.getAssignTo().getLastName()
 									+ COMMA_BR_BR)
 							+ "I hope this email finds you well. This is a friendly reminder about the Task  for the "
-							+ callTask.getCall().getLead().getTopic() + " by "
-							+ callTask.getCall().getLead().getContacts().stream().filter(Contacts::getPrimary)
-									.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("")
-							+ "." + THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(callTask.getDueDate()) + " At "
-							+ callTask.getDueTime() + ".")
+							+ callTask.getCall().getLead().getTopic() + " by " + leadName + "."
+							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(callTask.getDueDate()) + " At "
+							+ callTask.getDueTime12Hours() + ".")
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
 			msg.setContent(content.toString(), TEXT_HTML);
 			send(msg);
@@ -201,22 +201,23 @@ public class EmailUtil {
 			recipientAddress[0] = new InternetAddress(visitTask.getAssignTo().getEmailId());
 			if (nonNull(emailId) && !emailId.isEmpty()) {
 				recipientAddress = new InternetAddress[2];
+				recipientAddress[0] = new InternetAddress(visitTask.getAssignTo().getEmailId());
 				recipientAddress[1] = new InternetAddress(emailId);
 			}
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(TASK_REMINDER + visitTask.getSubject() + " - " + formatDate(visitTask.getDueDate()));
 			msg.setSentDate(new Date());
+			String leadName = visitTask.getVisit().getLead().getContacts().stream().filter(Contacts::getPrimary)
+					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
 					.append(String.format("%s",
 							DEAR + visitTask.getAssignTo().getFirstName() + " " + visitTask.getAssignTo().getLastName()
 									+ COMMA_BR_BR)
 							+ I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE
-							+ visitTask.getVisit().getSubject() + " by "
-							+ visitTask.getVisit().getLead().getContacts().stream().filter(Contacts::getPrimary)
-									.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("")
-							+ "." + THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(visitTask.getDueDate())
-							+ " At " + visitTask.getDueTime12Hours() + ".")
+							+ visitTask.getVisit().getSubject() + " by " + leadName + "."
+							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(visitTask.getDueDate()) + " At "
+							+ visitTask.getDueTime12Hours() + ".")
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
 			msg.setContent(content.toString(), TEXT_HTML);
 			send(msg);
@@ -235,22 +236,23 @@ public class EmailUtil {
 			recipientAddress[0] = new InternetAddress(meetingTask.getAssignTo().getEmailId());
 			if (nonNull(emailId) && !emailId.isEmpty()) {
 				recipientAddress = new InternetAddress[2];
+				recipientAddress[0] = new InternetAddress(meetingTask.getAssignTo().getEmailId());
 				recipientAddress[1] = new InternetAddress(emailId);
 			}
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(TASK_REMINDER + meetingTask.getSubject() + " - " + formatDate(meetingTask.getDueDate()));
 			msg.setSentDate(new Date());
+			String leadName = meetingTask.getMeetings().getLead().getContacts().stream().filter(Contacts::getPrimary)
+					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
 					.append(String.format("%s",
 							DEAR + meetingTask.getAssignTo().getFirstName() + " "
 									+ meetingTask.getAssignTo().getLastName() + COMMA_BR_BR)
 							+ I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE
-							+ meetingTask.getMeetings().getMeetingTitle() + " by "
-							+ meetingTask.getMeetings().getLead().getContacts().stream().filter(Contacts::getPrimary)
-									.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("")
-							+ "." + THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(meetingTask.getDueDate())
-							+ " At " + meetingTask.getDueTime12Hours() + ".")
+							+ meetingTask.getMeetings().getMeetingTitle() + " by " + leadName + "."
+							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(meetingTask.getDueDate()) + " At "
+							+ meetingTask.getDueTime12Hours() + ".")
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
 			msg.setContent(content.toString(), TEXT_HTML);
 			send(msg);
@@ -269,21 +271,22 @@ public class EmailUtil {
 			recipientAddress[0] = new InternetAddress(leadTask.getAssignTo().getEmailId());
 			if (nonNull(emailId) && !emailId.isEmpty()) {
 				recipientAddress = new InternetAddress[2];
+				recipientAddress[0] = new InternetAddress(leadTask.getAssignTo().getEmailId());
 				recipientAddress[1] = new InternetAddress(emailId);
 			}
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(TASK_REMINDER + leadTask.getSubject() + " - " + formatDate(leadTask.getDueDate()));
 			msg.setSentDate(new Date());
+			String leadName = leadTask.getLead().getContacts().stream().filter(Contacts::getPrimary)
+					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
 					.append(String.format("%s",
 							DEAR + leadTask.getAssignTo().getFirstName() + " " + leadTask.getAssignTo().getLastName()
 									+ COMMA_BR_BR)
 							+ I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE
-							+ leadTask.getLead().getTopic() + " by "
-							+ leadTask.getLead().getContacts().stream().filter(Contacts::getPrimary).findAny()
-									.map(con -> con.getFirstName() + " " + con.getLastName()).toString()
-							+ "." + THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(leadTask.getDueDate()) + " At "
+							+ leadTask.getLead().getTopic() + " by " + leadName + "."
+							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(leadTask.getDueDate()) + " At "
 							+ leadTask.getDueTime12Hours() + ".")
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
 			msg.setContent(content.toString(), TEXT_HTML);
@@ -302,22 +305,21 @@ public class EmailUtil {
 			recipientAddress[0] = new InternetAddress(leads.getEmployee().getEmailId());
 			if (nonNull(emailId) && !emailId.isEmpty()) {
 				recipientAddress = new InternetAddress[2];
+				recipientAddress[0] = new InternetAddress(leads.getEmployee().getEmailId());
 				recipientAddress[1] = new InternetAddress(emailId);
 			}
+			String leadName = leads.getContacts().stream().filter(Contacts::getPrimary)
+					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			msg.setFrom(new InternetAddress(USERNAME));
 			msg.setRecipients(TO, recipientAddress);
-			msg.setSubject("Follow-Up Reminder : " + leads.getTopic() + " by "
-					+ leads.getContacts().stream().filter(Contacts::getPrimary).findAny()
-							.map(e -> e.getFirstName() + " " + e.getLastName()).toString()
-					+ "-" + formatDate(leads.getRemainderDueOn()) + " At " + leads.getRemainderDueAt());
+			msg.setSubject("Follow-Up Reminder : " + leads.getTopic() + " by " + leadName + "-"
+					+ formatDate(leads.getRemainderDueOn()) + " At " + leads.getRemainderDueAt12Hours());
 			msg.setSentDate(new Date());
 			StringBuilder content = new StringBuilder().append("<br>").append(String.format("%s",
 					DEAR + leads.getEmployee().getFirstName() + " " + leads.getEmployee().getLastName() + COMMA_BR_BR)
 					+ "I hope this email finds you well. This is a friendly reminder about the follow-up for the lead: "
-					+ leads.getTopic() + " by "
-					+ leads.getContacts().stream().filter(Contacts::getPrimary).findAny()
-							.map(e -> e.getFirstName() + " " + e.getLastName()).toString()
-					+ ".").append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
+					+ leads.getTopic() + " by " + leadName + ".").append(BR).append(REGARDS).append("<br>")
+					.append(RABBIT_AND_TORTOISE_TECHNOLOGY);
 			msg.setContent(content.toString(), TEXT_HTML);
 			send(msg);
 		} catch (Exception e) {
