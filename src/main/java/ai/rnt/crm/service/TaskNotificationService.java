@@ -10,4 +10,6 @@ public interface TaskNotificationService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getNotification(Integer staffId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> seenNotification(Integer notifId);
+
 }

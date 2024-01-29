@@ -6,10 +6,10 @@ import lombok.Data;
 public class TaskNotificationsDto {
 
 	private Integer notifId;
-	private CallTaskDto callTask;
-	private VisitTaskDto visitTask;
-	private MeetingTaskDto meetingTask;
-	private LeadTaskDto leadTask;
-	private LeadDto leads;
+	private GetCallTaskDto callTask;
+	private GetVisitTaskDto visitTask;
+	private GetMeetingTaskDto meetingTask;
+	private GetLeadTaskDto leadTask;
+	private EditLeadDto leads;
 	private boolean notifStatus;
 }
