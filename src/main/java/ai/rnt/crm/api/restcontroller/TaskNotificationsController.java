@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,5 +25,10 @@ public class TaskNotificationsController {
 	@GetMapping("/get/{staffId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getNotification(@PathVariable Integer staffId) {
 		return taskNotificationService.getNotification(staffId);
+	}
+
+	@PutMapping("/update/{notifId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> seenNotification(@PathVariable Integer notifId) {
+		return taskNotificationService.seenNotification(notifId);
 	}
 }

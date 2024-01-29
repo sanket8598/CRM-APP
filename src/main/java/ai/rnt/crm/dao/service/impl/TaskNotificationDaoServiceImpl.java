@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,5 +21,15 @@ public class TaskNotificationDaoServiceImpl implements TaskNotificationDaoServic
 	@Override
 	public List<TaskNotifications> getNotifications(Integer staffId) {
 		return taskNotificationsRepository.findByNotifToStaffIdAndNotifStatus(staffId, true);
+	}
+
+	@Override
+	public Optional<TaskNotifications> getNotificationById(Integer notifId) {
+		return taskNotificationsRepository.findById(notifId);
+	}
+
+	@Override
+	public TaskNotifications seenNotification(TaskNotifications notifyData) {
+		return taskNotificationsRepository.save(notifyData);
 	}
 }
