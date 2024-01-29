@@ -2,7 +2,6 @@ package ai.rnt.crm.util;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
-import static ai.rnt.crm.util.AuditAwareUtil.activeProfile;
 import static ai.rnt.crm.util.EmailUtil.sendCallTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendEmail;
 import static ai.rnt.crm.util.EmailUtil.sendFollowUpLeadReminderMail;
@@ -26,6 +25,7 @@ import java.util.stream.Stream;
 
 import javax.mail.internet.AddressException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -81,6 +81,9 @@ public class TaskRemainderUtil {
 	private final EmployeeDaoService employeeDaoService;
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
+	
+	@Value("${spring.profiles.active}")
+	private String activeProfile;
 
 	@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {

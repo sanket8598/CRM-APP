@@ -63,10 +63,7 @@ public abstract class Auditable implements Serializable{
 			this.createdBy = details.getStaffId();
 		}
 		 this.createdDate = now();
-		if(nonNull(activeProfile) && !"local".equals(activeProfile))
-			this.createdDate =now().atZone(of("UTC"))
-            .withZoneSameInstant(of("Asia/Kolkata"))
-            .toLocalDateTime();
+			
 	}
 	
 	@PreUpdate
@@ -77,10 +74,6 @@ public abstract class Auditable implements Serializable{
 			this.updatedBy = details.getStaffId();
 		}
 		this.updatedDate = now();
-		if(nonNull(activeProfile) && !"local".equals(activeProfile))
-			this.updatedDate =now().atZone(of("UTC"))
-            .withZoneSameInstant(of("Asia/Kolkata"))
-            .toLocalDateTime();
 	}
 
 	@PreRemove
@@ -91,10 +84,6 @@ public abstract class Auditable implements Serializable{
 			this.deletedBy = details.getStaffId();
 		}
 		this.deletedDate = now();
-		if(nonNull(activeProfile) && !"local".equals(activeProfile))
-			this.deletedDate =now().atZone(of("UTC"))
-            .withZoneSameInstant(of("Asia/Kolkata"))
-            .toLocalDateTime();
 	}
 }
 //@formatter:on
