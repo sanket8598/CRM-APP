@@ -1,8 +1,8 @@
 package ai.rnt.crm.util;
-
 import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
+import static ai.rnt.crm.util.AuditAwareUtil.activeProfile;
 import static ai.rnt.crm.util.EmailUtil.sendCallTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendEmail;
 import static ai.rnt.crm.util.EmailUtil.sendFollowUpLeadReminderMail;
@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 
 import javax.mail.internet.AddressException;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -83,9 +82,6 @@ public class TaskRemainderUtil {
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
 
-	@Value("${spring.profiles.active}")
-	private String activeProfile;
-
 	@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
 		log.info("inside the reminderForTask method...{}");
@@ -93,13 +89,12 @@ public class TaskRemainderUtil {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
 			LocalDateTime currentTime = null;
-			if ("uat".equalsIgnoreCase(activeProfile)) {
-				log.info("inside the if block reminderForTask method...{}", activeProfile);
+			if(nonNull(activeProfile) && !"local".equals(activeProfile))
 				currentTime = now().plusHours(5).plusMinutes(30);
-			} else
+			else
 				currentTime = now();
 			String time = currentTime.format(ofPattern("HH:mm"));
-			log.info("inside the time is in reminderForTask method...{}", currentTime);
+			log.info("inside the time is in reminderForTask method...{}{}", currentTime,activeProfile);
 			log.info("inside the currenttime is in reminderForTask method...{}", time);
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
