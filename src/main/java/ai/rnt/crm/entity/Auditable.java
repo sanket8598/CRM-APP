@@ -1,6 +1,8 @@
 package ai.rnt.crm.entity;
 
+import static ai.rnt.crm.util.AuditAwareUtil.activeProfile;
 import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
 import static java.util.Objects.nonNull;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
@@ -60,7 +62,8 @@ public abstract class Auditable implements Serializable{
 			UserDetail details =(UserDetail) getContext().getAuthentication().getDetails();
 			this.createdBy = details.getStaffId();
 		}
-		this.createdDate = now();
+		 this.createdDate = now();
+			
 	}
 	
 	@PreUpdate

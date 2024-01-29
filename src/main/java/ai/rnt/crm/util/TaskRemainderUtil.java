@@ -1,5 +1,4 @@
 package ai.rnt.crm.util;
-
 import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
@@ -82,7 +81,7 @@ public class TaskRemainderUtil {
 	private final EmployeeDaoService employeeDaoService;
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
-
+	
 	@Value("${spring.profiles.active}")
 	private String activeProfile;
 
@@ -93,13 +92,12 @@ public class TaskRemainderUtil {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
 			LocalDateTime currentTime = null;
-			if ("uat".equalsIgnoreCase(activeProfile)) {
-				log.info("inside the if block reminderForTask method...{}", activeProfile);
+			if(nonNull(activeProfile) && !"local".equals(activeProfile))
 				currentTime = now().plusHours(5).plusMinutes(30);
-			} else
+			else
 				currentTime = now();
 			String time = currentTime.format(ofPattern("HH:mm"));
-			log.info("inside the time is in reminderForTask method...{}", currentTime);
+			log.info("inside the time is in reminderForTask method...{}{}", currentTime,activeProfile);
 			log.info("inside the currenttime is in reminderForTask method...{}", time);
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
