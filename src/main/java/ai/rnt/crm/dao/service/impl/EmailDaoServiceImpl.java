@@ -1,6 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class EmailDaoServiceImpl implements EmailDaoService {
 	}
 
 	@Override
-	public List<Email> isScheduledEmails(Date todayAsDate, String time) {
+	public List<Email> isScheduledEmails(LocalDate todayAsDate, String time) {
 		return emailRepository.findByScheduledOnAndScheduledAtAndScheduled(todayAsDate, time , true);
 	}
 }

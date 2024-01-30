@@ -2,7 +2,7 @@ package ai.rnt.crm.dto;
 
 import static javax.persistence.TemporalType.DATE;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import javax.persistence.Temporal;
 import javax.validation.constraints.FutureOrPresent;
@@ -36,7 +36,7 @@ public class VisitTaskDto {
 	@Temporal(DATE)
 	@NotNull(message="Due Date should not be null!!")
 	@FutureOrPresent(message="Date must not be smaller than today's date!!")
-	private Date dueDate;
+	private LocalDate dueDate;
 
 	@NotBlank(message = "Due time should not be null or empty!!")
 	private String dueTime;
@@ -51,7 +51,7 @@ public class VisitTaskDto {
 
 	@Temporal(DATE)
 	@FutureOrPresent(message="Date must not be smaller than today's date!!")
-	private Date remainderDueOn;
+	private LocalDate remainderDueOn;
 
 	private EmployeeDto assinTo;
 }

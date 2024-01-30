@@ -10,6 +10,7 @@ import static java.util.Objects.isNull;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -78,6 +79,26 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format in convertDateDateWithTime:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime: " + date);
+		}
+	}
+	/**
+	 * This method is used to convert the given date(yyyy-MM-dd) to the format
+	 * (dd-MMM-yyyy) with give String time added to it. e.g 2023-12-04 is converted
+	 * to the 04 Dec 2023 and also time is added.
+	 * 
+	 * @author Sanket Wakankar
+	 * @version 1.0
+	 * @since 05/12/2023.
+	 * @param date in java.util.Date,Time in String
+	 * @return String
+	 */
+	public static String convertDateDateWithTime(LocalDate date, String endTime) {
+		log.info("inside the convertDateDateWithTime method...{} {}", date, endTime);
+		try {
+			return isNull(date) ? null : DD_MMM_YYYY.format(YYYY_MM_DD.parse(date.toString())) + " " + endTime;
+		} catch (Exception e) {
+			log.error("Got Excetion while converting local date format in convertDateDateWithTime:", e.getMessage());
+			throw new CRMException("error while date convertDateDateWithTime for local date: " + date);
 		}
 	}
 }

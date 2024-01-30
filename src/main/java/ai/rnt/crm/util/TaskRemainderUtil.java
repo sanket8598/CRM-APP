@@ -14,13 +14,11 @@ import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
 import static java.time.format.DateTimeFormatter.ofPattern;
-import static java.util.Date.from;
 import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,13 +86,11 @@ public class TaskRemainderUtil {
 	public void reminderForTask() throws Exception {
 		log.info("inside the reminderForTask method...{}");
 		try {
-			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
-			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
+			LocalDate todayAsDate = LocalDate.now();
 			LocalDateTime currentTime = now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE))
 					.toLocalDateTime();
 			String time = currentTime.format(ofPattern("HH:mm"));
-			log.info("inside the time is in reminderForTask method...{}", currentTime);
-			log.info("inside the currenttime is in reminderForTask method...{}", time);
+			log.info("inside the time is in reminderForTask method...{}.. and currenttime ..{}", currentTime, time);
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {
 				String emailId = null;

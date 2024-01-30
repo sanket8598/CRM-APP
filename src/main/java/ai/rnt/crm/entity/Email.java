@@ -8,8 +8,8 @@ import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -75,8 +75,8 @@ public class Email extends Auditable {
 	@Column(name = "is_scheduled")
 	private Boolean scheduled;
 	
-	@Column(name = "scheduled_on")
-	private Date scheduledOn;
+	@Column(name = "scheduled_on",columnDefinition = "date")
+	private LocalDate scheduledOn;
 	
 	@Column(name = "scheduled_at")
 	private String scheduledAt;

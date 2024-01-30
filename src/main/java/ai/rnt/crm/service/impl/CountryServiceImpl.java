@@ -3,7 +3,7 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.dto_mapper.CountryDtoMapper.TO_COUNTRY_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
 
@@ -31,7 +31,7 @@ public class CountryServiceImpl implements CountryService {
 		try {
 			allCountry.put(SUCCESS, true);
 			allCountry.put(DATA, TO_COUNTRY_DTOS.apply(countryDaoService.getAllCountry()));
-			return new ResponseEntity<>(allCountry, FOUND);
+			return new ResponseEntity<>(allCountry, OK);
 		} catch (Exception e) {
 			log.info("Got Exception while getting the Country..{}", e.getMessage());
 			throw new CRMException(e);

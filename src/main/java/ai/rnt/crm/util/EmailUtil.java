@@ -8,6 +8,7 @@ import static javax.mail.Transport.send;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -328,7 +329,7 @@ public class EmailUtil {
 		}
 	}
 
-	private static String formatDate(Date date) {
+	private static String formatDate(LocalDate date) {
 		log.info("inside the formatDate method...{}", date);
 		try {
 			SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MMM-yyyy");

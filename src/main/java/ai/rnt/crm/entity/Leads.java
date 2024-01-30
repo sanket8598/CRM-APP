@@ -11,8 +11,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 import static org.hibernate.annotations.LazyCollectionOption.FALSE;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -83,7 +83,7 @@ public class Leads extends Auditable {
 	@Column(name = "pseudo_name")
 	private String pseudoName;
 
-	@Column(name = "is_follow_up_remainder")
+	@Column(name = "is_follow_up_remainder", columnDefinition = "boolean default false")
 	private Boolean isFollowUpRemainder;
 
 	@Column(name = "remainder_via")
@@ -93,7 +93,7 @@ public class Leads extends Auditable {
 	private String remainderDueAt;
 
 	@Column(name = "remainder_due_on")
-	private Date remainderDueOn;
+	private LocalDate remainderDueOn;
 
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "lead_source_id")

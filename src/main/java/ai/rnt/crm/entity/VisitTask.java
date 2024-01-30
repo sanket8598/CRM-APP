@@ -7,7 +7,7 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.text.ParseException;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -53,7 +53,7 @@ public class VisitTask extends Auditable {
 	private String priority;
 
 	@Column(name = "task_due_date", columnDefinition = "date")
-	private Date dueDate;
+	private LocalDate dueDate;
 
 	@Column(name = "task_due_time")
 	private String dueTime;
@@ -71,7 +71,7 @@ public class VisitTask extends Auditable {
 	private String remainderDueAt;
 
 	@Column(name = "remainder_due_on", columnDefinition = "date")
-	private Date remainderDueOn;
+	private LocalDate remainderDueOn;
 
 	@JoinColumn(name = "task_assign_to", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)

@@ -13,7 +13,6 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
@@ -88,7 +87,7 @@ public class ContactServiceImpl implements ContactService {
 			contactMap.put(SUCCESS, true);
 			contactMap.put(DATA, TO_CONTACT_DTO.apply(contactDaoService.findById(contactId)
 					.orElseThrow(() -> new ResourceNotFoundException("Contact", "contactId", contactId))));
-			return new ResponseEntity<>(contactMap, FOUND);
+			return new ResponseEntity<>(contactMap, OK);
 		} catch (Exception e) {
 			log.error("error occured while getting the contact of a lead...{}", e.getMessage());
 			throw new CRMException(e);

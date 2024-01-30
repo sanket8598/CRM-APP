@@ -4,7 +4,7 @@ import static ai.rnt.crm.constants.CacheConstant.LEADS;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,7 +81,7 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 	}
 
 	@Override
-	public List<Leads> getFollowUpLeads(Date todayAsDate, String time) {
+	public List<Leads> getFollowUpLeads(LocalDate todayAsDate, String time) {
 		return leadsRepository.findByRemainderDueOnAndRemainderDueAtAndIsFollowUpRemainder(todayAsDate, time, true);
 	}
 }

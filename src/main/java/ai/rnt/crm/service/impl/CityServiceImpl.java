@@ -3,7 +3,7 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.dto_mapper.CityDtoMapper.TO_CITY_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
 
@@ -36,7 +36,7 @@ public class CityServiceImpl implements CityService {
 		try {
 			allCity.put(SUCCESS, true);
 			allCity.put(DATA, TO_CITY_DTOS.apply(cityDaoService.getAllCity()));
-			return new ResponseEntity<>(allCity, FOUND);
+			return new ResponseEntity<>(allCity, OK);
 		} catch (Exception e) {
 			log.info("Got Exception while getting the City..{}", e.getMessage());
 			throw new CRMException(e);

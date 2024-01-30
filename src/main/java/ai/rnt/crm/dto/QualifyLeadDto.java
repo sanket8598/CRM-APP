@@ -1,8 +1,12 @@
 package ai.rnt.crm.dto;
 
-import java.util.Date;
+import static javax.persistence.TemporalType.DATE;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDate;
+
+import javax.persistence.Temporal;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
@@ -17,12 +21,14 @@ public class QualifyLeadDto {
 
 	private ServiceFallsDto serviceFallsMaster;
 	
-	private Boolean isFollowUpRemainder;
+	private Boolean isFollowUpRemainder=false;
 	
 	private String remainderVia;
 
 	private String remainderDueAt;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private Date remainderDueOn;
+	@Temporal(DATE)
+	@NotNull(message="Due date should not be null!!")
+	@FutureOrPresent(message="Date must not be smaller than today's date!!")
+	private LocalDate remainderDueOn;
 }
