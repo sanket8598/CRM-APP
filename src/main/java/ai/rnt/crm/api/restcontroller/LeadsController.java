@@ -47,6 +47,8 @@ import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.service.ServiceFallsService;
+import ai.rnt.crm.validation.DisqualifiedLead;
+import ai.rnt.crm.validation.LeadAdvanceInfo;
 import ai.rnt.crm.validation.ValidFile;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +71,7 @@ public class LeadsController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping(CREATE_LEAD)
-	public ResponseEntity<EnumMap<ApiResponse, Object>> saveLead(@RequestBody @Valid LeadDto dto) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> saveLead(@Validated(LeadAdvanceInfo.class) @RequestBody  LeadDto dto) {
 		return leadService.createLead(dto);
 	}
 
@@ -134,14 +136,14 @@ public class LeadsController {
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping(DIS_QUALIFY_LEAD)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> disQualifyLead(@PathVariable Integer leadId,
-			@RequestBody LeadDto dto) {
+			@Validated(DisqualifiedLead.class) @RequestBody  LeadDto dto) {
 		return leadService.disQualifyLead(leadId, dto);
 	}
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping(UPDATE_LEAD_CONTACT)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(@PathVariable Integer leadId,
-			@RequestBody UpdateLeadDto dto) {
+			@RequestBody @Valid UpdateLeadDto dto) {
 		return leadService.updateLeadContact(leadId, dto);
 	}
 

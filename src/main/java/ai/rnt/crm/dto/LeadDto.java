@@ -3,6 +3,9 @@ package ai.rnt.crm.dto;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
+import ai.rnt.crm.validation.DisqualifiedLead;
+import ai.rnt.crm.validation.LeadAdvanceInfo;
+import ai.rnt.crm.validation.ValidDisqualifiedStatus;
 import lombok.Data;
 
 @Data
@@ -10,10 +13,10 @@ public class LeadDto {
 
 	private Integer leadId;
 
-	@NotBlank(message = "First Name should not be null or empty!!")
+	@NotBlank(message = "First Name should not be null or empty!!",groups = LeadAdvanceInfo.class)
 	private String firstName;
 
-	@NotBlank(message = "Last Name should not be null or empty!!")
+	@NotBlank(message = "Last Name should not be null or empty!!",groups = LeadAdvanceInfo.class)
 	private String lastName;
 
 	// @Size(min = 10, max = 14)
@@ -24,13 +27,13 @@ public class LeadDto {
 
 	private String topic;
 
-	@NotBlank(message = "Email Address should not be null or empty!!")
-	@Email(message = "Please enter a valid Email Address")
+	@NotBlank(message = "Email Address should not be null or empty!!",groups = LeadAdvanceInfo.class)
+	@Email(message = "Please enter a valid Email Address",groups = LeadAdvanceInfo.class)
 	private String email;
 
 	private String companyWebsite;
 
-	@NotBlank(message = "Lead Source should not be null or empty!!")
+	@NotBlank(message = "Lead Source should not be null or empty!!",groups = LeadAdvanceInfo.class)
 	private String leadSourceId;
 
 	private String serviceFallsId;
@@ -55,6 +58,7 @@ public class LeadDto {
 
 	private String status;
 
+	@ValidDisqualifiedStatus(message="Disqualified-As is not valid!!",groups = DisqualifiedLead.class)
 	private String disqualifyAs;
 
 	private String disqualifyReason;
