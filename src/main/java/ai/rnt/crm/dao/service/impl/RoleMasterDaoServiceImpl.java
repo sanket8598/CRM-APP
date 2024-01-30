@@ -1,10 +1,13 @@
 package ai.rnt.crm.dao.service.impl;
 
 import static ai.rnt.crm.constants.CacheConstant.ROLES;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.util.RoleUtil.APP_ROLES;
+import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.isNull;
 
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +32,9 @@ public class RoleMasterDaoServiceImpl implements RoleMasterDaoService {
 		return this.roleMasterRepository
 				.findByEmployeeRoleIn(APP_ROLES.get()).stream()
 				.filter(emp -> (isNull(emp.getDepartureDate())
-						|| emp.getDepartureDate().isAfter(LocalDate.now())))
+						|| emp.getDepartureDate().isAfter(now().atZone(systemDefault())
+					            .withZoneSameInstant(of(INDIA_ZONE))
+					            .toLocalDate())))
 				.sorted(Comparator.comparing(EmployeeMaster::getFirstName).thenComparing(EmployeeMaster::getLastName))
 				.collect(Collectors.toList());
 	}

@@ -1,4 +1,5 @@
 package ai.rnt.crm.util;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
@@ -9,6 +10,7 @@ import static ai.rnt.crm.util.EmailUtil.sendLeadTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendMeetingTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendVisitTaskReminderMail;
 import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Date.from;
@@ -25,7 +27,6 @@ import java.util.stream.Stream;
 
 import javax.mail.internet.AddressException;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -82,22 +83,17 @@ public class TaskRemainderUtil {
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
 	
-	@Value("${spring.profiles.active}")
-	private String activeProfile;
-
 	@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
 		log.info("inside the reminderForTask method...{}");
 		try {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
-			LocalDateTime currentTime = null;
-			if(nonNull(activeProfile) && !"local".equals(activeProfile))
-				currentTime = now().plusHours(5).plusMinutes(30);
-			else
-				currentTime = now();
+			LocalDateTime currentTime=now().atZone(systemDefault())
+			            .withZoneSameInstant(of(INDIA_ZONE))
+			            .toLocalDateTime();
 			String time = currentTime.format(ofPattern("HH:mm"));
-			log.info("inside the time is in reminderForTask method...{}{}", currentTime,activeProfile);
+			log.info("inside the time is in reminderForTask method...{}", currentTime);
 			log.info("inside the currenttime is in reminderForTask method...{}", time);
 			List<PhoneCallTask> callTaskList = callDaoService.getTodaysCallTask(todayAsDate, time);
 			callTaskList.forEach(e -> {

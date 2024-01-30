@@ -2,6 +2,7 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_GET_LEAD_TASK_DTO;
 import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_LEAD_TASK;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
@@ -9,6 +10,8 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.TaskUtil.checkDuplicateLeadTask;
 import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
@@ -164,7 +167,9 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			LeadTask leadTask = leadTaskDaoService.getTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD_TASK, TASK_ID, taskId));
 			leadTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			leadTask.setDeletedDate(now());
+			leadTask.setDeletedDate(now().atZone(systemDefault())
+		            .withZoneSameInstant(of(INDIA_ZONE))
+		            .toLocalDateTime());
 			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task deleted SuccessFully");

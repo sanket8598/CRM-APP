@@ -4,6 +4,7 @@ import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.DateFormatterConstant.END_TIME;
 import static ai.rnt.crm.constants.DateFormatterConstant.START_TIME;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT;
@@ -16,6 +17,8 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.TaskUtil.checkDuplicateMeetingTask;
 import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -177,7 +180,9 @@ public class MeetingServiceImpl implements MeetingService {
 							MeetingAttachments data = meetingAttachmetDaoService
 									.findById(existingAttachment.getMeetingAttchId()).orElse(null);
 							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-							data.setDeletedDate(now());
+							data.setDeletedDate(now().atZone(systemDefault())
+						            .withZoneSameInstant(of(INDIA_ZONE))
+						            .toLocalDateTime());
 							meetingAttachmetDaoService.removeExistingMeetingAttachment(data);
 						}
 					}
@@ -217,16 +222,22 @@ public class MeetingServiceImpl implements MeetingService {
 					.orElseThrow(() -> new ResourceNotFoundException(MEETINGS, MEETING_ID, meetingId));
 			meetings.getMeetingTasks().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(now());
+				e.setDeletedDate(now().atZone(systemDefault())
+			            .withZoneSameInstant(of(INDIA_ZONE))
+			            .toLocalDateTime());
 				meetingDaoService.addMeetingTask(e);
 			});
 			meetings.getMeetingAttachments().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(now());
+				e.setDeletedDate(now().atZone(systemDefault())
+			            .withZoneSameInstant(of(INDIA_ZONE))
+			            .toLocalDateTime());
 				meetingAttachmetDaoService.addMeetingAttachment(e);
 			});
 			meetings.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			meetings.setDeletedDate(now());
+			meetings.setDeletedDate(now().atZone(systemDefault())
+		            .withZoneSameInstant(of(INDIA_ZONE))
+		            .toLocalDateTime());
 			if (nonNull(meetingDaoService.addMeeting(meetings))) {
 				result.put(MESSAGE, "Meeting deleted SuccessFully.");
 				result.put(SUCCESS, true);
@@ -301,7 +312,6 @@ public class MeetingServiceImpl implements MeetingService {
 			meetingTask.setRemainderDueOn(dto.getUpdatedRemainderDueOn());
 			meetingTask.setRemainderVia(dto.getRemainderVia());
 			meetingTask.setDescription(dto.getDescription());
-			meetingTask.setUpdatedDate(now());
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Updated Successfully..!!");
@@ -348,7 +358,9 @@ public class MeetingServiceImpl implements MeetingService {
 			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(MEETING_TASK, TASK_ID, taskId));
 			meetingTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			meetingTask.setDeletedDate(now());
+			meetingTask.setDeletedDate(now().atZone(systemDefault())
+		            .withZoneSameInstant(of(INDIA_ZONE))
+		            .toLocalDateTime());
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
 				result.put(MESSAGE, "Meeting Task Deleted SuccessFully.");
 				result.put(SUCCESS, true);
