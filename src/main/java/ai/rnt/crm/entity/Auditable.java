@@ -1,8 +1,9 @@
 package ai.rnt.crm.entity;
 
-import static ai.rnt.crm.util.AuditAwareUtil.activeProfile;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
@@ -62,7 +63,9 @@ public abstract class Auditable implements Serializable{
 			UserDetail details =(UserDetail) getContext().getAuthentication().getDetails();
 			this.createdBy = details.getStaffId();
 		}
-		 this.createdDate = now();
+		 this.createdDate =now().atZone(systemDefault())
+		            .withZoneSameInstant(of(INDIA_ZONE))
+		            .toLocalDateTime();
 			
 	}
 	
@@ -73,7 +76,9 @@ public abstract class Auditable implements Serializable{
 			UserDetail details =(UserDetail) getContext().getAuthentication().getDetails();
 			this.updatedBy = details.getStaffId();
 		}
-		this.updatedDate = now();
+		this.updatedDate = now().atZone(systemDefault())
+	            .withZoneSameInstant(of(INDIA_ZONE))
+	            .toLocalDateTime();
 	}
 
 	@PreRemove
@@ -83,7 +88,9 @@ public abstract class Auditable implements Serializable{
 			UserDetail details =(UserDetail) getContext().getAuthentication().getDetails();
 			this.deletedBy = details.getStaffId();
 		}
-		this.deletedDate = now();
+		this.deletedDate = now().atZone(systemDefault())
+	            .withZoneSameInstant(of(INDIA_ZONE))
+	            .toLocalDateTime();
 	}
 }
 //@formatter:on
