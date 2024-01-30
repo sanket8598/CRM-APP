@@ -1,4 +1,5 @@
 package ai.rnt.crm.util;
+
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
@@ -63,7 +64,7 @@ public class TaskRemainderUtil {
 
 	private static final String EMAIL = "Email";
 
-	private static final String NOTIFICATIONS = "Notifications";
+	private static final String NOTIFICATION = "Notification";
 
 	private static final String BOTH = "Both";
 
@@ -82,16 +83,15 @@ public class TaskRemainderUtil {
 	private final EmployeeDaoService employeeDaoService;
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
-	
+
 	@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
 		log.info("inside the reminderForTask method...{}");
 		try {
 			LocalDateTime todayDate = LocalDate.now().atStartOfDay();
 			Date todayAsDate = from(todayDate.atZone(systemDefault()).toInstant());
-			LocalDateTime currentTime=now().atZone(systemDefault())
-			            .withZoneSameInstant(of(INDIA_ZONE))
-			            .toLocalDateTime();
+			LocalDateTime currentTime = now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE))
+					.toLocalDateTime();
 			String time = currentTime.format(ofPattern("HH:mm"));
 			log.info("inside the time is in reminderForTask method...{}", currentTime);
 			log.info("inside the currenttime is in reminderForTask method...{}", time);
@@ -100,13 +100,13 @@ public class TaskRemainderUtil {
 				String emailId = null;
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
-				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
+				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
 					sendCallTaskReminderMail(e, emailId);
 					callNotification(e.getCallTaskId());
-				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
+				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
 					sendCallTaskReminderMail(e, emailId);
 
-				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
+				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					callNotification(e.getCallTaskId());
 			});
 
@@ -115,13 +115,13 @@ public class TaskRemainderUtil {
 				String emailId = null;
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
-				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
+				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
 					sendVisitTaskReminderMail(e, emailId);
 					visitNotification(e.getVisitTaskId());
-				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
+				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
 					sendVisitTaskReminderMail(e, emailId);
 
-				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
+				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					visitNotification(e.getVisitTaskId());
 			});
 
@@ -130,12 +130,12 @@ public class TaskRemainderUtil {
 				String emailId = null;
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
-				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
+				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
 					sendMeetingTaskReminderMail(e, emailId);
 					meetingNotification(e.getMeetingTaskId());
-				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
+				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
 					sendMeetingTaskReminderMail(e, emailId);
-				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
+				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					meetingNotification(e.getMeetingTaskId());
 			});
 
@@ -144,12 +144,12 @@ public class TaskRemainderUtil {
 				String emailId = null;
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
-				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
+				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
 					sendLeadTaskReminderMail(e, emailId);
 					leadNotification(e.getLeadTaskId());
-				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
+				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
 					sendLeadTaskReminderMail(e, emailId);
-				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
+				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					leadNotification(e.getLeadTaskId());
 			});
 
@@ -158,12 +158,12 @@ public class TaskRemainderUtil {
 				String emailId = null;
 				if (!e.getEmployee().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
-				if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(BOTH)) {
+				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
 					sendFollowUpLeadReminderMail(e, emailId);
 					followUpLeadNotification(e.getLeadId());
-				} else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(EMAIL))
+				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
 					sendFollowUpLeadReminderMail(e, emailId);
-				else if (nonNull(e.getRemainderVia()) && e.getRemainderVia().equalsIgnoreCase(NOTIFICATIONS))
+				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					followUpLeadNotification(e.getLeadId());
 			});
 
