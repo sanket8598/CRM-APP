@@ -2,7 +2,7 @@ package ai.rnt.crm.dto;
 
 import static javax.persistence.TemporalType.DATE;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Temporal;
@@ -47,7 +47,7 @@ public class EmailDto {
 
 	@Temporal(DATE)
 	@FutureOrPresent(message="Date must not be smaller than today's date!!")
-	private Date scheduledOn;
+	private LocalDate scheduledOn;
 
 	private String scheduledAt;
 

@@ -20,7 +20,6 @@ import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
@@ -109,7 +108,7 @@ public class CallServiceImpl implements CallService {
 			call.put(DATA, TO_GET_CALL_DTO.apply(callDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException(ADD_CALL, CALL_ID, callId))));
 			call.put(SUCCESS, true);
-			return new ResponseEntity<>(call, FOUND);
+			return new ResponseEntity<>(call, OK);
 		} catch (Exception e) {
 			log.error("Got exception while get call data for edit..{}", e.getMessage());
 			throw new CRMException(e);
@@ -280,7 +279,7 @@ public class CallServiceImpl implements CallService {
 			callTask.put(DATA, TO_GET_CALL_TASK_DTO.apply(callDaoService.getCallTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(PHONE_CALL_TASK, TASK_ID, taskId))));
 			callTask.put(SUCCESS, true);
-			return new ResponseEntity<>(callTask, FOUND);
+			return new ResponseEntity<>(callTask, OK);
 		} catch (Exception e) {
 			log.error("error occured while getting phone call task by id..{}", +taskId, e.getMessage());
 			throw new CRMException(e);

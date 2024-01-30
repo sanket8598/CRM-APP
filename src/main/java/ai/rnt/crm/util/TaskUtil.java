@@ -3,8 +3,7 @@ package ai.rnt.crm.util;
 import static java.util.Objects.isNull;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.time.ZoneId;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import ai.rnt.crm.entity.LeadTask;
@@ -135,9 +134,8 @@ public class TaskUtil {
 		}
 	}
 
-	private static boolean compareDatesIgnoringTime(Date oldDate, Date newDate) {
+	private static boolean compareDatesIgnoringTime(LocalDate oldDate, LocalDate newDate) {
 		log.info("inside the compareDatesIgnoringTime method...{}");
-		return oldDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
-				.equals(newDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+		return oldDate.equals(newDate);
 	}
 }

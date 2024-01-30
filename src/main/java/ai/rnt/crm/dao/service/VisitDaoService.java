@@ -1,6 +1,6 @@
 package ai.rnt.crm.dao.service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,5 +22,5 @@ public interface VisitDaoService extends CrudService<Visit, VisitDto> {
 
 	List<VisitTask> getAllTask();
 
-	List<VisitTask> getTodaysAllVisitTask(Date todayAsDate, String time);
+	List<VisitTask> getTodaysAllVisitTask(LocalDate todayAsDate, String time);
 }

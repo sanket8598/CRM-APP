@@ -129,7 +129,6 @@ import static java.util.stream.Collectors.toMap;
 import static org.apache.poi.ss.usermodel.WorkbookFactory.create;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.io.IOException;
@@ -355,7 +354,7 @@ public class LeadServiceImpl implements LeadService {
 				getAllLeads.put(DATA, dataMap);
 			} else
 				getAllLeads.put(DATA, TO_LEAD_DTOS.apply(leadDaoService.getLeadsByStatus(leadsStatus)));
-			return new ResponseEntity<>(getAllLeads, FOUND);
+			return new ResponseEntity<>(getAllLeads, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting open view leads data..{}", e.getMessage());
 			throw new CRMException(e);
@@ -369,7 +368,7 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			resultMap.put(SUCCESS, true);
 			resultMap.put(DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
-			return new ResponseEntity<>(resultMap, FOUND);
+			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting lead source..{}", e.getMessage());
 			throw new CRMException(e);
@@ -389,7 +388,7 @@ public class LeadServiceImpl implements LeadService {
 			dataMap.put(DOMAIN_MASTER_DATA, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
 			dataMap.put(ASSIGN_DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
 			resultMap.put(DATA, dataMap);
-			return new ResponseEntity<>(resultMap, FOUND);
+			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting all dropdown data..{}", e.getMessage());
 			throw new CRMException(e);
@@ -403,7 +402,7 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			leadsDashboardData.put(SUCCESS, true);
 			leadsDashboardData.put(DATA, TO_DASHBOARD_LEADDTOS.apply(leadDaoService.getLeadDashboardData()));
-			return new ResponseEntity<>(leadsDashboardData, FOUND);
+			return new ResponseEntity<>(leadsDashboardData, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting lead DashboardData..{}", e.getMessage());
 			throw new CRMException(e);
@@ -461,7 +460,7 @@ public class LeadServiceImpl implements LeadService {
 				leadsDataByStatus.put(DATA, emptyList());
 
 			leadsDataByStatus.put(SUCCESS, true);
-			return new ResponseEntity<>(leadsDataByStatus, FOUND);
+			return new ResponseEntity<>(leadsDataByStatus, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting LeadDashboardDataByStatus..{}", e.getMessage());
 			throw new CRMException(e);
@@ -663,9 +662,9 @@ public class LeadServiceImpl implements LeadService {
 			upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 			LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities = upNext.stream()
-					.collect(groupingBy(e -> DAYS.between(now().atZone(systemDefault())
-				            .withZoneSameInstant(of(INDIA_ZONE))
-				            .toLocalDateTime(), parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
+					.collect(groupingBy(e -> DAYS.between(
+							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime(),
+							parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
 					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
 							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
 			dataMap.put(LEAD_INFO, dto);
@@ -678,7 +677,7 @@ public class LeadServiceImpl implements LeadService {
 			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, leadById));
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);
-			return new ResponseEntity<>(lead, FOUND);
+			return new ResponseEntity<>(lead, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while editing the lead data..{}", e.getMessage());
 			throw new CRMException(e);
@@ -956,7 +955,7 @@ public class LeadServiceImpl implements LeadService {
 			result.put(DATA, TO_QUALIFY_LEAD.apply(leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId))));
 			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, FOUND);
+			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting the Qualified lead for edit..{}", e.getMessage());
 			throw new CRMException(e);

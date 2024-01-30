@@ -1,6 +1,6 @@
 package ai.rnt.crm.dao.service;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ public interface MeetingDaoService extends CrudService<Meetings, MeetingDto> {
 
 	Optional<MeetingTask> getMeetingTaskById(Integer taskId);
 
-	List<MeetingTask> getTodaysMeetingTask(Date todayAsDate, String time);
+	List<MeetingTask> getTodaysMeetingTask(LocalDate todayAsDate, String time);
 
 	List<MeetingTask> getAllMeetingTask();
 

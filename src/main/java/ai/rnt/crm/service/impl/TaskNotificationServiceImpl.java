@@ -3,10 +3,9 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_GET_NOTIFICATION_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -43,7 +42,7 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 			countData.put("Notifications", TO_GET_NOTIFICATION_DTOS.apply(notifyData));
 			notification.put(DATA, countData);
 			notification.put(SUCCESS, true);
-			return new ResponseEntity<>(notification, FOUND);
+			return new ResponseEntity<>(notification, OK);
 		} catch (Exception e) {
 			log.error("Got exception while getting notification..{}" + e.getMessage());
 			throw new CRMException(e);

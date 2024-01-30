@@ -5,7 +5,7 @@ import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EmployeeMaster;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static org.springframework.http.HttpStatus.FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -76,7 +76,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			  resultMap.put(DATA, emailMap);
 			}else
 			 resultMap.put(DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
-			return new ResponseEntity<>(resultMap, FOUND);
+			return new ResponseEntity<>(resultMap, OK);
 		}catch (Exception e) {
 			log.info("Got Exception while getting admin and user..{}" ,e.getMessage());
 			throw new CRMException(e);

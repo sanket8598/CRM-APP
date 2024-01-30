@@ -1,6 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +59,7 @@ public class CallDaoServiceImpl implements CallDaoService {
 	}
 
 	@Override
-	public List<PhoneCallTask> getTodaysCallTask(Date todayDate, String time) {
+	public List<PhoneCallTask> getTodaysCallTask(LocalDate todayDate, String time) {
 		return callTaskRepository.findByRemainderDueOnAndRemainderDueAtAndRemainderOn(todayDate, time, true);
 	}
 }

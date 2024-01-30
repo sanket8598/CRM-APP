@@ -14,7 +14,6 @@ import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
@@ -96,7 +95,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			result.put(DATA, TO_GET_LEAD_TASK_DTO.apply(leadTaskDaoService.getTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD_TASK, TASK_ID, taskId))));
 			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, FOUND);
+			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting the lead task..{}", e.getMessage());
 			throw new CRMException(e);

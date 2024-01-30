@@ -1,8 +1,9 @@
 package ai.rnt.crm.dto;
 
-import java.util.Date;
+import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
 
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.validation.ValidTaskPriority;
@@ -22,8 +23,9 @@ public class LeadTaskDto {
 	@ValidTaskPriority(message = "Please Enter Valid Task Priority!!")
 	private String priority;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private Date dueDate;
+	@NotNull(message="Due date should not be null!!")
+	@FutureOrPresent(message="Date must not be smaller than today's date!!")
+	private LocalDate dueDate;
 	
 	private String dueTime;
 
@@ -35,8 +37,8 @@ public class LeadTaskDto {
 
 	private String remainderDueAt;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private Date remainderDueOn;
+	@FutureOrPresent(message="Date must not be smaller than today's date!!")
+	private LocalDate remainderDueOn;
 
 	private EmployeeMaster assignTo;
 }

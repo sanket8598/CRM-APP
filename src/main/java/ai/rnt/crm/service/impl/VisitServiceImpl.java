@@ -20,7 +20,6 @@ import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
@@ -111,7 +110,7 @@ public class VisitServiceImpl implements VisitService {
 			visit.put(SUCCESS, true);
 			visit.put(DATA, TO_GET_VISIT_DTO.apply(visitDaoService.getVisitsByVisitId(visitId)
 					.orElseThrow(() -> new ResourceNotFoundException(VISIT, VISIT_ID, visitId))));
-			return new ResponseEntity<>(visit, FOUND);
+			return new ResponseEntity<>(visit, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while get visit for edit..{}", e.getMessage());
 			throw new CRMException(e);
@@ -279,7 +278,7 @@ public class VisitServiceImpl implements VisitService {
 			visitTask.put(SUCCESS, true);
 			visitTask.put(DATA, TO_GET_VISIT_TASK_DTO.apply(visitDaoService.getVisitTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(VISIT_TASK, TASK_ID, taskId))));
-			return new ResponseEntity<>(visitTask, FOUND);
+			return new ResponseEntity<>(visitTask, OK);
 		} catch (Exception e) {
 			log.error("error occured while getting visit task by id..{}", +taskId, e.getMessage());
 			throw new CRMException(e);

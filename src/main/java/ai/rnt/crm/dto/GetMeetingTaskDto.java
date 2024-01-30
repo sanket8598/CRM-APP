@@ -3,6 +3,7 @@ package ai.rnt.crm.dto;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static javax.persistence.TemporalType.DATE;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import javax.persistence.Temporal;
@@ -25,12 +26,12 @@ public class GetMeetingTaskDto {
 	private String priority;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date dueDate;
+	private LocalDate dueDate;
 
 	private String dueTime;
 
 	@Temporal(DATE)
-	private Date updateDueDate;
+	private LocalDate updateDueDate;
 
 	private String dueTime12Hours;
 
@@ -44,7 +45,7 @@ public class GetMeetingTaskDto {
 	private Date remainderDueOn;
 
 	@Temporal(DATE)
-	private Date updatedRemainderDueOn;
+	private LocalDate updatedRemainderDueOn;
 
 	public String getMeetingTaskDueDate() {
 		return convertDateDateWithTime(getDueDate(), getDueTime12Hours());

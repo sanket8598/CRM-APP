@@ -1,6 +1,6 @@
 package ai.rnt.crm.repository;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +13,7 @@ public interface LeadsRepository extends JpaRepository<Leads, Integer> {
 
 	List<Leads> findByOrderByCreatedDateDesc();
 
-	List<Leads> findByRemainderDueOnAndRemainderDueAtAndIsFollowUpRemainder(Date todayAsDate, String time,
+	List<Leads> findByRemainderDueOnAndRemainderDueAtAndIsFollowUpRemainder(LocalDate todayAsDate, String time,
 			boolean isFollowUpRemainder);
 
 }

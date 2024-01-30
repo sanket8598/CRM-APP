@@ -22,7 +22,6 @@ import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
@@ -134,7 +133,7 @@ public class MeetingServiceImpl implements MeetingService {
 			meeting.put(SUCCESS, true);
 			meeting.put(DATA, TO_GET_MEETING_DTO.apply(meetingDaoService.getMeetingById(meetingId)
 					.orElseThrow(() -> new ResourceNotFoundException("Meeting", MEETING_ID, meetingId))));
-			return new ResponseEntity<>(meeting, FOUND);
+			return new ResponseEntity<>(meeting, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while geting meeting for edit..{}", e.getMessage());
 			throw new CRMException(e);
@@ -288,7 +287,7 @@ public class MeetingServiceImpl implements MeetingService {
 			meetingTask.put(SUCCESS, true);
 			meetingTask.put(DATA, TO_GET_MEETING_TASK_DTO.apply(meetingDaoService.getMeetingTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(MEETING_TASK, "meetingTaskId", taskId))));
-			return new ResponseEntity<>(meetingTask, FOUND);
+			return new ResponseEntity<>(meetingTask, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting the meeting task by id..{} " + taskId, e.getMessage());
 			throw new CRMException(e);
