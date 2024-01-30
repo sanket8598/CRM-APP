@@ -1,8 +1,11 @@
 package ai.rnt.crm.functional.predicates;
 
 import static ai.rnt.crm.constants.DateFormatterConstant.DATE_TIME_WITH_AM_OR_PM;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.parse;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.MINUTES;
 import static java.util.Objects.isNull;
@@ -26,7 +29,9 @@ public class UpnextPredicate {
 			return false;
 		else {
 			try {
-				LocalDateTime now = now();
+				LocalDateTime now = now().atZone(systemDefault())
+			            .withZoneSameInstant(of(INDIA_ZONE))
+			            .toLocalDateTime();
 				LocalDateTime parse = parse(s, DATE_TIME_WITH_AM_OR_PM);
 				return (DAYS.between(now, parse) >= 0 && DAYS.between(now, parse) <= 4)
 						&& MINUTES.between(now, parse) >= 0;

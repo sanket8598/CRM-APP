@@ -4,6 +4,7 @@ import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.DateFormatterConstant.END_TIME;
 import static ai.rnt.crm.constants.DateFormatterConstant.START_TIME;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.VisitDtoMapper.TO_GET_VISIT_DTO;
@@ -15,6 +16,8 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.TaskUtil.checkDuplicateVisitTask;
 import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
@@ -139,7 +142,6 @@ public class VisitServiceImpl implements VisitService {
 			visit.setParticipates(dto.getParticipates().stream().collect(Collectors.joining(",")));
 			visit.setAllDay(dto.isAllDay());
 			visit.setStatus(status);
-			visit.setUpdatedDate(now());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				if (status.equalsIgnoreCase(SAVE))
 					result.put(MESSAGE, "Visit Updated Successfully");
@@ -192,7 +194,6 @@ public class VisitServiceImpl implements VisitService {
 		try {
 			Visit visit = visitDaoService.getVisitsByVisitId(visitId)
 					.orElseThrow(() -> new ResourceNotFoundException(VISIT, VISIT_ID, visitId));
-			visit.setUpdatedDate(now());
 			visit.setStatus(COMPLETE);
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit updated SuccessFully");
@@ -219,11 +220,15 @@ public class VisitServiceImpl implements VisitService {
 					.orElseThrow(() -> new ResourceNotFoundException(VISIT, VISIT_ID, visitId));
 			visit.getVisitTasks().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(now());
+				e.setDeletedDate(now().atZone(systemDefault())
+			            .withZoneSameInstant(of(INDIA_ZONE))
+			            .toLocalDateTime());
 				visitDaoService.addVisitTask(e);
 			});
 			visit.setDeletedBy(loggedInStaffId);
-			visit.setDeletedDate(now());
+			visit.setDeletedDate(now().atZone(systemDefault())
+		            .withZoneSameInstant(of(INDIA_ZONE))
+		            .toLocalDateTime());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit deleted SuccessFully.");
 				result.put(SUCCESS, true);
@@ -298,7 +303,6 @@ public class VisitServiceImpl implements VisitService {
 			visitTask.setRemainderOn(dto.isRemainderOn());
 			visitTask.setRemainderVia(dto.getRemainderVia());
 			visitTask.setDescription(dto.getDescription());
-			visitTask.setUpdatedDate(now());
 			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Task Updated Successfully..!!");
@@ -345,7 +349,9 @@ public class VisitServiceImpl implements VisitService {
 			VisitTask visitTask = visitDaoService.getVisitTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(VISIT_TASK, TASK_ID, taskId));
 			visitTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			visitTask.setDeletedDate(now());
+			visitTask.setDeletedDate(now().atZone(systemDefault())
+		            .withZoneSameInstant(of(INDIA_ZONE))
+		            .toLocalDateTime());
 			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
 				result.put(MESSAGE, "Visit Task Deleted SuccessFully.");
 				result.put(SUCCESS, true);

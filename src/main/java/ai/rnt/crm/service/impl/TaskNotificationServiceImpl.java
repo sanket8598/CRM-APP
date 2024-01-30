@@ -59,7 +59,6 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 			TaskNotifications notifyData = taskNotificationDaoService.getNotificationById(notifId)
 					.orElseThrow(() -> new ResourceNotFoundException("TaskNotifications", "NotifId", notifId));
 			notifyData.setNotifStatus(false);
-			notifyData.setUpdatedDate(now());
 			if (nonNull(taskNotificationDaoService.seenNotification(notifyData)))
 				notification.put(SUCCESS, true);
 			return new ResponseEntity<>(notification, CREATED);

@@ -4,6 +4,7 @@ import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.DateFormatterConstant.END_TIME;
 import static ai.rnt.crm.constants.DateFormatterConstant.START_TIME;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.COMPLETE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.dto_mapper.CallDtoMapper.TO_CALL;
@@ -15,6 +16,8 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.TaskUtil.checkDuplicateTask;
 import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.FOUND;
@@ -139,9 +142,8 @@ public class CallServiceImpl implements CallService {
 			call.setDuration(dto.getDuration());
 			call.setAllDay(dto.isAllDay());
 			call.setStatus(status);
-			call.setUpdatedDate(now());
 			if (nonNull(callDaoService.call(call))) {
-				if (status.equalsIgnoreCase(SAVE))
+				if (SAVE.equalsIgnoreCase(status))
 					result.put(MESSAGE, "Call Updated Successfully");
 				else
 					result.put(MESSAGE, "Call Updated And Completed Successfully");
@@ -219,11 +221,15 @@ public class CallServiceImpl implements CallService {
 					.orElseThrow(() -> new ResourceNotFoundException("Call", CALL_ID, callId));
 			call.getCallTasks().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(now());
+				e.setDeletedDate(now().atZone(systemDefault())
+			            .withZoneSameInstant(of(INDIA_ZONE))
+			            .toLocalDateTime());
 				callDaoService.addCallTask(e);
 			});
 			call.setDeletedBy(loggedInStaffId);
-			call.setDeletedDate(now());
+			call.setDeletedDate(now().atZone(systemDefault())
+		            .withZoneSameInstant(of(INDIA_ZONE))
+		            .toLocalDateTime());
 			if (nonNull(callDaoService.call(call))) {
 				result.put(MESSAGE, "Call deleted SuccessFully.");
 				result.put(SUCCESS, true);
@@ -298,7 +304,6 @@ public class CallServiceImpl implements CallService {
 			phoneCallTask.setRemainderVia(dto.getRemainderVia());
 			phoneCallTask.setRemainderDueAt(dto.getRemainderDueAt());
 			phoneCallTask.setDescription(dto.getDescription());
-			phoneCallTask.setUpdatedDate(now());
 			if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
 				callTask.put(SUCCESS, true);
 				callTask.put(MESSAGE, "Task Updated Successfully..!!");
@@ -345,7 +350,9 @@ public class CallServiceImpl implements CallService {
 			PhoneCallTask callTask = callDaoService.getCallTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(PHONE_CALL_TASK, TASK_ID, taskId));
 			callTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			callTask.setDeletedDate(now());
+			callTask.setDeletedDate(now().atZone(systemDefault())
+		            .withZoneSameInstant(of(INDIA_ZONE))
+		            .toLocalDateTime());
 			if (nonNull(callDaoService.addCallTask(callTask))) {
 				deleteTask.put(MESSAGE, "Call Task Deleted SuccessFully.");
 				deleteTask.put(SUCCESS, true);

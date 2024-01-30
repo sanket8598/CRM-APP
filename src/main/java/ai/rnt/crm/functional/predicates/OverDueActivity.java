@@ -1,8 +1,11 @@
 package ai.rnt.crm.functional.predicates;
 
 import static ai.rnt.crm.constants.DateFormatterConstant.DATE_TIME_WITH_AM_OR_PM;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.parse;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.isNull;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -22,7 +25,9 @@ public class OverDueActivity {
 			return false;
 		else {
 			try {
-				return parse(s, DATE_TIME_WITH_AM_OR_PM).isBefore(now());
+				return parse(s, DATE_TIME_WITH_AM_OR_PM).isBefore(now().atZone(systemDefault())
+			            .withZoneSameInstant(of(INDIA_ZONE))
+			            .toLocalDateTime());
 			} catch (Exception e) {
 				return false;
 			}

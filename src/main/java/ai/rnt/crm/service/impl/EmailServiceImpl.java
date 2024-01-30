@@ -1,6 +1,7 @@
 package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.SAVE;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT;
@@ -12,6 +13,8 @@ import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.EmailUtil.sendEmail;
 import static java.lang.Boolean.TRUE;
 import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -168,9 +171,13 @@ public class EmailServiceImpl implements EmailService {
 				if (nonNull(attachment) && !attachment.isEmpty()) {
 					List<Attachment> attach = attachment.stream().map(e -> {
 						e.setDeletedBy(details.getStaffId());
-						e.setDeletedDate(now());
+						e.setDeletedDate(now().atZone(systemDefault())
+					            .withZoneSameInstant(of(INDIA_ZONE))
+					            .toLocalDateTime());
 						e.getMail().setDeletedBy(details.getStaffId());
-						e.getMail().setDeletedDate(now());
+						e.getMail().setDeletedDate(now().atZone(systemDefault())
+					            .withZoneSameInstant(of(INDIA_ZONE))
+					            .toLocalDateTime());
 						e.setMail(e.getMail());
 						return e;
 					}).collect(Collectors.toList());
@@ -180,7 +187,9 @@ public class EmailServiceImpl implements EmailService {
 					}
 				} else {
 					mail.setDeletedBy(details.getStaffId());
-					mail.setDeletedDate(now());
+					mail.setDeletedDate(now().atZone(systemDefault())
+				            .withZoneSameInstant(of(INDIA_ZONE))
+				            .toLocalDateTime());
 					updatedEmail = emailDaoService.email(mail);
 				}
 			}
@@ -280,7 +289,9 @@ public class EmailServiceImpl implements EmailService {
 							Attachment data = attachmentDaoService.findById(existingAttachment.getEmailAttchId())
 									.orElse(null);
 							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-							data.setDeletedDate(now());
+							data.setDeletedDate(now().atZone(systemDefault())
+						            .withZoneSameInstant(of(INDIA_ZONE))
+						            .toLocalDateTime());
 							attachmentDaoService.addAttachment(data);
 						}
 					}

@@ -1,9 +1,12 @@
 package ai.rnt.crm.dao.service.impl;
 
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
+import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,7 +47,9 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 
 	@Override
 	public List<String> activeEmployeeEmailIds() {
-		return employeeMasterRepository.findEmailIdByDepartureDateIsNullOrDepartureDateBefore(LocalDate.now()).stream()
+		return employeeMasterRepository.findEmailIdByDepartureDateIsNullOrDepartureDateBefore(now().atZone(systemDefault())
+	            .withZoneSameInstant(of(INDIA_ZONE))
+	            .toLocalDate()).stream()
 				.filter(e -> nonNull(e) && nonNull(e.getEmailId())).map(EmailIdProjection::getEmailId)
 				.collect(Collectors.toList());
 	}

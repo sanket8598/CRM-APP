@@ -2,6 +2,7 @@ package ai.rnt.crm.payloads;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.time.LocalDateTime.now;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -36,7 +37,7 @@ public class ApiError implements Serializable{
 	private List<String> errors = new ArrayList<>();
 	HttpStatus httpStatus;
 	private ApiError() {
-		timestamp = LocalDateTime.now();
+		timestamp = now();
 	}
 
 	public ApiError(HttpStatus httpStatus) {

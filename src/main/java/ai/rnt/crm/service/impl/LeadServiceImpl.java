@@ -44,6 +44,7 @@ import static ai.rnt.crm.constants.MessageConstants.NO_ACTIVITY;
 import static ai.rnt.crm.constants.MessageConstants.SOON_MORE;
 import static ai.rnt.crm.constants.MessageConstants.WAIT_FOR;
 import static ai.rnt.crm.constants.RegexConstant.IS_DIGIT;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
@@ -111,6 +112,8 @@ import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.parse;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -660,7 +663,9 @@ public class LeadServiceImpl implements LeadService {
 			upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 			LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities = upNext.stream()
-					.collect(groupingBy(e -> DAYS.between(now(), parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
+					.collect(groupingBy(e -> DAYS.between(now().atZone(systemDefault())
+				            .withZoneSameInstant(of(INDIA_ZONE))
+				            .toLocalDateTime(), parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
 					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
 							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
 			dataMap.put(LEAD_INFO, dto);
