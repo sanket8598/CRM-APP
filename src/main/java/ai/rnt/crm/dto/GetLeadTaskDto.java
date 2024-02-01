@@ -1,5 +1,6 @@
 package ai.rnt.crm.dto;
 
+import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static javax.persistence.TemporalType.DATE;
 
 import java.time.LocalDate;
@@ -29,6 +30,8 @@ public class GetLeadTaskDto {
 
 	private String dueTime;
 
+	private String dueTime12Hours;
+
 	private String description;
 
 	private boolean remainderOn;
@@ -42,4 +45,8 @@ public class GetLeadTaskDto {
 
 	@Temporal(DATE)
 	private LocalDate updatedRemainderDueOn;
+
+	public String getLeadTaskDueDate() {
+		return convertDateDateWithTime(getDueDate(), getDueTime12Hours());
+	}
 }
