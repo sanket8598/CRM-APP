@@ -1,9 +1,11 @@
 package ai.rnt.crm.service.impl;
 
-import static ai.rnt.crm.dto_mapper.LeadTaskDtoMapper.TO_GET_NOTIFICATION_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
+import static java.lang.String.format;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.dao.service.TaskNotificationDaoService;
+import ai.rnt.crm.dto.TaskNotificationsDto;
+import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.TaskNotifications;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
@@ -38,8 +42,9 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 		try {
 			Map<String, Object> countData = new HashMap<>();
 			List<TaskNotifications> notifyData = taskNotificationDaoService.getNotifications(staffId);
+			List<TaskNotificationsDto> notifications = notifyData.stream().map(this::getMessage).collect(toList());
 			countData.put("Count", notifyData.stream().count());
-			countData.put("Notifications", TO_GET_NOTIFICATION_DTOS.apply(notifyData));
+			countData.put("Notifications", notifications);
 			notification.put(DATA, countData);
 			notification.put(SUCCESS, true);
 			return new ResponseEntity<>(notification, OK);
@@ -64,6 +69,42 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 		} catch (Exception e) {
 			log.error("Got exception while updating notification by Id..{}" + e.getMessage());
 			throw new CRMException(e);
+		}
+	}
+
+	private TaskNotificationsDto getMessage(TaskNotifications notification) {
+		log.info("inside the getMessage for Notification method...");
+		try {
+			if (nonNull(notification)) {
+				String msg = "Task Reminder : %s : The task is scheduled for completion by %s";
+				String leadMsg = "Follow-Up Reminder : %s by %s";
+				TaskNotificationsDto dto = new TaskNotificationsDto();
+				dto.setNotifStatus(notification.isNotifStatus());
+				dto.setNotifId(notification.getNotifId());
+				if (nonNull(notification.getCallTask()))
+					dto.setMessage(format(msg, notification.getCallTask().getSubject(), convertDateDateWithTime(
+							notification.getCallTask().getDueDate(), notification.getCallTask().getDueTime12Hours())));
+				else if (nonNull(notification.getVisitTask()))
+					dto.setMessage(format(msg, notification.getVisitTask().getSubject(),
+							convertDateDateWithTime(notification.getVisitTask().getDueDate(),
+									notification.getVisitTask().getDueTime12Hours())));
+				else if (nonNull(notification.getMeetingTask()))
+					dto.setMessage(format(msg, notification.getVisitTask().getSubject(),
+							convertDateDateWithTime(notification.getVisitTask().getDueDate(),
+									notification.getVisitTask().getDueTime12Hours())));
+				else if (nonNull(notification.getLeadTask()))
+					dto.setMessage(format(msg, notification.getLeadTask().getSubject(), convertDateDateWithTime(
+							notification.getLeadTask().getDueDate(), notification.getLeadTask().getDueTime12Hours())));
+				else if (nonNull(notification.getLeads()))
+					dto.setMessage(format(leadMsg, notification.getLeads().getTopic(),
+							notification.getLeads().getContacts().stream().filter(Contacts::getPrimary)
+									.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("")));
+				return dto;
+			}
+			return null;
+		} catch (Exception e) {
+			log.error("Got exception while getMessage for Notification..{}" + e.getMessage());
+			return null;
 		}
 	}
 }
