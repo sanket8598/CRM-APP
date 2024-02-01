@@ -143,7 +143,7 @@ public class LeadsController {
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping(UPDATE_LEAD_CONTACT)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(@PathVariable Integer leadId,
-			@RequestBody @Valid UpdateLeadDto dto) {
+			@RequestBody UpdateLeadDto dto) {
 		return leadService.updateLeadContact(leadId, dto);
 	}
 
