@@ -1,5 +1,6 @@
 package ai.rnt.crm.util;
 
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Objects.nonNull;
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
@@ -7,7 +8,6 @@ import static javax.mail.Message.RecipientType.TO;
 import static javax.mail.Transport.send;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Date;
@@ -332,8 +332,7 @@ public class EmailUtil {
 	private static String formatDate(LocalDate date) {
 		log.info("inside the formatDate method...{}", date);
 		try {
-			SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MMM-yyyy");
-			return outputFormat.format(date);
+			return ofPattern("dd-MMM-yyyy").format(date);
 		} catch (Exception e) {
 			log.error("Got Exception while converting task due date..{}" + e.getMessage());
 			throw new CRMException(e);

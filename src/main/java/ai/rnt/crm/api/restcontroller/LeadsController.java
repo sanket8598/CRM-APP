@@ -24,7 +24,6 @@ import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 import java.util.EnumMap;
 import java.util.Map;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.http.ResponseEntity;
