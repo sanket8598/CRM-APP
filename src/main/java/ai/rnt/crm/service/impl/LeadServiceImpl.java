@@ -1298,4 +1298,18 @@ public class LeadServiceImpl implements LeadService {
 		}
 		return upNextDataMap;
 	}
+
+	@Override
+	public void updateLeadsStatus(Integer leadId) {
+		log.info("inside the updateLeadsStatus method..{}", leadId);
+		try {
+			Leads lead = leadDaoService.getLeadById(leadId)
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
+			lead.setDisqualifyAs(QUALIFIED);
+			leadDaoService.addLead(lead);
+		} catch (Exception e) {
+			log.error("Got Exception while updating the lead status..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
 }

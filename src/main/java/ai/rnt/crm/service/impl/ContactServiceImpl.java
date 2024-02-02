@@ -54,10 +54,12 @@ public class ContactServiceImpl implements ContactService {
 			if (nonNull(contactDto.getName())) {
 				String[] names = splitByWhitespace(contactDto.getName());
 				if (hasWhitespace(contactDto.getName()) && names.length == 2) {
-					contact.setFirstName(names[0]);
-					contact.setLastName(names[1]);
-				} else
-					contact.setFirstName(contactDto.getName());
+					contact.setFirstName(nonNull(names[0]) ? names[0] : "");
+					contact.setLastName("null".equalsIgnoreCase(names[1]) ? null : names[1]);
+				} else {
+					contact.setFirstName(nonNull(contactDto.getName()) ? contactDto.getName() : "");
+				    contact.setLastName(null);
+				}
 			}
 			contact.setCompanyMaster(company);
 			leadDaoService.getLeadById(leadId).ifPresent(contact::setLead);
@@ -105,12 +107,13 @@ public class ContactServiceImpl implements ContactService {
 			if (nonNull(contactDto.getName())) {
 				String[] names = splitByWhitespace(contactDto.getName());
 				if (hasWhitespace(contactDto.getName()) && names.length == 2) {
-					contact.setFirstName(names[0]);
-					contact.setLastName(names[1]);
-				} else
+					contact.setFirstName(nonNull(names[0]) ? names[0] : "");
+					contact.setLastName("null".equalsIgnoreCase(names[1]) ? null : names[1]);
+				} else {
 					contact.setFirstName(contactDto.getName());
+					 contact.setLastName(null);
+				}
 			}
-
 			contact.setContactNumberPrimary(contactDto.getContactNumberPrimary());
 			contact.setContactNumberSecondary(contactDto.getContactNumberSecondary());
 			contact.setDesignation(contactDto.getDesignation());
