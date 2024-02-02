@@ -46,6 +46,7 @@ import ai.rnt.crm.entity.TaskNotifications;
 import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.service.LeadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -81,6 +82,8 @@ public class TaskRemainderUtil {
 	private final EmployeeDaoService employeeDaoService;
 
 	private final TaskNotificationsUtil taskNotificationsUtil;
+
+	private final LeadService leadService;
 
 	@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
@@ -157,10 +160,14 @@ public class TaskRemainderUtil {
 				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
 					sendFollowUpLeadReminderMail(e, emailId);
 					followUpLeadNotification(e.getLeadId());
-				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
+					leadService.updateLeadsStatus(e.getLeadId());
+				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia())) {
 					sendFollowUpLeadReminderMail(e, emailId);
-				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
+					leadService.updateLeadsStatus(e.getLeadId());
+				} else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia())) {
 					followUpLeadNotification(e.getLeadId());
+					leadService.updateLeadsStatus(e.getLeadId());
+				}
 			});
 
 			List<Email> emails = emailDaoService.isScheduledEmails(todayAsDate, time);

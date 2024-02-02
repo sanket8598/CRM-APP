@@ -46,4 +46,6 @@ public interface LeadService {
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getForQualifyLead(Integer leadId);
 
+	public void updateLeadsStatus(Integer leadId);
+
 }
