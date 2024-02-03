@@ -2,6 +2,9 @@ package ai.rnt.crm.dto;
 
 import static java.util.Objects.nonNull;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
 import lombok.Data;
 
 @Data
@@ -35,6 +38,8 @@ public class ContactDto {
 
 	private String businessCardType;
 	
+	@NotBlank(message = "First/last name should not be empty or null!!")
+	@Pattern(regexp = "^[A-Za-z]+\\s[A-Za-z]+$",message = "Plase enter valid first/last name!!")
 	private String name;
 
 	public String getName() {
