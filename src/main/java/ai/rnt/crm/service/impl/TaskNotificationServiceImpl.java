@@ -89,9 +89,9 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 							convertDateDateWithTime(notification.getVisitTask().getDueDate(),
 									notification.getVisitTask().getDueTime12Hours())));
 				else if (nonNull(notification.getMeetingTask()))
-					dto.setMessage(format(msg, notification.getVisitTask().getSubject(),
-							convertDateDateWithTime(notification.getVisitTask().getDueDate(),
-									notification.getVisitTask().getDueTime12Hours())));
+					dto.setMessage(format(msg, notification.getMeetingTask().getSubject(),
+							convertDateDateWithTime(notification.getMeetingTask().getDueDate(),
+									notification.getMeetingTask().getDueTime12Hours())));
 				else if (nonNull(notification.getLeadTask()))
 					dto.setMessage(format(msg, notification.getLeadTask().getSubject(), convertDateDateWithTime(
 							notification.getLeadTask().getDueDate(), notification.getLeadTask().getDueTime12Hours())));
