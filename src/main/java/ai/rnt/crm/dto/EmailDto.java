@@ -1,5 +1,6 @@
 package ai.rnt.crm.dto;
 
+import static com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING;
 import static javax.persistence.TemporalType.DATE;
 
 import java.time.LocalDate;
@@ -46,11 +47,18 @@ public class EmailDto {
 	private Boolean scheduled;
 
 	@Temporal(DATE)
-	@FutureOrPresent(message="Date must not be smaller than today's date!!")
+	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate scheduledOn;
+
+	@Temporal(DATE)
+	@JsonFormat(shape = STRING, pattern = "dd-MM-yyyy")
+	private LocalDate updateScheduledOn;
 
 	private String scheduledAt;
 
 	private List<AttachmentDto> attachment;
 
+	public LocalDate getUpdateScheduledOn() {
+		return getScheduledOn();
+	}
 }
