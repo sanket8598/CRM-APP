@@ -62,7 +62,7 @@ public class LeadDto {
 	private String disqualifyAs;
 
 	private String disqualifyReason;
-
+	
 	private String designation;
 
 	private String pseudoName;
