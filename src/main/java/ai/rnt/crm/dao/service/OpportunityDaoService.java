@@ -4,5 +4,5 @@ import ai.rnt.crm.entity.Opportunity;
 
 public interface OpportunityDaoService {
 
-	public Opportunity addOpportunity(Opportunity opportunity);
+	// Opportunity addOpportunity(Opportunity opportunity);
 }

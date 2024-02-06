@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.entity.Opportunity;
-import ai.rnt.crm.repository.OpportunityRepository;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -19,11 +18,11 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class OpportunityDaoServiceImpl implements OpportunityDaoService {
 
-	private final OpportunityRepository opportunityRespoitory;
+	//private final OpportunityRepository opportunityRespoitory;
 
-	@Override
-	public Opportunity addOpportunity(Opportunity opportunity) {
-		return opportunityRespoitory.save(opportunity);
-	}
+	/*
+	 * @Override public Opportunity addOpportunity(Opportunity opportunity) { return
+	 * opportunityRespoitory.save(opportunity); }
+	 */
 
 }
