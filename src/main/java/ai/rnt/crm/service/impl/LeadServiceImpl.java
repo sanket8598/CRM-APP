@@ -243,7 +243,7 @@ public class LeadServiceImpl implements LeadService {
 	private final MeetingDaoService meetingDaoService;
 	private final ContactDaoService contactDaoService;
 	private final DomainMasterDaoService domainMasterDaoService;
-	private final OpportunityDaoService opportunityDaoService;
+	//private final OpportunityDaoService opportunityDaoService;
 
 	private static final String PRIMFIELD = "PrimaryField";
 	private static final String SECNDFIELD = "SecondaryField";
@@ -1321,6 +1321,7 @@ public class LeadServiceImpl implements LeadService {
 		Opportunity opportunity = new Opportunity();
 		opportunity.setStatus(OppurtunityStatus.OPEN);
 		opportunity.setLeads(leads);
-		return nonNull(opportunityDaoService.addOpportunity(opportunity));
+		return false;
+				//nonNull(opportunityDaoService.addOpportunity(opportunity));
 	}
 }
