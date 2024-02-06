@@ -22,12 +22,12 @@ import lombok.Setter;
  * @since 03-02-2024.
  * @version 1.0
  */
-@Entity
-@Table(name = "crm_opportunites")
+//@Entity
+//@Table(name = "crm_opportunites")
 @Getter
 @Setter
 @NoArgsConstructor
-@Where(clause = "deleted_by is null")
+//@Where(clause = "deleted_by is null")
 public class Opportunity extends Auditable {
 	
 	private static final long serialVersionUID = -8839548448388664325L;

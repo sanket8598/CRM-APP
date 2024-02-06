@@ -708,7 +708,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			lead.setStatus(CLOSE_AS_QUALIFIED);
 			setServiceFallToLead(dto.getServiceFallsMaster().getServiceName(), lead);
-			if (nonNull(leadDaoService.addLead(lead)) && addToOpputunity(lead))
+			if (nonNull(leadDaoService.addLead(lead)))//&& addToOpputunity(lead)
 				result.put(MESSAGE, "Lead Qualified SuccessFully");
 			else
 				result.put(SUCCESS, false);
