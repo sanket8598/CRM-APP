@@ -8,6 +8,6 @@ import ai.rnt.crm.entity.TaskNotifications;
 
 public interface TaskNotificationsRepository extends JpaRepository<TaskNotifications, Integer> {
 
-	List<TaskNotifications> findByNotifToStaffIdAndNotifStatusOrderByCreatedDateDesc(Integer staffId, boolean notifyStatus);
-
+	List<TaskNotifications> findByNotifToStaffIdAndNotifStatusOrderByCreatedDateDesc(Integer staffId,
+			boolean notifyStatus);
 }

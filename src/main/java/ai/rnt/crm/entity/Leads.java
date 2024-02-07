@@ -23,6 +23,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -83,7 +84,7 @@ public class Leads extends Auditable {
 	@Column(name = "pseudo_name")
 	private String pseudoName;
 
-	@Column(name = "is_follow_up_remainder", columnDefinition = "boolean default false")
+	@Column(name = "is_follow_up_remainder")
 	private Boolean isFollowUpRemainder;
 
 	@Column(name = "remainder_via")
@@ -128,6 +129,11 @@ public class Leads extends Auditable {
 
 	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
 	private List<LeadTask> leadTasks = new ArrayList<>();
+	
+	/*
+	 * @OneToOne(mappedBy = "leads", cascade = ALL, orphanRemoval = true) private
+	 * Opportunity opportunity;
+	 */
 
 	@Transient
 	public String getRemainderDueAt12Hours() {

@@ -2,6 +2,8 @@ package ai.rnt.crm.util;
 
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
+import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
+import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
 import static ai.rnt.crm.util.EmailUtil.sendCallTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendEmail;
 import static ai.rnt.crm.util.EmailUtil.sendFollowUpLeadReminderMail;
@@ -16,7 +18,11 @@ import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.mail.internet.AddressException;
 
@@ -30,6 +36,7 @@ import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadTaskDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.dto.EmailDto;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
@@ -165,15 +172,15 @@ public class TaskRemainderUtil {
 
 			List<Email> emails = emailDaoService.isScheduledEmails(todayAsDate, time);
 			emails.forEach(email -> {
-				try {
-					if (sendEmail(email)) {
-						email.setStatus(SEND);
-						emailDaoService.email(email);
+					try {
+						if (sendEmail(email)){
+								email.setStatus(SEND);
+								emailDaoService.email(email);
+							}
+					} catch (AddressException e1) {
+						log.error("Got exception while sending the scheduled emails...{}", e1);
 					}
-				} catch (AddressException e1) {
-					log.error("Got exception while sending the scheduled emails...{}", e1);
-				}
-			});
+				});
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);
 			throw new CRMException(e);
@@ -260,3 +267,4 @@ public class TaskRemainderUtil {
 		}
 	}
 }
+>>>>>>> src/main/java/ai/rnt/crm/util/TaskRemainderUtil.java

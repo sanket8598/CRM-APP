@@ -152,6 +152,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import ai.rnt.crm.constants.ApiResponseKeyConstant;
+import ai.rnt.crm.constants.OppurtunityStatus;
 import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
@@ -164,6 +165,7 @@ import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSortFilterDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
+import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
@@ -193,6 +195,7 @@ import ai.rnt.crm.entity.LeadImportant;
 import ai.rnt.crm.entity.LeadSourceMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Meetings;
+import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.entity.StateMaster;
 import ai.rnt.crm.entity.Visit;
@@ -240,6 +243,7 @@ public class LeadServiceImpl implements LeadService {
 	private final MeetingDaoService meetingDaoService;
 	private final ContactDaoService contactDaoService;
 	private final DomainMasterDaoService domainMasterDaoService;
+	//private final OpportunityDaoService opportunityDaoService;
 
 	private static final String PRIMFIELD = "PrimaryField";
 	private static final String SECNDFIELD = "SecondaryField";
@@ -704,7 +708,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			lead.setStatus(CLOSE_AS_QUALIFIED);
 			setServiceFallToLead(dto.getServiceFallsMaster().getServiceName(), lead);
-			if (nonNull(leadDaoService.addLead(lead)))
+			if (nonNull(leadDaoService.addLead(lead)))//&& addToOpputunity(lead)
 				result.put(MESSAGE, "Lead Qualified SuccessFully");
 			else
 				result.put(SUCCESS, false);
@@ -1311,5 +1315,13 @@ public class LeadServiceImpl implements LeadService {
 			log.error("Got Exception while updating the lead status..{}", e.getMessage());
 			throw new CRMException(e);
 		}
+	}
+	
+	private boolean addToOpputunity(Leads leads) {
+		Opportunity opportunity = new Opportunity();
+		opportunity.setStatus(OppurtunityStatus.OPEN);
+		opportunity.setLeads(leads);
+		return false;
+				//nonNull(opportunityDaoService.addOpportunity(opportunity));
 	}
 }
