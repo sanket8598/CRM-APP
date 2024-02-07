@@ -172,28 +172,15 @@ public class TaskRemainderUtil {
 
 			List<Email> emails = emailDaoService.isScheduledEmails(todayAsDate, time);
 			emails.forEach(email -> {
-				Optional<EmailDto> newEmail = TO_EMAIL_DTO.apply(email);
-				newEmail.ifPresent(e -> {
-					e.setBcc(nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()
-							? Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList())
-							: Collections.emptyList());
-					e.setCc(nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
-							? Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList())
-							: Collections.emptyList());
-					e.setMailTo(nonNull(email.getToMail()) && !email.getToMail().isEmpty()
-							? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
-							: Collections.emptyList());
 					try {
-						if (sendEmail(e))
-							TO_EMAIL.apply(e).ifPresent(em -> {
-								em.setStatus(SEND);
-								emailDaoService.email(em);
-							});
+						if (sendEmail(email)){
+								email.setStatus(SEND);
+								emailDaoService.email(email);
+							}
 					} catch (AddressException e1) {
 						log.error("Got exception while sending the scheduled emails...{}", e1);
 					}
 				});
-			});
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);
 			throw new CRMException(e);
