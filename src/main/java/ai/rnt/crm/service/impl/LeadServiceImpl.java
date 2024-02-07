@@ -1318,9 +1318,10 @@ public class LeadServiceImpl implements LeadService {
 	}
 	
 	private boolean addToOpputunity(Leads leads) {
-		Opportunity opportunity = new Opportunity();
-		opportunity.setStatus(OppurtunityStatus.OPEN);
-		opportunity.setLeads(leads);
+		/*
+		 * Opportunity opportunity = new Opportunity();
+		 * opportunity.setStatus(OppurtunityStatus.OPEN); opportunity.setLeads(leads);
+		 */
 		return false;
 				//nonNull(opportunityDaoService.addOpportunity(opportunity));
 	}

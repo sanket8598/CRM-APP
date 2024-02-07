@@ -18,17 +18,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = PRIVATE)
 public class OpportunityDtoMapper {
 
-	public static final Function<Opportunity, Optional<LeadDashboardDto>> TO_DASHBOARD_OPPORTUNITY_DTO = e -> {
-		Optional<LeadDashboardDto> opportunityDashboardDto = evalMapper(e, LeadDashboardDto.class);
-		opportunityDashboardDto.ifPresent(l -> {
-			l.setCreatedOn(convertDate(e.getCreatedDate()));
-			l.setPrimaryContact(
-					TO_CONTACT_DTO.apply(e.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null))
-							.orElse(null));
-		});
-		return opportunityDashboardDto;
-	};
+	/*
+	 * public static final Function<Opportunity, Optional<LeadDashboardDto>>
+	 * TO_DASHBOARD_OPPORTUNITY_DTO = e -> { Optional<LeadDashboardDto>
+	 * opportunityDashboardDto = evalMapper(e, LeadDashboardDto.class);
+	 * opportunityDashboardDto.ifPresent(l -> {
+	 * l.setCreatedOn(convertDate(e.getCreatedDate())); l.setPrimaryContact(
+	 * TO_CONTACT_DTO.apply(e.getContacts().stream().filter(Contacts::getPrimary).
+	 * findFirst().orElse(null)) .orElse(null)); }); return opportunityDashboardDto;
+	 * };
+	 */
 	
-	public static final Function<Collection<Opportunity>, List<LeadDashboardDto>> TO_DASHBOARD_OPPORTUNITY_DTOS = e -> e.stream()
-			.map(dm -> TO_DASHBOARD_OPPORTUNITY_DTO.apply(dm).get()).collect(Collectors.toList());
+	/*
+	 * public static final Function<Collection<Opportunity>, List<LeadDashboardDto>>
+	 * TO_DASHBOARD_OPPORTUNITY_DTOS = e -> e.stream() .map(dm ->
+	 * TO_DASHBOARD_OPPORTUNITY_DTO.apply(dm).get()).collect(Collectors.toList());
+	 */
 }	
