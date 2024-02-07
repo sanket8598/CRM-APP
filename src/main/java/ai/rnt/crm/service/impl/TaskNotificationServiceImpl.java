@@ -17,7 +17,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.dao.service.TaskNotificationDaoService;
+import ai.rnt.crm.dao.TaskNotificationDaoService;
 import ai.rnt.crm.dto.TaskNotificationsDto;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.TaskNotifications;

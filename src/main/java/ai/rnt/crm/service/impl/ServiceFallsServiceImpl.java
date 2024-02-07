@@ -8,7 +8,7 @@ import java.util.EnumMap;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dao.ServiceFallsDaoSevice;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.service.ServiceFallsService;

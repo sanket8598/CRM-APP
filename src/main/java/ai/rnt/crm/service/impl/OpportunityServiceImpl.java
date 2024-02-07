@@ -24,7 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.constants.ApiResponseKeyConstant;
-import ai.rnt.crm.dao.service.OpportunityDaoService;
+import ai.rnt.crm.dao.OpportunityDaoService;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;

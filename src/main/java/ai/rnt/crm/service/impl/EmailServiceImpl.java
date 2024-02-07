@@ -32,9 +32,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ai.rnt.crm.dao.service.AttachmentDaoService;
-import ai.rnt.crm.dao.service.EmailDaoService;
-import ai.rnt.crm.dao.service.LeadDaoService;
+import ai.rnt.crm.dao.AttachmentDaoService;
+import ai.rnt.crm.dao.EmailDaoService;
+import ai.rnt.crm.dao.LeadDaoService;
 import ai.rnt.crm.dto.AttachmentDto;
 import ai.rnt.crm.dto.EmailDto;
 import ai.rnt.crm.entity.Attachment;
