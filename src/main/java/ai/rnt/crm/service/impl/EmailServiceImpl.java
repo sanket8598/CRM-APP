@@ -102,7 +102,6 @@ public class EmailServiceImpl implements EmailService {
 				result.put(DATA, sendEmail.getMailId());
 			} else if (SEND.equalsIgnoreCase(status)) {
 				boolean sendEmailStatus = sendEmail(sendEmail);
-				boolean sendEmailStatus = sendEmail(email);
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Saved and Sent Successfully!!");
