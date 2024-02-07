@@ -85,6 +85,10 @@ public class Email extends Auditable {
 	@JoinColumn(name="lead_id")
 	private Leads lead;
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="opty_id")
+	private Opportunity opportunity;
+	
 	@OneToMany(mappedBy = "mail",cascade = {REMOVE,REFRESH},orphanRemoval = true)
 	@Fetch(FetchMode.JOIN)
 	private List<Attachment> attachment = new ArrayList<>();

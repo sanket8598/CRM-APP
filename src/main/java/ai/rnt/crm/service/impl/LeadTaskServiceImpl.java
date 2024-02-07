@@ -24,8 +24,8 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.dao.service.LeadDaoService;
-import ai.rnt.crm.dao.service.LeadTaskDaoService;
+import ai.rnt.crm.dao.LeadDaoService;
+import ai.rnt.crm.dao.LeadTaskDaoService;
 import ai.rnt.crm.dto.GetLeadTaskDto;
 import ai.rnt.crm.dto.LeadTaskDto;
 import ai.rnt.crm.entity.EmployeeMaster;

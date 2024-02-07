@@ -17,7 +17,7 @@ public class OppurtunityStatus {
 
 	public static final String QUALIFY = "(In-Pipeline) Qualify";
 
-	public static final String DEVELOP = "(In-Pipeline) Develop";
+	public static final String ANALYSIS = "(In-Pipeline) Analysis";
 
 	public static final String PROPOSE = "(In-Pipeline) Propose";
 

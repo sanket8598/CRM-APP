@@ -22,8 +22,8 @@ import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.dao.service.ContactDaoService;
-import ai.rnt.crm.dao.service.LeadDaoService;
+import ai.rnt.crm.dao.ContactDaoService;
+import ai.rnt.crm.dao.LeadDaoService;
 import ai.rnt.crm.dto.ContactDto;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;

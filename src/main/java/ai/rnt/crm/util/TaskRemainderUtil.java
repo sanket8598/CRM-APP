@@ -23,6 +23,7 @@ import javax.mail.internet.AddressException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+<<<<<<< 5cf01ad7d29d79c9703acf64dc45666428fe7998
 import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.EmployeeDaoService;
@@ -30,6 +31,15 @@ import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadTaskDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
+=======
+import ai.rnt.crm.dao.CallDaoService;
+import ai.rnt.crm.dao.EmailDaoService;
+import ai.rnt.crm.dao.EmployeeDaoService;
+import ai.rnt.crm.dao.LeadDaoService;
+import ai.rnt.crm.dao.LeadTaskDaoService;
+import ai.rnt.crm.dao.MeetingDaoService;
+import ai.rnt.crm.dao.VisitDaoService;
+>>>>>>> 7720f4769a8bb8c1dea0ea8d4347001986bcf777
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
@@ -45,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Nikhil Gaikwad
- * @since 11/12/2023
+ * @since 11-12-2023
  * @version 1.0
  *
  */
@@ -165,6 +175,7 @@ public class TaskRemainderUtil {
 
 			List<Email> emails = emailDaoService.isScheduledEmails(todayAsDate, time);
 			emails.forEach(email -> {
+<<<<<<< 5cf01ad7d29d79c9703acf64dc45666428fe7998
 					try {
 						if (sendEmail(email))
 								email.setStatus(SEND);
@@ -172,6 +183,16 @@ public class TaskRemainderUtil {
 					} catch (AddressException e1) {
 						log.error("Got exception while sending the scheduled emails...{}", e1);
 					}
+=======
+				try {
+					if (sendEmail(email)) {
+						email.setStatus(SEND);
+						emailDaoService.email(email);
+					}
+				} catch (AddressException e1) {
+					log.error("Got exception while sending the scheduled emails...{}", e1);
+				}
+>>>>>>> 7720f4769a8bb8c1dea0ea8d4347001986bcf777
 			});
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);

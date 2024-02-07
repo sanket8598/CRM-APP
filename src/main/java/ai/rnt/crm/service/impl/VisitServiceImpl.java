@@ -33,8 +33,8 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.dao.service.LeadDaoService;
-import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.dao.LeadDaoService;
+import ai.rnt.crm.dao.VisitDaoService;
 import ai.rnt.crm.dto.GetVisitTaskDto;
 import ai.rnt.crm.dto.VisitDto;
 import ai.rnt.crm.dto.VisitTaskDto;

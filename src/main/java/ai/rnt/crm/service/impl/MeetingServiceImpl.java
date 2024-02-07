@@ -36,9 +36,9 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.dao.service.LeadDaoService;
-import ai.rnt.crm.dao.service.MeetingAttachmentDaoService;
-import ai.rnt.crm.dao.service.MeetingDaoService;
+import ai.rnt.crm.dao.LeadDaoService;
+import ai.rnt.crm.dao.MeetingAttachmentDaoService;
+import ai.rnt.crm.dao.MeetingDaoService;
 import ai.rnt.crm.dto.GetMeetingTaskDto;
 import ai.rnt.crm.dto.MeetingAttachmentsDto;
 import ai.rnt.crm.dto.MeetingDto;
