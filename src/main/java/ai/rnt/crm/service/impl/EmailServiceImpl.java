@@ -316,4 +316,3 @@ public class EmailServiceImpl implements EmailService {
 		}
 	}
 }
->>>>>>> src/main/java/ai/rnt/crm/service/impl/EmailServiceImpl.java
