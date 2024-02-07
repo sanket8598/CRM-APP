@@ -129,11 +129,9 @@ public class Leads extends Auditable {
 
 	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
 	private List<LeadTask> leadTasks = new ArrayList<>();
-	
-	/*
-	 * @OneToOne(mappedBy = "leads", cascade = ALL, orphanRemoval = true) private
-	 * Opportunity opportunity;
-	 */
+
+	@OneToOne(mappedBy = "leads", cascade = ALL, orphanRemoval = true)
+	private Opportunity opportunity;
 
 	@Transient
 	public String getRemainderDueAt12Hours() {
