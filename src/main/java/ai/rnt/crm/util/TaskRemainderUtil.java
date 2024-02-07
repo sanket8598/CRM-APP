@@ -166,20 +166,13 @@ public class TaskRemainderUtil {
 			List<Email> emails = emailDaoService.isScheduledEmails(todayAsDate, time);
 			emails.forEach(email -> {
 					try {
-						if (sendEmail(email))
+						if (sendEmail(email)) {
 								email.setStatus(SEND);
 								emailDaoService.email(email);
+						}
 					} catch (AddressException e1) {
 						log.error("Got exception while sending the scheduled emails...{}", e1);
 					}
-				try {
-					if (sendEmail(email)) {
-						email.setStatus(SEND);
-						emailDaoService.email(email);
-					}
-				} catch (AddressException e1) {
-					log.error("Got exception while sending the scheduled emails...{}", e1);
-				}
 			});
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);
