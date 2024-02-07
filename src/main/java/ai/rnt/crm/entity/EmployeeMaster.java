@@ -84,9 +84,6 @@ public class EmployeeMaster extends Auditable {
 	private List<Leads> leads = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "employee")
-	private List<Opportunity> opportunity = new ArrayList<>();
-	
-	@OneToMany(mappedBy = "employee")
 	private Set<LeadImportant> impLead;
 
 	public EmployeeMaster(Integer staffId, String firstName, String lastName, LocalDate departureDate,String emailId) {

@@ -1,15 +1,9 @@
 package ai.rnt.crm.repository;
 
-import java.util.List;
-
 import org.springframework.data.repository.CrudRepository;
 
-import ai.rnt.crm.entity.Opportunity;
+import ai.rnt.crm.entity.Leads;
 
-public interface OpportunityRepository{ /*extends CrudRepository<Opportunity, Integer>{
+//public interface OpportunityRepository extends CrudRepository<Leads, Integer>{
 
-	List<Opportunity> findByOrderByCreatedDateDesc();
-
-	List<Opportunity> findByStatusOrderByCreatedDateDesc(String status);*/
-
-}
+//}

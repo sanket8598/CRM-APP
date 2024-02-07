@@ -6,8 +6,6 @@ import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilde
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
@@ -19,9 +17,6 @@ public class GlobalDateFormatConfig {
 		return builder->{
 			builder.serializers(new LocalDateSerializer(ofPattern("yyyy-MM-dd")));
 			builder.serializers(new LocalDateTimeSerializer(ofPattern("yyyy-MM-dd HH:mm:ss")));
-			// Deserialize LocalDate and LocalDateTime with different formats
-            builder.deserializers(new LocalDateDeserializer(ofPattern("dd-MM-yyyy")));
-            builder.deserializers(new LocalDateTimeDeserializer(ofPattern("dd-MM-yyyy HH:mm:ss")));
 		};
 	}
 

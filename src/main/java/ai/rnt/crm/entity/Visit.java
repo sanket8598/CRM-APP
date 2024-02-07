@@ -92,10 +92,6 @@ public class Visit extends Auditable {
 	@ManyToOne
 	@JoinColumn(name = "lead_id")
 	private Leads lead;
-	
-	@ManyToOne
-	@JoinColumn(name = "opty_id")
-	private Opportunity opportunity;
 
 	@OneToMany(mappedBy = "visit", cascade = ALL, orphanRemoval = true)
 	private List<VisitTask> visitTasks = new ArrayList<>();

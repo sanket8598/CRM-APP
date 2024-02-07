@@ -32,8 +32,8 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.dao.CallDaoService;
-import ai.rnt.crm.dao.LeadDaoService;
+import ai.rnt.crm.dao.service.CallDaoService;
+import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.CallDto;
 import ai.rnt.crm.dto.CallTaskDto;
 import ai.rnt.crm.dto.GetCallTaskDto;
