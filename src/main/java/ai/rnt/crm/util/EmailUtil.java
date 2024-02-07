@@ -79,7 +79,9 @@ public class EmailUtil {
 			Message msg = new MimeMessage(getSession());
 			msg.setFrom(new InternetAddress(USERNAME));// change it to mail from.
 
-			List<String> recipientList =nonNull(email.getToMail())?of(email.getToMail().split(",")).map(String::trim).collect(toList()):emptyList();
+			List<String> recipientList = nonNull(email.getToMail())
+					? of(email.getToMail().split(",")).map(String::trim).collect(toList())
+					: emptyList();
 			InternetAddress[] recipientAddress = new InternetAddress[recipientList.size()];
 			int counter = 0;
 			for (String recipient : recipientList)
@@ -87,7 +89,7 @@ public class EmailUtil {
 			msg.setRecipients(TO, recipientAddress);
 
 			if (nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()) {
-				List<String> ccAddresses =of(email.getCcMail().split(",")).map(String::trim).collect(toList());
+				List<String> ccAddresses = of(email.getCcMail().split(",")).map(String::trim).collect(toList());
 				InternetAddress[] ccAddressList = new InternetAddress[ccAddresses.size()];
 				int count = 0;
 				for (String cc : ccAddresses)
@@ -95,7 +97,7 @@ public class EmailUtil {
 				msg.setRecipients(CC, ccAddressList);
 			}
 			if (nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()) {
-				List<String> bccAddress =of(email.getBccMail().split(",")).map(String::trim).collect(toList());
+				List<String> bccAddress = of(email.getBccMail().split(",")).map(String::trim).collect(toList());
 				InternetAddress[] bccAddressList = new InternetAddress[bccAddress.size()];
 				int index = 0;
 				for (String bcc : bccAddress)

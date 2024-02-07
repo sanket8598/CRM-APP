@@ -15,18 +15,19 @@ import static java.lang.Boolean.TRUE;
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.of;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -100,7 +101,11 @@ public class EmailServiceImpl implements EmailService {
 				result.put(MESSAGE, "Email Added Successfully");
 				result.put(DATA, sendEmail.getMailId());
 			} else if (SEND.equalsIgnoreCase(status)) {
+<<<<<<< 5cf01ad7d29d79c9703acf64dc45666428fe7998
+				boolean sendEmailStatus = sendEmail(sendEmail);
+=======
 				boolean sendEmailStatus = sendEmail(email);
+>>>>>>> 7720f4769a8bb8c1dea0ea8d4347001986bcf777
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Saved and Sent Successfully!!");
@@ -159,25 +164,22 @@ public class EmailServiceImpl implements EmailService {
 				if (nonNull(attachment) && !attachment.isEmpty()) {
 					List<Attachment> attach = attachment.stream().map(e -> {
 						e.setDeletedBy(details.getStaffId());
-						e.setDeletedDate(now().atZone(systemDefault())
-					            .withZoneSameInstant(of(INDIA_ZONE))
-					            .toLocalDateTime());
+						e.setDeletedDate(
+								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 						e.getMail().setDeletedBy(details.getStaffId());
-						e.getMail().setDeletedDate(now().atZone(systemDefault())
-					            .withZoneSameInstant(of(INDIA_ZONE))
-					            .toLocalDateTime());
+						e.getMail().setDeletedDate(
+								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 						e.setMail(e.getMail());
 						return e;
-					}).collect(Collectors.toList());
+					}).collect(toList());
 					for (Attachment e : attach) {
 						attachmentDaoService.addAttachment(e);
 						updatedEmail = emailDaoService.email(mail);
 					}
 				} else {
 					mail.setDeletedBy(details.getStaffId());
-					mail.setDeletedDate(now().atZone(systemDefault())
-				            .withZoneSameInstant(of(INDIA_ZONE))
-				            .toLocalDateTime());
+					mail.setDeletedDate(
+							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 					updatedEmail = emailDaoService.email(mail);
 				}
 			}
@@ -227,14 +229,14 @@ public class EmailServiceImpl implements EmailService {
 			Optional<EmailDto> mailDto = TO_EMAIL_DTO.apply(email);
 			mailDto.ifPresent(e -> {
 				e.setBcc(nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()
-						? Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList())
-						: Collections.emptyList());
+						? of(email.getBccMail().split(",")).map(String::trim).collect(toList())
+						: emptyList());
 				e.setCc(nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
-						? Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList())
-						: Collections.emptyList());
+						? of(email.getCcMail().split(",")).map(String::trim).collect(toList())
+						: emptyList());
 				e.setMailTo(nonNull(email.getToMail()) && !email.getToMail().isEmpty()
-						? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
-						: Collections.emptyList());
+						? of(email.getToMail().split(",")).map(String::trim).collect(toList())
+						: emptyList());
 			});
 			resultMap.put(DATA, mailDto);
 			resultMap.put(SUCCESS, true);
@@ -277,9 +279,8 @@ public class EmailServiceImpl implements EmailService {
 							Attachment data = attachmentDaoService.findById(existingAttachment.getEmailAttchId())
 									.orElse(null);
 							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-							data.setDeletedDate(now().atZone(systemDefault())
-						            .withZoneSameInstant(of(INDIA_ZONE))
-						            .toLocalDateTime());
+							data.setDeletedDate(now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE))
+									.toLocalDateTime());
 							attachmentDaoService.addAttachment(data);
 						}
 					}
