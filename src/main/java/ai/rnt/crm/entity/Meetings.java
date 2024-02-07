@@ -94,10 +94,6 @@ public class Meetings extends Auditable {
 	@ManyToOne
 	@JoinColumn(name = "lead_id")
 	private Leads lead;
-	
-	@ManyToOne
-	@JoinColumn(name = "opty_id")
-	private Opportunity opportunity;
 
 	@OneToMany(mappedBy = "meetings", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
 	private List<MeetingAttachments> meetingAttachments = new ArrayList<>();

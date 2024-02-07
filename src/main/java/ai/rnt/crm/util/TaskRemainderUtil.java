@@ -2,6 +2,8 @@ package ai.rnt.crm.util;
 
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
+import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL;
+import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
 import static ai.rnt.crm.util.EmailUtil.sendCallTaskReminderMail;
 import static ai.rnt.crm.util.EmailUtil.sendEmail;
 import static ai.rnt.crm.util.EmailUtil.sendFollowUpLeadReminderMail;
@@ -16,20 +18,25 @@ import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.mail.internet.AddressException;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import ai.rnt.crm.dao.CallDaoService;
-import ai.rnt.crm.dao.EmailDaoService;
-import ai.rnt.crm.dao.EmployeeDaoService;
-import ai.rnt.crm.dao.LeadDaoService;
-import ai.rnt.crm.dao.LeadTaskDaoService;
-import ai.rnt.crm.dao.MeetingDaoService;
-import ai.rnt.crm.dao.VisitDaoService;
+import ai.rnt.crm.dao.service.CallDaoService;
+import ai.rnt.crm.dao.service.EmailDaoService;
+import ai.rnt.crm.dao.service.EmployeeDaoService;
+import ai.rnt.crm.dao.service.LeadDaoService;
+import ai.rnt.crm.dao.service.LeadTaskDaoService;
+import ai.rnt.crm.dao.service.MeetingDaoService;
+import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.dto.EmailDto;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
@@ -45,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Nikhil Gaikwad
- * @since 11-12-2023
+ * @since 11/12/2023
  * @version 1.0
  *
  */
@@ -165,14 +172,27 @@ public class TaskRemainderUtil {
 
 			List<Email> emails = emailDaoService.isScheduledEmails(todayAsDate, time);
 			emails.forEach(email -> {
+				Optional<EmailDto> newEmail = TO_EMAIL_DTO.apply(email);
+				newEmail.ifPresent(e -> {
+					e.setBcc(nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()
+							? Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+					e.setCc(nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
+							? Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+					e.setMailTo(nonNull(email.getToMail()) && !email.getToMail().isEmpty()
+							? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
 					try {
-						if (sendEmail(email)) {
-								email.setStatus(SEND);
-								emailDaoService.email(email);
-						}
+						if (sendEmail(e))
+							TO_EMAIL.apply(e).ifPresent(em -> {
+								em.setStatus(SEND);
+								emailDaoService.email(em);
+							});
 					} catch (AddressException e1) {
 						log.error("Got exception while sending the scheduled emails...{}", e1);
 					}
+				});
 			});
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);

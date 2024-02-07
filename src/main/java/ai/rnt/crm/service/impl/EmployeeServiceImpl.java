@@ -16,8 +16,8 @@ import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.dao.EmployeeDaoService;
-import ai.rnt.crm.dao.RoleMasterDaoService;
+import ai.rnt.crm.dao.service.EmployeeDaoService;
+import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dto.EmployeeDto;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.enums.ApiResponse;

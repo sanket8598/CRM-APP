@@ -153,23 +153,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 import ai.rnt.crm.constants.ApiResponseKeyConstant;
 import ai.rnt.crm.constants.OppurtunityStatus;
-import ai.rnt.crm.dao.CallDaoService;
-import ai.rnt.crm.dao.CityDaoService;
-import ai.rnt.crm.dao.CompanyMasterDaoService;
-import ai.rnt.crm.dao.ContactDaoService;
-import ai.rnt.crm.dao.CountryDaoService;
-import ai.rnt.crm.dao.DomainMasterDaoService;
-import ai.rnt.crm.dao.EmailDaoService;
-import ai.rnt.crm.dao.ExcelHeaderDaoService;
-import ai.rnt.crm.dao.LeadDaoService;
-import ai.rnt.crm.dao.LeadSortFilterDaoService;
-import ai.rnt.crm.dao.LeadSourceDaoService;
-import ai.rnt.crm.dao.MeetingDaoService;
-import ai.rnt.crm.dao.OpportunityDaoService;
-import ai.rnt.crm.dao.RoleMasterDaoService;
-import ai.rnt.crm.dao.ServiceFallsDaoSevice;
-import ai.rnt.crm.dao.StateDaoService;
-import ai.rnt.crm.dao.VisitDaoService;
+import ai.rnt.crm.dao.service.CallDaoService;
+import ai.rnt.crm.dao.service.CityDaoService;
+import ai.rnt.crm.dao.service.CompanyMasterDaoService;
+import ai.rnt.crm.dao.service.ContactDaoService;
+import ai.rnt.crm.dao.service.CountryDaoService;
+import ai.rnt.crm.dao.service.DomainMasterDaoService;
+import ai.rnt.crm.dao.service.EmailDaoService;
+import ai.rnt.crm.dao.service.ExcelHeaderDaoService;
+import ai.rnt.crm.dao.service.LeadDaoService;
+import ai.rnt.crm.dao.service.LeadSortFilterDaoService;
+import ai.rnt.crm.dao.service.LeadSourceDaoService;
+import ai.rnt.crm.dao.service.MeetingDaoService;
+import ai.rnt.crm.dao.service.OpportunityDaoService;
+import ai.rnt.crm.dao.service.RoleMasterDaoService;
+import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dao.service.StateDaoService;
+import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
@@ -1318,10 +1318,9 @@ public class LeadServiceImpl implements LeadService {
 	}
 	
 	private boolean addToOpputunity(Leads leads) {
-		/*
-		 * Opportunity opportunity = new Opportunity();
-		 * opportunity.setStatus(OppurtunityStatus.OPEN); opportunity.setLeads(leads);
-		 */
+		Opportunity opportunity = new Opportunity();
+		opportunity.setStatus(OppurtunityStatus.OPEN);
+		opportunity.setLeads(leads);
 		return false;
 				//nonNull(opportunityDaoService.addOpportunity(opportunity));
 	}

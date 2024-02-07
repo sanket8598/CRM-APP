@@ -15,27 +15,26 @@ import static java.lang.Boolean.TRUE;
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
-import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Stream.of;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import ai.rnt.crm.dao.AttachmentDaoService;
-import ai.rnt.crm.dao.EmailDaoService;
-import ai.rnt.crm.dao.LeadDaoService;
+import ai.rnt.crm.dao.service.AttachmentDaoService;
+import ai.rnt.crm.dao.service.EmailDaoService;
+import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.AttachmentDto;
 import ai.rnt.crm.dto.EmailDto;
 import ai.rnt.crm.entity.Attachment;
@@ -101,7 +100,19 @@ public class EmailServiceImpl implements EmailService {
 				result.put(MESSAGE, "Email Added Successfully");
 				result.put(DATA, sendEmail.getMailId());
 			} else if (SEND.equalsIgnoreCase(status)) {
-				boolean sendEmailStatus = sendEmail(sendEmail);
+				Optional<EmailDto> mailDto = TO_EMAIL_DTO.apply(sendEmail);
+				mailDto.ifPresent(e -> {
+					e.setBcc(nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()
+							? Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+					e.setCc(nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
+							? Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+					e.setMailTo(nonNull(email.getToMail()) && !email.getToMail().isEmpty()
+							? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
+							: Collections.emptyList());
+				});
+				boolean sendEmailStatus = sendEmail(mailDto.get());
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Saved and Sent Successfully!!");
@@ -160,22 +171,25 @@ public class EmailServiceImpl implements EmailService {
 				if (nonNull(attachment) && !attachment.isEmpty()) {
 					List<Attachment> attach = attachment.stream().map(e -> {
 						e.setDeletedBy(details.getStaffId());
-						e.setDeletedDate(
-								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+						e.setDeletedDate(now().atZone(systemDefault())
+					            .withZoneSameInstant(of(INDIA_ZONE))
+					            .toLocalDateTime());
 						e.getMail().setDeletedBy(details.getStaffId());
-						e.getMail().setDeletedDate(
-								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+						e.getMail().setDeletedDate(now().atZone(systemDefault())
+					            .withZoneSameInstant(of(INDIA_ZONE))
+					            .toLocalDateTime());
 						e.setMail(e.getMail());
 						return e;
-					}).collect(toList());
+					}).collect(Collectors.toList());
 					for (Attachment e : attach) {
 						attachmentDaoService.addAttachment(e);
 						updatedEmail = emailDaoService.email(mail);
 					}
 				} else {
 					mail.setDeletedBy(details.getStaffId());
-					mail.setDeletedDate(
-							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+					mail.setDeletedDate(now().atZone(systemDefault())
+				            .withZoneSameInstant(of(INDIA_ZONE))
+				            .toLocalDateTime());
 					updatedEmail = emailDaoService.email(mail);
 				}
 			}
@@ -225,14 +239,14 @@ public class EmailServiceImpl implements EmailService {
 			Optional<EmailDto> mailDto = TO_EMAIL_DTO.apply(email);
 			mailDto.ifPresent(e -> {
 				e.setBcc(nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()
-						? of(email.getBccMail().split(",")).map(String::trim).collect(toList())
-						: emptyList());
+						? Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList())
+						: Collections.emptyList());
 				e.setCc(nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
-						? of(email.getCcMail().split(",")).map(String::trim).collect(toList())
-						: emptyList());
+						? Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList())
+						: Collections.emptyList());
 				e.setMailTo(nonNull(email.getToMail()) && !email.getToMail().isEmpty()
-						? of(email.getToMail().split(",")).map(String::trim).collect(toList())
-						: emptyList());
+						? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
+						: Collections.emptyList());
 			});
 			resultMap.put(DATA, mailDto);
 			resultMap.put(SUCCESS, true);
@@ -275,8 +289,9 @@ public class EmailServiceImpl implements EmailService {
 							Attachment data = attachmentDaoService.findById(existingAttachment.getEmailAttchId())
 									.orElse(null);
 							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-							data.setDeletedDate(now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE))
-									.toLocalDateTime());
+							data.setDeletedDate(now().atZone(systemDefault())
+						            .withZoneSameInstant(of(INDIA_ZONE))
+						            .toLocalDateTime());
 							attachmentDaoService.addAttachment(data);
 						}
 					}
@@ -291,7 +306,8 @@ public class EmailServiceImpl implements EmailService {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Updated Successfully");
 			} else if (SEND.equalsIgnoreCase(status)) {
-				boolean sendEmailStatus = sendEmail(sendEmail);
+				boolean sendEmailStatus = sendEmail(
+						TO_EMAIL_DTO.apply(sendEmail).orElseThrow(ResourceNotFoundException::new));
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Updated and Sent Successfully!!");
