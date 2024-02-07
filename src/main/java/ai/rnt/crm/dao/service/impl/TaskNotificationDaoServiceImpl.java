@@ -20,7 +20,7 @@ public class TaskNotificationDaoServiceImpl implements TaskNotificationDaoServic
 
 	@Override
 	public List<TaskNotifications> getNotifications(Integer staffId) {
-		return taskNotificationsRepository.findByNotifToStaffIdAndNotifStatus(staffId, true);
+		return taskNotificationsRepository.findByNotifToStaffIdAndNotifStatusOrderByCreatedDateDesc(staffId, true);
 	}
 
 	@Override
