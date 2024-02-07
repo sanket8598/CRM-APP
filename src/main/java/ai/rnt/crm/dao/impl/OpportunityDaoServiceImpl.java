@@ -23,23 +23,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OpportunityDaoServiceImpl implements OpportunityDaoService {
 
-	private final OpportunityRepository opportunityRespoitory;
-
-	@Override
-	public List<Opportunity> getOpportunityDashboardData() {
-		log.info("inside the getOpportunityDashboardData method...");
-		return opportunityRespoitory.findByOrderByCreatedDateDesc();
-	}
-
-	@Override
-	public List<Opportunity> getOpportunityByStatus(String status) {
-		log.info("inside the getOpportunityByStatus method...{}", status);
-		return opportunityRespoitory.findByStatusOrderByCreatedDateDesc(status);
-	}
-
-	@Override
-	public Opportunity addOpportunity(Opportunity opportunity) {
-		log.info("inside the addOpportunity method...{}");
-		return opportunityRespoitory.save(opportunity);
-	}
+	/*
+	 * private final OpportunityRepository opportunityRespoitory;
+	 * 
+	 * @Override public List<Opportunity> getOpportunityDashboardData() {
+	 * log.info("inside the getOpportunityDashboardData method..."); return
+	 * opportunityRespoitory.findByOrderByCreatedDateDesc(); }
+	 * 
+	 * @Override public List<Opportunity> getOpportunityByStatus(String status) {
+	 * log.info("inside the getOpportunityByStatus method...{}", status); return
+	 * opportunityRespoitory.findByStatusOrderByCreatedDateDesc(status); }
+	 * 
+	 * @Override public Opportunity addOpportunity(Opportunity opportunity) {
+	 * log.info("inside the addOpportunity method...{}"); return
+	 * opportunityRespoitory.save(opportunity); }
+	 */
 }

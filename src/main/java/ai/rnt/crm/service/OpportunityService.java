@@ -8,6 +8,6 @@ import ai.rnt.crm.enums.ApiResponse;
 
 public interface OpportunityService {
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityDataByStatus(String status);
+	//ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityDataByStatus(String status);
 
 }
