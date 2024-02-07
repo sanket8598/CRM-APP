@@ -1,7 +1,10 @@
 package ai.rnt.crm.util;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Stream.of;
 import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
@@ -30,9 +33,9 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.springframework.stereotype.Component;
 
-import ai.rnt.crm.dto.AttachmentDto;
-import ai.rnt.crm.dto.EmailDto;
+import ai.rnt.crm.entity.Attachment;
 import ai.rnt.crm.entity.Contacts;
+import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
@@ -69,30 +72,30 @@ public class EmailUtil {
 	private static final String TEXT_HTML = "text/html";
 	private static final String DEAR = "Dear ";
 
-	public static boolean sendEmail(EmailDto email) throws AddressException {
+	public static boolean sendEmail(Email email) throws AddressException {
 		log.info("inside the sendEmail method...");
 		try {
 			// create a message with headers
 			Message msg = new MimeMessage(getSession());
 			msg.setFrom(new InternetAddress(USERNAME));// change it to mail from.
 
-			List<String> recipientList = email.getMailTo();
+			List<String> recipientList =nonNull(email.getToMail())?of(email.getToMail().split(",")).map(String::trim).collect(toList()):emptyList();
 			InternetAddress[] recipientAddress = new InternetAddress[recipientList.size()];
 			int counter = 0;
 			for (String recipient : recipientList)
 				recipientAddress[counter++] = new InternetAddress(recipient.trim());
 			msg.setRecipients(TO, recipientAddress);
 
-			if (nonNull(email.getCc()) && !email.getCc().isEmpty()) {
-				List<String> ccAddresses = email.getCc();
+			if (nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()) {
+				List<String> ccAddresses =of(email.getCcMail().split(",")).map(String::trim).collect(toList());
 				InternetAddress[] ccAddressList = new InternetAddress[ccAddresses.size()];
 				int count = 0;
 				for (String cc : ccAddresses)
 					ccAddressList[count++] = new InternetAddress(cc.trim());
 				msg.setRecipients(CC, ccAddressList);
 			}
-			if (nonNull(email.getBcc()) && !email.getBcc().isEmpty()) {
-				List<String> bccAddress = email.getBcc();
+			if (nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()) {
+				List<String> bccAddress =of(email.getBccMail().split(",")).map(String::trim).collect(toList());
 				InternetAddress[] bccAddressList = new InternetAddress[bccAddress.size()];
 				int index = 0;
 				for (String bcc : bccAddress)
@@ -128,13 +131,13 @@ public class EmailUtil {
 		});
 	}
 
-	public static Message sendWithAttachments(Message msg, String content, List<AttachmentDto> list)
+	public static Message sendWithAttachments(Message msg, String content, List<Attachment> list)
 			throws MessagingException {
 		log.info("inside the sendWithAttachments method...}");
 		try {
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
 			MimeMultipart multipart = new MimeMultipart();
-			for (AttachmentDto data : list) {
+			for (Attachment data : list) {
 				if (nonNull(data.getAttachmentData())) {
 					MimeBodyPart attachemntBodyPart = new MimeBodyPart();
 					attachemntBodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(

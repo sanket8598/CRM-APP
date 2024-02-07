@@ -23,7 +23,7 @@ public class OpportunityPredicates {
 	 * 
 	 * @since version 1.0
 	 */
-	public static final Predicate<Opportunity> IN_PIPELINE_OPPORTUNITY_FILTER = l -> nonNull(l.getStatus())
+	public static final Predicate<Opportunity> IN_PIPELINE_OPPORTUNITIES = l -> nonNull(l.getStatus())
 			&& l.getStatus().equalsIgnoreCase(QUALIFY)
 			|| (l.getStatus().equalsIgnoreCase(ANALYSIS) || l.getStatus().equalsIgnoreCase(PROPOSE)
 					|| l.getStatus().equalsIgnoreCase(CLOSE));
@@ -32,17 +32,17 @@ public class OpportunityPredicates {
 	 * 
 	 * @since version 1.0
 	 */
-	public static final Predicate<Opportunity> WON_OPPORTUNITY_FILTER = l -> nonNull(l.getStatus())
+	public static final Predicate<Opportunity> WON_OPPORTUNITIES = l -> nonNull(l.getStatus())
 			&& l.getStatus().equalsIgnoreCase(WON);
 	/*
 	 * * This Predicate return true if it the opportunity has Loss.
 	 * 
 	 * @since version 1.0
 	 */
-	public static final Predicate<Opportunity> LOSS_OPPORTUNITY_FILTER = l -> nonNull(l.getStatus())
+	public static final Predicate<Opportunity> LOSS_OPPORTUNITIES = l -> nonNull(l.getStatus())
 			&& l.getStatus().equalsIgnoreCase(LOST);
 
-	public static final BiPredicate<Opportunity, Integer> OPPORTUNITY_ASSIGNED_TO_FILTER = (l,
+	public static final BiPredicate<Opportunity, Integer> ASSIGNED_OPPORTUNITIES = (l,
 			loggedInStaffId) -> l.getEmployee().getStaffId().equals(loggedInStaffId)
 					|| l.getCreatedBy().equals(loggedInStaffId);
 }

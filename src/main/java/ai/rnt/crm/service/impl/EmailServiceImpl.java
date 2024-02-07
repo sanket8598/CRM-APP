@@ -100,19 +100,7 @@ public class EmailServiceImpl implements EmailService {
 				result.put(MESSAGE, "Email Added Successfully");
 				result.put(DATA, sendEmail.getMailId());
 			} else if (SEND.equalsIgnoreCase(status)) {
-				Optional<EmailDto> mailDto = TO_EMAIL_DTO.apply(sendEmail);
-				mailDto.ifPresent(e -> {
-					e.setBcc(nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()
-							? Stream.of(email.getBccMail().split(",")).map(String::trim).collect(Collectors.toList())
-							: Collections.emptyList());
-					e.setCc(nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
-							? Stream.of(email.getCcMail().split(",")).map(String::trim).collect(Collectors.toList())
-							: Collections.emptyList());
-					e.setMailTo(nonNull(email.getToMail()) && !email.getToMail().isEmpty()
-							? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
-							: Collections.emptyList());
-				});
-				boolean sendEmailStatus = sendEmail(mailDto.get());
+				boolean sendEmailStatus = sendEmail(email);
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Saved and Sent Successfully!!");
@@ -306,8 +294,7 @@ public class EmailServiceImpl implements EmailService {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Updated Successfully");
 			} else if (SEND.equalsIgnoreCase(status)) {
-				boolean sendEmailStatus = sendEmail(
-						TO_EMAIL_DTO.apply(sendEmail).orElseThrow(ResourceNotFoundException::new));
+				boolean sendEmailStatus = sendEmail(sendEmail);
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Updated and Sent Successfully!!");

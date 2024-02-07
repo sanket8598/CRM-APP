@@ -5,10 +5,10 @@ import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.dto_mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static ai.rnt.crm.functional.predicates.OpportunityPredicates.IN_PIPELINE_OPPORTUNITY_FILTER;
-import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORTUNITY_FILTER;
-import static ai.rnt.crm.functional.predicates.OpportunityPredicates.OPPORTUNITY_ASSIGNED_TO_FILTER;
-import static ai.rnt.crm.functional.predicates.OpportunityPredicates.WON_OPPORTUNITY_FILTER;
+import static ai.rnt.crm.functional.predicates.OpportunityPredicates.ASSIGNED_OPPORTUNITIES;
+import static ai.rnt.crm.functional.predicates.OpportunityPredicates.IN_PIPELINE_OPPORTUNITIES;
+import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORTUNITIES;
+import static ai.rnt.crm.functional.predicates.OpportunityPredicates.WON_OPPORTUNITIES;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
@@ -44,6 +44,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OpportunityServiceImpl implements OpportunityService {
 
+	private static final String ALL_OPPORTUNITY = "allOpportunity";
+	private static final String IN_PIPELINE_OPPORTUNITY = "inPipelineOpportunity";
+	private static final String WON_OPPORTUNITY = "wonOpportunity";
+	private static final String LOSS_OPPORTUNITY = "lossOpportunity";
 	private final AuditAwareUtil auditAwareUtil;
 	private final OpportunityDaoService opportunityDaoService;
 
@@ -57,13 +61,11 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Map<String, Object> countMap = new HashMap<>();
 			Map<String, Object> dataMap = new HashMap<>();
 			if (auditAwareUtil.isAdmin()) {
-				countMap.put("allOpportunity", opportunityDashboardData.stream().count());
-				countMap.put("inPipelineOpportunity",
-						opportunityDashboardData.stream().filter(IN_PIPELINE_OPPORTUNITY_FILTER).count());
-				countMap.put("wonOpportunity",
-						opportunityDashboardData.stream().filter(WON_OPPORTUNITY_FILTER).count());
-				countMap.put("lossOpportunity",
-						opportunityDashboardData.stream().filter(LOSS_OPPORTUNITY_FILTER).count());
+				countMap.put(ALL_OPPORTUNITY, opportunityDashboardData.stream().count());
+				countMap.put(IN_PIPELINE_OPPORTUNITY,
+						opportunityDashboardData.stream().filter(IN_PIPELINE_OPPORTUNITIES).count());
+				countMap.put(WON_OPPORTUNITY, opportunityDashboardData.stream().filter(WON_OPPORTUNITIES).count());
+				countMap.put(LOSS_OPPORTUNITY, opportunityDashboardData.stream().filter(LOSS_OPPORTUNITIES).count());
 				dataMap.put(COUNTDATA, countMap);
 				if (nonNull(status) && status.equalsIgnoreCase(ALL)) {
 					dataMap.put(ApiResponseKeyConstant.DATA,
@@ -75,28 +77,29 @@ public class OpportunityServiceImpl implements OpportunityService {
 					opportunityDataByStatus.put(DATA, dataMap);
 				}
 			} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
-				countMap.put("allOpportunity", opportunityDashboardData.stream()
-						.filter(d -> OPPORTUNITY_ASSIGNED_TO_FILTER.test(d, loggedInStaffId)).count());
-				countMap.put("inPipelineOpportunity",
-						opportunityDashboardData.stream().filter(l -> IN_PIPELINE_OPPORTUNITY_FILTER.test(l)
-								&& OPPORTUNITY_ASSIGNED_TO_FILTER.test(l, loggedInStaffId)).count());
-				countMap.put("wonOpportunity", opportunityDashboardData.stream().filter(
-						l -> WON_OPPORTUNITY_FILTER.test(l) && OPPORTUNITY_ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
+				countMap.put(ALL_OPPORTUNITY, opportunityDashboardData.stream()
+						.filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId)).count());
+				countMap.put(IN_PIPELINE_OPPORTUNITY, opportunityDashboardData.stream().filter(
+						l -> IN_PIPELINE_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 						.count());
-				countMap.put("lossOpportunity", opportunityDashboardData.stream().filter(
-						l -> LOSS_OPPORTUNITY_FILTER.test(l) && OPPORTUNITY_ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
-						.count());
+				countMap.put(WON_OPPORTUNITY,
+						opportunityDashboardData.stream().filter(
+								l -> WON_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
+								.count());
+				countMap.put(LOSS_OPPORTUNITY,
+						opportunityDashboardData.stream().filter(
+								l -> LOSS_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
+								.count());
 				dataMap.put(COUNTDATA, countMap);
 				if (nonNull(status) && status.equalsIgnoreCase(ALL)) {
 					dataMap.put(ApiResponseKeyConstant.DATA,
 							TO_DASHBOARD_OPPORTUNITY_DTOS.apply(opportunityDashboardData.stream()
-									.filter(d -> OPPORTUNITY_ASSIGNED_TO_FILTER.test(d, loggedInStaffId))
-									.collect(toList())));
+									.filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId)).collect(toList())));
 					opportunityDataByStatus.put(DATA, dataMap);
 				} else {
 					dataMap.put(ApiResponseKeyConstant.DATA,
 							TO_DASHBOARD_OPPORTUNITY_DTOS.apply(opportunityDaoService.getOpportunityByStatus(status)
-									.stream().filter(d -> OPPORTUNITY_ASSIGNED_TO_FILTER.test(d, loggedInStaffId))
+									.stream().filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId))
 									.collect(toList())));
 					opportunityDataByStatus.put(DATA, dataMap);
 				}
