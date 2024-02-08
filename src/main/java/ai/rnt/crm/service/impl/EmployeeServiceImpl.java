@@ -92,5 +92,19 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public Integer findByEmailId(String email) {
 		return employeeDaoService.findTopStaffIdByEmailId(email);
 	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getCRMUser() {
+		log.info("inside the getCRMUser method...{}");
+		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		try{
+			resultMap.put(SUCCESS, true);
+			resultMap.put(DATA, TO_Employees.apply(roleMasterDaoService.getUsers()));
+			return new ResponseEntity<>(resultMap, OK);
+		}catch (Exception e) {
+			log.info("Got Exception while getting users..{}" ,e.getMessage());
+			throw new CRMException(e);
+		}
+	}
 }
 //@formatter:on
