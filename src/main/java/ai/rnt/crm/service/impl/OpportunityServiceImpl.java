@@ -71,6 +71,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityDataByStatus(String status) {
 		log.info("inside the getOpportunityDataByStatus method...{}", status);
 		EnumMap<ApiResponse, Object> opportunityDataByStatus = new EnumMap<>(ApiResponse.class);
+		opportunityDataByStatus.put(SUCCESS, false);
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			List<Opportunity> opportunityDashboardData = opportunityDaoService.getOpportunityDashboardData();
@@ -147,6 +148,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashBoardData(Integer staffId) {
 		log.info("inside the Opportunity getDashBoardData method...{}");
 		EnumMap<ApiResponse, Object> dashBoardData = new EnumMap<>(ApiResponse.class);
+		dashBoardData.put(SUCCESS, false);
 		try {
 			Map<String, Object> dataMap = new HashMap<>();
 			Map<String, Object> countMap = new HashMap<>();
@@ -191,6 +193,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 				} else
 					dashBoardData.put(DATA, emptyList());
 			}
+			dashBoardData.put(SUCCESS, true);
 			return new ResponseEntity<>(dashBoardData, OK);
 		} catch (Exception e) {
 			log.error("Got exception while getting the opportunity data by status...{}", e.getMessage());
