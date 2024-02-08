@@ -43,4 +43,10 @@ public class OpportunityDaoServiceImpl implements OpportunityDaoService {
 		return opportunityRespoitory.save(opportunity);
 	}
 
+	@Override
+	public List<Opportunity> getOpportunityByStatusIn(List<String> status) {
+		log.info("inside the getOpportunityByStatusIn method...{}");
+		return opportunityRespoitory.findByStatusInOrderByCreatedDateDesc(status);
+	}
+
 }

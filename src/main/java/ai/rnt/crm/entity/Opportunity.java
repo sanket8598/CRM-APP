@@ -4,6 +4,7 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 import static org.hibernate.annotations.LazyCollectionOption.FALSE;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +63,9 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "proposed_solution")
 	private String proposedSolution;
+	
+	@Column(name = "closed_on")
+	private LocalDate closedOn;
 
 	@JoinColumn(name = "assign_to", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)

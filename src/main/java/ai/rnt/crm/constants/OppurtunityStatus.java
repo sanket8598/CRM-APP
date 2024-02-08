@@ -26,5 +26,7 @@ public class OppurtunityStatus {
 	public static final String WON = "Won";
 
 	public static final String LOST = "Lost";
+	
+	public static final String IN_PIPELINE = "in-pipeline";
 
 }

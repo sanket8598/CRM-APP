@@ -12,4 +12,6 @@ public interface OpportunityDaoService {
 
 	Opportunity addOpportunity(Opportunity opportunity);
 
+	List<Opportunity> getOpportunityByStatusIn(List<String> asList);
+
 }

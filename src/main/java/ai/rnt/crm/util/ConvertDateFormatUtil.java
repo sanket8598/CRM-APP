@@ -101,4 +101,24 @@ public class ConvertDateFormatUtil {
 			throw new CRMException("error while date convertDateDateWithTime for local date: " + date);
 		}
 	}
+	/**
+	 * This method is used to convert the given date(yyyy-MM-dd) to the format
+	 * (dd-MMM-yyyy) with give String time added to it. e.g 2023-12-04 is converted
+	 * to the 04 Dec 2023.
+	 * 
+	 * @author Sanket Wakankar
+	 * @version 1.0
+	 * @since 08-02-2024.
+	 * @param date in java.util.LocalDate
+	 * @return String
+	 */
+	public static String convertLocalDate(LocalDate date) {
+		log.info("inside the convertLocalDate method...{} {}", date);
+		try {
+			return isNull(date) ? null : DD_MMM_YYYY.format(YYYY_MM_DD.parse(date.toString()));
+		} catch (Exception e) {
+			log.error("Got Excetion while converting local date format in convertLocalDate:", e.getMessage());
+			throw new CRMException("error while date convertDateDateWithTime for local date: " + date);
+		}
+	}
 }
