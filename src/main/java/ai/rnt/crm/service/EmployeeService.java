@@ -20,4 +20,6 @@ public interface EmployeeService {
 	Optional<EmployeeMaster> findByName(String firstName, String lastName);
 
 	Integer findByEmailId(String email);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> getCRMUser();
 }

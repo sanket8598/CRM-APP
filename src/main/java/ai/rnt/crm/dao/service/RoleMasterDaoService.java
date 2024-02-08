@@ -8,4 +8,6 @@ public interface RoleMasterDaoService {
 
 	List<EmployeeMaster> getAdminAndUser();
 
+	List<EmployeeMaster> getUsers();
+
 }

@@ -11,6 +11,7 @@ import static ai.rnt.crm.constants.CRMConstants.ROLE;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.CRMConstants.TOKEN;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
+import static ai.rnt.crm.constants.RoleConstants.CHECK_ADMIN_ACCESS;
 import static ai.rnt.crm.util.Sha1Encryptor.encryptThisString;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -117,6 +118,12 @@ public class LoginController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAdminAndUser(
 			@PathVariable(name = "email", required = false) String mail) {
 		return employeeService.getAdminAndUser(mail);
+	}
+	
+	@GetMapping("/users")
+	@PreAuthorize(CHECK_ADMIN_ACCESS)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getCRMUser() {
+		return employeeService.getCRMUser();
 	}
 
 	@GetMapping("/phoneNum/{phoneNum}")

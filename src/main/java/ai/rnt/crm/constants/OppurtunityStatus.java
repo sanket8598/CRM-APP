@@ -15,16 +15,18 @@ public class OppurtunityStatus {
 
 	public static final String OPEN = "Open";
 
-	public static final String QUALIFY = "(In-Pipeline) Qualify";
+	public static final String QUALIFY = "Qualify";
 
-	public static final String DEVELOP = "(In-Pipeline) Develop";
+	public static final String ANALYSIS = "Analysis";
 
-	public static final String PROPOSE = "(In-Pipeline) Propose";
+	public static final String PROPOSE = "Propose";
 
-	public static final String CLOSE = "(In-Pipeline) Close";
+	public static final String CLOSE = "Close";
 
 	public static final String WON = "Won";
 
 	public static final String LOST = "Lost";
+	
+	public static final String IN_PIPELINE = "in-pipeline";
 
 }

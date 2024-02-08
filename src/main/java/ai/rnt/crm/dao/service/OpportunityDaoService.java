@@ -1,8 +1,17 @@
 package ai.rnt.crm.dao.service;
 
+import java.util.List;
+
 import ai.rnt.crm.entity.Opportunity;
 
 public interface OpportunityDaoService {
 
-	// Opportunity addOpportunity(Opportunity opportunity);
+	List<Opportunity> getOpportunityDashboardData();
+
+	List<Opportunity> getOpportunityByStatus(String status);
+
+	Opportunity addOpportunity(Opportunity opportunity);
+
+	List<Opportunity> getOpportunityByStatusIn(List<String> asList);
+
 }
