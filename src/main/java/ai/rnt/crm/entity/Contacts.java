@@ -75,11 +75,6 @@ public class Contacts extends Auditable {
 	@JoinColumn(name = "lead_id",nullable = true)
 	private Leads lead;
 	
-	@ManyToOne(cascade=ALL)
-	@JoinColumn(name = "opty_id",nullable = true)
-	private Opportunity opportunity;
-
-
 	@ManyToOne
 	@JoinColumn(name = "company_id",nullable = true)
 	private CompanyMaster companyMaster;
