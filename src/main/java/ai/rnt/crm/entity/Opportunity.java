@@ -76,10 +76,6 @@ public class Opportunity extends Auditable {
 	@JoinColumn(name = "lead_id", unique = true)
 	private Leads leads;
 
-	@OneToMany(mappedBy = "opportunity", orphanRemoval = true)
-	@LazyCollection(FALSE)
-	private List<Contacts> contacts = new ArrayList<>();
-
 	@OneToMany(mappedBy = "opportunity", cascade = ALL)
 	private List<Email> emails = new ArrayList<>();
 
