@@ -3,8 +3,10 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.constants.CRMConstants.ACTIVITY;
 import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
 import static ai.rnt.crm.constants.CRMConstants.DOMAINS;
+import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE;
 import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALL;
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.CRMConstants.TASK;
 import static ai.rnt.crm.constants.CRMConstants.TIMELINE;
 import static ai.rnt.crm.constants.CRMConstants.UPNEXT_DATA;
@@ -25,13 +27,17 @@ import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_GRAPHICAL_DATA_DTO;
+import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
+import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
+import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
 import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
+import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_CALL;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_EMAIL;
@@ -71,6 +77,7 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.Comparator;
@@ -79,6 +86,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -98,6 +106,7 @@ import ai.rnt.crm.dto.EditMeetingDto;
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
+import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Email;
@@ -513,5 +522,62 @@ public class OpportunityServiceImpl implements OpportunityService {
 		dataMap.put("canBanData", countMap);
 		dataMap.put("graphData", graph);
 		dashBoardData.put(DATA, dataMap);
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getQualifyPopUpData(Integer opportunityId) {
+		log.info("inside the Opportunity getQualifyPopUpData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> qualifyData = new EnumMap<>(ApiResponse.class);
+		qualifyData.put(SUCCESS, false);
+		try {
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException("Opportunity", "opportunityId", opportunityId));
+			List<Contacts> contacts = opportunityData.getLeads().getContacts();
+			Optional<QualifyOpportunityDto> dto = TO_QUALIFY_OPPORTUNITY_DTO.apply(opportunityData);
+			dto.ifPresent(e -> {
+				e.setPrimaryContact(TO_CONTACT_DTO
+						.apply(contacts.stream().filter(Contacts::getPrimary).findFirst()
+								.orElseThrow(() -> new ResourceNotFoundException("Priamry Contact")))
+						.orElseThrow(ResourceNotFoundException::new));
+				e.setAssignTo(opportunityData.getEmployee().getStaffId());
+				e.setLeadSourceId(opportunityData.getLeads().getLeadSourceMaster().getLeadSourceId());
+				e.setContacts(TO_CONTACT_DTOS.apply(contacts));
+			});
+			qualifyData.put(DATA, dto);
+			qualifyData.put(SUCCESS, true);
+			return new ResponseEntity<>(qualifyData, OK);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while getting qualify data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateQualifyPopUpData(QualifyOpportunityDto dto,
+			Integer opportunityId) {
+		log.info("inside the Opportunity updateQualifyPopUpData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> updateQualifyData = new EnumMap<>(ApiResponse.class);
+		updateQualifyData.put(SUCCESS, false);
+		try {
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException("Opportunity", "opportunityId", opportunityId));
+			opportunityData.setEmployee(employeeService.getById(dto.getAssignTo())
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, dto.getAssignTo())));
+			opportunityData.setTopic(dto.getTopic());
+			opportunityData.setProposedSolution(dto.getProposedSolution());
+			opportunityData.setClosedOn(dto.getUpdatedClosedOn());
+			opportunityData.setBudgetAmount(dto.getBudgetAmount());
+			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
+				updateQualifyData.put(SUCCESS, true);
+				updateQualifyData.put(MESSAGE, "Qualify Successfully..!!");
+			} else {
+				updateQualifyData.put(SUCCESS, false);
+				updateQualifyData.put(MESSAGE, "Not Qualify");
+			}
+			return new ResponseEntity<>(updateQualifyData, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while updating the qualify data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
 	}
 }

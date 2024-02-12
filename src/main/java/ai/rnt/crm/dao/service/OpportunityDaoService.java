@@ -6,7 +6,7 @@ import java.util.Optional;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
 import ai.rnt.crm.entity.Opportunity;
 
-public interface OpportunityDaoService extends CrudService<Opportunity, OpportunityDto>{
+public interface OpportunityDaoService extends CrudService<Opportunity, OpportunityDto> {
 
 	List<Opportunity> getOpportunityDashboardData();
 
@@ -15,7 +15,6 @@ public interface OpportunityDaoService extends CrudService<Opportunity, Opportun
 	Opportunity addOpportunity(Opportunity opportunity);
 
 	List<Opportunity> getOpportunityByStatusIn(List<String> asList);
-	
+
 	Optional<Opportunity> findOpportunity(Integer optId);
-	
 }

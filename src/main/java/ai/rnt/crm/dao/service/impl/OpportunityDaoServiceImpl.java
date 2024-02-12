@@ -52,7 +52,7 @@ public class OpportunityDaoServiceImpl implements OpportunityDaoService {
 
 	@Override
 	public Optional<Opportunity> findOpportunity(Integer optId) {
+		log.info("inside the findOpportunityById method...{}", optId);
 		return opportunityRespoitory.findById(optId);
 	}
-
 }
