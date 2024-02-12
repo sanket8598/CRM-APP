@@ -34,12 +34,10 @@ import javax.mail.util.ByteArrayDataSource;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.entity.Attachment;
-import ai.rnt.crm.dto.EmailDto;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
-import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.MeetingTask;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.VisitTask;

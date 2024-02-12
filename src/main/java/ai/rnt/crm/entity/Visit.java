@@ -84,6 +84,9 @@ public class Visit extends Auditable {
 
 	@Column(name = "participants")
 	private String participates;
+	
+	@Column(name="is_opportunity",columnDefinition = "default false")
+	private Boolean isOpportunity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "visit_by", updatable = true, nullable = false)
@@ -93,10 +96,6 @@ public class Visit extends Auditable {
 	@JoinColumn(name = "lead_id")
 	private Leads lead;
 	
-	@ManyToOne
-	@JoinColumn(name = "opty_id")
-	private Opportunity opportunity;
-
 	@OneToMany(mappedBy = "visit", cascade = ALL, orphanRemoval = true)
 	private List<VisitTask> visitTasks = new ArrayList<>();
 

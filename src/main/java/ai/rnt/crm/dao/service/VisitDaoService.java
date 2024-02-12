@@ -23,4 +23,6 @@ public interface VisitDaoService extends CrudService<Visit, VisitDto> {
 	List<VisitTask> getAllTask();
 
 	List<VisitTask> getTodaysAllVisitTask(LocalDate todayAsDate, String time);
+
+	List<Visit> getVisitsByLeadIdAndIsOpportunity(Integer leadId);
 }

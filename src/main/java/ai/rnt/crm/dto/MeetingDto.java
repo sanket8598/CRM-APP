@@ -49,6 +49,8 @@ public class MeetingDto {
 	private String description;
 
 	private String meetingMode;
+	
+	private Boolean isOpportunity=false;
 
 	private List<MeetingAttachmentsDto> meetingAttachments;
 

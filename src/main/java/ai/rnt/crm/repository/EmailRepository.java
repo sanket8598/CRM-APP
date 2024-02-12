@@ -22,4 +22,6 @@ public interface EmailRepository extends JpaRepository<Email, Integer> {
 
 	List<Email> findByScheduledOnAndScheduledAtAndScheduled(LocalDate todayAsDate, String time, boolean scheduled);
 
+	List<Email> findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(Integer leadId, boolean flag);
+
 }

@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,4 +50,9 @@ public class OpportunityDaoServiceImpl implements OpportunityDaoService {
 		return opportunityRespoitory.findByStatusInOrderByCreatedDateDesc(status);
 	}
 
+	@Override
+	public Optional<Opportunity> findOpportunity(Integer optId) {
+		log.info("inside the findOpportunityById method...{}", optId);
+		return opportunityRespoitory.findById(optId);
+	}
 }

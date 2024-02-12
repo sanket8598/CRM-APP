@@ -80,14 +80,13 @@ public class Email extends Auditable {
 	
 	@Column(name = "scheduled_at")
 	private String scheduledAt;
+	
+	@Column(name="is_opportunity",columnDefinition = "default false")
+	private Boolean isOpportunity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="lead_id")
 	private Leads lead;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="opty_id")
-	private Opportunity opportunity;
 	
 	@OneToMany(mappedBy = "mail",cascade = {REMOVE,REFRESH},orphanRemoval = true)
 	@Fetch(FetchMode.JOIN)

@@ -62,4 +62,9 @@ public class CallDaoServiceImpl implements CallDaoService {
 	public List<PhoneCallTask> getTodaysCallTask(LocalDate todayDate, String time) {
 		return callTaskRepository.findByRemainderDueOnAndRemainderDueAtAndRemainderOn(todayDate, time, true);
 	}
+
+	@Override
+	public List<Call> getCallsByLeadIdAndIsOpportunity(Integer leadId) {
+		return callRepository.findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(leadId,false);
+	}
 }

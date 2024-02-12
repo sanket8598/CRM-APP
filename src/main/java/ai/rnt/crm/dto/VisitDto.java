@@ -55,5 +55,7 @@ public class VisitDto {
 	private Integer leadId;
 
 	private Integer visitBy;
+	
+	private Boolean isOpportunity=false;
 
 }

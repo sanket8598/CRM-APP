@@ -62,4 +62,9 @@ public class MeetingDaoServiceImpl implements MeetingDaoService {
 	public List<MeetingTask> getAllMeetingTask() {
 		return meetingTaskRepository.findAll();
 	}
+
+	@Override
+	public List<Meetings> getMeetingByLeadIdAndIsOpportunity(Integer leadId) {
+		return meetingRepository.findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(leadId,false);
+	}
 }

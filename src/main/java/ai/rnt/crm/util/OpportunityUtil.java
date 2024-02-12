@@ -25,7 +25,7 @@ public class OpportunityUtil {
 		long wholePart = (long) n;
 		double fractionalPart = n - wholePart;
 		int size = valueOf(wholePart).length();
-		if (size <= 3) {
+	  if (size <= 3) {
 			return formatAmount((wholePart + fractionalPart) / 1000.0, suffix[0]);
 		} else if (size >= 4 && size < 6) {
 			return formatAmount((wholePart + fractionalPart) / 1000.0, suffix[0]);
@@ -59,5 +59,9 @@ public class OpportunityUtil {
 		default:
 			return null;
 		}
+	}
+	
+	public static void main(String[] args) {
+	 System.out.println(amountInWords(100));
 	}
 }

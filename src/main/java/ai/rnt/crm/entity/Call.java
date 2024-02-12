@@ -100,11 +100,9 @@ public class Call extends Auditable {
 	@JoinColumn(name = "lead_id")
 	private Leads lead;
 	
-	@ManyToOne(cascade = MERGE)
-	@JoinColumn(name = "opty_id")
-	private Opportunity opportunity;
-
-
+	@Column(name="is_opportunity",columnDefinition = "default false")
+	private Boolean isOpportunity;
+	
 	@OneToMany(mappedBy = "call", cascade = ALL, orphanRemoval = true)
 	private List<PhoneCallTask> callTasks = new ArrayList<>();
 	
