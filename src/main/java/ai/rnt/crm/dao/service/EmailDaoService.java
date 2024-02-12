@@ -24,4 +24,6 @@ public interface EmailDaoService extends CrudService<Email, EmailDto> {
 
 	List<Email> isScheduledEmails(LocalDate todayAsDate, String time);
 
+	List<Email> getEmailByLeadIdAndIsOpportunity(Integer leadId);
+
 }

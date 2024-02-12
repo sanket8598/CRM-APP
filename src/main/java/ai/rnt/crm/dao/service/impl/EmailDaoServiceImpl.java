@@ -50,4 +50,9 @@ public class EmailDaoServiceImpl implements EmailDaoService {
 	public List<Email> isScheduledEmails(LocalDate todayAsDate, String time) {
 		return emailRepository.findByScheduledOnAndScheduledAtAndScheduled(todayAsDate, time , true);
 	}
+
+	@Override
+	public List<Email> getEmailByLeadIdAndIsOpportunity(Integer leadId) {
+		return emailRepository.findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(leadId,false);
+	}
 }

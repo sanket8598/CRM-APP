@@ -58,5 +58,7 @@ public class CallDto {
 	private String endTime;
 
 	private boolean allDay;
+	
+	private Boolean isOpportunity=false;
 
 }

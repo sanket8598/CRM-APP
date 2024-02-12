@@ -30,4 +30,6 @@ public interface MeetingDaoService extends CrudService<Meetings, MeetingDto> {
 
 	List<MeetingTask> getAllMeetingTask();
 
+	List<Meetings> getMeetingByLeadIdAndIsOpportunity(Integer leadId);
+
 }

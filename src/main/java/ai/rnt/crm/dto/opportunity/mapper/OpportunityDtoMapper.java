@@ -32,5 +32,9 @@ public class OpportunityDtoMapper {
 			.stream().map(dm -> TO_DASHBOARD_OPPORTUNITY_DTO.apply(dm).get()).collect(Collectors.toList());
 	
 	public static final Function<Opportunity, Optional<GraphicalDataDto>> TO_GRAPHICAL_DATA_DTO = e-> evalMapper(e, GraphicalDataDto.class);
-
+	
+	public static final Function<OpportunityDto, Optional<Opportunity>> TO_OPPORTUNITY = e-> evalMapper(e, Opportunity.class);
+	
+	public static final Function<Opportunity, Optional<OpportunityDto>> TO_OPPORTUNITY_DTO = e-> evalMapper(e, OpportunityDto.class);
+	
 }

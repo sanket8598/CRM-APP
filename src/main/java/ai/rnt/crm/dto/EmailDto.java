@@ -55,6 +55,8 @@ public class EmailDto {
 	private LocalDate updateScheduledOn;
 
 	private String scheduledAt;
+	
+	private Boolean isOpportunity=false;
 
 	private List<AttachmentDto> attachment;
 

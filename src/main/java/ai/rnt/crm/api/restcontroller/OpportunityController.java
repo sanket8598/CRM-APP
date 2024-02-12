@@ -33,5 +33,11 @@ public class OpportunityController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData(@PathVariable(name = "staffId", required = false) Integer staffId) {
 		return opportunityService.getDashBoardData(staffId);
 	}
+	
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/{optId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editOpportunity(@PathVariable Integer optId) {
+		return opportunityService.getOpportunityData(optId);
+	}
 
 }

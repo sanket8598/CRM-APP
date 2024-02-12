@@ -16,4 +16,6 @@ public interface MeetingRepository extends JpaRepository<Meetings, Integer> {
 
 	List<Meetings> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
 
+	List<Meetings> findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(Integer leadId, boolean flag);
+
 }

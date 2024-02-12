@@ -62,4 +62,9 @@ public class VisitDaoServiceImpl implements VisitDaoService {
 	public List<VisitTask> getTodaysAllVisitTask(LocalDate todayAsDate, String time) {
 		return visitTaskRepository.findByRemainderDueOnAndRemainderDueAtAndRemainderOn(todayAsDate, time, true);
 	}
+
+	@Override
+	public List<Visit> getVisitsByLeadIdAndIsOpportunity(Integer leadId) {
+		return visitRepository.findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(leadId,false);
+	}
 }

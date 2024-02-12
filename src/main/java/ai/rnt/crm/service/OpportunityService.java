@@ -12,4 +12,6 @@ public interface OpportunityService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getDashBoardData(Integer staffId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityData(Integer optId);
+
 }
