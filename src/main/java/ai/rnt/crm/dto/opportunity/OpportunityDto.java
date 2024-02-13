@@ -1,7 +1,10 @@
 package ai.rnt.crm.dto.opportunity;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import ai.rnt.crm.dto.ContactDto;
 import ai.rnt.crm.dto.EmployeeDto;
 import ai.rnt.crm.dto.LeadDashboardDto;
 import lombok.Data;
@@ -28,6 +31,9 @@ public class OpportunityDto {
 	
 	@JsonProperty("assignOpportunity")
 	private EmployeeDto employee;
+	
+	@JsonProperty("contacts")
+	private List<ContactDto> contacts;
 	
 	private String createdOn;
 }

@@ -15,6 +15,7 @@ import static ai.rnt.crm.constants.OppurtunityStatus.ANALYSIS;
 import static ai.rnt.crm.constants.OppurtunityStatus.CLOSE;
 import static ai.rnt.crm.constants.OppurtunityStatus.IN_PIPELINE;
 import static ai.rnt.crm.constants.OppurtunityStatus.LOST;
+import static ai.rnt.crm.constants.OppurtunityStatus.OPEN;
 import static ai.rnt.crm.constants.OppurtunityStatus.PROPOSE;
 import static ai.rnt.crm.constants.OppurtunityStatus.QUALIFY;
 import static ai.rnt.crm.constants.OppurtunityStatus.WON;
@@ -28,9 +29,9 @@ import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOAR
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_GRAPHICAL_DATA_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_OPPORTUNITY_DTO;
+import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
-import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
 import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
@@ -106,6 +107,7 @@ import ai.rnt.crm.dto.EditMeetingDto;
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
+import ai.rnt.crm.dto.opportunity.OpportunityDto;
 import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.Contacts;
@@ -133,6 +135,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OpportunityServiceImpl implements OpportunityService {
 
+	private static final String OPPORTUNITY2 = "Opportunity";
 	private static final String OPPORTUNITY_INFO = "OpportunityInfo";
 	private static final String ALL_OPPORTUNITY = "allOpportunity";
 	private static final String IN_PIPELINE_OPPORTUNITY = "inPipelineOpportunity";
@@ -236,7 +239,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Map<String, Object> dataMap = new HashMap<>();
 			Map<String, Object> countMap = new HashMap<>();
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
-			List<Opportunity> opportunityDashboardData = opportunityDaoService.getOpportunityDashboardData();
+			List<Opportunity> opportunityDashboardData = opportunityDaoService.getOpportunityDashboardData().stream()
+					.filter(e -> nonNull(e.getStatus()) && !OPEN.equalsIgnoreCase(e.getStatus())).collect(toList());
 			if (nonNull(staffId))
 				getGraphAndCanBanData(countMap, dataMap, opportunityDashboardData, dashBoardData, staffId);
 			else {
@@ -292,11 +296,12 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Map<String, Object> dataMap = new LinkedHashMap<>();
 			Opportunity opportunity = opportunityDaoService.findOpportunity(optId)
-					.orElseThrow(() -> new ResourceNotFoundException("Opportunity", "optId", optId));
-			List<Call> calls = callDaoService.getCallsByLeadId(opportunity.getLeads().getLeadId());
-			List<Visit> visits = visitDaoService.getVisitsByLeadId(opportunity.getLeads().getLeadId());
-			List<Email> emails = emailDaoService.getEmailByLeadId(opportunity.getLeads().getLeadId());
-			List<Meetings> meetings = meetingDaoService.getMeetingByLeadId(opportunity.getLeads().getLeadId());
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, "optId", optId));
+			Integer leadId = opportunity.getLeads().getLeadId();
+			List<Call> calls = callDaoService.getCallsByLeadId(leadId);
+			List<Visit> visits = visitDaoService.getVisitsByLeadId(leadId);
+			List<Email> emails = emailDaoService.getEmailByLeadId(leadId);
+			List<Meetings> meetings = meetingDaoService.getMeetingByLeadId(leadId);
 			List<TimeLineActivityDto> timeLine = calls.stream().filter(TIMELINE_CALL).map(call -> {
 				EditCallDto callDto = new EditCallDto();
 				callDto.setId(call.getCallId());
@@ -469,7 +474,9 @@ public class OpportunityServiceImpl implements OpportunityService {
 							parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
 					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
 							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
-			dataMap.put(OPPORTUNITY_INFO, TO_DASHBOARD_OPPORTUNITY_DTO.apply(opportunity));
+			OpportunityDto dto=TO_DASHBOARD_OPPORTUNITY_DTO.apply(opportunity).orElseThrow(ResourceNotFoundException::new);
+			dto.setContacts(TO_CONTACT_DTOS.apply(opportunity.getLeads().getContacts()));
+			dataMap.put(OPPORTUNITY_INFO, dto);
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
@@ -531,7 +538,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 		qualifyData.put(SUCCESS, false);
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
-					.orElseThrow(() -> new ResourceNotFoundException("Opportunity", "opportunityId", opportunityId));
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, "opportunityId", opportunityId));
 			List<Contacts> contacts = opportunityData.getLeads().getContacts();
 			Optional<QualifyOpportunityDto> dto = TO_QUALIFY_OPPORTUNITY_DTO.apply(opportunityData);
 			dto.ifPresent(e -> {
@@ -560,7 +567,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 		updateQualifyData.put(SUCCESS, false);
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
-					.orElseThrow(() -> new ResourceNotFoundException("Opportunity", "opportunityId", opportunityId));
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, "opportunityId", opportunityId));
 			opportunityData.setEmployee(employeeService.getById(dto.getAssignTo())
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, dto.getAssignTo())));
 			opportunityData.setTopic(dto.getTopic());
