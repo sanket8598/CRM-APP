@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto_mapper;
 
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
+import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
 
 import java.util.Collection;
@@ -16,7 +17,6 @@ import ai.rnt.crm.dto.LeadsCardDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Leads;
-import ai.rnt.crm.util.ConvertDateFormatUtil;
 
 public class LeadsDtoMapper {
 
@@ -64,7 +64,7 @@ public class LeadsDtoMapper {
 	public static final Function<Leads, Optional<LeadDashboardDto>> TO_DASHBOARD_LEADDTO = e -> {
 		Optional<LeadDashboardDto> leadDashboardDto = evalMapper(e, LeadDashboardDto.class);
 		leadDashboardDto.ifPresent(l -> {
-			l.setCreatedOn(ConvertDateFormatUtil.convertDate(e.getCreatedDate()));
+			l.setCreatedOn(convertDate(e.getCreatedDate()));
 			l.setPrimaryContact(
 					TO_CONTACT_DTO.apply(e.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null))
 							.orElse(null));
