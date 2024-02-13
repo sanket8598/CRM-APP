@@ -35,7 +35,7 @@ public class OpprtAttachment extends Auditable{
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
-	@Column(name = "opty_attch_id")
+	@Column(name = "opty_attach_id")
 	private Integer optAttchId;
 
 	@Column(name = "attachment")
@@ -47,7 +47,7 @@ public class OpprtAttachment extends Auditable{
 	@Column(name = "attach_name")
 	private String attachName;
 	
-	@Column(name = "attachment_of")
+	@Column(name = "attach_of")
 	private String attachmentOf;
 
 	@ManyToOne(cascade = ALL)

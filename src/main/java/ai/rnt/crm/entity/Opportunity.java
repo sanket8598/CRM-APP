@@ -33,7 +33,7 @@ import lombok.Setter;
  * @version 1.0
  */
 @Entity
-@Table(name = "crm_opportunites")
+@Table(name = "crm_opportunity")
 @Getter
 @Setter
 @NoArgsConstructor
