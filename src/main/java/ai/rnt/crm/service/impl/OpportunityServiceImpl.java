@@ -29,9 +29,9 @@ import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOAR
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_GRAPHICAL_DATA_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_OPPORTUNITY_DTO;
-import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
+import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
 import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
@@ -112,6 +112,7 @@ import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Email;
+import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.Visit;
@@ -474,8 +475,15 @@ public class OpportunityServiceImpl implements OpportunityService {
 							parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
 					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
 							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
-			OpportunityDto dto=TO_DASHBOARD_OPPORTUNITY_DTO.apply(opportunity).orElseThrow(ResourceNotFoundException::new);
+			OpportunityDto dto = TO_DASHBOARD_OPPORTUNITY_DTO.apply(opportunity)
+					.orElseThrow(ResourceNotFoundException::new);
 			dto.setContacts(TO_CONTACT_DTOS.apply(opportunity.getLeads().getContacts()));
+			dto.setMessage("Assigned To " + opportunity.getEmployee().getFirstName() + " "
+					+ opportunity.getEmployee().getLastName());
+			EmployeeMaster employeeMaster = employeeService.getById(opportunity.getCreatedBy())
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, opportunity.getCreatedBy()));
+			dto.setGeneratedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
+			dto.setDropDownAssignTo(employeeMaster.getStaffId());
 			dataMap.put(OPPORTUNITY_INFO, dto);
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));

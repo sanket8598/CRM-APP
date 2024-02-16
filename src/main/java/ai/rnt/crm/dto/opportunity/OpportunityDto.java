@@ -1,5 +1,8 @@
 package ai.rnt.crm.dto.opportunity;
 
+import static ai.rnt.crm.util.LeadsCardUtil.shortName;
+import static java.util.Objects.nonNull;
+
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,14 +29,33 @@ public class OpportunityDto {
 
 	private String proposedSolution;
 
+	private String message;
+
+	private String generatedBy;
+
+	private Integer dropDownAssignTo;
+
 	@JsonProperty("lead")
 	private LeadDashboardDto leadDashboardDto;
-	
+
 	@JsonProperty("assignOpportunity")
 	private EmployeeDto employee;
-	
+
 	@JsonProperty("contacts")
 	private List<ContactDto> contacts;
-	
+
 	private String createdOn;
+
+	public String getShortName() {
+		return nonNull(leadDashboardDto) && nonNull(leadDashboardDto.getPrimaryContact()) ? shortName(
+				leadDashboardDto.getPrimaryContact().getFirstName(), leadDashboardDto.getPrimaryContact().getLastName())
+				: null;
+	}
+
+	public String getFullName() {
+		return nonNull(leadDashboardDto) && nonNull(leadDashboardDto.getPrimaryContact())
+				? leadDashboardDto.getPrimaryContact().getFirstName() + " "
+						+ leadDashboardDto.getPrimaryContact().getLastName()
+				: null;
+	}
 }

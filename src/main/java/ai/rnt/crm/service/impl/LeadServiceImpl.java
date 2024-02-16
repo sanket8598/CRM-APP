@@ -1188,6 +1188,7 @@ public class LeadServiceImpl implements LeadService {
 		opportunity.setProposedSolution(leads.getProposedSolution());
 		opportunity.setTopic(leads.getTopic());
 		opportunity.setPseudoName(leads.getPseudoName());
+		opportunity.setEmployee(leads.getEmployee());
 		opportunity.setLeads(leads);
 		return nonNull(opportunityDaoService.addOpportunity(opportunity));
 	}
