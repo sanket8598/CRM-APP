@@ -35,6 +35,7 @@ import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
+import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_OPTY_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
@@ -575,6 +576,9 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
 			List<Contacts> contacts = opportunityData.getLeads().getContacts();
+			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
+					.filter(e -> nonNull(e.getAttachmentOf()) && "Qualify".equalsIgnoreCase(e.getAttachmentOf()))
+					.collect(toList());
 			Optional<QualifyOpportunityDto> dto = TO_QUALIFY_OPPORTUNITY_DTO.apply(opportunityData);
 			dto.ifPresent(e -> {
 				e.setPrimaryContact(TO_CONTACT_DTO
@@ -584,6 +588,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 				e.setAssignTo(opportunityData.getEmployee().getStaffId());
 				e.setLeadSourceId(opportunityData.getLeads().getLeadSourceMaster().getLeadSourceId());
 				e.setContacts(TO_CONTACT_DTOS.apply(contacts));
+				e.setAttachments(TO_OPTY_ATTACHMENT_DTOS.apply(attachments));
 			});
 			qualifyData.put(DATA, dto);
 			qualifyData.put(SUCCESS, true);
