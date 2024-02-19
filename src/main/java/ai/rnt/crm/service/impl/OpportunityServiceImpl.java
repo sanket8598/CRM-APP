@@ -25,9 +25,12 @@ import static ai.rnt.crm.constants.StatusConstants.CALL;
 import static ai.rnt.crm.constants.StatusConstants.EMAIL;
 import static ai.rnt.crm.constants.StatusConstants.MEETING;
 import static ai.rnt.crm.constants.StatusConstants.VISIT;
+import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_ANALYSIS_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_GRAPHICAL_DATA_DTO;
+import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUNITY_ATTACHMENT_DTOS;
+import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_PROPOSE_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
@@ -57,7 +60,11 @@ import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORT
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.WON_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OverDueActivity.OVER_DUE;
 import static ai.rnt.crm.util.CommonUtil.getTaskDataMap;
+import static ai.rnt.crm.util.CommonUtil.setDomainToLead;
+import static ai.rnt.crm.util.CommonUtil.setLeadSourceToLead;
+import static ai.rnt.crm.util.CommonUtil.setServiceFallToLead;
 import static ai.rnt.crm.util.CommonUtil.upNextActivities;
+import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertLocalDate;
@@ -91,30 +98,42 @@ import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.constants.ApiResponseKeyConstant;
 import ai.rnt.crm.dao.service.CallDaoService;
+import ai.rnt.crm.dao.service.CityDaoService;
+import ai.rnt.crm.dao.service.CompanyMasterDaoService;
+import ai.rnt.crm.dao.service.ContactDaoService;
+import ai.rnt.crm.dao.service.CountryDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
+import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditMeetingDto;
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
+import ai.rnt.crm.dto.UpdateLeadDto;
+import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
+import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
 import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
+import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.entity.Opportunity;
+import ai.rnt.crm.entity.OpprtAttachment;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
@@ -153,6 +172,14 @@ public class OpportunityServiceImpl implements OpportunityService {
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
 	private final LeadSourceDaoService leadSourceDaoService;
 	private final DomainMasterDaoService domainMasterDaoService;
+	private final CompanyMasterDaoService companyMasterDaoService;
+	private final CityDaoService cityDaoService;
+	private final StateDaoService stateDaoService;
+	private final CountryDaoService countryDaoService;
+	private final ContactDaoService contactDaoService;
+	private final LeadDaoService leadDaoService;
+
+	private static final String OPPORTUNITY_ID = "opportunityId";
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityDataByStatus(String status) {
@@ -546,7 +573,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 		qualifyData.put(SUCCESS, false);
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
-					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, "opportunityId", opportunityId));
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
 			List<Contacts> contacts = opportunityData.getLeads().getContacts();
 			Optional<QualifyOpportunityDto> dto = TO_QUALIFY_OPPORTUNITY_DTO.apply(opportunityData);
 			dto.ifPresent(e -> {
@@ -572,10 +599,9 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Integer opportunityId) {
 		log.info("inside the Opportunity updateQualifyPopUpData method...{}", opportunityId);
 		EnumMap<ApiResponse, Object> updateQualifyData = new EnumMap<>(ApiResponse.class);
-		updateQualifyData.put(SUCCESS, false);
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
-					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, "opportunityId", opportunityId));
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
 			opportunityData.setEmployee(employeeService.getById(dto.getAssignTo())
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, dto.getAssignTo())));
 			opportunityData.setTopic(dto.getTopic());
@@ -584,14 +610,147 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setBudgetAmount(dto.getBudgetAmount());
 			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateQualifyData.put(SUCCESS, true);
-				updateQualifyData.put(MESSAGE, "Qualify Successfully..!!");
+				updateQualifyData.put(MESSAGE, "Opportunity Qualify Successfully..!!");
 			} else {
 				updateQualifyData.put(SUCCESS, false);
-				updateQualifyData.put(MESSAGE, "Not Qualify");
+				updateQualifyData.put(MESSAGE, "Opportunity Not Qualify");
 			}
 			return new ResponseEntity<>(updateQualifyData, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception in Opportunity while updating the qualify data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAnalysisPopUpData(Integer opportunityId) {
+		log.info("inside the Opportunity getAnalysisPopUpData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> analysisData = new EnumMap<>(ApiResponse.class);
+		analysisData.put(SUCCESS, false);
+		try {
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
+					.filter(e -> nonNull(e.getAttachmentOf()) && "Analysis".equalsIgnoreCase(e.getAttachmentOf()))
+					.collect(toList());
+			Optional<AnalysisOpportunityDto> dto = TO_ANALYSIS_OPPORTUNITY_DTO.apply(opportunityData);
+			dto.ifPresent(l -> l.setAttachments(TO_OPPORTUNITY_ATTACHMENT_DTOS.apply(attachments)));
+			analysisData.put(DATA, dto);
+			analysisData.put(SUCCESS, true);
+			return new ResponseEntity<>(analysisData, OK);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while getting analysis data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateAnalysisPopUpData(AnalysisOpportunityDto dto,
+			Integer opportunityId) {
+		log.info("inside the Opportunity updateAnalysisPopUpData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> updateAnalysisData = new EnumMap<>(ApiResponse.class);
+		try {
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			opportunityData.setTechnicalNeed(dto.getTechnicalNeed());
+			opportunityData.setIntegrationPoint(dto.getIntegrationPoint());
+			opportunityData.setSecAndComp(dto.getSecAndComp());
+			opportunityData.setRiskMinigation(dto.getRiskMinigation());
+			opportunityData.setInitialTimeline(dto.getInitialTimeline());
+			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
+				updateAnalysisData.put(SUCCESS, true);
+				updateAnalysisData.put(MESSAGE, "Opportunity Analysis Successfully..!!");
+			} else {
+				updateAnalysisData.put(SUCCESS, false);
+				updateAnalysisData.put(MESSAGE, "Opportunity Not Analysis");
+			}
+			return new ResponseEntity<>(updateAnalysisData, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while updating the analysis data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getProposePopUpData(Integer opportunityId) {
+		log.info("inside the Opportunity getProposePopUpData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> proposeData = new EnumMap<>(ApiResponse.class);
+		proposeData.put(SUCCESS, false);
+		try {
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
+					.filter(e -> nonNull(e.getAttachmentOf()) && "Propose".equalsIgnoreCase(e.getAttachmentOf()))
+					.collect(toList());
+			Optional<ProposeOpportunityDto> dto = TO_PROPOSE_OPPORTUNITY_DTO.apply(opportunityData);
+			dto.ifPresent(l -> l.setAttachments(TO_OPPORTUNITY_ATTACHMENT_DTOS.apply(attachments)));
+			proposeData.put(DATA, dto);
+			proposeData.put(SUCCESS, true);
+			return new ResponseEntity<>(proposeData, OK);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while getting propose data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateProposePopUpData(ProposeOpportunityDto dto,
+			Integer opportunityId) {
+		log.info("inside the Opportunity updateProposePopUpData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> updateProposeData = new EnumMap<>(ApiResponse.class);
+		try {
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			opportunityData.setLicAndPricDetails(dto.getLicAndPricDetails());
+			opportunityData.setDevPlan(dto.getDevPlan());
+			opportunityData.setPropAcceptCriteria(dto.getPropAcceptCriteria());
+			opportunityData.setPropExpDate(dto.getUpdatedPropExpDate());
+			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
+				updateProposeData.put(SUCCESS, true);
+				updateProposeData.put(MESSAGE, "Opportunity Propose Successfully..!!");
+			} else {
+				updateProposeData.put(SUCCESS, false);
+				updateProposeData.put(MESSAGE, "Opportunity Not Propose");
+			}
+			return new ResponseEntity<>(updateProposeData, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while updating the propose data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunity(UpdateLeadDto dto, Integer opportunityId) {
+		log.info("inside the updateOpportunity method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Opportunity opportunity = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			opportunity.setTopic(dto.getTopic());
+			opportunity.setBudgetAmount(dto.getBudgetAmount());
+			opportunity.setCustomerNeed(dto.getCustomerNeed());
+			opportunity.setProposedSolution(dto.getProposedSolution());
+			opportunity.setPseudoName(dto.getPseudoName());
+			Leads lead = opportunity.getLeads();
+			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
+					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
+			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService, dto,
+					contact);
+			setServiceFallToLead(dto.getServiceFallsId(), lead, serviceFallsDaoSevice);
+			setLeadSourceToLead(dto.getLeadSourceId(), lead, leadSourceDaoService);
+			setDomainToLead(dto.getDomainId(), lead, domainMasterDaoService);
+			contact.setLinkedinId(dto.getLinkedinId());
+			opportunity.setLeads(lead);
+			if (nonNull(contactDaoService.addContact(contact)) && nonNull(leadDaoService.addLead(lead))
+					&& nonNull(opportunityDaoService.addOpportunity(opportunity)))
+				result.put(MESSAGE, "Opportunity Details Updated Successfully !!");
+			else
+				result.put(MESSAGE, "Opportunity Details Not Updated !!");
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception while updateOpportunity..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

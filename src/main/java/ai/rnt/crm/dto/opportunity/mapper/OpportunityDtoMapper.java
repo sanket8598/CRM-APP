@@ -11,10 +11,14 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
+import ai.rnt.crm.dto.opportunity.OpprtAttachmentDto;
 import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
+import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
 import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.entity.Opportunity;
+import ai.rnt.crm.entity.OpprtAttachment;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = PRIVATE)
@@ -47,4 +51,16 @@ public class OpportunityDtoMapper {
 	public static final Function<Collection<Opportunity>, List<QualifyOpportunityDto>> TO_QUALIFY_OPPORTUNITY_DTOS = e -> e
 			.stream().map(dm -> TO_QUALIFY_OPPORTUNITY_DTO.apply(dm).get()).collect(Collectors.toList());
 
+	public static final Function<Opportunity, Optional<AnalysisOpportunityDto>> TO_ANALYSIS_OPPORTUNITY_DTO = e -> evalMapper(
+			e, AnalysisOpportunityDto.class);
+	
+	public static final Function<OpprtAttachment, Optional<OpprtAttachmentDto>> TO_OPPORTUNITY_ATTACHMENT_DTO = e -> evalMapper(
+			e, OpprtAttachmentDto.class);
+	
+	public static final Function<Collection<OpprtAttachment>, List<OpprtAttachmentDto>> TO_OPPORTUNITY_ATTACHMENT_DTOS = e -> e
+			.stream().map(dm -> TO_OPPORTUNITY_ATTACHMENT_DTO.apply(dm).get()).collect(Collectors.toList());
+
+
+	public static final Function<Opportunity, Optional<ProposeOpportunityDto>> TO_PROPOSE_OPPORTUNITY_DTO = e -> evalMapper(
+			e, ProposeOpportunityDto.class);
 }

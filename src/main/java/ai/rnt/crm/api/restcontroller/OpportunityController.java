@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ai.rnt.crm.dto.UpdateLeadDto;
+import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
+import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
 import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.OpportunityService;
@@ -56,5 +59,39 @@ public class OpportunityController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateQualifyPopUpData(@RequestBody QualifyOpportunityDto dto,
 			@PathVariable(name = "opportunityId") Integer opportunityId) {
 		return opportunityService.updateQualifyPopUpData(dto, opportunityId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/analysis/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getAnalysisPopUpData(
+			@PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.getAnalysisPopUpData(opportunityId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@PutMapping("/analysis/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateAnalysisPopUpData(@RequestBody AnalysisOpportunityDto dto,
+			@PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.updateAnalysisPopUpData(dto, opportunityId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/propose/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getProposePopUpData(
+			@PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.getProposePopUpData(opportunityId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@PutMapping("/propose/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateProposePopUpData(@RequestBody ProposeOpportunityDto dto,
+			@PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.updateProposePopUpData(dto, opportunityId);
+	}
+	
+	@PutMapping("/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunity(@RequestBody UpdateLeadDto dto,
+			@PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.updateOpportunity(dto, opportunityId);
 	}
 }
