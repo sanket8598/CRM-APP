@@ -8,6 +8,7 @@ import java.util.List;
 
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.MeetingTask;
+import ai.rnt.crm.entity.OpportunityTask;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.exception.CRMException;
@@ -130,6 +131,34 @@ public class TaskUtil {
 			return status;
 		} catch (Exception e) {
 			log.info("Got Exception while checking the DuplicateMeetingTask..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public static boolean checkDuplicateOptyTask(List<OpportunityTask> allOptyTask, OpportunityTask opportunityTask) {
+		log.info("inside the checkDuplicateOptyTask method...{}");
+		boolean status = false;
+		try {
+			if (isNull(allOptyTask) || allOptyTask.isEmpty())
+				status = false;
+			for (OpportunityTask task : allOptyTask) {
+				if (task.getSubject().equals(opportunityTask.getSubject())
+						&& task.getStatus().equals(opportunityTask.getStatus())
+						&& task.getPriority().equals(opportunityTask.getPriority())
+						&& compareDatesIgnoringTime(task.getDueDate(), opportunityTask.getDueDate())
+						&& task.getRemainderVia().equals(opportunityTask.getRemainderVia())
+						&& task.getRemainderDueAt().equals(opportunityTask.getRemainderDueAt())
+						&& compareDatesIgnoringTime(task.getRemainderDueOn(), opportunityTask.getRemainderDueOn())
+						&& task.getDescription().equals(opportunityTask.getDescription())
+						&& task.getDueTime().equals(opportunityTask.getDueTime())
+						&& task.isRemainderOn() == opportunityTask.isRemainderOn()) {
+					status = true;
+					break;
+				}
+			}
+			return status;
+		} catch (Exception e) {
+			log.info("Got Exception while checking the DuplicateOpportunityTask..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
