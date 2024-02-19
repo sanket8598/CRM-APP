@@ -10,13 +10,9 @@ import static ai.rnt.crm.constants.CRMConstants.LEAD_ID;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_INFO;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE_DATA;
-import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE_MASTER;
-import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE_NAME;
 import static ai.rnt.crm.constants.CRMConstants.OTHER;
 import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALL;
-import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALLS_MASTER;
 import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALL_DATA;
-import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALL_ID;
 import static ai.rnt.crm.constants.CRMConstants.SORT_FILTER;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.CRMConstants.TASK;
@@ -28,7 +24,6 @@ import static ai.rnt.crm.constants.ExcelConstants.LEAD_DATA;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
 import static ai.rnt.crm.constants.MessageConstants.MSG;
-import static ai.rnt.crm.constants.RegexConstant.IS_DIGIT;
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
@@ -84,14 +79,17 @@ import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_MEETING;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_VISIT;
 import static ai.rnt.crm.functional.predicates.OverDueActivity.OVER_DUE;
 import static ai.rnt.crm.util.CommonUtil.getTaskDataMap;
+import static ai.rnt.crm.util.CommonUtil.setDomainToLead;
+import static ai.rnt.crm.util.CommonUtil.setLeadSourceToLead;
+import static ai.rnt.crm.util.CommonUtil.setServiceFallToLead;
 import static ai.rnt.crm.util.CommonUtil.upNextActivities;
+import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
 import static java.lang.Boolean.TRUE;
-import static java.lang.Integer.parseInt;
 import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.parse;
 import static java.time.ZoneId.of;
@@ -102,8 +100,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.Optional.of;
-import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -162,7 +158,6 @@ import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.entity.Call;
-import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
@@ -176,7 +171,6 @@ import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.ServiceFallsMaster;
-import ai.rnt.crm.entity.StateMaster;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
@@ -238,9 +232,9 @@ public class LeadServiceImpl implements LeadService {
 			leads.setStatus(OPEN);
 			leads.setDisqualifyAs(OPEN);
 			leads.setPseudoName(auditAwareUtil.getLoggedInUserName());
-			setServiceFallToLead(leadDto.getServiceFallsId(), leads);
-			setLeadSourceToLead(leadDto.getLeadSourceId(), leads);
-			setDomainToLead(leadDto.getDomainId(), leads);
+			setServiceFallToLead(leadDto.getServiceFallsId(), leads, serviceFallsDaoSevice);
+			setLeadSourceToLead(leadDto.getLeadSourceId(), leads, leadSourceDaoService);
+			setDomainToLead(leadDto.getDomainId(), leads, domainMasterDaoService);
 			if (nonNull(leadDto.getAssignTo()))
 				employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
 			else
@@ -684,7 +678,7 @@ public class LeadServiceImpl implements LeadService {
 				lead.setRemainderDueOn(dto.getRemainderDueOn());
 			}
 			lead.setStatus(CLOSE_AS_QUALIFIED);
-			setServiceFallToLead(dto.getServiceFallsMaster().getServiceName(), lead);
+			setServiceFallToLead(dto.getServiceFallsMaster().getServiceName(), lead, serviceFallsDaoSevice);
 			if (nonNull(leadDaoService.addLead(lead)) && addToOpputunity(lead))
 				result.put(MESSAGE, "Lead Qualified SuccessFully");
 			else
@@ -745,12 +739,10 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	@Override
+	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(Integer leadId, UpdateLeadDto dto) {
 		log.info("inside the updateLeadContact method...{}", leadId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		CountryMaster country = new CountryMaster();
-		StateMaster state = new StateMaster();
-		CityMaster city = new CityMaster();
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
@@ -759,88 +751,19 @@ public class LeadServiceImpl implements LeadService {
 			lead.setCustomerNeed(dto.getCustomerNeed());
 			lead.setProposedSolution(dto.getProposedSolution());
 			lead.setPseudoName(dto.getPseudoName());
-			Optional<CityMaster> existCityByName = cityDaoService.existCityByName(dto.getCity());
-			Optional<StateMaster> findBystate = stateDaoService.findBystate(dto.getState());
-			Optional<CountryMaster> findByCountryName = countryDaoService.findByCountryName(dto.getCountry());
-			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(dto.getCompanyName());
+
 			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
-			if (existCompany.isPresent()) {
-				CompanyMaster companyMaster = TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
-						.orElseThrow(ResourceNotFoundException::new);
-				companyMaster.setCompanyWebsite(dto.getCompanyWebsite());
-				if (findByCountryName.isPresent())
-					findByCountryName.ifPresent(companyMaster::setCountry);
-				else {
-					country = new CountryMaster();
-					country.setCountry(dto.getCountry());
-					Optional<CountryMaster> newFindByCountryName = of(countryDaoService.addCountry(country));
-					newFindByCountryName.ifPresent(companyMaster::setCountry);
-				}
-				if (findBystate.isPresent())
-					findBystate.ifPresent(companyMaster::setState);
-				else {
-					state = new StateMaster();
-					state.setState(dto.getState());
-					Optional<StateMaster> newFindBystate = of(stateDaoService.addState(state));
-					newFindBystate.ifPresent(companyMaster::setState);
-				}
-				if (existCityByName.isPresent())
-					existCityByName.ifPresent(companyMaster::setCity);
-				else {
-					city = new CityMaster();
-					city.setCity(dto.getCity());
-					Optional<CityMaster> newExistCityByName = of(cityDaoService.addCity(city));
-					newExistCityByName.ifPresent(companyMaster::setCity);
-				}
-				companyMaster.setZipCode(dto.getZipCode());
-				companyMaster.setAddressLineOne(dto.getAddressLineOne());
-				TO_COMPANY
-						.apply(companyMasterDaoService.save(companyMaster).orElseThrow(ResourceNotFoundException::new))
-						.ifPresent(contact::setCompanyMaster);
-			} else {
-				CompanyMaster companyMaster = TO_COMPANY
-						.apply(CompanyDto.builder().companyName(dto.getCompanyName())
-								.companyWebsite(dto.getCompanyWebsite()).build())
-						.orElseThrow(ResourceNotFoundException::new);
-				if (findByCountryName.isPresent())
-					findByCountryName.ifPresent(companyMaster::setCountry);
-				else {
-					country = new CountryMaster();
-					country.setCountry(dto.getCountry());
-					Optional<CountryMaster> newFindByCountryName = of(countryDaoService.addCountry(country));
-					newFindByCountryName.ifPresent(companyMaster::setCountry);
-				}
-				if (findBystate.isPresent())
-					findBystate.ifPresent(companyMaster::setState);
-				else {
-					state = new StateMaster();
-					state.setState(dto.getState());
-					Optional<StateMaster> newFindBystate = of(stateDaoService.addState(state));
-					newFindBystate.ifPresent(companyMaster::setState);
-				}
-				if (existCityByName.isPresent())
-					existCityByName.ifPresent(companyMaster::setCity);
-				else {
-					city = new CityMaster();
-					city.setCity(dto.getCity());
-					Optional<CityMaster> newExistCityByName = of(cityDaoService.addCity(city));
-					newExistCityByName.ifPresent(companyMaster::setCity);
-				}
-				companyMaster.setZipCode(dto.getZipCode());
-				companyMaster.setAddressLineOne(dto.getAddressLineOne());
-				TO_COMPANY
-						.apply(companyMasterDaoService.save(companyMaster).orElseThrow(ResourceNotFoundException::new))
-						.ifPresent(contact::setCompanyMaster);
-			}
-			setServiceFallToLead(dto.getServiceFallsId(), lead);
-			setLeadSourceToLead(dto.getLeadSourceId(), lead);
-			setDomainToLead(dto.getDomainId(), lead);
+			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService, dto,
+					contact);
+			setServiceFallToLead(dto.getServiceFallsId(), lead, serviceFallsDaoSevice);
+			setLeadSourceToLead(dto.getLeadSourceId(), lead, leadSourceDaoService);
+			setDomainToLead(dto.getDomainId(), lead, domainMasterDaoService);
 			contact.setLinkedinId(dto.getLinkedinId());
 			if (nonNull(contactDaoService.addContact(contact)) && nonNull(leadDaoService.addLead(lead)))
-				result.put(MESSAGE, "Leads Contact Updated Successfully !!");
+				result.put(MESSAGE, "Lead Details Updated Successfully !!");
 			else
-				result.put(MESSAGE, "Leads Contact Not Updated !!");
+				result.put(MESSAGE, "Lead Details Not Updated !!");
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
@@ -1104,52 +1027,6 @@ public class LeadServiceImpl implements LeadService {
 							.orElseThrow(ResourceNotFoundException::new));
 		}
 
-	}
-
-	private void setServiceFallToLead(String serviceFallsName, Leads leads) throws Exception {
-		log.info("inside the setServiceFallToLead method...{}", serviceFallsName);
-		if (nonNull(serviceFallsName) && compile(IS_DIGIT).matcher(serviceFallsName).matches())
-			serviceFallsDaoSevice.getServiceFallById(parseInt(serviceFallsName))
-					.ifPresent(leads::setServiceFallsMaster);
-		else if (isNull(serviceFallsName) || serviceFallsName.isEmpty() || OTHER.equals(serviceFallsName))
-			serviceFallsDaoSevice.findByName(OTHER).ifPresent(leads::setServiceFallsMaster);
-		else {
-			ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
-			serviceFalls.setServiceName(sanitize(serviceFallsName));
-			TO_SERVICE_FALL_MASTER.apply(serviceFallsDaoSevice.save(serviceFalls).orElseThrow(
-					() -> new ResourceNotFoundException(SERVICE_FALLS_MASTER, SERVICE_FALL_ID, serviceFallsName)))
-					.ifPresent(leads::setServiceFallsMaster);
-		}
-	}
-
-	private void setLeadSourceToLead(String leadSourceName, Leads leads) throws Exception {
-		log.info("inside the setLeadSourceToLead method...{} ", leadSourceName);
-		if (nonNull(leadSourceName) && compile(IS_DIGIT).matcher(leadSourceName).matches())
-			leadSourceDaoService.getLeadSourceById(parseInt(leadSourceName)).ifPresent(leads::setLeadSourceMaster);
-		else if (isNull(leadSourceName) || leadSourceName.isEmpty() || OTHER.equals(leadSourceName))
-			leadSourceDaoService.getByName(OTHER).ifPresent(leads::setLeadSourceMaster);
-		else {
-			LeadSourceMaster leadSource = new LeadSourceMaster();
-			leadSource.setSourceName(sanitize(leadSourceName));
-			TO_LEAD_SOURCE
-					.apply(leadSourceDaoService.save(leadSource).orElseThrow(
-							() -> new ResourceNotFoundException(LEAD_SOURCE_MASTER, LEAD_SOURCE_NAME, leadSourceName)))
-					.ifPresent(leads::setLeadSourceMaster);
-		}
-
-	}
-
-	private void setDomainToLead(String domainName, Leads leads) throws Exception {
-		log.info("inside the setDomainToLead method...{} ", domainName);
-		if (nonNull(domainName) && compile(IS_DIGIT).matcher(domainName).matches())
-			domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
-		else if (isNull(domainName) || domainName.isEmpty() || OTHER.equals(domainName))
-			domainMasterDaoService.findByName(OTHER).ifPresent(leads::setDomainMaster);
-		else {
-			DomainMaster domainMaster = new DomainMaster();
-			domainMaster.setDomainName(sanitize(domainName));
-			domainMasterDaoService.addDomain(domainMaster).ifPresent(leads::setDomainMaster);
-		}
 	}
 
 	private void setLocationToCompany(String location, CompanyMaster company) {

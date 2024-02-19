@@ -60,7 +60,11 @@ import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORT
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.WON_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OverDueActivity.OVER_DUE;
 import static ai.rnt.crm.util.CommonUtil.getTaskDataMap;
+import static ai.rnt.crm.util.CommonUtil.setDomainToLead;
+import static ai.rnt.crm.util.CommonUtil.setLeadSourceToLead;
+import static ai.rnt.crm.util.CommonUtil.setServiceFallToLead;
 import static ai.rnt.crm.util.CommonUtil.upNextActivities;
+import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertLocalDate;
@@ -91,25 +95,32 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.constants.ApiResponseKeyConstant;
 import ai.rnt.crm.dao.service.CallDaoService;
+import ai.rnt.crm.dao.service.CityDaoService;
+import ai.rnt.crm.dao.service.CompanyMasterDaoService;
+import ai.rnt.crm.dao.service.ContactDaoService;
+import ai.rnt.crm.dao.service.CountryDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
+import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditMeetingDto;
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
+import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
@@ -119,6 +130,7 @@ import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
+import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.OpprtAttachment;
@@ -160,6 +172,13 @@ public class OpportunityServiceImpl implements OpportunityService {
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
 	private final LeadSourceDaoService leadSourceDaoService;
 	private final DomainMasterDaoService domainMasterDaoService;
+	private final CompanyMasterDaoService companyMasterDaoService;
+	private final CityDaoService cityDaoService;
+	private final StateDaoService stateDaoService;
+	private final CountryDaoService countryDaoService;
+	private final ContactDaoService contactDaoService;
+	private final LeadDaoService leadDaoService;
+
 	private static final String OPPORTUNITY_ID = "opportunityId";
 
 	@Override
@@ -696,6 +715,42 @@ public class OpportunityServiceImpl implements OpportunityService {
 			return new ResponseEntity<>(updateProposeData, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception in Opportunity while updating the propose data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunity(UpdateLeadDto dto, Integer opportunityId) {
+		log.info("inside the updateOpportunity method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			Opportunity opportunity = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			opportunity.setTopic(dto.getTopic());
+			opportunity.setBudgetAmount(dto.getBudgetAmount());
+			opportunity.setCustomerNeed(dto.getCustomerNeed());
+			opportunity.setProposedSolution(dto.getProposedSolution());
+			opportunity.setPseudoName(dto.getPseudoName());
+			Leads lead = opportunity.getLeads();
+			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
+					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
+			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService, dto,
+					contact);
+			setServiceFallToLead(dto.getServiceFallsId(), lead, serviceFallsDaoSevice);
+			setLeadSourceToLead(dto.getLeadSourceId(), lead, leadSourceDaoService);
+			setDomainToLead(dto.getDomainId(), lead, domainMasterDaoService);
+			contact.setLinkedinId(dto.getLinkedinId());
+			opportunity.setLeads(lead);
+			if (nonNull(contactDaoService.addContact(contact)) && nonNull(leadDaoService.addLead(lead))
+					&& nonNull(opportunityDaoService.addOpportunity(opportunity)))
+				result.put(MESSAGE, "Opportunity Details Updated Successfully !!");
+			else
+				result.put(MESSAGE, "Opportunity Details Not Updated !!");
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception while updateOpportunity..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

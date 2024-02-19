@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
 import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
@@ -86,5 +87,11 @@ public class OpportunityController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateProposePopUpData(@RequestBody ProposeOpportunityDto dto,
 			@PathVariable(name = "opportunityId") Integer opportunityId) {
 		return opportunityService.updateProposePopUpData(dto, opportunityId);
+	}
+	
+	@PutMapping("/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunity(@RequestBody UpdateLeadDto dto,
+			@PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.updateOpportunity(dto, opportunityId);
 	}
 }
