@@ -6,6 +6,7 @@ import java.util.EnumMap;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1/opportunity/")
 @RequiredArgsConstructor
+@Validated
 public class OpportunityController {
 
 	private final OpportunityService opportunityService;
@@ -89,9 +91,11 @@ public class OpportunityController {
 		return opportunityService.updateProposePopUpData(dto, opportunityId);
 	}
 	
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/{opportunityId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunity(@RequestBody UpdateLeadDto dto,
 			@PathVariable(name = "opportunityId") Integer opportunityId) {
 		return opportunityService.updateOpportunity(dto, opportunityId);
 	}
+	
 }

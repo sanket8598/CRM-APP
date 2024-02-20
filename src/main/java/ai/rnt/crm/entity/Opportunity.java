@@ -64,49 +64,49 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "proposed_solution")
 	private String proposedSolution;
-	
+
 	@Column(name = "closed_on")
 	private LocalDate closedOn;
-	
+
 	@Column(name = "technical_need")
 	private String technicalNeed;
-	
+
 	@Column(name = "integration_point")
 	private String integrationPoint;
-	
+
 	@Column(name = "security_complainces")
 	private String secAndComp;
-	
+
 	@Column(name = "risk_minigation")
 	private String riskMinigation;
-	
+
 	@Column(name = "initial_timeline")
 	private String initialTimeline;
-	
+
 	@Column(name = "lic_pric_dets")
 	private String licAndPricDetails;
-	
+
 	@Column(name = "dev_plan")
 	private String devPlan;
-	
+
 	@Column(name = "prop_accept_criteria")
 	private String propAcceptCriteria;
-	
-	@Column(name = "prop_exp_date",columnDefinition = "date")
+
+	@Column(name = "prop_exp_date", columnDefinition = "date")
 	private LocalDate propExpDate;
-	
+
 	@Column(name = "win_lose_reason")
 	private String winLoseReason;
-	
+
 	@Column(name = "payment_terms")
 	private String paymentTerms;
-	
-	@Column(name="current_phase")
+
+	@Column(name = "current_phase")
 	private String currentPhase;
-	
-	@OneToMany(mappedBy = "opportunity",cascade = {REMOVE,REFRESH},orphanRemoval = true)
+
+	@OneToMany(mappedBy = "opportunity", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
 	private List<OpprtAttachment> oprtAttachment = new ArrayList<>();
-	
+
 	@JoinColumn(name = "assign_to", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
@@ -115,4 +115,7 @@ public class Opportunity extends Auditable {
 	@OneToOne(cascade = ALL)
 	@JoinColumn(name = "lead_id", unique = true)
 	private Leads leads;
+
+	@OneToMany(mappedBy = "opportunity", cascade = ALL, orphanRemoval = true)
+	private List<OpportunityTask> opportunityTasks = new ArrayList<>();
 }

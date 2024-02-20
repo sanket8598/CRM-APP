@@ -38,5 +38,7 @@ public class QualifyOpportunityDto {
 
 	private ContactDto primaryContact;
 
-	private List<ContactDto> contacts = new ArrayList<>();
+	private List<ContactDto> contacts = new ArrayList<>()
+			;
+	private List<OpprtAttachmentDto> attachments = new ArrayList<>();
 }
