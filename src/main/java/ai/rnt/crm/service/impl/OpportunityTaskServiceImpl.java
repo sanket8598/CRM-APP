@@ -1,13 +1,23 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
+import static ai.rnt.crm.dto.opportunity.mapper.OpportunityTaskDtoMapper.TO_GET_OPPORTUNITY_TASK_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityTaskDtoMapper.TO_OPPORTUNITY_TASK;
+import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.TaskUtil.checkDuplicateOptyTask;
+import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -16,7 +26,9 @@ import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.OpportunityTaskDaoService;
+import ai.rnt.crm.dto.opportunity.GetOpportunityTaskDto;
 import ai.rnt.crm.dto.opportunity.OpportunityTaskDto;
+import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.OpportunityTask;
 import ai.rnt.crm.enums.ApiResponse;
@@ -44,14 +56,17 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 	private final EmployeeService employeeService;
 	private final OpportunityTaskDaoService opportunityTaskDaoService;
 
+	public static final String OPPORTUNITY_TASK = "OpportunityTask";
+	public static final String TASK_ID = "taskId";
+
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addOpportunityTask(@Valid OpportunityTaskDto dto,
 			Integer optyId) {
 		log.info("inside the addOpportunityTask method...{}", optyId);
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			OpportunityTask opportunityTask = TO_OPPORTUNITY_TASK.apply(dto).orElseThrow(
-					() -> new ResourceNotFoundException("OpportunityTask", "optyTaskId", dto.getOptyTaskId()));
+			OpportunityTask opportunityTask = TO_OPPORTUNITY_TASK.apply(dto)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY_TASK, TASK_ID, dto.getOptyTaskId()));
 			Opportunity opportunity = opportunityDaoService.findOpportunity(optyId)
 					.orElseThrow(() -> new ResourceNotFoundException("Opportunity", "optyId", optyId));
 			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(opportunityTask::setAssignTo);
@@ -69,6 +84,102 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while adding the opportunity task..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityTask(Integer taskId) {
+		log.info("inside the getOpportunityTask method...{}", taskId);
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			result.put(DATA, TO_GET_OPPORTUNITY_TASK_DTO.apply(opportunityTaskDaoService.getOptyTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY_TASK, TASK_ID, taskId))));
+			result.put(SUCCESS, true);
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while getting the opportunity task..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunityTask(GetOpportunityTaskDto dto,
+			Integer taskId) {
+		log.info("inside the updateOpportunityTask method...{}", taskId);
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			OpportunityTask opportunityTask = opportunityTaskDaoService.getOptyTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY_TASK, TASK_ID, taskId));
+			opportunityTask.setSubject(dto.getSubject());
+			opportunityTask.setStatus(dto.getStatus());
+			opportunityTask.setPriority(dto.getPriority());
+			opportunityTask.setDueDate(dto.getUpdateDueDate());
+			opportunityTask.setDueTime(dto.getDueTime());
+			opportunityTask.setRemainderOn(dto.isRemainderOn());
+			opportunityTask.setRemainderDueOn(dto.getUpdatedRemainderDueOn());
+			opportunityTask.setRemainderDueAt(dto.getRemainderDueAt());
+			opportunityTask.setRemainderVia(dto.getRemainderVia());
+			opportunityTask.setDescription(dto.getDescription());
+			if (nonNull(opportunityTaskDaoService.addOptyTask(opportunityTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Updated Successfully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Updated");
+			}
+			return new ResponseEntity<>(result, CREATED);
+
+		} catch (Exception e) {
+			log.error("Got Exception while updating the opportunity task..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignOpportunityTask(Map<String, Integer> map) {
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		log.info("inside the assignOpportunityTask staffId: {} taskId:{}", map.get(STAFF_ID), map.get(TASK_ID));
+		try {
+			OpportunityTask opportunityTask = opportunityTaskDaoService.getOptyTaskById(map.get(TASK_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY_TASK, TASK_ID, map.get(TASK_ID)));
+			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
+			opportunityTask.setAssignTo(employee);
+			if (nonNull(opportunityTaskDaoService.addOptyTask(opportunityTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task Assigned SuccessFully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not Assigned");
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while assigning the opportunity task..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteOpportunityTask(Integer taskId) {
+		log.info("inside the deleteOpportunityTask method...{}", taskId);
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		try {
+			OpportunityTask opportunityTask = opportunityTaskDaoService.getOptyTaskById(taskId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY_TASK, TASK_ID, taskId));
+			opportunityTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			opportunityTask.setDeletedDate(
+					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+			if (nonNull(opportunityTaskDaoService.addOptyTask(opportunityTask))) {
+				result.put(SUCCESS, true);
+				result.put(MESSAGE, "Task deleted SuccessFully");
+			} else {
+				result.put(SUCCESS, false);
+				result.put(MESSAGE, "Task Not delete.");
+			}
+			return new ResponseEntity<>(result, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while deleting the opportunity task..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

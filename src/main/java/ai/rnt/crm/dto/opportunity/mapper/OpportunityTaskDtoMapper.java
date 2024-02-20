@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.opportunity.GetOpportunityTaskDto;
 import ai.rnt.crm.dto.opportunity.OpportunityTaskDto;
 import ai.rnt.crm.entity.OpportunityTask;
 import lombok.NoArgsConstructor;
@@ -42,4 +43,6 @@ public class OpportunityTaskDtoMapper {
 	public static final Function<Collection<OpportunityTaskDto>, List<OpportunityTask>> TO_OPPORTUNITY_TASKS = e -> e
 			.stream().map(dm -> TO_OPPORTUNITY_TASK.apply(dm).get()).collect(Collectors.toList());
 
+	public static final Function<OpportunityTask, Optional<GetOpportunityTaskDto>> TO_GET_OPPORTUNITY_TASK_DTO = e -> evalMapper(
+			e, GetOpportunityTaskDto.class);
 }
