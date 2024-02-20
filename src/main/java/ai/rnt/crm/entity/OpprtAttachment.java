@@ -27,7 +27,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "crm_opt_attachment")
+@Table(name = "crm_opty_attachment")
 @Where(clause = "deleted_by is null")
 public class OpprtAttachment extends Auditable{
 
