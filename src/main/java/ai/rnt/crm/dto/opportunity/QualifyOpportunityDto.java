@@ -30,7 +30,7 @@ public class QualifyOpportunityDto {
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate closedOn;
-	
+
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate updatedClosedOn;
 
@@ -38,7 +38,7 @@ public class QualifyOpportunityDto {
 
 	private ContactDto primaryContact;
 
-	private List<ContactDto> contacts = new ArrayList<>()
-			;
+	private List<ContactDto> contacts = new ArrayList<>();
+
 	private List<OpprtAttachmentDto> attachments = new ArrayList<>();
 }
