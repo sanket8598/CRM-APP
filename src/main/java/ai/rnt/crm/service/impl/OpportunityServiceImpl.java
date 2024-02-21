@@ -634,17 +634,18 @@ public class OpportunityServiceImpl implements OpportunityService {
 
 			Opportunity opportunity = null;
 			boolean status = false;
+			Integer staffId = auditAwareUtil.getLoggedInStaffId();
 			List<Integer> newIds = dto.getAttachments().stream().map(OpprtAttachmentDto::getOptAttchId)
 					.filter(Objects::nonNull).collect(toList());
-			 opportunityData.getOprtAttachment().stream()
+			List<OpprtAttachment> optData = opportunityData.getOprtAttachment().stream()
 					.filter(e -> nonNull(e.getAttachmentOf()) && "Qualify".equalsIgnoreCase(e.getAttachmentOf()))
-					.filter(data->newIds.isEmpty()||!newIds.contains(data.getOptAttchId()))
-					.filter(Objects::nonNull)
-					.forEach(data -> {
-					data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-					data.setDeletedDate(
-							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
-					 opprtAttachmentDaoService.addOpprtAttachment(data);
+					.filter(data -> newIds.isEmpty() || !newIds.contains(data.getOptAttchId())).filter(Objects::nonNull)
+					.collect(toList());
+			optData.stream().forEach(data -> {
+				data.setDeletedBy(staffId);
+				data.setDeletedDate(
+						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+				opprtAttachmentDaoService.addOpprtAttachment(data);
 			});
 			if (dto.getAttachments().isEmpty()) {
 				opportunity = opportunityDaoService.addOpportunity(opportunityData);
