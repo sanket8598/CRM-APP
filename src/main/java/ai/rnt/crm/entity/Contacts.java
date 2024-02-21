@@ -81,4 +81,7 @@ public class Contacts extends Auditable {
 
 	@Column(name = "is_primary",columnDefinition = "boolean default false")
 	private Boolean primary;
+	
+	@Column(name = "is_client",columnDefinition = "boolean default false")
+	private Boolean client;
 }

@@ -22,4 +22,5 @@ public class AnalysisOpportunityDto {
 	private String currentPhase;
 	
 	private List<OpprtAttachmentDto> attachments;
+	
 }

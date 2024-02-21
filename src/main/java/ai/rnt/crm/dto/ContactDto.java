@@ -38,6 +38,8 @@ public class ContactDto {
 
 	private String businessCardType;
 	
+	private Boolean client=false;
+	
 	@NotBlank(message = "First/last name should not be empty or null!!")
 	@Pattern(regexp = "^[A-Za-z]+\\s[A-Za-z]+$",message = "Plase enter valid first/last name!!")
 	private String name;

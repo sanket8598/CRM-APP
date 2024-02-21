@@ -41,4 +41,6 @@ public class QualifyOpportunityDto {
 	private List<ContactDto> contacts = new ArrayList<>();
 
 	private List<OpprtAttachmentDto> attachments = new ArrayList<>();
+	
+	private List<ContactDto> clients= new ArrayList<>();
 }
