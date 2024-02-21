@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -267,15 +268,15 @@ public class EmailServiceImpl implements EmailService {
 			email.setScheduledAt(dto.getScheduledAt());
 
 			List<Integer> newIds = dto.getAttachment().stream().map(AttachmentDto::getEmailAttchId).collect(toList());
-			email.getAttachment().stream().filter(e -> !newIds.contains(e.getEmailAttchId()))
-					.map(existingAttachment -> {
-						Attachment data = attachmentDaoService.findById(existingAttachment.getEmailAttchId())
-								.orElse(null);
-						data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-						data.setDeletedDate(
-								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
-						return attachmentDaoService.addAttachment(data);
-					});
+		List<Attachment> emailList=email.getAttachment().stream().filter(e -> !newIds.contains(e.getEmailAttchId()))
+			.filter(Objects::nonNull)
+			.collect(toList());
+		emailList.stream().forEach(data -> {
+			data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			data.setDeletedDate(
+					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+			attachmentDaoService.addAttachment(data);
+		});
 			if (dto.getAttachment().isEmpty()) {
 				sendEmail = emailDaoService.email(email);
 				saveStatus = nonNull(sendEmail);
