@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,5 +36,11 @@ public class OpportunityTaskDaoServiceImpl implements OpportunityTaskDaoService 
 	public OpportunityTask addOptyTask(OpportunityTask opportunityTask) {
 		log.info("inside the OpportunityTaskDaoServiceImpl addOptyTask method...");
 		return opportunityTaskRespoitory.save(opportunityTask);
+	}
+
+	@Override
+	public Optional<OpportunityTask> getOptyTaskById(Integer taskId) {
+		log.info("inside the OpportunityTaskDaoServiceImpl getOptyTaskById method...{}", taskId);
+		return opportunityTaskRespoitory.findById(taskId);
 	}
 }

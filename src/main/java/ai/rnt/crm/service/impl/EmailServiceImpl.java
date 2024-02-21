@@ -16,6 +16,7 @@ import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
@@ -265,24 +266,21 @@ public class EmailServiceImpl implements EmailService {
 			email.setScheduledOn(dto.getScheduledOn());
 			email.setScheduledAt(dto.getScheduledAt());
 
+			List<Integer> newIds = dto.getAttachment().stream().map(AttachmentDto::getEmailAttchId).collect(toList());
+			email.getAttachment().stream().filter(e -> !newIds.contains(e.getEmailAttchId()))
+					.map(existingAttachment -> {
+						Attachment data = attachmentDaoService.findById(existingAttachment.getEmailAttchId())
+								.orElse(null);
+						data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+						data.setDeletedDate(
+								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+						return attachmentDaoService.addAttachment(data);
+					});
 			if (dto.getAttachment().isEmpty()) {
 				sendEmail = emailDaoService.email(email);
 				saveStatus = nonNull(sendEmail);
 			} else {
 				for (AttachmentDto attach : dto.getAttachment()) {
-					List<Integer> newIds = dto.getAttachment().stream().map(AttachmentDto::getEmailAttchId)
-							.collect(Collectors.toList());
-					for (Attachment existingAttachment : email.getAttachment()) {
-						if (!newIds.contains(existingAttachment.getEmailAttchId())) {
-							Attachment data = attachmentDaoService.findById(existingAttachment.getEmailAttchId())
-									.orElse(null);
-							data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-							data.setDeletedDate(now().atZone(systemDefault())
-						            .withZoneSameInstant(of(INDIA_ZONE))
-						            .toLocalDateTime());
-							attachmentDaoService.addAttachment(data);
-						}
-					}
 					Attachment attachment = TO_ATTACHMENT.apply(attach).orElseThrow(ResourceNotFoundException::new);
 					attachment.setMail(email);
 					Attachment addAttachment = attachmentDaoService.addAttachment(attachment);

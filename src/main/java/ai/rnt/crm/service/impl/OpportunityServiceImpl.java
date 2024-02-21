@@ -29,6 +29,7 @@ import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_ANALYSIS
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_GRAPHICAL_DATA_DTO;
+import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUNITY_ATTACHMENT;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUNITY_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_PROPOSE_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_OPPORTUNITY_DTO;
@@ -95,6 +96,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
@@ -113,9 +115,11 @@ import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
+import ai.rnt.crm.dao.service.OpprtAttachmentDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.dto.ContactDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditMeetingDto;
@@ -125,6 +129,7 @@ import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
+import ai.rnt.crm.dto.opportunity.OpprtAttachmentDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
 import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.entity.Call;
@@ -179,6 +184,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 	private final CountryDaoService countryDaoService;
 	private final ContactDaoService contactDaoService;
 	private final LeadDaoService leadDaoService;
+	private final OpprtAttachmentDaoService opprtAttachmentDaoService;
 
 	private static final String OPPORTUNITY_ID = "opportunityId";
 
@@ -607,19 +613,61 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+
 			opportunityData.setEmployee(employeeService.getById(dto.getAssignTo())
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, dto.getAssignTo())));
 			opportunityData.setTopic(dto.getTopic());
 			opportunityData.setProposedSolution(dto.getProposedSolution());
 			opportunityData.setClosedOn(dto.getUpdatedClosedOn());
 			opportunityData.setBudgetAmount(dto.getBudgetAmount());
-			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
+
+			List<Integer> clientList = dto.getClients().stream().filter(ContactDto::getClient)
+					.map(ContactDto::getContactId).collect(toList());
+
+			opportunityData.getLeads().getContacts().stream().filter(con -> clientList.contains(con.getContactId()))
+					.forEach(con -> {
+						Contacts contact = contactDaoService.findById(con.getContactId()).orElseThrow(
+								() -> new ResourceNotFoundException("Contact", "contactId", con.getContactId()));
+						contact.setClient(true);
+						contactDaoService.addContact(contact);
+					});
+
+			Opportunity opportunity = null;
+			boolean status = false;
+			List<Integer> newIds = dto.getAttachments().stream().map(OpprtAttachmentDto::getOptAttchId)
+					.filter(Objects::nonNull).collect(toList());
+			 opportunityData.getOprtAttachment().stream()
+					.filter(e -> nonNull(e.getAttachmentOf()) && "Qualify".equalsIgnoreCase(e.getAttachmentOf()))
+					.filter(data->newIds.isEmpty()||!newIds.contains(data.getOptAttchId()))
+					.filter(Objects::nonNull)
+					.forEach(data -> {
+					data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+					data.setDeletedDate(
+							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+					 opprtAttachmentDaoService.addOpprtAttachment(data);
+			});
+			if (dto.getAttachments().isEmpty()) {
+				opportunity = opportunityDaoService.addOpportunity(opportunityData);
+				status = nonNull(opportunity);
+			} else {
+				for (OpprtAttachmentDto attach : dto.getAttachments()) {
+					OpprtAttachment attachment = TO_OPPORTUNITY_ATTACHMENT.apply(attach)
+							.orElseThrow(ResourceNotFoundException::new);
+					attachment.setOpportunity(opportunityData);
+					OpprtAttachment addAttachment = opprtAttachmentDaoService.addOpprtAttachment(attachment);
+					opportunity = addAttachment.getOpportunity();
+					status = nonNull(opportunity);
+				}
+			}
+
+			if (status) {
 				updateQualifyData.put(SUCCESS, true);
 				updateQualifyData.put(MESSAGE, "Opportunity Qualify Successfully..!!");
 			} else {
 				updateQualifyData.put(SUCCESS, false);
 				updateQualifyData.put(MESSAGE, "Opportunity Not Qualify");
 			}
+
 			return new ResponseEntity<>(updateQualifyData, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception in Opportunity while updating the qualify data...{}", e.getMessage());
