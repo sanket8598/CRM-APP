@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
+import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
 import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.enums.ApiResponse;
@@ -90,12 +91,25 @@ public class OpportunityController {
 			@PathVariable(name = "opportunityId") Integer opportunityId) {
 		return opportunityService.updateProposePopUpData(dto, opportunityId);
 	}
-	
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/close/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getClosePopUpData(
+			@PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.getClosePopUpData(opportunityId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@PutMapping("/close/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateClosePopUpData(@RequestBody CloseOpportunityDto dto,
+			@PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.updateClosePopUpData(dto, opportunityId);
+	}
+
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/{opportunityId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunity(@RequestBody UpdateLeadDto dto,
 			@PathVariable(name = "opportunityId") Integer opportunityId) {
 		return opportunityService.updateOpportunity(dto, opportunityId);
 	}
-	
 }

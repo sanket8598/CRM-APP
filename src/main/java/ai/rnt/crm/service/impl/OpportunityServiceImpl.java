@@ -26,6 +26,7 @@ import static ai.rnt.crm.constants.StatusConstants.EMAIL;
 import static ai.rnt.crm.constants.StatusConstants.MEETING;
 import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_ANALYSIS_OPPORTUNITY_DTO;
+import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_CLOSE_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_GRAPHICAL_DATA_DTO;
@@ -127,6 +128,7 @@ import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
+import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
 import ai.rnt.crm.dto.opportunity.OpprtAttachmentDto;
@@ -583,7 +585,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
 			List<Contacts> contacts = opportunityData.getLeads().getContacts();
 			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
-					.filter(e -> nonNull(e.getAttachmentOf()) && "Qualify".equalsIgnoreCase(e.getAttachmentOf()))
+					.filter(e -> nonNull(e.getAttachmentOf()) && QUALIFY.equalsIgnoreCase(e.getAttachmentOf()))
 					.collect(toList());
 			Optional<QualifyOpportunityDto> dto = TO_QUALIFY_OPPORTUNITY_DTO.apply(opportunityData);
 			dto.ifPresent(e -> {
@@ -611,6 +613,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 		log.info("inside the Opportunity updateQualifyPopUpData method...{}", opportunityId);
 		EnumMap<ApiResponse, Object> updateQualifyData = new EnumMap<>(ApiResponse.class);
 		try {
+			boolean status = false;
+			String phase = QUALIFY;
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
 
@@ -631,36 +635,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 						contact.setClient(true);
 						contactDaoService.addContact(contact);
 					});
-
-			Opportunity opportunity = null;
-			boolean status = false;
-			Integer staffId = auditAwareUtil.getLoggedInStaffId();
-			List<Integer> newIds = dto.getAttachments().stream().map(OpprtAttachmentDto::getOptAttchId)
-					.filter(Objects::nonNull).collect(toList());
-			List<OpprtAttachment> optData = opportunityData.getOprtAttachment().stream()
-					.filter(e -> nonNull(e.getAttachmentOf()) && "Qualify".equalsIgnoreCase(e.getAttachmentOf()))
-					.filter(data -> newIds.isEmpty() || !newIds.contains(data.getOptAttchId())).filter(Objects::nonNull)
-					.collect(toList());
-			optData.stream().forEach(data -> {
-				data.setDeletedBy(staffId);
-				data.setDeletedDate(
-						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
-				opprtAttachmentDaoService.addOpprtAttachment(data);
-			});
-			if (dto.getAttachments().isEmpty()) {
-				opportunity = opportunityDaoService.addOpportunity(opportunityData);
-				status = nonNull(opportunity);
-			} else {
-				for (OpprtAttachmentDto attach : dto.getAttachments()) {
-					OpprtAttachment attachment = TO_OPPORTUNITY_ATTACHMENT.apply(attach)
-							.orElseThrow(ResourceNotFoundException::new);
-					attachment.setOpportunity(opportunityData);
-					OpprtAttachment addAttachment = opprtAttachmentDaoService.addOpprtAttachment(attachment);
-					opportunity = addAttachment.getOpportunity();
-					status = nonNull(opportunity);
-				}
-			}
-
+			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
+			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
 			if (status) {
 				updateQualifyData.put(SUCCESS, true);
 				updateQualifyData.put(MESSAGE, "Opportunity Qualify Successfully..!!");
@@ -668,7 +644,6 @@ public class OpportunityServiceImpl implements OpportunityService {
 				updateQualifyData.put(SUCCESS, false);
 				updateQualifyData.put(MESSAGE, "Opportunity Not Qualify");
 			}
-
 			return new ResponseEntity<>(updateQualifyData, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception in Opportunity while updating the qualify data...{}", e.getMessage());
@@ -685,7 +660,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
 			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
-					.filter(e -> nonNull(e.getAttachmentOf()) && "Analysis".equalsIgnoreCase(e.getAttachmentOf()))
+					.filter(e -> nonNull(e.getAttachmentOf()) && ANALYSIS.equalsIgnoreCase(e.getAttachmentOf()))
 					.collect(toList());
 			Optional<AnalysisOpportunityDto> dto = TO_ANALYSIS_OPPORTUNITY_DTO.apply(opportunityData);
 			dto.ifPresent(l -> l.setAttachments(TO_OPPORTUNITY_ATTACHMENT_DTOS.apply(attachments)));
@@ -704,6 +679,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 		log.info("inside the Opportunity updateAnalysisPopUpData method...{}", opportunityId);
 		EnumMap<ApiResponse, Object> updateAnalysisData = new EnumMap<>(ApiResponse.class);
 		try {
+			boolean status = false;
+			String phase = ANALYSIS;
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
 			opportunityData.setTechnicalNeed(dto.getTechnicalNeed());
@@ -711,7 +688,10 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setSecAndComp(dto.getSecAndComp());
 			opportunityData.setRiskMinigation(dto.getRiskMinigation());
 			opportunityData.setInitialTimeline(dto.getInitialTimeline());
-			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
+
+			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
+			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
+			if (status) {
 				updateAnalysisData.put(SUCCESS, true);
 				updateAnalysisData.put(MESSAGE, "Opportunity Analysis Successfully..!!");
 			} else {
@@ -734,7 +714,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
 			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
-					.filter(e -> nonNull(e.getAttachmentOf()) && "Propose".equalsIgnoreCase(e.getAttachmentOf()))
+					.filter(e -> nonNull(e.getAttachmentOf()) && PROPOSE.equalsIgnoreCase(e.getAttachmentOf()))
 					.collect(toList());
 			Optional<ProposeOpportunityDto> dto = TO_PROPOSE_OPPORTUNITY_DTO.apply(opportunityData);
 			dto.ifPresent(l -> l.setAttachments(TO_OPPORTUNITY_ATTACHMENT_DTOS.apply(attachments)));
@@ -753,13 +733,17 @@ public class OpportunityServiceImpl implements OpportunityService {
 		log.info("inside the Opportunity updateProposePopUpData method...{}", opportunityId);
 		EnumMap<ApiResponse, Object> updateProposeData = new EnumMap<>(ApiResponse.class);
 		try {
+			boolean status = false;
+			String phase = PROPOSE;
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
 			opportunityData.setLicAndPricDetails(dto.getLicAndPricDetails());
 			opportunityData.setDevPlan(dto.getDevPlan());
 			opportunityData.setPropAcceptCriteria(dto.getPropAcceptCriteria());
 			opportunityData.setPropExpDate(dto.getUpdatedPropExpDate());
-			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
+			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
+			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
+			if (status) {
 				updateProposeData.put(SUCCESS, true);
 				updateProposeData.put(MESSAGE, "Opportunity Propose Successfully..!!");
 			} else {
@@ -769,6 +753,59 @@ public class OpportunityServiceImpl implements OpportunityService {
 			return new ResponseEntity<>(updateProposeData, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception in Opportunity while updating the propose data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getClosePopUpData(Integer opportunityId) {
+		log.info("inside the Opportunity getClosePopUpData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> closeData = new EnumMap<>(ApiResponse.class);
+		closeData.put(SUCCESS, false);
+		try {
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
+					.filter(e -> nonNull(e.getAttachmentOf()) && CLOSE.equalsIgnoreCase(e.getAttachmentOf()))
+					.collect(toList());
+			Optional<CloseOpportunityDto> dto = TO_CLOSE_OPPORTUNITY_DTO.apply(opportunityData);
+			dto.ifPresent(l -> l.setAttachments(TO_OPPORTUNITY_ATTACHMENT_DTOS.apply(attachments)));
+			closeData.put(DATA, dto);
+			closeData.put(SUCCESS, true);
+			return new ResponseEntity<>(closeData, OK);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while getting close pop up data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateClosePopUpData(CloseOpportunityDto dto,
+			Integer opportunityId) {
+		log.info("inside the Opportunity updateClosePopUpData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> updateCloseData = new EnumMap<>(ApiResponse.class);
+		try {
+			boolean status = false;
+			String phase = CLOSE;
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			opportunityData.setWinLoseReason(dto.getWinLoseReason());
+			opportunityData.setContract(dto.getContract());
+			opportunityData.setPaymentTerms(dto.getPaymentTerms());
+			opportunityData.setSupportPlan(dto.getSupportPlan());
+			opportunityData.setFinalBudget(dto.getFinalBudget());
+			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
+			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
+			if (status) {
+				updateCloseData.put(SUCCESS, true);
+				updateCloseData.put(MESSAGE, "Opportunity Close Successfully..!!");
+			} else {
+				updateCloseData.put(SUCCESS, false);
+				updateCloseData.put(MESSAGE, "Opportunity Not Close");
+			}
+			return new ResponseEntity<>(updateCloseData, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while updating the close popup data...{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -805,6 +842,45 @@ public class OpportunityServiceImpl implements OpportunityService {
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while updateOpportunity..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	private boolean updateAttachmentsOfAllPhases(Opportunity opportunityData, String phase,
+			List<OpprtAttachmentDto> isAttachments) {
+		log.info("inside the updateAttachmentsOfAllPhases method...");
+		try {
+			Opportunity opportunity = null;
+			boolean status = false;
+			Integer staffId = auditAwareUtil.getLoggedInStaffId();
+			List<Integer> newIds = isAttachments.stream().map(OpprtAttachmentDto::getOptAttchId)
+					.filter(Objects::nonNull).collect(toList());
+			List<OpprtAttachment> optData = opportunityData.getOprtAttachment().stream()
+					.filter(e -> nonNull(e.getAttachmentOf()) && phase.equalsIgnoreCase(e.getAttachmentOf()))
+					.filter(data -> newIds.isEmpty() || !newIds.contains(data.getOptAttchId())).filter(Objects::nonNull)
+					.collect(toList());
+			optData.stream().forEach(data -> {
+				data.setDeletedBy(staffId);
+				data.setDeletedDate(
+						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+				opprtAttachmentDaoService.addOpprtAttachment(data);
+			});
+			if (isAttachments.isEmpty()) {
+				opportunity = opportunityDaoService.addOpportunity(opportunityData);
+				status = nonNull(opportunity);
+			} else {
+				for (OpprtAttachmentDto attach : isAttachments) {
+					OpprtAttachment attachment = TO_OPPORTUNITY_ATTACHMENT.apply(attach)
+							.orElseThrow(ResourceNotFoundException::new);
+					attachment.setOpportunity(opportunityData);
+					OpprtAttachment addAttachment = opprtAttachmentDaoService.addOpprtAttachment(attachment);
+					opportunity = addAttachment.getOpportunity();
+					status = nonNull(opportunity);
+				}
+			}
+			return status;
+		} catch (Exception e) {
+			log.error("Got Exception while updating the attachments of opportunity phase...{}", phase);
 			throw new CRMException(e);
 		}
 	}
