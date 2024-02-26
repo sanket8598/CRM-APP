@@ -111,5 +111,5 @@ public class OpportunityController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunity(@RequestBody UpdateLeadDto dto,
 			@PathVariable(name = "opportunityId") Integer opportunityId) {
 		return opportunityService.updateOpportunity(dto, opportunityId);
-	}
+	} 
 }
