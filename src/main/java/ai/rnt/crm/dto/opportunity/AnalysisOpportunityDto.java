@@ -1,6 +1,9 @@
 package ai.rnt.crm.dto.opportunity;
 
+import java.time.LocalDate;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Data;
 
@@ -17,7 +20,11 @@ public class AnalysisOpportunityDto {
 	
 	private String riskMinigation;
 	
-	private String initialTimeline;
+	@JsonFormat(pattern = "dd-MM-yyyy")
+	private LocalDate initialTimeline;
+	
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private LocalDate updatedInitialTimeline;
 	
 	private String currentPhase;
 	

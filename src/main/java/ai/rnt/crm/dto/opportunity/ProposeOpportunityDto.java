@@ -15,6 +15,14 @@ public class ProposeOpportunityDto {
 	private String devPlan;
 
 	private String propAcceptCriteria;
+	
+	private String presentation;
+	
+	private String scopeOfWork;
+	
+	private String termsAndConditions;
+	
+	private String proposition;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate propExpDate;
