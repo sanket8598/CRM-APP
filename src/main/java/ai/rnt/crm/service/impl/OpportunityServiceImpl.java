@@ -744,6 +744,10 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setDevPlan(dto.getDevPlan());
 			opportunityData.setPropAcceptCriteria(dto.getPropAcceptCriteria());
 			opportunityData.setPropExpDate(dto.getUpdatedPropExpDate());
+			opportunityData.setPresentation(dto.getPresentation());
+			opportunityData.setProposition(dto.getProposition());
+			opportunityData.setTermsAndConditions(dto.getTermsAndConditions());
+			opportunityData.setScopeOfWork(dto.getScopeOfWork());
 			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
 			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
 			if (status) {
