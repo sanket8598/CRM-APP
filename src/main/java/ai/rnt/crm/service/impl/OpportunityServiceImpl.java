@@ -75,6 +75,7 @@ import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static ai.rnt.crm.util.OpportunityUtil.amountInWords;
 import static ai.rnt.crm.util.OpportunityUtil.calculateBubbleSize;
 import static ai.rnt.crm.util.OpportunityUtil.checkPhase;
+import static java.lang.Boolean.TRUE;
 import static java.lang.Double.valueOf;
 import static java.time.LocalDateTime.now;
 import static java.time.LocalDateTime.parse;
@@ -597,6 +598,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 				e.setLeadSourceId(opportunityData.getLeads().getLeadSourceMaster().getLeadSourceId());
 				e.setContacts(TO_CONTACT_DTOS.apply(contacts));
 				e.setAttachments(TO_OPTY_ATTACHMENT_DTOS.apply(attachments));
+				e.setClients(TO_CONTACT_DTOS.apply(contacts.stream()
+						.filter(cl -> nonNull(cl.getClient()) && TRUE.equals(cl.getClient())).collect(toList())));
 			});
 			qualifyData.put(DATA, dto);
 			qualifyData.put(SUCCESS, true);
