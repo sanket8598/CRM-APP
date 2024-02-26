@@ -80,8 +80,8 @@ public class Opportunity extends Auditable {
 	@Column(name = "risk_minigation")
 	private String riskMinigation;
 
-	@Column(name = "initial_timeline")
-	private String initialTimeline;
+	@Column(name = "initial_timeline" , columnDefinition = "date")
+	private LocalDate initialTimeline;
 
 	@Column(name = "lic_pric_dets")
 	private String licAndPricDetails;
@@ -94,6 +94,18 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "prop_exp_date", columnDefinition = "date")
 	private LocalDate propExpDate;
+	
+	@Column(name = "terms_and_conditions")
+	private String termsAndConditions;
+	
+	@Column(name = "presentation")
+	private String presentation;
+	
+	@Column(name = "scope_of_work")
+	private String scopeOfWork;
+	
+	@Column(name = "proposition")
+	private String proposition;
 
 	@Column(name = "win_lose_reason")
 	private String winLoseReason;

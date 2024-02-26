@@ -687,7 +687,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setIntegrationPoint(dto.getIntegrationPoint());
 			opportunityData.setSecAndComp(dto.getSecAndComp());
 			opportunityData.setRiskMinigation(dto.getRiskMinigation());
-			opportunityData.setInitialTimeline(dto.getInitialTimeline());
+			opportunityData.setInitialTimeline(dto.getUpdatedInitialTimeline());
 
 			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
 			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
