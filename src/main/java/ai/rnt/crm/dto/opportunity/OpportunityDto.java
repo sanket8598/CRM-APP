@@ -3,8 +3,10 @@ package ai.rnt.crm.dto.opportunity;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static java.util.Objects.nonNull;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ai.rnt.crm.dto.ContactDto;
@@ -34,10 +36,13 @@ public class OpportunityDto {
 	private String generatedBy;
 
 	private Integer dropDownAssignTo;
-	
+
 	private String currentPhase;
-	
+
 	private String progressStatus;
+
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDate closedOn;
 
 	@JsonProperty("lead")
 	private LeadDashboardDto leadDashboardDto;
