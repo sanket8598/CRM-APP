@@ -35,6 +35,10 @@ public class QualifyOpportunityDto {
 	private LocalDate updatedClosedOn;
 
 	private Integer leadSourceId;
+	
+	private String progressStatus;
+	
+	private String currentPhase;
 
 	private ContactDto primaryContact;
 

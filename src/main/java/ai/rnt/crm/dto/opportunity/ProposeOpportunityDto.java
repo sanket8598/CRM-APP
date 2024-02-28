@@ -23,6 +23,10 @@ public class ProposeOpportunityDto {
 	private String termsAndConditions;
 	
 	private String proposition;
+	
+	private String progressStatus;
+	
+	private String currentPhase;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate propExpDate;

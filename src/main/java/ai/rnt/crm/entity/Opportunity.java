@@ -124,6 +124,9 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "final_budget")
 	private String finalBudget;
+	
+	@Column(name = "progress_status")
+	private String progressStatus;
 
 	@OneToMany(mappedBy = "opportunity", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
 	private List<OpprtAttachment> oprtAttachment = new ArrayList<>();
