@@ -34,6 +34,10 @@ public class OpportunityDto {
 	private String generatedBy;
 
 	private Integer dropDownAssignTo;
+	
+	private String currentPhase;
+	
+	private String progressStatus;
 
 	@JsonProperty("lead")
 	private LeadDashboardDto leadDashboardDto;
