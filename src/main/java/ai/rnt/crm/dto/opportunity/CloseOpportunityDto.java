@@ -22,6 +22,10 @@ public class CloseOpportunityDto {
 	private String supportPlan;
 
 	private String finalBudget;
+	
+	private String progressStatus;
+	
+	private String currentPhase;
 
 	private List<OpprtAttachmentDto> attachments;
 }

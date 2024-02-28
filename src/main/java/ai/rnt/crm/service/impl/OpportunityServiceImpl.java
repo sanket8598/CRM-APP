@@ -627,6 +627,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setProposedSolution(dto.getProposedSolution());
 			opportunityData.setClosedOn(dto.getUpdatedClosedOn());
 			opportunityData.setBudgetAmount(dto.getBudgetAmount());
+			opportunityData.setProgressStatus(dto.getProgressStatus());
+			opportunityData.setCurrentPhase(dto.getCurrentPhase());
 
 			List<Integer> clientList = dto.getClients().stream().filter(ContactDto::getClient)
 					.map(ContactDto::getContactId).collect(toList());
@@ -691,6 +693,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setSecAndComp(dto.getSecAndComp());
 			opportunityData.setRiskMinigation(dto.getRiskMinigation());
 			opportunityData.setInitialTimeline(dto.getUpdatedInitialTimeline());
+			opportunityData.setProgressStatus(dto.getProgressStatus());
+			opportunityData.setCurrentPhase(dto.getCurrentPhase());
 
 			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
 			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
@@ -748,6 +752,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setProposition(dto.getProposition());
 			opportunityData.setTermsAndConditions(dto.getTermsAndConditions());
 			opportunityData.setScopeOfWork(dto.getScopeOfWork());
+			opportunityData.setProgressStatus(dto.getProgressStatus());
+			opportunityData.setCurrentPhase(dto.getCurrentPhase());
 			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
 			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
 			if (status) {
@@ -801,6 +807,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setPaymentTerms(dto.getPaymentTerms());
 			opportunityData.setSupportPlan(dto.getSupportPlan());
 			opportunityData.setFinalBudget(dto.getFinalBudget());
+			opportunityData.setProgressStatus(dto.getProgressStatus());
+			opportunityData.setCurrentPhase(dto.getCurrentPhase());
 			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
 			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
 			if (status) {

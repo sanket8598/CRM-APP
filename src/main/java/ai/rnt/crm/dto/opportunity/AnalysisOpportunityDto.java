@@ -28,6 +28,8 @@ public class AnalysisOpportunityDto {
 	
 	private String currentPhase;
 	
+	private String progressStatus;
+	
 	private List<OpprtAttachmentDto> attachments;
 	
 }
