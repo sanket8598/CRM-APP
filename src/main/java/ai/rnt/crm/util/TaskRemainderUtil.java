@@ -78,7 +78,7 @@ public class TaskRemainderUtil {
 
 	private final LeadService leadService;
 
-	@Scheduled(cron = "0 * * * * ?") // for every minute.
+	//@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
 		log.info("inside the reminderForTask method...{}");
 		try {

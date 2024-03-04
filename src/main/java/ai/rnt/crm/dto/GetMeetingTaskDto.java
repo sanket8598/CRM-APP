@@ -42,7 +42,7 @@ public class GetMeetingTaskDto {
 	private String remainderDueAt;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
-	private Date remainderDueOn;
+	private LocalDate remainderDueOn;
 
 	@Temporal(DATE)
 	private LocalDate updatedRemainderDueOn;

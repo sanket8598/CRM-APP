@@ -90,11 +90,13 @@ public class VisitServiceImpl implements VisitService {
 				visit.setEndTime(END_TIME);
 			}
 			visit.setStatus(SAVE);
-			if (nonNull(visitDaoService.saveVisit(visit)))
+			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit Added Successfully");
-			else
+				result.put(SUCCESS, true);
+			} else {
 				result.put(MESSAGE, "Visit Not Added");
-			result.put(SUCCESS, true);
+				result.put(SUCCESS, false);
+			}
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while adding the visit..{}", e.getMessage());
@@ -142,13 +144,15 @@ public class VisitServiceImpl implements VisitService {
 			visit.setAllDay(dto.isAllDay());
 			visit.setStatus(status);
 			if (nonNull(visitDaoService.saveVisit(visit))) {
-				if (status.equalsIgnoreCase(SAVE))
+				if (status.equalsIgnoreCase(SAVE)) {
 					result.put(MESSAGE, "Visit Updated Successfully");
-				else
+					result.put(SUCCESS, true);
+				} else
 					result.put(MESSAGE, "Visit Updated And Completed Successfully");
-			} else
+			} else {
 				result.put(MESSAGE, "Visit Not Updated");
-			result.put(SUCCESS, true);
+				result.put(SUCCESS, false);
+			}
 			return new ResponseEntity<>(result, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while update the visit..{}", e.getMessage());
@@ -219,15 +223,11 @@ public class VisitServiceImpl implements VisitService {
 					.orElseThrow(() -> new ResourceNotFoundException(VISIT, VISIT_ID, visitId));
 			visit.getVisitTasks().stream().forEach(e -> {
 				e.setDeletedBy(loggedInStaffId);
-				e.setDeletedDate(now().atZone(systemDefault())
-			            .withZoneSameInstant(of(INDIA_ZONE))
-			            .toLocalDateTime());
+				e.setDeletedDate(now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 				visitDaoService.addVisitTask(e);
 			});
 			visit.setDeletedBy(loggedInStaffId);
-			visit.setDeletedDate(now().atZone(systemDefault())
-		            .withZoneSameInstant(of(INDIA_ZONE))
-		            .toLocalDateTime());
+			visit.setDeletedDate(now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
 				result.put(MESSAGE, "Visit deleted SuccessFully.");
 				result.put(SUCCESS, true);
@@ -348,9 +348,8 @@ public class VisitServiceImpl implements VisitService {
 			VisitTask visitTask = visitDaoService.getVisitTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(VISIT_TASK, TASK_ID, taskId));
 			visitTask.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			visitTask.setDeletedDate(now().atZone(systemDefault())
-		            .withZoneSameInstant(of(INDIA_ZONE))
-		            .toLocalDateTime());
+			visitTask.setDeletedDate(
+					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
 				result.put(MESSAGE, "Visit Task Deleted SuccessFully.");
 				result.put(SUCCESS, true);
