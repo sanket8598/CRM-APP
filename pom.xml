@@ -65,8 +65,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-		<!--
-		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -83,8 +82,7 @@
 			<artifactId>jjwt</artifactId>
 			<version>${jwt.token.version}</version>
 		</dependency>
-		<!--
-		https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter -->
+		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-boot-starter</artifactId>
@@ -105,27 +103,26 @@
 			<artifactId>javax.mail</artifactId>
 			<version>${mail.version}</version>
 		</dependency>
-		<!--
-		https://mvnrepository.com/artifact/com.googlecode.libphonenumber/libphonenumber -->
+		<!-- https://mvnrepository.com/artifact/com.googlecode.libphonenumber/libphonenumber -->
 		<dependency>
 			<groupId>com.googlecode.libphonenumber</groupId>
 			<artifactId>libphonenumber</artifactId>
 			<version>${phoneNumValid.version}</version>
 		</dependency>
-    <!--New dependency for excel file-->
-    <dependency>
+		<!--New dependency for excel file -->
+		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.17</version>
 		</dependency>
 
-   <!-- end-->
+		<!-- end -->
 		<dependency>
 			<groupId>com.ibm.icu</groupId>
 			<artifactId>icu4j</artifactId>
 			<version>4.8</version>
 		</dependency>
-<!-- https://mvnrepository.com/artifact/com.hazelcast/hazelcast -->
+		<!-- https://mvnrepository.com/artifact/com.hazelcast/hazelcast -->
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-all</artifactId>
@@ -136,11 +133,36 @@
 			<artifactId>owasp-java-html-sanitizer</artifactId>
 			<version>20181114.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>jacoco-maven-plugin</artifactId>
+			<version>0.8.8</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<finalName>rnt-crm</finalName>
 		<plugins>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.5</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<!-- attached to Maven test phase -->
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -155,5 +177,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
