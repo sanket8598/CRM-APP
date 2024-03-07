@@ -1029,7 +1029,7 @@ public class LeadServiceImpl implements LeadService {
 
 	}
 
-	private void setLocationToCompany(String location, CompanyMaster company) {
+	public void setLocationToCompany(String location, CompanyMaster company) {
 		log.info("inside the setLocationToCompany method...{} ", location);
 		if (nonNull(location) && !location.isEmpty()) {
 			Optional<CountryMaster> country = countryDaoService.findByCountryName(location);
@@ -1057,7 +1057,7 @@ public class LeadServiceImpl implements LeadService {
 		}
 	}
 
-	private boolean addToOpputunity(Leads leads) {
+	public boolean addToOpputunity(Leads leads) {
 		Opportunity opportunity = new Opportunity();
 		opportunity.setStatus(OppurtunityStatus.OPEN);
 		opportunity.setBudgetAmount(leads.getBudgetAmount());
@@ -1069,5 +1069,4 @@ public class LeadServiceImpl implements LeadService {
 		opportunity.setLeads(leads);
 		return nonNull(opportunityDaoService.addOpportunity(opportunity));
 	}
-
 }
