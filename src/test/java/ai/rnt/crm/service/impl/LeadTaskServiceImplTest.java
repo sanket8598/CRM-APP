@@ -145,16 +145,16 @@ class LeadTaskServiceImplTest {
 		assertEquals("Task Not Assigned", response.getBody().get(MESSAGE));
 	}
 
-	//@Test
+	@Test
 	void assignLeadTaskTestException() {
 		Map<String, Integer> map = new HashMap<>();
 		map.put("staffId", 1477);
 		map.put("taskId", 1);
-		when(leadTaskDaoService.getTaskById(1)).thenThrow(ResourceNotFoundException.class);
-		when(employeeService.getById(1477)).thenThrow(ResourceNotFoundException.class);
+		int id = 1;
+		when(leadTaskDaoService.getTaskById(id)).thenReturn(Optional.empty());
 		assertThrows(CRMException.class, () -> leadTaskServiceImpl.assignLeadTask(map));
 	}
-
+	
 	@Test
 	void deleteLeadTaskTest() {
 		LeadTask leadTask = new LeadTask();
