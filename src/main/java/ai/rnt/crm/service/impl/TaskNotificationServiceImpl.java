@@ -72,7 +72,7 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 		}
 	}
 
-	private TaskNotificationsDto getMessage(TaskNotifications notification) {
+	public TaskNotificationsDto getMessage(TaskNotifications notification) {
 		log.info("inside the getMessage for Notification method...");
 		try {
 			if (nonNull(notification)) {
