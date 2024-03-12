@@ -1,37 +1,44 @@
 package ai.rnt.crm.service.impl;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ai.rnt.crm.dao.service.ContactDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.ContactDto;
+import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
+import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
-import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.exception.CRMException;
+import ai.rnt.crm.util.ContactUtil;
 
-@ExtendWith(MockitoExtension.class)
 class ContactServiceImplTest {
 
 	@Mock
 	private ContactDaoService contactDaoService;
+
+	@Mock
+	private ContactUtil contactUtil;
 
 	@Mock
 	private LeadDaoService leadDaoService;
@@ -39,46 +46,125 @@ class ContactServiceImplTest {
 	@InjectMocks
 	private ContactServiceImpl contactServiceImpl;
 
+	@Autowired
+	MockMvc mockMvc;
+	
+	@Mock
+	ContactDto contactDto;
+	
+	@Mock
+	Contacts contactDto1;
+	
 	@BeforeEach
-	void setUp() {
+	void setup() {
 		MockitoAnnotations.openMocks(this);
+		this.mockMvc = MockMvcBuilders.standaloneSetup(contactServiceImpl).build();
 	}
 
-	// @Test
-	void testAddContact_Success() {
-		// Arrange
-		Contacts contacts = new Contacts();
-		ContactDto contactDto = new ContactDto();
-		contactDto.setPrimary(true);
-		contactDto.setFirstName("FirstName");
-		contactDto.setLastName(" LastName");
+	@Test
+	void testAddContact() {
+		contactDto.setName("John Doe12");
+		contactDto.setPrimary(false);
+
 		Integer leadId = 1;
-		when(contactDaoService.contactsOfLead(leadId)).thenReturn(Collections.emptyList());
-		when(contactDaoService.addContact(any(Contacts.class))).thenReturn(contacts);
-		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.empty());
+
+		List<Contacts> existingContacts = new ArrayList<>();
+		Contacts existingContact = new Contacts();
+		existingContact.setPrimary(false);
+		existingContacts.add(existingContact);
+
+		CompanyMaster companyMaster = new CompanyMaster();
+		existingContact.setCompanyMaster(companyMaster);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.addContact(contactDto, leadId);
-		assertNotNull(response);
-		assertEquals(201, response.getStatusCodeValue());
-		assertTrue((boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Added Successfully !!", response.getBody().get(ApiResponse.MESSAGE));
-	}
 
-	//@Test
-	void testGetContact_WhenContactExists_ReturnsResponseEntityWithContactData() {
-		Contacts contact = new Contacts();
-		int contactId = 5;
-		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(contact));
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.getContact(contactId);
-		assertNotNull(response);
-		assertEquals(200, response.getStatusCodeValue());
-		assertTrue((boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertNotNull(response.getBody().get(ApiResponse.DATA));
-	}
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
 
-	//@Test
-	void testGetContact_WhenContactDoesNotExist_ReturnsResourceNotFoundException() {
-		int contactId = 1;
-		when(contactDaoService.findById(contactId)).thenReturn(Optional.empty());
-		assertThrows(ResourceNotFoundException.class, () -> contactServiceImpl.getContact(contactId));
+		ContactDto contactDto1 = new ContactDto();
+		contactDto1.setPrimary(true);
+
+		Integer leadId1 = 1;
+
+		List<Contacts> existingContacts1 = new ArrayList<>();
+		Contacts existingContact1 = new Contacts();
+		existingContact1.setPrimary(true);
+		existingContacts1.add(existingContact1);
+		Contacts contactDto2 = new Contacts();
+		contactDto2.setPrimary(true);
+		existingContacts1.add(contactDto2);
+
+		CompanyMaster companyMaster1 = new CompanyMaster();
+		existingContact.setCompanyMaster(companyMaster1);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response1 = contactServiceImpl.addContact(contactDto1, leadId1);
+
+		assertEquals(HttpStatus.CREATED, response1.getStatusCode());
+		assertFalse((Boolean) response1.getBody().get(ApiResponse.SUCCESS));
 	}
+	
+    @Test
+    void testGetContactNotFound() {
+        Integer contactId = 1;
+        assertThrows(CRMException.class, () -> {
+        	contactServiceImpl.getContact(contactId);
+        });
+    }
+    
+    @Test
+    void testUpdateContactSuccess() {
+        // Mock data
+        ContactDto contactDto = new ContactDto();
+        contactDto.setName("John Doe");
+        Integer contactId = 1;
+
+        // Mock existing contact
+        Contacts existingContact = new Contacts();
+        existingContact.setContactId(contactId);
+        existingContact.setLead(new Leads());
+        when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void testUpdateContactNotFound() {
+        // Mock data
+        ContactDto contactDto = new ContactDto();
+        Integer contactId = 1;
+
+        // Mock behavior of findById to return empty optional
+        when(contactDaoService.findById(contactId)).thenReturn(Optional.empty());
+
+        // Call the method and expect a ResourceNotFoundException to be thrown
+        assertThrows(CRMException.class, () -> {
+            contactServiceImpl.updateContact(contactDto, contactId);
+        });
+    }
+
+    @Test
+    void testUpdateContactUnmarkPrimary() {
+        // Mock data
+        ContactDto contactDto = new ContactDto();
+        contactDto.setPrimary(false);
+        Integer contactId = 1;
+
+        // Mock existing contact
+        Contacts existingContact = new Contacts();
+        existingContact.setContactId(contactId);
+        existingContact.setPrimary(true);
+        existingContact.setLead(new Leads());
+
+        List<Contacts> existingContacts = new ArrayList<>();
+        existingContacts.add(existingContact);
+
+        // Mock behavior of findById
+        when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
+        // Mock behavior of contactsOfLead
+        when(contactDaoService.contactsOfLead(anyInt())).thenReturn(existingContacts);
+
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
+
+        // Assertions
+        assertEquals("Contact Not Updated !!", response.getBody().get(ApiResponse.MESSAGE));
+    }
+
 }

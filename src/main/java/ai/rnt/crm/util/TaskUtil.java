@@ -163,7 +163,7 @@ public class TaskUtil {
 		}
 	}
 
-	private static boolean compareDatesIgnoringTime(LocalDate oldDate, LocalDate newDate) {
+	public static boolean compareDatesIgnoringTime(LocalDate oldDate, LocalDate newDate) {
 		log.info("inside the compareDatesIgnoringTime method...{}");
 		return oldDate.equals(newDate);
 	}
