@@ -491,12 +491,15 @@ class CallServiceImplTest {
 		Integer taskId = 2;
 		Integer staffId = 1;
 		PhoneCallTask callTask = new PhoneCallTask();
+		Map<String,Integer> map=new HashMap<>();
+		map.put("taskId", taskId);
+		map.put("staffId", staffId);
 		EmployeeMaster employee = new EmployeeMaster();
 		when(callDaoService.getCallTaskById(taskId)).thenReturn(java.util.Optional.of(callTask));
 		when(employeeService.getById(staffId)).thenReturn(java.util.Optional.of(employee));
 		when(callDaoService.addCallTask(any())).thenReturn(null);
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = callServiceImpl
-				.assignCallTask(Map.of("taskId", taskId, "staffId", staffId));
+				.assignCallTask(map);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertFalse((Boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
 		assertEquals("Task Not Assigned", responseEntity.getBody().get(ApiResponse.MESSAGE));

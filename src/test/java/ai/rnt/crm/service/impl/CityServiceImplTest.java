@@ -1,12 +1,12 @@
 package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static java.util.List.of;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dao.service.CityDaoService;
+import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 
@@ -32,7 +33,12 @@ class CityServiceImplTest {
 
 	@Test
     void getAllCityTest() {
-        when(cityDaoService.getAllCity()).thenReturn(of());
+		CityMaster city1=new CityMaster();
+		CityMaster city2=new CityMaster();
+		List<CityMaster> cities=new ArrayList<>();
+		cities.add(city2);
+		cities.add(city1);
+        when(cityDaoService.getAllCity()).thenReturn(cities);
         ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = cityServiceImpl.getAllCity();
         assertEquals(OK, responseEntity.getStatusCode());
         EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
