@@ -57,7 +57,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public Optional<EmployeeMaster> getById(Integer assignTo) {
 		log.info("inside the getById method...{}",assignTo);
 		try {
-			return TO_EmployeeMaster.apply(employeeDaoService.getById(assignTo).get());
+			return TO_EmployeeMaster.apply(employeeDaoService.getById(assignTo).orElseThrow(()->new ResourceNotFoundException("Employee", "userId", assignTo)));
 		} catch (Exception e) {
 			log.info("Got Exception while getting the user..{}" ,e.getMessage());
 			throw new CRMException(e);
