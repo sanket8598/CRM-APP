@@ -101,6 +101,15 @@ class ContactServiceImplTest {
 		assertFalse((Boolean) response1.getBody().get(ApiResponse.SUCCESS));
 	}
 	
+	@Test
+	void testaddContactException() {
+		Integer contactId = 1;
+		contactDto1.setPrimary(true);
+		when(contactDaoService.contactsOfLead(contactId)).thenThrow(CRMException.class);
+		assertThrows(CRMException.class, () -> {
+			contactServiceImpl.addContact(contactDto,contactId);
+		});
+	}
     @Test
     void testGetContactNotFound() {
         Integer contactId = 1;
