@@ -153,20 +153,20 @@ public class MeetingUtil {
 		return attachmentPart;
 	}
 
-	private String formatDate(Date date) {
+	public String formatDate(Date date) {
 		log.info("inside the meetingUtil formatDate method...{}", date);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		dateFormat.setTimeZone(getTimeZone("UTC+05:30"));
 		return dateFormat.format(date);
 	}
 
-	private String formatDateTime(Date date, String time) {
+	public String formatDateTime(Date date, String time) {
 		log.info("inside the meetingUtil formatDateTime method...{}", date);
 		return ofInstant(date.toInstant(), of("UTC+05:30")).toLocalDate().atTime(parseTime(time))
 				.format(ofPattern("yyyyMMdd'T'HHmmss"));
 	}
 
-	private LocalTime parseTime(String time) {
+	public LocalTime parseTime(String time) {
 		log.info("inside the meetingUtil parseTime method...{}", time);
 		return parse(time, ofPattern("HH:mm", US));
 	}
