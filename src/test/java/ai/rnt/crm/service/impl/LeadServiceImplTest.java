@@ -1,5 +1,7 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
+import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +37,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ai.rnt.crm.constants.OppurtunityStatus;
+import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.ContactDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
@@ -44,10 +48,14 @@ import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
+import ai.rnt.crm.dto.UpdateLeadDto;
+import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CompanyMaster;
+import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.EmployeeMaster;
@@ -56,6 +64,7 @@ import ai.rnt.crm.entity.LeadSourceMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.ServiceFallsMaster;
+import ai.rnt.crm.entity.StateMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.service.EmployeeService;
@@ -92,12 +101,17 @@ class LeadServiceImplTest {
 
 	@Mock
 	private ReadExcelUtil readExcelUtil;
+	
+	@Mock
+	private CityDaoService cityDaoService;
 
 	@Mock
 	private RoleMasterDaoService roleMasterDaoService;
 
 	@Mock
 	private ContactDaoService contactDaoService;
+	@Mock
+	private StateDaoService stateDaoService;
 
 	@Mock
 	private DomainMasterDaoService domainMasterDaoService;
@@ -567,6 +581,37 @@ class LeadServiceImplTest {
 	    assertThrows(CRMException.class, () -> leadService.assignLead(map));
 	}
 
-
-
+	@Test
+    void testUpdateLeadContact_Success() {
+        Integer leadId = 1;
+        UpdateLeadDto dto =mock(UpdateLeadDto.class);
+        Leads lead = mock(Leads.class);
+        Contacts contact = mock(Contacts.class);
+        EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+        result.put(MESSAGE, "Lead Details Updated Successfully !!");
+        result.put(SUCCESS, true);
+        when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
+        when(lead.getContacts()).thenReturn(Arrays.asList(contact));
+        when(contact.getPrimary()).thenReturn(true);
+        when(contact.getPrimary()).thenReturn(true);
+        when(cityDaoService.existCityByName("dhjsd")).thenReturn(Optional.of(mock(CityMaster.class)));
+        when(stateDaoService.findBystate("dfs")).thenReturn(Optional.of(mock(StateMaster.class)));
+        when(countryDaoService.findByCountryName("sfgdfsd")).thenReturn(Optional.of(mock(CountryMaster.class)));
+        when(companyMasterDaoService.findByCompanyName("fsdfsdds")).thenReturn(Optional.of(mock(CompanyDto.class)));
+        when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(mock(CountryMaster.class));
+        when(stateDaoService.addState(any(StateMaster.class))).thenReturn(mock(StateMaster.class));
+        when(cityDaoService.addCity(any(CityMaster.class))).thenReturn(mock(CityMaster.class));
+        when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
+        ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = leadService.updateLeadContact(leadId, dto);
+        assertEquals(HttpStatus.CREATED,responseEntity.getStatusCode());
+    }
+	
+	@Test
+	void updateLead_Exception() {
+		Integer leadId = 1;
+		UpdateLeadDto dto =mock(UpdateLeadDto.class);
+	    when(leadDaoService.getLeadById(leadId)).thenThrow(new RuntimeException("Database error"));
+	    assertThrows(CRMException.class, () -> leadService.updateLeadContact(leadId,dto));
+	}
+	
 }
