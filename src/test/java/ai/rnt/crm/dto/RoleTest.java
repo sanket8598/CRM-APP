@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 
 class RoleTest {
 
-	Role role = new Role();
-	Role role1 = new Role();
-
 	@Test
 	void testSetAndGetRoleData() {
 		Role role = new Role();
+		Role role1 = new Role();
 		role.setRoleId(1);
-		role.setRoleName("Administrator");
+		role1.setRoleId(1);
+		role.setRoleName("Admin");
+		role1.setRoleName("Admin");
 		Integer roleId = role.getRoleId();
 		String roleName = role.getRoleName();
 		role.canEqual(role);
@@ -23,6 +23,6 @@ class RoleTest {
 		role.toString();
 		assertNotNull(roleId);
 		assertEquals(1, roleId);
-		assertEquals("Administrator", roleName);
+		assertEquals("Admin", roleName);
 	}
 }

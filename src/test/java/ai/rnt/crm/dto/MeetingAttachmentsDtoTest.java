@@ -6,16 +6,18 @@ import org.junit.jupiter.api.Test;
 
 class MeetingAttachmentsDtoTest {
 
-	MeetingAttachmentsDto dto = new MeetingAttachmentsDto();
-	MeetingAttachmentsDto dto1 = new MeetingAttachmentsDto();
-
 	@Test
 	void testCreateObject() {
 		MeetingAttachmentsDto dto = new MeetingAttachmentsDto();
+		MeetingAttachmentsDto dto1 = new MeetingAttachmentsDto();
 		dto.setMeetingAttchId(1);
+		dto1.setMeetingAttchId(1);
 		dto.setMeetingAttachmentData("qwerthjfv");
+		dto1.setMeetingAttachmentData("qwerthjfv");
 		dto.setMeetingAttachType("image/jpeg");
+		dto1.setMeetingAttachType("image/jpeg");
 		dto.setMeetingAttachName("Mydata");
+		dto1.setMeetingAttachName("Mydata");
 		dto.canEqual(dto);
 		dto.equals(dto1);
 		dto.hashCode();
@@ -39,5 +41,4 @@ class MeetingAttachmentsDtoTest {
 		dto.setMeetingAttachType(null);
 		assertEquals("OTHER", dto.getType());
 	}
-
 }

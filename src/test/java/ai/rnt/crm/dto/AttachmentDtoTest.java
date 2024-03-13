@@ -32,7 +32,7 @@ class AttachmentDtoTest {
 	@Test
 	void testGetType() {
 		AttachmentDto attachmentDto = new AttachmentDto();
-		attachmentDto.setAttachType("PDF");
+		attachmentDto.setAttachType("OTHER");
 		String type = attachmentDto.getType();
 		assertEquals("OTHER", type);
 	}

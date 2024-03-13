@@ -12,25 +12,36 @@ import org.junit.jupiter.api.Test;
 
 class MeetingDtoTest {
 
-	MeetingDto dto = new MeetingDto();
-	MeetingDto dto1 = new MeetingDto();
-
 	@Test
 	void testCreateObject() {
 		MeetingDto dto = new MeetingDto();
+		MeetingDto dto1 = new MeetingDto();
 		dto.setMeetingId(1);
+		dto1.setMeetingId(1);
 		dto.setMeetingTitle("Meeting Title");
+		dto1.setMeetingTitle("Meeting Title");
 		dto.setParticipates(Arrays.asList("Participant 1", "Participant 2"));
+		dto1.setParticipates(Arrays.asList("Participant 1", "Participant 2"));
 		dto.setStartDate(new Date());
+		dto1.setStartDate(new Date());
 		dto.setEndDate(new Date());
+		dto1.setEndDate(new Date());
 		dto.setStartTime("09:00 AM");
+		dto1.setStartTime("09:00 AM");
 		dto.setDuration("1 hour");
+		dto1.setDuration("1 hour");
 		dto.setEndTime("10:00 AM");
+		dto1.setEndTime("10:00 AM");
 		dto.setAllDay(false);
+		dto1.setAllDay(false);
 		dto.setLocation("Meeting Room");
+		dto1.setLocation("Meeting Room");
 		dto.setDescription("Meeting Description");
-		dto.setMeetingMode("In-person");
+		dto1.setDescription("Meeting Description");
+		dto.setMeetingMode("Online");
+		dto1.setMeetingMode("Online");
 		dto.setIsOpportunity(false);
+		dto1.setIsOpportunity(false);
 		MeetingAttachmentsDto attachment1 = new MeetingAttachmentsDto();
 		attachment1.setMeetingAttchId(1);
 		attachment1.setMeetingAttachName("Attachment 1");
@@ -41,6 +52,7 @@ class MeetingDtoTest {
 		attachments.add(attachment1);
 		attachments.add(attachment2);
 		dto.setMeetingAttachments(attachments);
+		dto1.setMeetingAttachments(attachments);
 		dto.canEqual(dto);
 		dto.equals(dto1);
 		dto.hashCode();
@@ -59,7 +71,7 @@ class MeetingDtoTest {
 		assertEquals(false, dto.isAllDay());
 		assertEquals("Meeting Room", dto.getLocation());
 		assertEquals("Meeting Description", dto.getDescription());
-		assertEquals("In-person", dto.getMeetingMode());
+		assertEquals("Online", dto.getMeetingMode());
 		assertEquals(false, dto.getIsOpportunity());
 		List<MeetingAttachmentsDto> retrievedAttachments = dto.getMeetingAttachments();
 		assertNotNull(retrievedAttachments);

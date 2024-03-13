@@ -27,9 +27,11 @@ class TimeLineAndActivityDtoTest {
 		String shortName = timeLineAndActivityDto.getShortName();
 		String createdOn = timeLineAndActivityDto.getCreatedOn();
 		String dueDate = timeLineAndActivityDto.getDueDate();
+		TimeLineAndActivityDto timeLineAndActivityDto1 = new TimeLineAndActivityDto(id,type,subject,body,shortName,createdOn,dueDate);
 		dto.equals(dto1);
 		dto.hashCode();
 		dto.toString();
+		assertNotNull(timeLineAndActivityDto1);
 		assertNotNull(id);
 		assertEquals(1, id);
 		assertEquals("Type", type);
