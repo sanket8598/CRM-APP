@@ -12,7 +12,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -80,48 +79,6 @@ class EmailServiceImplTest {
 		MockitoAnnotations.openMocks(this);
 		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
 		this.mockMvc = MockMvcBuilders.standaloneSetup(emailServiceImpl).build();
-	}
-
-	 //@Test
-	void testAddEmail_Success_SaveStatusSave_WithAttachment() {
-		// Arrange
-		EmailDto dto = new EmailDto(); // Provide appropriate values for the DTO
-		Integer leadId = 1;
-		List<String> toMail = Arrays.asList("s.wakankar@rnt.ai", "t.pagare@rnt.ai");
-		dto.setMailTo(toMail);
-		List<String> ccMail = Arrays.asList("s.wakankar@rnt.ai", "t.pagare@rnt.ai");
-		dto.setCc(ccMail);
-		List<String> bccMail = Arrays.asList("s.wakankar@rnt.ai", "t.pagare@rnt.ai");
-		dto.setBcc(bccMail);
-		String status = "SAVE";
-		// Set appropriate values
-		when(leadDaoService.getLeadById(leadId)).thenReturn(java.util.Optional.of(new Leads())); // Provide appropriate
-																									// lead object
-		List<AttachmentDto> attachmentDtos = new ArrayList<>();
-		AttachmentDto attachmentDto = new AttachmentDto();
-		// Set up attachmentDto properties
-		attachmentDtos.add(attachmentDto);
-		dto.setAttachment(attachmentDtos);
-		Attachment attachment = new Attachment(); // Provide appropriate attachment object
-		when(attachmentDaoService.addAttachment(any(Attachment.class))).thenReturn(attachment);
-		// Set up behavior for emailDaoService.email()
-		Email sendEmail = new Email(); // Create a mock Email object
-		sendEmail.setMailId(1);
-		if (!dto.getAttachment().isEmpty()) {
-			when(emailDaoService.email(any(Email.class))).thenReturn(new Email());
-		} else {
-			when(emailDaoService.email(any(Email.class))).thenReturn(sendEmail);
-		}
-
-		// Set up behavior for attachmentDaoService.addAttachment()
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = emailServiceImpl.addEmail(dto, leadId, status);
-
-		// Assert
-		assertNotNull(response);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Email Added Successfully", response.getBody().get(ApiResponse.MESSAGE));
-		assertEquals(1, response.getBody().get(ApiResponse.DATA));
 	}
 
 	@Test
@@ -302,6 +259,43 @@ class EmailServiceImplTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
         assertEquals("Email deleted SuccessFully.", response.getBody().get(ApiResponse.MESSAGE));
+    }
+    
+    @Test
+    void deleteEmail_exceptionThrown_error() {
+    	 Integer mailId = 1;
+        when(emailDaoService.findById(mailId)).thenThrow(new RuntimeException("Database error"));
+        assertThrows(CRMException.class, () -> emailServiceImpl.deleteEmail(mailId));
+    }
+
+    
+    @Test
+    void updateEmail_Success_NoAttachments() {
+        when(emailDaoService.findById(anyInt())).thenReturn(email);
+        when(emailDaoService.email(any(Email.class))).thenReturn(email);
+        when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = emailServiceImpl.updateEmail(emailDto, "SAVE", 1);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+        assertEquals("Email Updated Successfully", response.getBody().get(ApiResponse.MESSAGE));
+        verify(emailDaoService, times(1)).email(any(Email.class));
+    }
+
+    @Test
+    void updateEmail_Success_Send() {
+        when(emailDaoService.findById(anyInt())).thenReturn(email);
+        when(emailDaoService.email(any(Email.class))).thenReturn(email);
+        when(attachmentDaoService.addAttachment(any(Attachment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = emailServiceImpl.updateEmail(emailDto, "SEND", 1);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+    }
+
+    @Test
+    void updateEmail_exceptionThrown() {
+    	 Integer mailId = 1;
+        when(emailDaoService.findById(mailId)).thenThrow(new RuntimeException("Database error"));
+        assertThrows(CRMException.class, () -> emailServiceImpl.updateEmail(emailDto, "SEND",mailId));
     }
 
 }
