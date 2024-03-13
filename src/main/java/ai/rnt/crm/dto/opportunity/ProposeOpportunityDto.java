@@ -5,9 +5,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ProposeOpportunityDto {
 
 	private String licAndPricDetails;
@@ -15,17 +17,17 @@ public class ProposeOpportunityDto {
 	private String devPlan;
 
 	private String propAcceptCriteria;
-	
+
 	private String presentation;
-	
+
 	private String scopeOfWork;
-	
+
 	private String termsAndConditions;
-	
+
 	private String proposition;
-	
+
 	private String progressStatus;
-	
+
 	private String currentPhase;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
@@ -33,6 +35,6 @@ public class ProposeOpportunityDto {
 
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate updatedPropExpDate;
-	
+
 	private List<OpprtAttachmentDto> attachments;
 }

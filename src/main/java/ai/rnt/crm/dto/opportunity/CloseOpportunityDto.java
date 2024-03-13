@@ -2,7 +2,8 @@ package ai.rnt.crm.dto.opportunity;
 
 import java.util.List;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
@@ -10,7 +11,8 @@ import lombok.Data;
  * @version 1.2
  *
  */
-@Data
+@Getter
+@Setter
 public class CloseOpportunityDto {
 
 	private String winLoseReason;
@@ -22,9 +24,9 @@ public class CloseOpportunityDto {
 	private String supportPlan;
 
 	private String finalBudget;
-	
+
 	private String progressStatus;
-	
+
 	private String currentPhase;
 
 	private List<OpprtAttachmentDto> attachments;

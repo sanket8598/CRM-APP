@@ -1,11 +1,8 @@
 package ai.rnt.crm.dto.opportunity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -13,60 +10,36 @@ import org.junit.jupiter.api.Test;
 class ProposeOpportunityDtoTest {
 
 	@Test
-	void testObjectCreationAndGetSetData() {
-		ProposeOpportunityDto dto = new ProposeOpportunityDto();
-		dto.setLicAndPricDetails("Details");
-		dto.setDevPlan("Plan");
-		dto.setPropAcceptCriteria("Criteria");
-		dto.setPresentation("Presentation");
-		dto.setScopeOfWork("Scope");
-		dto.setTermsAndConditions("Conditions");
-		dto.setProposition("Proposition");
-		dto.setProgressStatus("Status");
-		dto.setCurrentPhase("Phase");
-		dto.setPropExpDate(LocalDate.of(2024, 3, 7));
-		dto.setUpdatedPropExpDate(LocalDate.of(2024, 3, 7));
-
-		List<OpprtAttachmentDto> attachments = new ArrayList<>();
-		attachments.add(new OpprtAttachmentDto());
-		dto.setAttachments(attachments);
-		assertEquals("Details", dto.getLicAndPricDetails());
-		assertEquals("Plan", dto.getDevPlan());
-		assertEquals("Criteria", dto.getPropAcceptCriteria());
-		assertEquals("Presentation", dto.getPresentation());
-		assertEquals("Scope", dto.getScopeOfWork());
-		assertEquals("Conditions", dto.getTermsAndConditions());
-		assertEquals("Proposition", dto.getProposition());
-		assertEquals("Status", dto.getProgressStatus());
-		assertEquals("Phase", dto.getCurrentPhase());
-		assertEquals(LocalDate.of(2024, 3, 7), dto.getPropExpDate());
-		assertEquals(LocalDate.of(2024, 3, 7), dto.getUpdatedPropExpDate());
-		assertEquals(1, dto.getAttachments().size());
-	}
-
-	@Test
-	void testToString() {
-		ProposeOpportunityDto dto = new ProposeOpportunityDto();
-		assertNotNull(dto.toString());
-	}
-
-	@Test
-	void testHashCode() {
-		ProposeOpportunityDto dto1 = new ProposeOpportunityDto();
-		ProposeOpportunityDto dto2 = new ProposeOpportunityDto();
-		assertEquals(dto1.hashCode(), dto2.hashCode());
-	}
-
-	@Test
-	void testEquals() {
-		ProposeOpportunityDto dto1 = new ProposeOpportunityDto();
-		ProposeOpportunityDto dto2 = new ProposeOpportunityDto();
-		assertTrue(dto1.equals(dto2));
-	}
-
-	@Test
-	void testCanEquals() {
-		ProposeOpportunityDto dto = new ProposeOpportunityDto();
-		assertTrue(dto.canEqual(new ProposeOpportunityDto()));
+	void testProposeOpportunityDto() {
+		ProposeOpportunityDto proposeOpportunityDto = new ProposeOpportunityDto();
+		OpprtAttachmentDto attachment1 = new OpprtAttachmentDto();
+		attachment1.setOptAttchId(1);
+		OpprtAttachmentDto attachment2 = new OpprtAttachmentDto();
+		attachment2.setOptAttchId(2);
+		List<OpprtAttachmentDto> attachments = List.of(attachment1, attachment2);
+		proposeOpportunityDto.setLicAndPricDetails("License and Pricing Details");
+		proposeOpportunityDto.setDevPlan("Development Plan");
+		proposeOpportunityDto.setPropAcceptCriteria("Proposal Acceptance Criteria");
+		proposeOpportunityDto.setPresentation("Presentation");
+		proposeOpportunityDto.setScopeOfWork("Scope of Work");
+		proposeOpportunityDto.setTermsAndConditions("Terms and Conditions");
+		proposeOpportunityDto.setProposition("Proposition");
+		proposeOpportunityDto.setProgressStatus("In Progress");
+		proposeOpportunityDto.setCurrentPhase("Phase 1");
+		proposeOpportunityDto.setPropExpDate(LocalDate.of(2024, 3, 13));
+		proposeOpportunityDto.setUpdatedPropExpDate(LocalDate.of(2024, 3, 15));
+		proposeOpportunityDto.setAttachments(attachments);
+		assertEquals("License and Pricing Details", proposeOpportunityDto.getLicAndPricDetails());
+		assertEquals("Development Plan", proposeOpportunityDto.getDevPlan());
+		assertEquals("Proposal Acceptance Criteria", proposeOpportunityDto.getPropAcceptCriteria());
+		assertEquals("Presentation", proposeOpportunityDto.getPresentation());
+		assertEquals("Scope of Work", proposeOpportunityDto.getScopeOfWork());
+		assertEquals("Terms and Conditions", proposeOpportunityDto.getTermsAndConditions());
+		assertEquals("Proposition", proposeOpportunityDto.getProposition());
+		assertEquals("In Progress", proposeOpportunityDto.getProgressStatus());
+		assertEquals("Phase 1", proposeOpportunityDto.getCurrentPhase());
+		assertEquals(LocalDate.of(2024, 3, 13), proposeOpportunityDto.getPropExpDate());
+		assertEquals(LocalDate.of(2024, 3, 15), proposeOpportunityDto.getUpdatedPropExpDate());
+		assertEquals(attachments, proposeOpportunityDto.getAttachments());
 	}
 }

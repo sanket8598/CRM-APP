@@ -1,53 +1,42 @@
 package ai.rnt.crm.dto.opportunity;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 class AnalysisOpportunityDtoTest {
 
 	@Test
-	void testEqualsAndHashCode() {
-		AnalysisOpportunityDto dto1 = createSampleDto();
-		AnalysisOpportunityDto dto2 = createSampleDto();
+	void testAnalysisOpportunityDto() {
+		AnalysisOpportunityDto analysisOpportunityDto = new AnalysisOpportunityDto();
+		OpprtAttachmentDto attachment1 = new OpprtAttachmentDto();
+		attachment1.setAttachmentOf("Analysis");
+		OpprtAttachmentDto attachment2 = new OpprtAttachmentDto();
+		attachment2.setAttachmentOf("Analysis");
+		List<OpprtAttachmentDto> attachments = List.of(attachment1, attachment2);
+		analysisOpportunityDto.setOpportunityId(1);
+		analysisOpportunityDto.setTechnicalNeed("Test Technical Need");
+		analysisOpportunityDto.setIntegrationPoint("Test Integration Point");
+		analysisOpportunityDto.setSecAndComp("Test Security and Compliance");
+		analysisOpportunityDto.setRiskMinigation("Test Risk Minigation");
+		analysisOpportunityDto.setInitialTimeline(LocalDate.of(2024, 3, 13));
+		analysisOpportunityDto.setUpdatedInitialTimeline(LocalDate.of(2024, 3, 15));
+		analysisOpportunityDto.setCurrentPhase("Phase 1");
+		analysisOpportunityDto.setProgressStatus("In Progress");
+		analysisOpportunityDto.setAttachments(attachments);
 
-		assertEquals(dto1, dto2);
-		assertEquals(dto1.hashCode(), dto2.hashCode());
-
-		dto2.setOpportunityId(2);
-		assertNotEquals(dto1, dto2);
-	}
-
-	@Test
-	void testToString() {
-		AnalysisOpportunityDto dto = createSampleDto();
-		assertNotNull(dto.toString());
-	}
-
-	@Test
-	void testCanEqual() {
-		AnalysisOpportunityDto dto = createSampleDto();
-		assertTrue(dto.canEqual(new AnalysisOpportunityDto()));
-	}
-
-	private AnalysisOpportunityDto createSampleDto() {
-		AnalysisOpportunityDto dto = new AnalysisOpportunityDto();
-		dto.setOpportunityId(1);
-		dto.setTechnicalNeed("Technical need");
-		dto.setIntegrationPoint("Integration point");
-		dto.setSecAndComp("Security and Compliance");
-		dto.setRiskMinigation("Risk mitigation");
-		dto.setInitialTimeline(LocalDate.of(2024, 3, 7));
-		dto.setUpdatedInitialTimeline(LocalDate.of(2024, 3, 8));
-		dto.setCurrentPhase("Current phase");
-		dto.setProgressStatus("Progress status");
-		dto.setAttachments(new ArrayList<>());
-		return dto;
+		assertEquals(1, analysisOpportunityDto.getOpportunityId());
+		assertEquals("Test Technical Need", analysisOpportunityDto.getTechnicalNeed());
+		assertEquals("Test Integration Point", analysisOpportunityDto.getIntegrationPoint());
+		assertEquals("Test Security and Compliance", analysisOpportunityDto.getSecAndComp());
+		assertEquals("Test Risk Minigation", analysisOpportunityDto.getRiskMinigation());
+		assertEquals(LocalDate.of(2024, 3, 13), analysisOpportunityDto.getInitialTimeline());
+		assertEquals(LocalDate.of(2024, 3, 15), analysisOpportunityDto.getUpdatedInitialTimeline());
+		assertEquals("Phase 1", analysisOpportunityDto.getCurrentPhase());
+		assertEquals("In Progress", analysisOpportunityDto.getProgressStatus());
+		assertEquals(attachments, analysisOpportunityDto.getAttachments());
 	}
 }

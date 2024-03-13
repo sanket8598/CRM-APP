@@ -1,48 +1,30 @@
 package ai.rnt.crm.dto.opportunity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 class DashboardDataDtoTest {
 
 	@Test
-	void testEqualsAndHashCode() {
-		DashboardDataDto dto1 = createSampleDto();
-		DashboardDataDto dto2 = createSampleDto();
-
-		assertEquals(dto1, dto2);
-		assertEquals(dto1.hashCode(), dto2.hashCode());
-
-		dto2.setInPipelineAmount("Different amount");
-		assertNotEquals(dto1, dto2);
+	void testDashboardDataDto() {
+		DashboardDataDto dashboardDataDto = new DashboardDataDto();
+		GraphicalDataDto graphicalData1 = new GraphicalDataDto();
+		graphicalData1.setTopic("test1");
+		GraphicalDataDto graphicalData2 = new GraphicalDataDto();
+		graphicalData2.setTopic("test");
+		List<GraphicalDataDto> graphData = List.of(graphicalData1, graphicalData2);
+		dashboardDataDto.setInPipelineAmount("10000");
+		dashboardDataDto.setInPipelineOpprt(10);
+		dashboardDataDto.setWinOpprt(5);
+		dashboardDataDto.setLostOpprt(2);
+		dashboardDataDto.setGrapdata(graphData);
+		assertEquals("10000", dashboardDataDto.getInPipelineAmount());
+		assertEquals(10, dashboardDataDto.getInPipelineOpprt());
+		assertEquals(5, dashboardDataDto.getWinOpprt());
+		assertEquals(2, dashboardDataDto.getLostOpprt());
+		assertEquals(graphData, dashboardDataDto.getGrapdata());
 	}
-
-	@Test
-	void testToString() {
-		DashboardDataDto dto = createSampleDto();
-		assertNotNull(dto.toString());
-	}
-
-	@Test
-	void testCanEqual() {
-		DashboardDataDto dto = createSampleDto();
-		assertTrue(dto.canEqual(new DashboardDataDto()));
-	}
-
-	private DashboardDataDto createSampleDto() {
-		DashboardDataDto dto = new DashboardDataDto();
-		dto.setInPipelineAmount("Amount");
-		dto.setInPipelineOpprt(10);
-		dto.setWinOpprt(5);
-		dto.setLostOpprt(3);
-		dto.setGrapdata(new ArrayList<>());
-		return dto;
-	}
-
 }
