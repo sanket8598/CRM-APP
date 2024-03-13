@@ -19,6 +19,7 @@ class CityDtoTest {
 		cityDto2.setCityId(1);
 		cityDto2.setCity("New York");
 		cityDto2.setStateId(1);
+		cityDto1.equals(cityDto2);
 		assertEquals(cityDto1, cityDto2);
 		assertEquals(cityDto1.hashCode(), cityDto2.hashCode());
 		cityDto2.setCity("Los Angeles");

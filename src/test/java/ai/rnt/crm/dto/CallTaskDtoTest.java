@@ -1,5 +1,8 @@
 package ai.rnt.crm.dto;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
@@ -27,6 +30,7 @@ class CallTaskDtoTest {
 		dto.canEqual(dto);
 		dto.hashCode();
 		dto.toString();
+		assertEquals(dto, dto1);
 
 	}
 
@@ -51,5 +55,6 @@ class CallTaskDtoTest {
 		dto1.setSubject("test");
 		dto1.setStatus("On Hold");
 		dto1.setPriority("High");
+		assertNotNull(dto);
 	}
 }
