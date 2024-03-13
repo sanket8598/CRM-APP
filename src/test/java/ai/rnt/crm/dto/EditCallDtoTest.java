@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 
 class EditCallDtoTest {
 
-	EditCallDto dto = new EditCallDto();
-	EditCallDto dto1 = new EditCallDto();
-
 	@Test
 	void testEditCallDto() {
 		EditCallDto editCallDto = new EditCallDto();
+		EditCallDto dto = new EditCallDto();
+		EditCallDto dto1 = new EditCallDto();
+
 		Integer id = 1;
 		String type = "Incoming";
 		String subject = "Meeting";
@@ -40,9 +40,23 @@ class EditCallDtoTest {
 		editCallDto.setDueDate(dueDate);
 		editCallDto.setStatus(status);
 		editCallDto.setAssignTo(assignTo);
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		dto1.setId(id);
+		dto1.setType(type);
+		dto1.setSubject(subject);
+		dto1.setBody(body);
+		dto1.setShortName(shortName);
+		dto1.setCallFrom(callFrom);
+		dto1.setCallTo(callTo);
+		dto1.setDirection(direction);
+		dto1.setPhoneNo(phoneNo);
+		dto1.setComment(comment);
+		dto1.setDuration(duration);
+		dto1.setDueDate(dueDate);
+		dto1.setStatus(status);
+		dto1.setAssignTo(assignTo);
+		editCallDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(id, editCallDto.getId());
 		assertEquals(type, editCallDto.getType());

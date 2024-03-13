@@ -17,9 +17,9 @@ class RoleTest {
 		role1.setRoleName("Admin");
 		Integer roleId = role.getRoleId();
 		String roleName = role.getRoleName();
-		role.canEqual(role);
 		role.equals(role1);
 		role.hashCode();
+		role1.hashCode();
 		role.toString();
 		assertNotNull(roleId);
 		assertEquals(1, roleId);

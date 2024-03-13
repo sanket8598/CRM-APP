@@ -11,14 +11,16 @@ import javax.validation.constraints.Size;
 
 import ai.rnt.crm.validation.PhoneNumValid;
 import ai.rnt.crm.validation.ValidCallDirection;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Sanket Wakankar
  * @version 1.0
  * @since 11/09/2023.
  */
-@Data
+@Getter
+@Setter
 public class CallDto {
 
 	private Integer callId;
@@ -58,7 +60,7 @@ public class CallDto {
 	private String endTime;
 
 	private boolean allDay;
-	
-	private Boolean isOpportunity=false;
+
+	private Boolean isOpportunity = false;
 
 }

@@ -8,9 +8,11 @@ import javax.validation.constraints.NotNull;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.validation.ValidTaskPriority;
 import ai.rnt.crm.validation.ValidTaskStatus;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class LeadTaskDto {
 
 	private Integer leadTaskId;
@@ -23,10 +25,10 @@ public class LeadTaskDto {
 	@ValidTaskPriority(message = "Please Enter Valid Task Priority!!")
 	private String priority;
 
-	@NotNull(message="Due date should not be null!!")
-	@FutureOrPresent(message="Date must not be smaller than today's date!!")
+	@NotNull(message = "Due date should not be null!!")
+	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate dueDate;
-	
+
 	private String dueTime;
 
 	private String description;
@@ -37,7 +39,7 @@ public class LeadTaskDto {
 
 	private String remainderDueAt;
 
-	@FutureOrPresent(message="Date must not be smaller than today's date!!")
+	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate remainderDueOn;
 
 	private EmployeeMaster assignTo;

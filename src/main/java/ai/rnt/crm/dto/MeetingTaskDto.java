@@ -11,7 +11,8 @@ import javax.validation.constraints.NotNull;
 
 import ai.rnt.crm.validation.ValidTaskPriority;
 import ai.rnt.crm.validation.ValidTaskStatus;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
@@ -19,7 +20,8 @@ import lombok.Data;
  * @since 27/11/2023.
  *
  */
-@Data
+@Getter
+@Setter
 public class MeetingTaskDto {
 
 	private Integer meetingTaskId;
@@ -27,7 +29,6 @@ public class MeetingTaskDto {
 	@NotBlank(message = "Subject should not be null or empty!!")
 	private String subject;
 
-	
 	@ValidTaskStatus(message = "Please Enter Valid Task Status!!")
 	private String status;
 
@@ -35,8 +36,8 @@ public class MeetingTaskDto {
 	private String priority;
 
 	@Temporal(DATE)
-	@NotNull(message="Due Date should not be null!!")
-	@FutureOrPresent(message="Date must not be smaller than today's date!!")
+	@NotNull(message = "Due Date should not be null!!")
+	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate dueDate;
 
 	@NotBlank(message = "Due time should not be null or empty!!")
@@ -51,6 +52,6 @@ public class MeetingTaskDto {
 	private String remainderDueAt;
 
 	@Temporal(DATE)
-	@FutureOrPresent(message="Date must not be smaller than today's date!!")
+	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate remainderDueOn;
 }

@@ -6,12 +6,11 @@ import org.junit.jupiter.api.Test;
 
 class LeadsCardDtoTest {
 
-	LeadsCardDto dto = new LeadsCardDto();
-	LeadsCardDto dto1 = new LeadsCardDto();
-
 	@Test
 	void testLeadsCardDto() {
 		LeadsCardDto leadsCardDto = new LeadsCardDto();
+		LeadsCardDto dto = new LeadsCardDto();
+		LeadsCardDto dto1 = new LeadsCardDto();
 		Integer leadId = 1;
 		String shortName = "JD";
 		String disqualifyAs = "Not applicable";
@@ -26,9 +25,16 @@ class LeadsCardDtoTest {
 		leadsCardDto.setImportant(important);
 		leadsCardDto.setPrimaryField(primaryField);
 		leadsCardDto.setSecondaryField(secondaryField);
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		dto1.setLeadId(leadId);
+		dto1.setShortName(shortName);
+		dto1.setDisqualifyAs(disqualifyAs);
+		dto1.setStatus(status);
+		dto1.setImportant(important);
+		dto1.setPrimaryField(primaryField);
+		dto1.setSecondaryField(secondaryField);
+		leadsCardDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(leadId, leadsCardDto.getLeadId());
 		assertEquals(shortName, leadsCardDto.getShortName());

@@ -6,12 +6,11 @@ import org.junit.jupiter.api.Test;
 
 class MainTaskDtoTest {
 
-	MainTaskDto dto = new MainTaskDto();
-	MainTaskDto dto1 = new MainTaskDto();
-
 	@Test
 	void testMainTaskDto() {
 		MainTaskDto mainTaskDto = new MainTaskDto();
+		MainTaskDto dto = new MainTaskDto();
+		MainTaskDto dto1 = new MainTaskDto();
 		Integer id = 1;
 		String subject = "Task Subject";
 		String status = "Pending";
@@ -32,9 +31,19 @@ class MainTaskDtoTest {
 		mainTaskDto.setRemainderOn(remainderOn);
 		mainTaskDto.setParentStatus(parentStatus);
 		mainTaskDto.setRemainderDate(remainderDate);
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		dto1.setId(id);
+		dto1.setSubject(subject);
+		dto1.setStatus(status);
+		dto1.setType(type);
+		dto1.setDueDate(dueDate);
+		dto1.setAssignTo(assignTo);
+		dto1.setParentId(parentId);
+		dto1.setRemainderOn(remainderOn);
+		dto1.setParentStatus(parentStatus);
+		dto1.setRemainderDate(remainderDate);
+		mainTaskDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(id, mainTaskDto.getId());
 		assertEquals(subject, mainTaskDto.getSubject());

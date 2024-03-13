@@ -18,9 +18,9 @@ class MeetingAttachmentsDtoTest {
 		dto1.setMeetingAttachType("image/jpeg");
 		dto.setMeetingAttachName("Mydata");
 		dto1.setMeetingAttachName("Mydata");
-		dto.canEqual(dto);
 		dto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(1, dto.getMeetingAttchId());
 		assertEquals("qwerthjfv", dto.getMeetingAttachmentData());

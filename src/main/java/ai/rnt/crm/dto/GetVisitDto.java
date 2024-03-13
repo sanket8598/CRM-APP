@@ -5,9 +5,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class GetVisitDto {
 
 	private Integer visitId;
@@ -33,7 +35,7 @@ public class GetVisitDto {
 	private String startTime;
 
 	private String endTime;
-	
+
 	private String startTime12Hours;
 
 	private String endTime12Hours;

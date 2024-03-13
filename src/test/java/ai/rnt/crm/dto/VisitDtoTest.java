@@ -11,12 +11,11 @@ import org.junit.jupiter.api.Test;
 
 class VisitDtoTest {
 
-	VisitDto dto = new VisitDto();
-	VisitDto dto1 = new VisitDto();
-
 	@Test
 	void testSetAndGetVisitData() {
 		VisitDto visitDto = new VisitDto();
+		VisitDto dto = new VisitDto();
+		VisitDto dto1 = new VisitDto();
 		visitDto.setVisitId(1);
 		visitDto.setLocation("Location");
 		visitDto.setSubject("Subject");
@@ -35,6 +34,23 @@ class VisitDtoTest {
 		visitDto.setLeadId(123);
 		visitDto.setVisitBy(456);
 		visitDto.setIsOpportunity(true);
+
+		dto1.setVisitId(1);
+		dto1.setLocation("Location");
+		dto1.setSubject("Subject");
+		dto1.setContent("Content");
+		dto1.setComment("Comment");
+		dto1.setDuration("Duration");
+		dto1.setStartDate(new Date());
+		dto1.setEndDate(new Date());
+		dto1.setParticipates(participants);
+		dto1.setStartTime("10:00 AM");
+		dto1.setEndTime("12:00 PM");
+		dto1.setAllDay(false);
+		dto1.setLeadId(123);
+		dto1.setVisitBy(456);
+		dto1.setIsOpportunity(true);
+
 		Integer visitId = visitDto.getVisitId();
 		String location = visitDto.getLocation();
 		String subject = visitDto.getSubject();
@@ -50,9 +66,9 @@ class VisitDtoTest {
 		Integer leadId = visitDto.getLeadId();
 		Integer visitBy = visitDto.getVisitBy();
 		boolean isOpportunity = visitDto.getIsOpportunity();
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		visitDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertNotNull(visitId);
 		assertEquals(1, visitId);

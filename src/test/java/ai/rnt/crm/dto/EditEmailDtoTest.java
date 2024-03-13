@@ -43,7 +43,6 @@ class EditEmailDtoTest {
 		dto1.setStatus(status);
 		dto1.setScheduledDate(scheduledDate);
 		dto1.setAssignTo(assignTo);
-		dto.canEqual(dto);
 		editEmailDto.equals(dto1);
 		dto.hashCode();
 		dto1.hashCode();

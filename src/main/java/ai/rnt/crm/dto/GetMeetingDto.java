@@ -5,9 +5,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class GetMeetingDto {
 
 	private Integer meetingId;
@@ -25,7 +27,7 @@ public class GetMeetingDto {
 	private String startTime;
 
 	private String endTime;
-	
+
 	private String startTime12Hours;
 
 	private String endTime12Hours;
@@ -41,5 +43,5 @@ public class GetMeetingDto {
 	private List<MeetingAttachmentsDto> meetingAttachments;
 
 	private List<GetMeetingTaskDto> meetingTasks;
-	
+
 }

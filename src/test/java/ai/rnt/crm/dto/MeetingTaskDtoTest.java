@@ -9,12 +9,11 @@ import org.junit.jupiter.api.Test;
 
 class MeetingTaskDtoTest {
 
-	MeetingTaskDto dto = new MeetingTaskDto();
-	MeetingTaskDto dto1 = new MeetingTaskDto();
-
 	@Test
 	void testSetAndGetMeetingTaskData() {
 		MeetingTaskDto meetingTaskDto = new MeetingTaskDto();
+		MeetingTaskDto dto = new MeetingTaskDto();
+		MeetingTaskDto dto1 = new MeetingTaskDto();
 		meetingTaskDto.setMeetingTaskId(1);
 		meetingTaskDto.setSubject("Discuss project status");
 		meetingTaskDto.setStatus("Pending");
@@ -26,6 +25,17 @@ class MeetingTaskDtoTest {
 		meetingTaskDto.setRemainderVia("Email");
 		meetingTaskDto.setRemainderDueAt("08:30 AM");
 		meetingTaskDto.setRemainderDueOn(LocalDate.of(2024, 3, 9));
+		dto1.setMeetingTaskId(1);
+		dto1.setSubject("Discuss project status");
+		dto1.setStatus("Pending");
+		dto1.setPriority("High");
+		dto1.setDueDate(LocalDate.of(2024, 3, 10));
+		dto1.setDueTime("09:00 AM");
+		dto1.setDescription("Discuss the progress of the project with the team");
+		dto1.setRemainderOn(true);
+		dto1.setRemainderVia("Email");
+		dto1.setRemainderDueAt("08:30 AM");
+		dto1.setRemainderDueOn(LocalDate.of(2024, 3, 9));
 		Integer meetingTaskId = meetingTaskDto.getMeetingTaskId();
 		String subject = meetingTaskDto.getSubject();
 		String status = meetingTaskDto.getStatus();
@@ -37,9 +47,9 @@ class MeetingTaskDtoTest {
 		String remainderVia = meetingTaskDto.getRemainderVia();
 		String remainderDueAt = meetingTaskDto.getRemainderDueAt();
 		LocalDate remainderDueOn = meetingTaskDto.getRemainderDueOn();
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		meetingTaskDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertNotNull(meetingTaskId);
 		assertEquals(1, meetingTaskId);

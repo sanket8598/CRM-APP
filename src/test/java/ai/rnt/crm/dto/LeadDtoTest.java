@@ -6,13 +6,11 @@ import org.junit.jupiter.api.Test;
 
 class LeadDtoTest {
 
-	LeadDto dto = new LeadDto();
-	LeadDto dto1 = new LeadDto();
-
 	@Test
 	void testLeadDto() {
-		// Arrange
 		LeadDto leadDto = new LeadDto();
+		LeadDto dto = new LeadDto();
+		LeadDto dto1 = new LeadDto();
 		Integer leadId = 1;
 		String firstName = "John";
 		String lastName = "Doe";
@@ -37,7 +35,6 @@ class LeadDtoTest {
 		String businessCardName = "myData";
 		String businessCardType = "pdf";
 
-		// Act
 		leadDto.setLeadId(leadId);
 		leadDto.setFirstName(firstName);
 		leadDto.setLastName(lastName);
@@ -62,10 +59,33 @@ class LeadDtoTest {
 		leadDto.setBusinessCardName(businessCardName);
 		leadDto.setBusinessCardType(businessCardType);
 
-		// Assert
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		dto1.setLeadId(leadId);
+		dto1.setFirstName(firstName);
+		dto1.setLastName(lastName);
+		dto1.setPhoneNumber(phoneNumber);
+		dto1.setTopic(topic);
+		dto1.setEmail(email);
+		dto1.setCompanyWebsite(companyWebsite);
+		dto1.setLeadSourceId(leadSourceId);
+		dto1.setServiceFallsId(serviceFallsId);
+		dto1.setDomainId(domainId);
+		dto1.setCompanyName(companyName);
+		dto1.setBudgetAmount(budgetAmount);
+		dto1.setAssignTo(assignTo);
+		dto1.setStatus(status);
+		dto1.setDisqualifyAs(disqualifyAs);
+		dto1.setDisqualifyReason(disqualifyReason);
+		dto1.setDesignation(designation);
+		dto1.setPseudoName(pseudoName);
+		dto1.setLocation(location);
+		dto1.setLinkedinId(linkedinId);
+		dto1.setBusinessCard(businessCard);
+		dto1.setBusinessCardName(businessCardName);
+		dto1.setBusinessCardType(businessCardType);
+
+		leadDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(leadId, leadDto.getLeadId());
 		assertEquals(firstName, leadDto.getFirstName());

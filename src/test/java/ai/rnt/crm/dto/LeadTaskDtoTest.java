@@ -10,12 +10,11 @@ import ai.rnt.crm.entity.EmployeeMaster;
 
 class LeadTaskDtoTest {
 
-	LeadTaskDto dto = new LeadTaskDto();
-	LeadTaskDto dto1 = new LeadTaskDto();
-
 	@Test
 	void testLeadTaskDto() {
 		LeadTaskDto leadTaskDto = new LeadTaskDto();
+		LeadTaskDto dto = new LeadTaskDto();
+		LeadTaskDto dto1 = new LeadTaskDto();
 		Integer leadTaskId = 1;
 		String subject = "Follow-up";
 		String status = "Pending";
@@ -40,9 +39,21 @@ class LeadTaskDtoTest {
 		leadTaskDto.setRemainderDueAt(remainderDueAt);
 		leadTaskDto.setRemainderDueOn(remainderDueOn);
 		leadTaskDto.setAssignTo(assignTo);
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		dto1.setLeadTaskId(leadTaskId);
+		dto1.setSubject(subject);
+		dto1.setStatus(status);
+		dto1.setPriority(priority);
+		dto1.setDueDate(dueDate);
+		dto1.setDueTime(dueTime);
+		dto1.setDescription(description);
+		dto1.setRemainderOn(remainderOn);
+		dto1.setRemainderVia(remainderVia);
+		dto1.setRemainderDueAt(remainderDueAt);
+		dto1.setRemainderDueOn(remainderDueOn);
+		dto1.setAssignTo(assignTo);
+		leadTaskDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(leadTaskId, leadTaskDto.getLeadTaskId());
 		assertEquals(subject, leadTaskDto.getSubject());

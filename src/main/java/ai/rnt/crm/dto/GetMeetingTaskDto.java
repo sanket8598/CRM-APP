@@ -4,15 +4,16 @@ import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static javax.persistence.TemporalType.DATE;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import javax.persistence.Temporal;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class GetMeetingTaskDto {
 
 	private Integer meetingTaskId;

@@ -44,9 +44,9 @@ class EditMeetingDtoTest {
 		dto1.setStatus(status);
 		dto1.setAssignTo(assignTo);
 		dto1.setAttachments(attachments);
-		dto.canEqual(dto);
 		editMeetingDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		editMeetingDto.hashCode();
 		dto.toString();
 		assertEquals(id, editMeetingDto.getId());
