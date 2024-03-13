@@ -5,11 +5,13 @@ import static java.util.Objects.nonNull;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ContactDto {
-	
+
 	private Integer contactId;
 
 	private String firstName;
@@ -29,23 +31,23 @@ public class ContactDto {
 	private CompanyDto companyMaster;
 
 	private String linkedinId;
-	
+
 	private Boolean primary;
-	
+
 	private String businessCard;
 
 	private String businessCardName;
 
 	private String businessCardType;
-	
-	private Boolean client=false;
-	
+
+	private Boolean client = false;
+
 	@NotBlank(message = "First/last name should not be empty or null!!")
-	@Pattern(regexp = "^[A-Za-z]+\\s[A-Za-z]+$",message = "Plase enter valid first/last name!!")
+	@Pattern(regexp = "^[A-Za-z]+\\s[A-Za-z]+$", message = "Plase enter valid first/last name!!")
 	private String name;
 
 	public String getName() {
-		return nonNull(name)? name:getFirstName() + " " +getLastName();
+		return nonNull(name) ? name : getFirstName() + " " + getLastName();
 
 	}
 }

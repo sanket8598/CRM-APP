@@ -1,7 +1,8 @@
 package ai.rnt.crm.dto;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
@@ -9,7 +10,8 @@ import lombok.EqualsAndHashCode;
  * @since 21/09/2023.
  *
  */
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 public class EditVisitDto extends TimeLineActivityDto {
 
@@ -24,11 +26,11 @@ public class EditVisitDto extends TimeLineActivityDto {
 	private String type;
 
 	private String shortName;
-	
+
 	private String dueDate;
-	
+
 	private String status;
-	
+
 	private Integer assignTo;
-	
+
 }

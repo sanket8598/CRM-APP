@@ -9,12 +9,11 @@ import org.junit.jupiter.api.Test;
 
 class EmployeeDtoTest {
 
-	EmployeeDto dto = new EmployeeDto();
-	EmployeeDto dto1 = new EmployeeDto();
-
 	@Test
 	void testEmployeeDto() {
 		EmployeeDto employeeDto = new EmployeeDto();
+		EmployeeDto dto = new EmployeeDto();
+		EmployeeDto dto1 = new EmployeeDto();
 		Integer staffId = 1;
 		String userID = "user123";
 		String password = "password123";
@@ -35,9 +34,18 @@ class EmployeeDtoTest {
 		employeeDto.setEmailID(emailID);
 		employeeDto.setEmployeeJobTitle(employeeJobTitle);
 		employeeDto.setEmployeeRole(employeeRole);
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		dto1.setStaffId(staffId);
+		dto1.setUserID(userID);
+		dto1.setPassword(password);
+		dto1.setFirstName(firstName);
+		dto1.setMiddleName(middleName);
+		dto1.setLastName(lastName);
+		dto1.setEmailID(emailID);
+		dto1.setEmployeeJobTitle(employeeJobTitle);
+		dto1.setEmployeeRole(employeeRole);
+		employeeDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(staffId, employeeDto.getStaffId());
 		assertEquals(userID, employeeDto.getUserID());

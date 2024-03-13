@@ -6,12 +6,11 @@ import org.junit.jupiter.api.Test;
 
 class EditVisitDtoTest {
 
-	EditVisitDto dto = new EditVisitDto();
-	EditVisitDto dto1 = new EditVisitDto();
-
 	@Test
 	void testEditVisitDto() {
 		EditVisitDto editVisitDto = new EditVisitDto();
+		EditVisitDto dto = new EditVisitDto();
+		EditVisitDto dto1 = new EditVisitDto();
 		Integer id = 1;
 		String location = "Office";
 		String subject = "Client Meeting";
@@ -30,9 +29,20 @@ class EditVisitDtoTest {
 		editVisitDto.setDueDate(dueDate);
 		editVisitDto.setStatus(status);
 		editVisitDto.setAssignTo(assignTo);
+		
+		dto1.setId(id);
+		dto1.setLocation(location);
+		dto1.setSubject(subject);
+		dto1.setBody(body);
+		dto1.setType(type);
+		dto1.setShortName(shortName);
+		dto1.setDueDate(dueDate);
+		dto1.setStatus(status);
+		dto1.setAssignTo(assignTo);
 		dto.canEqual(dto);
-		dto.equals(dto1);
+		editVisitDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(id, editVisitDto.getId());
 		assertEquals(location, editVisitDto.getLocation());

@@ -1,11 +1,13 @@
 package ai.rnt.crm.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class DomainMasterDto {
-	
+
 	private Integer domainId;
-	
+
 	private String domainName;
 }

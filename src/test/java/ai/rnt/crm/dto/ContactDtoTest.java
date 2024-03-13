@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
 
@@ -27,10 +28,10 @@ class ContactDtoTest {
 		dto.getBusinessCardType();
 		dto.getClient();
 		dto.getName();
-		dto.canEqual(dto);
 		dto.equals(dto1);
 		dto.hashCode();
 		dto.toString();
+		assertNotNull(dto);
 	}
 
 	CompanyDto companyDto = new CompanyDto();
@@ -53,6 +54,7 @@ class ContactDtoTest {
 		dto.setBusinessCardType("pdf");
 		dto.setClient(true);
 		dto.setName("gdsfytukhmvb");
+		assertNotNull(dto);
 	}
 
 	@Test

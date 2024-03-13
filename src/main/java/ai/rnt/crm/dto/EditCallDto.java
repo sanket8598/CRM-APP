@@ -1,9 +1,11 @@
 package ai.rnt.crm.dto;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 public class EditCallDto extends TimeLineActivityDto {
 

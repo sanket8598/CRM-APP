@@ -9,12 +9,11 @@ import org.junit.jupiter.api.Test;
 
 class EditEmailDtoTest {
 
-	EditEmailDto dto = new EditEmailDto();
-	EditEmailDto dto1 = new EditEmailDto();
-
 	@Test
 	void testEditEmailDto() {
 		EditEmailDto editEmailDto = new EditEmailDto();
+		EditEmailDto dto = new EditEmailDto();
+		EditEmailDto dto1 = new EditEmailDto();
 		Integer id = 1;
 		String type = "Outgoing";
 		String subject = "Project Updates";
@@ -35,9 +34,19 @@ class EditEmailDtoTest {
 		editEmailDto.setStatus(status);
 		editEmailDto.setScheduledDate(scheduledDate);
 		editEmailDto.setAssignTo(assignTo);
+		dto1.setId(id);
+		dto1.setType(type);
+		dto1.setSubject(subject);
+		dto1.setBody(body);
+		dto1.setAttachments(attachments);
+		dto1.setShortName(shortName);
+		dto1.setStatus(status);
+		dto1.setScheduledDate(scheduledDate);
+		dto1.setAssignTo(assignTo);
 		dto.canEqual(dto);
-		dto.equals(dto1);
+		editEmailDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(id, editEmailDto.getId());
 		assertEquals(type, editEmailDto.getType());
@@ -49,5 +58,4 @@ class EditEmailDtoTest {
 		assertEquals(scheduledDate, editEmailDto.getScheduledDate());
 		assertEquals(assignTo, editEmailDto.getAssignTo());
 	}
-
 }

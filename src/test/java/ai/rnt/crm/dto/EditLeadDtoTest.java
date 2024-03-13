@@ -2,6 +2,9 @@ package ai.rnt.crm.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 class EditLeadDtoTest {
@@ -28,6 +31,9 @@ class EditLeadDtoTest {
 		String pseudoName = "JD";
 		Integer dropDownAssignTo = 3;
 		ContactDto primaryContact = new ContactDto();
+		List<ContactDto> contacts = new ArrayList<>();
+		contacts.add(primaryContact);
+		editLeadDto.setContacts(contacts);
 		primaryContact.setFirstName("John");
 		primaryContact.setLastName("Doe");
 		primaryContact.setContactNumberPrimary("1234567890");
@@ -48,10 +54,10 @@ class EditLeadDtoTest {
 		editLeadDto.setDropDownAssignTo(dropDownAssignTo);
 		editLeadDto.setPrimaryContact(primaryContact);
 		editLeadDto.getContacts().add(primaryContact);
-		dto.canEqual(dto);
 		dto.equals(dto1);
 		dto.hashCode();
 		dto.toString();
+		dto1.hashCode();
 		assertEquals(leadId, editLeadDto.getLeadId());
 		assertEquals(topic, editLeadDto.getTopic());
 		assertEquals(budgetAmount, editLeadDto.getBudgetAmount());
