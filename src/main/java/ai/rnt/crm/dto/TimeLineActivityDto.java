@@ -1,13 +1,15 @@
 package ai.rnt.crm.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public abstract class TimeLineActivityDto {
-	
+
 	private String createdOn;
-	
+
 	private boolean waitTwoDays;
-	
+
 	private Boolean overDue;
 }

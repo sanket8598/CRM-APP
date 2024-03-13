@@ -11,14 +11,16 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
  * @since 25/11/2023
  * @version 1.0
  */
-@Data
+@Getter
+@Setter
 public class MeetingDto {
 
 	private Integer meetingId;
@@ -27,7 +29,7 @@ public class MeetingDto {
 	private String meetingTitle;
 
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
-	@NotNull(message="Attendees should not be null!!")
+	@NotNull(message = "Attendees should not be null!!")
 	private List<String> participates;
 
 	@Temporal(DATE)
@@ -37,7 +39,7 @@ public class MeetingDto {
 	private Date endDate;
 
 	private String startTime;
-	
+
 	private String duration;
 
 	private String endTime;
@@ -49,8 +51,8 @@ public class MeetingDto {
 	private String description;
 
 	private String meetingMode;
-	
-	private Boolean isOpportunity=false;
+
+	private Boolean isOpportunity = false;
 
 	private List<MeetingAttachmentsDto> meetingAttachments;
 

@@ -1,10 +1,12 @@
 package ai.rnt.crm.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class ServiceFallsDto {
-	
+
 	private Integer serviceFallsId;
 
 	private String serviceName;

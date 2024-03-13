@@ -9,15 +9,11 @@ import org.junit.jupiter.api.Test;
 
 class QualifyLeadDtoTest {
 
-	QualifyLeadDto dto = new QualifyLeadDto();
-	QualifyLeadDto dto1 = new QualifyLeadDto();
-
 	@Test
 	void testSetAndGetQualifyLeadData() {
-		// Create a QualifyLeadDto object
 		QualifyLeadDto qualifyLeadDto = new QualifyLeadDto();
-
-		// Set data
+		QualifyLeadDto dto = new QualifyLeadDto();
+		QualifyLeadDto dto1 = new QualifyLeadDto();
 		qualifyLeadDto.setLeadId(1);
 		qualifyLeadDto.setCustomerNeed("Software solution for inventory management");
 		qualifyLeadDto.setProposedSolution("Customized software with inventory tracking features");
@@ -26,8 +22,15 @@ class QualifyLeadDtoTest {
 		qualifyLeadDto.setRemainderVia("Email");
 		qualifyLeadDto.setRemainderDueAt("08:30 AM");
 		qualifyLeadDto.setRemainderDueOn(LocalDate.of(2024, 3, 9));
+		dto1.setLeadId(1);
+		dto1.setCustomerNeed("Software solution for inventory management");
+		dto1.setProposedSolution("Customized software with inventory tracking features");
+		dto1.setServiceFallsMaster(new ServiceFallsDto());
+		dto1.setIsFollowUpRemainder(true);
+		dto1.setRemainderVia("Email");
+		dto1.setRemainderDueAt("08:30 AM");
+		dto1.setRemainderDueOn(LocalDate.of(2024, 3, 9));
 
-		// Get data
 		Integer leadId = qualifyLeadDto.getLeadId();
 		String customerNeed = qualifyLeadDto.getCustomerNeed();
 		String proposedSolution = qualifyLeadDto.getProposedSolution();
@@ -37,10 +40,9 @@ class QualifyLeadDtoTest {
 		String remainderDueAt = qualifyLeadDto.getRemainderDueAt();
 		LocalDate remainderDueOn = qualifyLeadDto.getRemainderDueOn();
 
-		// Assertions
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		qualifyLeadDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertNotNull(leadId);
 		assertEquals(1, leadId);

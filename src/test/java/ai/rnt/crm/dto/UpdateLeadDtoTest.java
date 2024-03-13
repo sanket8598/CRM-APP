@@ -7,12 +7,11 @@ import org.junit.jupiter.api.Test;
 
 class UpdateLeadDtoTest {
 
-	UpdateLeadDto dto = new UpdateLeadDto();
-	UpdateLeadDto dto1 = new UpdateLeadDto();
-
 	@Test
 	void testSetAndGetUpdateLeadData() {
 		UpdateLeadDto updateLeadDto = new UpdateLeadDto();
+		UpdateLeadDto dto = new UpdateLeadDto();
+		UpdateLeadDto dto1 = new UpdateLeadDto();
 		updateLeadDto.setFirstName("John");
 		updateLeadDto.setLastName("Doe");
 		updateLeadDto.setPhoneNumber("1234567890");
@@ -34,6 +33,27 @@ class UpdateLeadDtoTest {
 		updateLeadDto.setPseudoName("pseudoName");
 		updateLeadDto.setLinkedinId("john_doe");
 		updateLeadDto.setTopic("test");
+		dto1.setFirstName("John");
+		dto1.setLastName("Doe");
+		dto1.setPhoneNumber("1234567890");
+		dto1.setEmail("john.doe@example.com");
+		dto1.setBudgetAmount("10000");
+		dto1.setServiceFallsId("serviceFallsId");
+		dto1.setLeadSourceId("leadSourceId");
+		dto1.setDomainId("domainId");
+		dto1.setCompanyWebsite("example.com");
+		dto1.setCompanyName("Example Company");
+		dto1.setCountry("USA");
+		dto1.setState("California");
+		dto1.setCity("San Francisco");
+		dto1.setZipCode("12345");
+		dto1.setAddressLineOne("123 Main St");
+		dto1.setFullName("John Doe");
+		dto1.setCustomerNeed("Customer need");
+		dto1.setProposedSolution("Proposed solution");
+		dto1.setPseudoName("pseudoName");
+		dto1.setLinkedinId("john_doe");
+		dto1.setTopic("test");
 		String firstName = updateLeadDto.getFirstName();
 		String lastName = updateLeadDto.getLastName();
 		String phoneNumber = updateLeadDto.getPhoneNumber();
@@ -55,9 +75,9 @@ class UpdateLeadDtoTest {
 		String pseudoName = updateLeadDto.getPseudoName();
 		String linkedinId = updateLeadDto.getLinkedinId();
 		String topic = updateLeadDto.getTopic();
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		updateLeadDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertNotNull(firstName);
 		assertEquals("John", firstName);

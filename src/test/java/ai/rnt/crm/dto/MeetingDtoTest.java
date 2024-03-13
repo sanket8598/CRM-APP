@@ -53,9 +53,9 @@ class MeetingDtoTest {
 		attachments.add(attachment2);
 		dto.setMeetingAttachments(attachments);
 		dto1.setMeetingAttachments(attachments);
-		dto.canEqual(dto);
 		dto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(1, dto.getMeetingId());
 		assertEquals("Meeting Title", dto.getMeetingTitle());

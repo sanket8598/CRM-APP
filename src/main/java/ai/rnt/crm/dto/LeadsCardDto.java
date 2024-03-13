@@ -1,8 +1,10 @@
 package ai.rnt.crm.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class LeadsCardDto {
 
 	private Integer leadId;
@@ -14,9 +16,9 @@ public class LeadsCardDto {
 	private String status;
 
 	private boolean important;
-	
+
 	private String primaryField;
-	
+
 	private String secondaryField;
 
 }

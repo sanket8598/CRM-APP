@@ -10,12 +10,11 @@ import org.junit.jupiter.api.Test;
 
 class GetVisitDtoTest {
 
-	GetVisitDto dto = new GetVisitDto();
-	GetVisitDto dto1 = new GetVisitDto();
-
 	@Test
 	void testGetVisitDto() {
 		GetVisitDto visitDto = new GetVisitDto();
+		GetVisitDto dto = new GetVisitDto();
+		GetVisitDto dto1 = new GetVisitDto();
 		Integer visitId = 1;
 		String location = "Client Office";
 		String subject = "Meeting with Client";
@@ -48,9 +47,24 @@ class GetVisitDtoTest {
 		visitDto.setEndTime12Hours(endTime12Hours);
 		visitDto.setAllDay(allDay);
 		visitDto.setVisitTasks(visitTasks);
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		dto1.setVisitId(visitId);
+		dto1.setLocation(location);
+		dto1.setSubject(subject);
+		dto1.setDuration(duration);
+		dto1.setContent(content);
+		dto1.setComment(comment);
+		dto1.setStartDate(startDate);
+		dto1.setEndDate(endDate);
+		dto1.setParticipants(participants);
+		dto1.setStartTime(startTime);
+		dto1.setEndTime(endTime);
+		dto1.setStartTime12Hours(startTime12Hours);
+		dto1.setEndTime12Hours(endTime12Hours);
+		dto1.setAllDay(allDay);
+		dto1.setVisitTasks(visitTasks);
+		visitDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(visitId, visitDto.getVisitId());
 		assertEquals(location, visitDto.getLocation());

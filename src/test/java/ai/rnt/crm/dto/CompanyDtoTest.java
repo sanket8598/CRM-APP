@@ -22,6 +22,7 @@ class CompanyDtoTest {
 		companyDto.getZipCode();
 		companyDto.hashCode();
 		companyDto.toString();
+		companyDto1.toString();
 		companyDto.equals(companyDto1);
 		companyDto.builder();
 		Assertions.assertNotNull(companyDto);
@@ -60,8 +61,18 @@ class CompanyDtoTest {
 		companyDto.setState(state);
 		companyDto.setCity(city);
 		companyDto.setZipCode("cdvh24");
+		companyDto1.setCompanyId(1);
+		companyDto1.setCompanyName("RNT");
+		companyDto1.setCompanyWebsite("www.rnt.ai");
+		companyDto1.setAddressLineOne("pune kharadi");
+		companyDto1.setCountry(country);
+		companyDto1.setState(state);
+		companyDto1.setCity(city);
+		companyDto1.setZipCode("cdvh24");
 		companyDto.hashCode();
+		companyDto1.hashCode();
 		companyDto.toString();
+		companyDto1.toString();
 		companyDto.equals(companyDto1);
 		Assertions.assertNotNull(companyDto);
 	}

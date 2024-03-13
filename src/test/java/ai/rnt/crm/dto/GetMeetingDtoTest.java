@@ -10,12 +10,11 @@ import org.junit.jupiter.api.Test;
 
 class GetMeetingDtoTest {
 
-	GetMeetingDto dto = new GetMeetingDto();
-	GetMeetingDto dto1 = new GetMeetingDto();
-
 	@Test
 	void testGetMeetingDto() {
 		GetMeetingDto meetingDto = new GetMeetingDto();
+		GetMeetingDto dto = new GetMeetingDto();
+		GetMeetingDto dto1 = new GetMeetingDto();
 		Integer meetingId = 1;
 		String meetingTitle = "Project Review Meeting";
 		List<String> participants = new ArrayList<>();
@@ -48,9 +47,24 @@ class GetMeetingDtoTest {
 		meetingDto.setMeetingMode(meetingMode);
 		meetingDto.setMeetingAttachments(meetingAttachments);
 		meetingDto.setMeetingTasks(meetingTasks);
-		dto.canEqual(dto);
+		dto1.setMeetingId(meetingId);
+		dto1.setMeetingTitle(meetingTitle);
+		dto1.setParticipants(participants);
+		dto1.setStartDate(startDate);
+		dto1.setEndDate(endDate);
+		dto1.setStartTime(startTime);
+		dto1.setEndTime(endTime);
+		dto1.setStartTime12Hours(startTime12Hours);
+		dto1.setEndTime12Hours(endTime12Hours);
+		dto1.setAllDay(allDay);
+		dto1.setLocation(location);
+		dto1.setDescription(description);
+		dto1.setMeetingMode(meetingMode);
+		dto1.setMeetingAttachments(meetingAttachments);
+		dto1.setMeetingTasks(meetingTasks);
 		dto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(meetingId, meetingDto.getMeetingId());
 		assertEquals(meetingTitle, meetingDto.getMeetingTitle());

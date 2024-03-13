@@ -8,12 +8,11 @@ import org.junit.jupiter.api.Test;
 
 class GetMeetingTaskDtoTest {
 
-	GetMeetingTaskDto dto = new GetMeetingTaskDto();
-	GetMeetingTaskDto dto1 = new GetMeetingTaskDto();
-
 	@Test
 	void testGetMeetingTaskDto() {
 		GetMeetingTaskDto meetingTaskDto = new GetMeetingTaskDto();
+		GetMeetingTaskDto dto = new GetMeetingTaskDto();
+		GetMeetingTaskDto dto1 = new GetMeetingTaskDto();
 		Integer meetingTaskId = 1;
 		String subject = "Prepare presentation";
 		String description = "Create slides for the upcoming meeting.";
@@ -42,9 +41,23 @@ class GetMeetingTaskDtoTest {
 		meetingTaskDto.setRemainderDueAt(remainderDueAt);
 		meetingTaskDto.setRemainderDueOn(remainderDueOn);
 		meetingTaskDto.setUpdatedRemainderDueOn(updatedRemainderDueOn);
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		dto1.setMeetingTaskId(meetingTaskId);
+		dto1.setSubject(subject);
+		dto1.setDescription(description);
+		dto1.setStatus(status);
+		dto1.setPriority(priority);
+		dto1.setDueDate(dueDate);
+		dto1.setDueTime(dueTime);
+		dto1.setUpdateDueDate(updateDueDate);
+		dto1.setDueTime12Hours(dueTime12Hours);
+		dto1.setRemainderOn(remainderOn);
+		dto1.setRemainderVia(remainderVia);
+		dto1.setRemainderDueAt(remainderDueAt);
+		dto1.setRemainderDueOn(remainderDueOn);
+		dto1.setUpdatedRemainderDueOn(updatedRemainderDueOn);
+		meetingTaskDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(meetingTaskId, meetingTaskDto.getMeetingTaskId());
 		assertEquals(subject, meetingTaskDto.getSubject());

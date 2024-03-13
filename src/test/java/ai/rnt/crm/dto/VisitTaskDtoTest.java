@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 
 class VisitTaskDtoTest {
 
-	VisitTaskDto dto = new VisitTaskDto();
-	VisitTaskDto dto1 = new VisitTaskDto();
-
 	@Test
 	void testSetAndGetVisitTaskData() {
 		VisitTaskDto visitTaskDto = new VisitTaskDto();
+		VisitTaskDto dto = new VisitTaskDto();
+		VisitTaskDto dto1 = new VisitTaskDto();
+
 		visitTaskDto.setVisitTaskId(1);
 		visitTaskDto.setSubject("Subject");
 		visitTaskDto.setStatus("Status");
@@ -27,6 +27,18 @@ class VisitTaskDtoTest {
 		visitTaskDto.setRemainderDueAt("09:00 AM");
 		visitTaskDto.setRemainderDueOn(LocalDate.now());
 		visitTaskDto.setAssinTo(new EmployeeDto());
+		dto1.setVisitTaskId(1);
+		dto1.setSubject("Subject");
+		dto1.setStatus("Status");
+		dto1.setPriority("Priority");
+		dto1.setDueDate(LocalDate.now());
+		dto1.setDueTime("10:00 AM");
+		dto1.setDescription("Description");
+		dto1.setRemainderOn(true);
+		dto1.setRemainderVia("Email");
+		dto1.setRemainderDueAt("09:00 AM");
+		dto1.setRemainderDueOn(LocalDate.now());
+		dto1.setAssinTo(new EmployeeDto());
 		Integer visitTaskId = visitTaskDto.getVisitTaskId();
 		String subject = visitTaskDto.getSubject();
 		String status = visitTaskDto.getStatus();
@@ -39,9 +51,9 @@ class VisitTaskDtoTest {
 		String remainderDueAt = visitTaskDto.getRemainderDueAt();
 		LocalDate remainderDueOn = visitTaskDto.getRemainderDueOn();
 		EmployeeDto assignTo = visitTaskDto.getAssinTo();
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		visitTaskDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertNotNull(visitTaskId);
 		assertEquals(1, visitTaskId);
