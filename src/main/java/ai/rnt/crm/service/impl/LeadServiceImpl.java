@@ -1022,9 +1022,8 @@ public class LeadServiceImpl implements LeadService {
 							.companyWebsite(leadDto.getCompanyWebsite()).build())
 					.orElseThrow(ResourceNotFoundException::new);
 			setLocationToCompany(leadDto.getLocation(), company);
-			contact.setCompanyMaster(
-					TO_COMPANY.apply(companyMasterDaoService.save(company).orElseThrow(ResourceNotFoundException::new))
-							.orElseThrow(ResourceNotFoundException::new));
+			companyMasterDaoService.save(company)
+					.ifPresent(e -> TO_COMPANY.apply(e).ifPresent(contact::setCompanyMaster));
 		}
 
 	}
