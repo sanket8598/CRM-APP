@@ -7,7 +7,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import ai.rnt.crm.dto.ContactDto;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
@@ -15,7 +16,8 @@ import lombok.Data;
  * @version 1.2
  *
  */
-@Data
+@Getter
+@Setter
 public class QualifyOpportunityDto {
 
 	private Integer opportunityId;
@@ -35,9 +37,9 @@ public class QualifyOpportunityDto {
 	private LocalDate updatedClosedOn;
 
 	private Integer leadSourceId;
-	
+
 	private String progressStatus;
-	
+
 	private String currentPhase;
 
 	private ContactDto primaryContact;
@@ -45,6 +47,6 @@ public class QualifyOpportunityDto {
 	private List<ContactDto> contacts = new ArrayList<>();
 
 	private List<OpprtAttachmentDto> attachments = new ArrayList<>();
-	
-	private List<ContactDto> clients= new ArrayList<>();
+
+	private List<ContactDto> clients = new ArrayList<>();
 }

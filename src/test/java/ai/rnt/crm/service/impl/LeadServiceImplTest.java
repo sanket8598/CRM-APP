@@ -9,13 +9,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,13 +26,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ai.rnt.crm.constants.OppurtunityStatus;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.ContactDaoService;
+import ai.rnt.crm.dao.service.CountryDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSortFilterDaoService;
@@ -37,8 +44,11 @@ import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
+import ai.rnt.crm.entity.CompanyMaster;
+import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.LeadImportant;
@@ -59,6 +69,8 @@ class LeadServiceImplTest {
 
 	@Mock
 	private ServiceFallsDaoSevice serviceFallsDaoSevice;
+	@Mock
+	private CountryDaoService countryDaoService;
 
 	@Mock
 	private LeadSortFilterDaoService leadSortFilterDaoService;
@@ -90,7 +102,13 @@ class LeadServiceImplTest {
 	@Mock
 	private DomainMasterDaoService domainMasterDaoService;
 
-	// Mock other dependencies
+	@Mock
+	private LeadDto leadDto;
+	@Mock
+	private EmployeeMaster employee;
+
+	@Autowired
+	MockMvc mockMvc;
 
 	@InjectMocks
 	private LeadServiceImpl leadService;
@@ -98,6 +116,7 @@ class LeadServiceImplTest {
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
+		this.mockMvc = MockMvcBuilders.standaloneSetup(leadService).build();
 	}
 
 	@Test
@@ -486,4 +505,68 @@ class LeadServiceImplTest {
 		boolean result = leadService.addToOpputunity(leads);
 		assertFalse(result);
 	}
+
+	@Test
+	void createLead_UnSuccess() {
+		LeadDto dto = mock(LeadDto.class);
+		dto.setAssignTo(1);
+		dto.setFirstName("sanket");
+		Integer staffId = 1;
+		when(auditAwareUtil.getLoggedInUserName()).thenReturn("username");
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(staffId);
+		when(employeeService.getById(staffId)).thenReturn(Optional.of(employee));
+		CountryMaster country = new CountryMaster();
+		country.setCountry("india");
+		when(countryDaoService.findByCountryName("india")).thenReturn(Optional.of(country));
+		CompanyMaster company = mock(CompanyMaster.class);
+		CompanyDto companyDto = mock(CompanyDto.class);
+		companyDto.setCompanyName("rnt.ai");
+		companyDto.setCompanyWebsite("wwwwwwwww");
+		when(companyMasterDaoService.save(company)).thenReturn(Optional.of(companyDto));
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.createLead(dto);
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Lead Not Added !!", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void assignLead_Success() {
+	    Map<String, Integer> map = new HashMap<>();
+	    map.put("leadId", 1);
+	    map.put("staffId", 1);
+	    Leads lead = new Leads(); 
+	    EmployeeMaster employee = new EmployeeMaster(); 
+	    when(leadDaoService.getLeadById(1)).thenReturn(Optional.of(lead));
+	    when(employeeService.getById(1)).thenReturn(Optional.of(employee));
+	    when(leadDaoService.addLead(any(Leads.class))).thenReturn(lead);
+	    ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.assignLead(map);
+	    assertEquals(HttpStatus.OK, response.getStatusCode());
+	    assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+	    assertEquals("Lead Assigned SuccessFully", response.getBody().get(ApiResponse.MESSAGE));
+	}
+	@Test
+	void assignLead_UnSuccess() {
+		Map<String, Integer> map = new HashMap<>();
+		map.put("leadId", 1);
+		map.put("staffId", 1);
+		Leads lead = new Leads(); 
+		EmployeeMaster employee = new EmployeeMaster(); 
+		when(leadDaoService.getLeadById(1)).thenReturn(Optional.of(lead));
+		when(employeeService.getById(1)).thenReturn(Optional.of(employee));
+		when(leadDaoService.addLead(any(Leads.class))).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.assignLead(map);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
+	
+	@Test
+	void assignLead_Exception() {
+		Map<String, Integer> map = new HashMap<>();
+	    map.put("leadId", 1);
+	    map.put("staffId", 1);
+	    when(leadDaoService.getLeadById(1)).thenThrow(new RuntimeException("Database error"));
+	    assertThrows(CRMException.class, () -> leadService.assignLead(map));
+	}
+
+
+
 }

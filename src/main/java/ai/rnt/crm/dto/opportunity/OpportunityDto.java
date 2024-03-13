@@ -12,9 +12,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import ai.rnt.crm.dto.ContactDto;
 import ai.rnt.crm.dto.EmployeeDto;
 import ai.rnt.crm.dto.LeadDashboardDto;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class OpportunityDto {
 
 	private Integer opportunityId;

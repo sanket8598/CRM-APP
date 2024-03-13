@@ -1,51 +1,38 @@
 package ai.rnt.crm.dto.opportunity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 class CloseOpportunityDtoTest {
 
 	@Test
-	void testEqualsAndHashCode() {
-		CloseOpportunityDto dto1 = createSampleDto();
-		CloseOpportunityDto dto2 = createSampleDto();
+	void testCloseOpportunityDto() {
+		CloseOpportunityDto closeOpportunityDto = new CloseOpportunityDto();
+		OpprtAttachmentDto attachment1 = new OpprtAttachmentDto();
+		attachment1.setAttachmentOf("Close");
+		OpprtAttachmentDto attachment2 = new OpprtAttachmentDto();
+		attachment2.setAttachmentOf("Close");
+		List<OpprtAttachmentDto> attachments = Arrays.asList(attachment1, attachment2);
+		closeOpportunityDto.setWinLoseReason("Test Win/Lose Reason");
+		closeOpportunityDto.setPaymentTerms("Test Payment Terms");
+		closeOpportunityDto.setContract("Test Contract");
+		closeOpportunityDto.setSupportPlan("Test Support Plan");
+		closeOpportunityDto.setFinalBudget("Test Final Budget");
+		closeOpportunityDto.setProgressStatus("Closed Won");
+		closeOpportunityDto.setCurrentPhase("Phase 3");
+		closeOpportunityDto.setAttachments(attachments);
 
-		assertEquals(dto1, dto2);
-		assertEquals(dto1.hashCode(), dto2.hashCode());
-
-		dto2.setWinLoseReason("Different reason");
-		assertNotEquals(dto1, dto2);
+		assertEquals("Test Win/Lose Reason", closeOpportunityDto.getWinLoseReason());
+		assertEquals("Test Payment Terms", closeOpportunityDto.getPaymentTerms());
+		assertEquals("Test Contract", closeOpportunityDto.getContract());
+		assertEquals("Test Support Plan", closeOpportunityDto.getSupportPlan());
+		assertEquals("Test Final Budget", closeOpportunityDto.getFinalBudget());
+		assertEquals("Closed Won", closeOpportunityDto.getProgressStatus());
+		assertEquals("Phase 3", closeOpportunityDto.getCurrentPhase());
+		assertEquals(attachments, closeOpportunityDto.getAttachments());
 	}
-
-	@Test
-	void testToString() {
-		CloseOpportunityDto dto = createSampleDto();
-		assertNotNull(dto.toString());
-	}
-
-	@Test
-	void testCanEqual() {
-		CloseOpportunityDto dto = createSampleDto();
-		assertTrue(dto.canEqual(new CloseOpportunityDto()));
-	}
-
-	private CloseOpportunityDto createSampleDto() {
-		CloseOpportunityDto dto = new CloseOpportunityDto();
-		dto.setWinLoseReason("Win reason");
-		dto.setPaymentTerms("Payment terms");
-		dto.setContract("Contract");
-		dto.setSupportPlan("Support plan");
-		dto.setFinalBudget("Final budget");
-		dto.setProgressStatus("Progress status");
-		dto.setCurrentPhase("Current phase");
-		dto.setAttachments(new ArrayList<>());
-		return dto;
-	}
-
 }

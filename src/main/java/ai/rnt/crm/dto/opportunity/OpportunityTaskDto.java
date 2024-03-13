@@ -8,7 +8,8 @@ import javax.validation.constraints.NotNull;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.validation.ValidTaskPriority;
 import ai.rnt.crm.validation.ValidTaskStatus;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
@@ -16,7 +17,8 @@ import lombok.Data;
  * @version 1.2
  *
  */
-@Data
+@Getter
+@Setter
 public class OpportunityTaskDto {
 
 	private Integer optyTaskId;

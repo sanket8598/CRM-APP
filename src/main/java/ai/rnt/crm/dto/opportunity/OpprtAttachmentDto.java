@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto.opportunity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
@@ -8,7 +9,8 @@ import lombok.Data;
  * @version 1.2
  *
  */
-@Data
+@Getter
+@Setter
 public class OpprtAttachmentDto {
 
 	private Integer optAttchId;
