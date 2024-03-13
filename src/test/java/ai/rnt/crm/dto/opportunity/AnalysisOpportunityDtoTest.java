@@ -3,6 +3,7 @@ package ai.rnt.crm.dto.opportunity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,9 @@ class AnalysisOpportunityDtoTest {
 		attachment1.setAttachmentOf("Analysis");
 		OpprtAttachmentDto attachment2 = new OpprtAttachmentDto();
 		attachment2.setAttachmentOf("Analysis");
-		List<OpprtAttachmentDto> attachments = List.of(attachment1, attachment2);
+		List<OpprtAttachmentDto> attachments=new ArrayList<>();
+		attachments.add(attachment1);
+		attachments.add(attachment2);
 		analysisOpportunityDto.setOpportunityId(1);
 		analysisOpportunityDto.setTechnicalNeed("Test Technical Need");
 		analysisOpportunityDto.setIntegrationPoint("Test Integration Point");
