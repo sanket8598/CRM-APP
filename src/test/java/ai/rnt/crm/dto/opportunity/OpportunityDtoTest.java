@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class OpportunityDtoTest {
 		LeadDashboardDto leadDashboardDto = new LeadDashboardDto();
 		EmployeeDto employeeDto = new EmployeeDto();
 		employeeDto.setStaffId(1);
-		List<ContactDto> contacts = List.of(new ContactDto(), new ContactDto());
+		List<ContactDto> contacts = Arrays.asList(new ContactDto(), new ContactDto());
 		opportunityDto.setOpportunityId(1);
 		opportunityDto.setStatus("Open");
 		opportunityDto.setTopic("Test Topic");

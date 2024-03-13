@@ -2,6 +2,7 @@ package ai.rnt.crm.dto.opportunity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ class DashboardDataDtoTest {
 		graphicalData1.setTopic("test1");
 		GraphicalDataDto graphicalData2 = new GraphicalDataDto();
 		graphicalData2.setTopic("test");
-		List<GraphicalDataDto> graphData = List.of(graphicalData1, graphicalData2);
+		List<GraphicalDataDto> graphData = Arrays.asList(graphicalData1, graphicalData2);
 		dashboardDataDto.setInPipelineAmount("10000");
 		dashboardDataDto.setInPipelineOpprt(10);
 		dashboardDataDto.setWinOpprt(5);

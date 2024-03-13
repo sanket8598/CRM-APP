@@ -2,6 +2,7 @@ package ai.rnt.crm.dto.opportunity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ class CloseOpportunityDtoTest {
 		attachment1.setAttachmentOf("Close");
 		OpprtAttachmentDto attachment2 = new OpprtAttachmentDto();
 		attachment2.setAttachmentOf("Close");
-		List<OpprtAttachmentDto> attachments = List.of(attachment1, attachment2);
+		List<OpprtAttachmentDto> attachments = Arrays.asList(attachment1, attachment2);
 		closeOpportunityDto.setWinLoseReason("Test Win/Lose Reason");
 		closeOpportunityDto.setPaymentTerms("Test Payment Terms");
 		closeOpportunityDto.setContract("Test Contract");
