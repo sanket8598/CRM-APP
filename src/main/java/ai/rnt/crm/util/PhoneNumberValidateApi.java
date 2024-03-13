@@ -48,7 +48,7 @@ public class PhoneNumberValidateApi {
 		return responseMap;
 	}
 
-	private String getRegionCode(String phoneNumber) throws NumberParseException {
+	public String getRegionCode(String phoneNumber) throws NumberParseException {
 		if (isNull(phoneNumber) || phoneNumber.isEmpty())
 			return null;
 		if (!phoneNumber.startsWith("+"))

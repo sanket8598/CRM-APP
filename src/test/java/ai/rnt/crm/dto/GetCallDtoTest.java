@@ -10,12 +10,11 @@ import org.junit.jupiter.api.Test;
 
 class GetCallDtoTest {
 
-	GetCallDto dto = new GetCallDto();
-	GetCallDto dto1 = new GetCallDto();
-
 	@Test
 	void testGetCallDto() {
 		GetCallDto getCallDto = new GetCallDto();
+		GetCallDto dto = new GetCallDto();
+		GetCallDto dto1 = new GetCallDto();
 		Integer callId = 1;
 		String subject = "Client Meeting";
 		EmployeeDto callFrom = new EmployeeDto();
@@ -48,9 +47,25 @@ class GetCallDtoTest {
 		getCallDto.setEndTime12Hours(endTime12Hours);
 		getCallDto.setAllDay(allDay);
 		getCallDto.setCallTasks(callTasks);
-		dto.canEqual(dto);
-		dto.equals(dto1);
+		dto1.setCallId(callId);
+		dto1.setSubject(subject);
+		dto1.setCallFrom(callFrom);
+		dto1.setCallTo(callTo);
+		dto1.setDirection(direction);
+		dto1.setPhoneNo(phoneNo);
+		dto1.setComment(comment);
+		dto1.setDuration(duration);
+		dto1.setStartDate(startDate);
+		dto1.setEndDate(endDate);
+		dto1.setStartTime(startTime);
+		dto1.setEndTime(endTime);
+		dto1.setStartTime12Hours(startTime12Hours);
+		dto1.setEndTime12Hours(endTime12Hours);
+		dto1.setAllDay(allDay);
+		dto1.setCallTasks(callTasks);
+		getCallDto.equals(dto1);
 		dto.hashCode();
+		dto1.hashCode();
 		dto.toString();
 		assertEquals(callId, getCallDto.getCallId());
 		assertEquals(subject, getCallDto.getSubject());

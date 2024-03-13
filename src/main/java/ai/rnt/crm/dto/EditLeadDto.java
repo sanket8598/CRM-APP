@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ai.rnt.crm.util.LeadsCardUtil;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class EditLeadDto {
 
 	private Integer leadId;

@@ -9,12 +9,12 @@ import org.junit.jupiter.api.Test;
 
 class EditMeetingDtoTest {
 
-	EditMeetingDto dto = new EditMeetingDto();
-	EditMeetingDto dto1 = new EditMeetingDto();
-
 	@Test
 	void testEditMeetingDto() {
 		EditMeetingDto editMeetingDto = new EditMeetingDto();
+		EditMeetingDto dto = new EditMeetingDto();
+		EditMeetingDto dto1 = new EditMeetingDto();
+
 		Integer id = 1;
 		String subject = "Project Review";
 		String body = "Review progress of ongoing projects";
@@ -35,9 +35,19 @@ class EditMeetingDtoTest {
 		editMeetingDto.setStatus(status);
 		editMeetingDto.setAssignTo(assignTo);
 		editMeetingDto.setAttachments(attachments);
+		dto1.setId(id);
+		dto1.setSubject(subject);
+		dto1.setBody(body);
+		dto1.setType(type);
+		dto1.setShortName(shortName);
+		dto1.setDueDate(dueDate);
+		dto1.setStatus(status);
+		dto1.setAssignTo(assignTo);
+		dto1.setAttachments(attachments);
 		dto.canEqual(dto);
-		dto.equals(dto1);
+		editMeetingDto.equals(dto1);
 		dto.hashCode();
+		editMeetingDto.hashCode();
 		dto.toString();
 		assertEquals(id, editMeetingDto.getId());
 		assertEquals(subject, editMeetingDto.getSubject());

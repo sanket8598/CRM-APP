@@ -19,7 +19,6 @@ import static java.util.Objects.nonNull;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -45,7 +44,6 @@ import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
-import ai.rnt.crm.security.UserDetail;
 import ai.rnt.crm.service.EmailService;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
@@ -152,37 +150,28 @@ public class EmailServiceImpl implements EmailService {
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		Email updatedEmail = null;
 		try {
-			if (nonNull(getContext()) && nonNull(getContext().getAuthentication())
-					&& nonNull(getContext().getAuthentication().getDetails())) {
-				UserDetail details = (UserDetail) getContext().getAuthentication().getDetails();
-
+                Integer staffId=auditAwareUtil.getLoggedInStaffId();
 				Email mail = emailDaoService.findById(mailId);
 				List<Attachment> attachment = mail.getAttachment();
 				if (nonNull(attachment) && !attachment.isEmpty()) {
-					List<Attachment> attach = attachment.stream().map(e -> {
-						e.setDeletedBy(details.getStaffId());
-						e.setDeletedDate(now().atZone(systemDefault())
-					            .withZoneSameInstant(of(INDIA_ZONE))
-					            .toLocalDateTime());
-						e.getMail().setDeletedBy(details.getStaffId());
-						e.getMail().setDeletedDate(now().atZone(systemDefault())
-					            .withZoneSameInstant(of(INDIA_ZONE))
-					            .toLocalDateTime());
+					for (Attachment e : attachment) {
+						e.setDeletedBy(staffId);
+						e.setDeletedDate(
+								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+						e.getMail().setDeletedBy(staffId);
+						e.getMail().setDeletedDate(
+								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 						e.setMail(e.getMail());
-						return e;
-					}).collect(Collectors.toList());
-					for (Attachment e : attach) {
 						attachmentDaoService.addAttachment(e);
 						updatedEmail = emailDaoService.email(mail);
 					}
 				} else {
-					mail.setDeletedBy(details.getStaffId());
+					mail.setDeletedBy(staffId);
 					mail.setDeletedDate(now().atZone(systemDefault())
 				            .withZoneSameInstant(of(INDIA_ZONE))
 				            .toLocalDateTime());
 					updatedEmail = emailDaoService.email(mail);
 				}
-			}
 			if (nonNull(updatedEmail)) {
 				result.put(MESSAGE, "Email deleted SuccessFully.");
 				result.put(SUCCESS, true);

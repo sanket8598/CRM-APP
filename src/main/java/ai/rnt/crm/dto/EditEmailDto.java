@@ -2,10 +2,12 @@ package ai.rnt.crm.dto;
 
 import java.util.List;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = false)
 public class EditEmailDto extends TimeLineActivityDto {
 
@@ -24,7 +26,7 @@ public class EditEmailDto extends TimeLineActivityDto {
 	private String status;
 
 	private String scheduledDate;
-	
+
 	private Integer assignTo;
 
 }

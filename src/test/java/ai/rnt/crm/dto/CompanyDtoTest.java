@@ -24,6 +24,7 @@ class CompanyDtoTest {
 		companyDto.toString();
 		companyDto.equals(companyDto1);
 		companyDto.builder();
+		Assertions.assertNotNull(companyDto);
 
 	}
 
@@ -62,5 +63,31 @@ class CompanyDtoTest {
 		companyDto.hashCode();
 		companyDto.toString();
 		companyDto.equals(companyDto1);
+		Assertions.assertNotNull(companyDto);
 	}
+	
+	 @Test
+	     void testCompanyDtoBuilder() {
+	        CountryDto country = new CountryDto();
+	        StateDto state = new StateDto();
+	        CityDto city = new CityDto();
+	        CompanyDto companyDto = CompanyDto.builder()
+	            .companyId(1)
+	            .companyName("Test Company")
+	            .companyWebsite("www.testcompany.com")
+	            .addressLineOne("123 Test Street")
+	            .country(country)
+	            .state(state)
+	            .city(city)
+	            .zipCode("12345")
+	            .build();
+	        assertEquals(1, companyDto.getCompanyId());
+	        assertEquals("Test Company", companyDto.getCompanyName());
+	        assertEquals("www.testcompany.com", companyDto.getCompanyWebsite());
+	        assertEquals("123 Test Street", companyDto.getAddressLineOne());
+	        assertEquals(country, companyDto.getCountry());
+	        assertEquals(state, companyDto.getState());
+	        assertEquals(city, companyDto.getCity());
+	        assertEquals("12345", companyDto.getZipCode());
+	    }
 }

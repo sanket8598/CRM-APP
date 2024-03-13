@@ -5,9 +5,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class GetCallDto {
 
 	private Integer callId;
@@ -26,15 +28,15 @@ public class GetCallDto {
 	private Date endDate;
 
 	private String startTime;
-	
+
 	private String endTime;
-	
+
 	private String startTime12Hours;
 
 	private String endTime12Hours;
-	
+
 	private boolean allDay;
 
 	private List<GetCallTaskDto> callTasks;
-	
+
 }
