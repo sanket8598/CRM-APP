@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Path;
@@ -32,7 +31,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -58,12 +59,15 @@ class GlobalExceptionHandlerTest {
 	@Autowired
 	MockMvc mockMvc;
 	
+	private MockHttpServletRequest mockHttpRequest;
+	
 	 @Mock
-	    private MockHttpServletRequest request;
+	    private WebRequest webRequest;
 
 	@BeforeEach
 	void setUp() {
 		mockRequest = mock(WebRequest.class);
+		mockHttpRequest = new MockHttpServletRequest();
 		MockitoAnnotations.openMocks(this);
 		this.mockMvc = MockMvcBuilders.standaloneSetup(globalExceptionHandler).build();
 	}
@@ -237,6 +241,31 @@ class GlobalExceptionHandlerTest {
         ApiError apiError = responseEntity.getBody();
         assertEquals("Some internal error", apiError.getMessage());
     }
+    
+    @Test
+    void handleNoHandlerFoundException_ShouldReturnNotFoundWithErrorMessage() {
+        NoHandlerFoundException ex = new NoHandlerFoundException("GET", "/api/resource", null);
+        mockHttpRequest.setRequestURI("/api/resource");
+        WebRequest webRequest = new ServletWebRequest(mockHttpRequest);
+        HttpHeaders headers = new HttpHeaders();
+        ResponseEntity<Object> responseEntity = globalExceptionHandler.handleNoHandlerFoundException(
+                ex, headers, HttpStatus.NOT_FOUND, webRequest);
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        ApiError apiError = (ApiError) responseEntity.getBody();
+        assertEquals("No URL Found In The CRM with http://localhost/api/resource.", apiError.getMessage());
+    }
+   
+    
+    @Test
+    void handleMissingPathVariable_ShouldReturnBadRequestWithErrorMessage() {
+        MissingPathVariableException ex = mock(MissingPathVariableException.class);
+        ResponseEntity<Object> responseEntity = globalExceptionHandler.handleMissingPathVariable(
+                ex, new HttpHeaders(), HttpStatus.BAD_REQUEST, webRequest);
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        ApiError apiError = (ApiError) responseEntity.getBody();
+        assertEquals(HttpStatus.BAD_REQUEST, apiError.getHttpStatus());
+    }
+ 
     private static class PathImpl implements Path {
         private final String property;
 
