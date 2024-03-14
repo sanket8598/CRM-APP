@@ -861,7 +861,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 		}
 	}
 
-	private boolean updateAttachmentsOfAllPhases(Opportunity opportunityData, String phase,
+	public boolean updateAttachmentsOfAllPhases(Opportunity opportunityData, String phase,
 			List<OpprtAttachmentDto> isAttachments) {
 		log.info("inside the updateAttachmentsOfAllPhases method...");
 		try {
