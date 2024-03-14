@@ -16,6 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -613,5 +615,24 @@ class LeadServiceImplTest {
 	    when(leadDaoService.getLeadById(leadId)).thenThrow(new RuntimeException("Database error"));
 	    assertThrows(CRMException.class, () -> leadService.updateLeadContact(leadId,dto));
 	}
+	
+	//@Test
+    void testUploadExcelSuccessful() throws Exception {
+		InputStream stream=mock(InputStream.class);
+        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+        when(file.getInputStream()).thenReturn(stream);
+        Map<String, Object> mockExcelData =new HashMap<>(); 
+        mockExcelData.put("FLAG", true);
+        mockExcelData.put("LEAD_DATA", Arrays.asList(leadDto));
+        when(readExcelUtil.readExcelFile(any(), any())).thenReturn(mockExcelData);
+        when(contactDaoService.addContact(any())).thenReturn(new Contacts());
+        when(leadDaoService.getAllLeads()).thenReturn(Arrays.asList());
+        when(auditAwareUtil.getLoggedInUserName()).thenReturn("Test User");
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.uploadExcel(file);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+        assertEquals("1 Leads Added And 0 Duplicate Found!!", response.getBody().get(ApiResponse.MESSAGE));
+    }
 	
 }
