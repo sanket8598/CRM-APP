@@ -152,19 +152,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	@ExceptionHandler(ResourceNotFoundException.class)
-	private ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException exc) {
+	protected ResponseEntity<ApiError> handleResourceNotFoundException(ResourceNotFoundException exc) {
 		log.info("handling ResourceNotFoundException....{}", exc.getLocalizedMessage());
 		return new ResponseEntity<>(new ApiError(false, exc.getMessage()), HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(InvalidKeyException.class)
-	private ResponseEntity<ApiError> handleInvalidKeyException(InvalidKeyException exc) {
+	protected ResponseEntity<ApiError> handleInvalidKeyException(InvalidKeyException exc) {
 		log.error("handle InvalidKeyException handler: {}", exc.getMessage());
 		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), UNAUTHORIZED);
 	}
 
 	@ExceptionHandler(CRMException.class)
-	private ResponseEntity<ApiError> handleCRMException(CRMException exc) throws Throwable {
+	protected ResponseEntity<ApiError> handleCRMException(CRMException exc) throws Throwable {
 		log.info("handling CRM Exception....{}", exc.getLocalizedMessage());
 		if (exc.getException() instanceof BadCredentialsException)
 			return new ResponseEntity<>(new ApiError(false, BAD_CREDENTIALS), BAD_REQUEST);
@@ -193,7 +193,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	 * @since version 1.0
 	 */
 	@ExceptionHandler({ UnsupportedOperationException.class, DTOConvertionException.class })
-	public ResponseEntity<Object> handleInvalidRequestBodyException(UnsupportedOperationException ex,
+	protected ResponseEntity<Object> handleInvalidRequestBodyException(UnsupportedOperationException ex,
 			WebRequest request) {
 		ApiError apiError = new ApiError(BAD_REQUEST, ex.getLocalizedMessage(),
 				Arrays.asList(ex.getMessage(), "Invalid Request Body"));
@@ -202,14 +202,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)
-	private ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException exc) {
+	protected ResponseEntity<ApiError> handleAccessDeniedException(AccessDeniedException exc) {
 		log.error("handle AccessDenied api error handler: {}", exc.getMessage());
 		return new ResponseEntity<>(new ApiError(false, ACCESS_DENIED + "" + exc.getMessage()),
 				HttpStatus.UNAUTHORIZED);
 	}
 
 	@ExceptionHandler(ConstraintViolationException.class)
-	private ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException exc) {
+	protected ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException exc) {
 		List<String> errors = new ArrayList<>();
 		exc.getConstraintViolations().forEach(e -> {
 			String fieldName = e.getPropertyPath().toString();
@@ -235,13 +235,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 	
 
 	@ExceptionHandler({ SQLException.class })
-	private ResponseEntity<ApiError> handleDBException(Exception exc) {
+	protected ResponseEntity<ApiError> handleDBException(Exception exc) {
 		log.error("handle DB connection exception and api error handler: {}", exc.getMessage());
 		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), TOO_MANY_REQUESTS);
 	}
 
 	@ExceptionHandler(Exception.class)
-	private ResponseEntity<ApiError> handleAllException(Exception exc) {
+	protected ResponseEntity<ApiError> handleAllException(Exception exc) {
 		log.error("inside All exception and api error handler: {}{}", exc.getMessage(),exc);
 		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), INTERNAL_SERVER_ERROR);
 	}
