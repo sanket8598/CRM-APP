@@ -24,7 +24,7 @@ import org.modelmapper.convention.MatchingStrategies;
  */
 public class FunctionUtil {
 
-	private FunctionUtil() {}
+	protected FunctionUtil() {}
 
 	private static final ModelMapper mp = new ModelMapper();
 	

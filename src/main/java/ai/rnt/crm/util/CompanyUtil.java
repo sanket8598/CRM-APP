@@ -60,8 +60,9 @@ public class CompanyUtil {
 			}
 			companyMaster.setZipCode(dto.getZipCode());
 			companyMaster.setAddressLineOne(dto.getAddressLineOne());
-			TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(ResourceNotFoundException::new))
-					.ifPresent(contact::setCompanyMaster);
+			contact.setCompanyMaster(companyMaster);
+			companyMasterDaoService.save(companyMaster)
+					.ifPresent(comp -> TO_COMPANY.apply(comp).ifPresent(contact::setCompanyMaster));
 		} else {
 			CompanyMaster companyMaster = TO_COMPANY
 					.apply(CompanyDto.builder().companyName(dto.getCompanyName())
@@ -93,8 +94,8 @@ public class CompanyUtil {
 			}
 			companyMaster.setZipCode(dto.getZipCode());
 			companyMaster.setAddressLineOne(dto.getAddressLineOne());
-			TO_COMPANY.apply(companyMasterDaoService.save(companyMaster).orElseThrow(ResourceNotFoundException::new))
-					.ifPresent(contact::setCompanyMaster);
+			companyMasterDaoService.save(companyMaster)
+			.ifPresent(comp -> TO_COMPANY.apply(comp).ifPresent(contact::setCompanyMaster));
 		}
 	}
 
