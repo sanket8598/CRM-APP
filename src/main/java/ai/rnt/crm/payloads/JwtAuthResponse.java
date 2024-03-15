@@ -3,7 +3,7 @@ package ai.rnt.crm.payloads;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 // @// @formatter:off
 /**
@@ -14,7 +14,8 @@ import lombok.Data;
  * @since 21-08-2023
  * 
  */
-@Data
+@Getter
+@Setter
 @Builder
 public class JwtAuthResponse {
 	@JsonProperty("SUCCESS")

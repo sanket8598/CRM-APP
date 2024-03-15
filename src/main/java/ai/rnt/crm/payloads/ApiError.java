@@ -18,9 +18,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @JsonPropertyOrder({"status", "message","timestamp", "errors", "messages" })
 @JsonInclude(NON_NULL)
 public class ApiError implements Serializable{
@@ -36,7 +37,7 @@ public class ApiError implements Serializable{
 	@JsonInclude(NON_EMPTY)
 	private List<String> errors = new ArrayList<>();
 	HttpStatus httpStatus;
-	private ApiError() {
+	public ApiError() {
 		timestamp = now();
 	}
 

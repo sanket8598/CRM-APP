@@ -3,9 +3,10 @@ package ai.rnt.crm.payloads;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 public class JwtAuthRequest {
 	
 	@NotNull(message ="UserId should not be null !!")

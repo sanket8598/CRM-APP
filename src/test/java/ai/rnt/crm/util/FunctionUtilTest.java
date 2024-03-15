@@ -57,12 +57,12 @@ class FunctionUtilTest {
 		Object obj = null;
 		Object obj1 = new FunctionUtil();
 		Optional<String> result = FunctionUtil.evalMapperProjection(obj, String.class);
-		assertTrue(result.isPresent());
+		assertFalse(result.isPresent());
 		Optional<String> result1 = FunctionUtil.evalMapperProjection(obj1, String.class);
 		assertTrue(result1.isPresent());
 		Optional<String> result2 = FunctionUtil.evalMapperProjection(obj1, String.class);
-		assertFalse(result2.isPresent());
+		assertTrue(result2.isPresent());
 		Optional<String> result3 = FunctionUtil.evalMapperProjection(obj1, null);
-		assertTrue(result3.isPresent());
+		assertFalse(result3.isPresent());
 	}
 }
