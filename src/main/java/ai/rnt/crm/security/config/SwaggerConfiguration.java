@@ -1,6 +1,5 @@
 package ai.rnt.crm.security.config;
 
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +37,7 @@ public class SwaggerConfiguration {
 	}
 
 	@Bean
-	public Docket api() {
+	Docket api() {
 
 		return new Docket(DocumentationType.SWAGGER_2).apiInfo(getApiInfo()).securityContexts(securityContexts())
 				.securitySchemes(Arrays.asList(apiKeys())).select().apis(RequestHandlerSelectors.any())
@@ -46,9 +45,9 @@ public class SwaggerConfiguration {
 	}
 
 	private ApiInfo getApiInfo() {
-		return new ApiInfo("CRM Application :REST API", "This project is developed by RNT", "1.0",
-				"Terms And Service", new Contact("Sanket", "www.rnt.ai", "sanketwakankar8@gmail.com"),
-				"Licennse of APi", "API lincense URL", Collections.emptyList());
+		return new ApiInfo("CRM Application :REST API", "This project is developed by RNT", "1.0", "Terms And Service",
+				new Contact("Sanket", "www.rnt.ai", "sanketwakankar8@gmail.com"), "Licennse of APi", "API lincense URL",
+				Collections.emptyList());
 	}
 
 }
