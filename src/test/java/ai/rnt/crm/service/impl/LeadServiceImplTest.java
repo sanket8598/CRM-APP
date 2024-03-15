@@ -12,19 +12,23 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -39,34 +43,52 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import ai.rnt.crm.constants.OppurtunityStatus;
+import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.ContactDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
+import ai.rnt.crm.dao.service.EmailDaoService;
+import ai.rnt.crm.dao.service.ExcelHeaderDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadSortFilterDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
+import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.RoleMasterDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
+import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
+import ai.rnt.crm.dto.ContactDto;
+import ai.rnt.crm.dto.EditCallDto;
+import ai.rnt.crm.dto.EditEmailDto;
+import ai.rnt.crm.dto.EditLeadDto;
+import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
+import ai.rnt.crm.dto.QualifyLeadDto;
+import ai.rnt.crm.dto.ServiceFallsDto;
+import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
+import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.DomainMaster;
+import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
+import ai.rnt.crm.entity.ExcelHeaderMaster;
 import ai.rnt.crm.entity.LeadImportant;
 import ai.rnt.crm.entity.LeadSourceMaster;
 import ai.rnt.crm.entity.Leads;
+import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.entity.StateMaster;
+import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.service.EmployeeService;
@@ -80,8 +102,21 @@ class LeadServiceImplTest {
 
 	@Mock
 	private ServiceFallsDaoSevice serviceFallsDaoSevice;
+
 	@Mock
 	private CountryDaoService countryDaoService;
+
+	@Mock
+	private CallDaoService callDaoService;
+
+	@Mock
+	private VisitDaoService visitDaoService;
+
+	@Mock
+	private EmailDaoService emailDaoService;
+
+	@Mock
+	private MeetingDaoService meetingDaoService;
 
 	@Mock
 	private LeadSortFilterDaoService leadSortFilterDaoService;
@@ -105,6 +140,9 @@ class LeadServiceImplTest {
 	private ReadExcelUtil readExcelUtil;
 	
 	@Mock
+    private ExcelHeaderDaoService excelHeaderDaoService;
+
+	@Mock
 	private CityDaoService cityDaoService;
 
 	@Mock
@@ -112,6 +150,7 @@ class LeadServiceImplTest {
 
 	@Mock
 	private ContactDaoService contactDaoService;
+
 	@Mock
 	private StateDaoService stateDaoService;
 
@@ -120,8 +159,45 @@ class LeadServiceImplTest {
 
 	@Mock
 	private LeadDto leadDto;
+
+	@Mock
+	private QualifyLeadDto qualifyLeadDto;
+
+	@Mock
+	private EditLeadDto editLeadDto;
+
+	@Mock
+	private EditVisitDto editVisitDto;
+
+	@Mock
+	private EditEmailDto editEmailDto;
+
+	@Mock
+	private EditCallDto editCallDto;
+
+	@Mock
+	private LeadImportant leadImportant;
+
 	@Mock
 	private EmployeeMaster employee;
+
+	@Mock
+	private Leads leads;
+
+	@Mock
+	private Call call;
+
+	@Mock
+	private Visit visit;
+
+	@Mock
+	private Email email;
+
+	@Mock
+	private Meetings meetings;
+
+	@Mock
+	private TimeLineActivityDto timeLineActivityDto;
 
 	@Autowired
 	MockMvc mockMvc;
@@ -485,7 +561,7 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void testAddToOpportunity_Success() {
+	void testAddToOpportunitySuccess() {
 		Leads leads = new Leads();
 		leads.setBudgetAmount("1000.0");
 		leads.setCustomerNeed("Test Customer Need");
@@ -515,7 +591,7 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void testAddToOpportunity_Failure() {
+	void testAddToOpportunityFailure() {
 		Leads leads = new Leads();
 		when(opportunityDaoService.addOpportunity(any())).thenReturn(null);
 		boolean result = leadService.addToOpputunity(leads);
@@ -523,7 +599,7 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void createLead_UnSuccess() {
+	void createLeadUnSuccess() {
 		LeadDto dto = mock(LeadDto.class);
 		dto.setAssignTo(1);
 		dto.setFirstName("sanket");
@@ -546,93 +622,272 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void assignLead_Success() {
-	    Map<String, Integer> map = new HashMap<>();
-	    map.put("leadId", 1);
-	    map.put("staffId", 1);
-	    Leads lead = new Leads(); 
-	    EmployeeMaster employee = new EmployeeMaster(); 
-	    when(leadDaoService.getLeadById(1)).thenReturn(Optional.of(lead));
-	    when(employeeService.getById(1)).thenReturn(Optional.of(employee));
-	    when(leadDaoService.addLead(any(Leads.class))).thenReturn(lead);
-	    ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.assignLead(map);
-	    assertEquals(HttpStatus.OK, response.getStatusCode());
-	    assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-	    assertEquals("Lead Assigned SuccessFully", response.getBody().get(ApiResponse.MESSAGE));
+	void assignLeadSuccess() {
+		Map<String, Integer> map = new HashMap<>();
+		map.put("leadId", 1);
+		map.put("staffId", 1);
+		Leads lead = new Leads();
+		EmployeeMaster employee = new EmployeeMaster();
+		when(leadDaoService.getLeadById(1)).thenReturn(Optional.of(lead));
+		when(employeeService.getById(1)).thenReturn(Optional.of(employee));
+		when(leadDaoService.addLead(any(Leads.class))).thenReturn(lead);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.assignLead(map);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Lead Assigned SuccessFully", response.getBody().get(ApiResponse.MESSAGE));
 	}
+
 	@Test
 	void assignLead_UnSuccess() {
 		Map<String, Integer> map = new HashMap<>();
 		map.put("leadId", 1);
 		map.put("staffId", 1);
-		Leads lead = new Leads(); 
-		EmployeeMaster employee = new EmployeeMaster(); 
+		Leads lead = new Leads();
+		EmployeeMaster employee = new EmployeeMaster();
 		when(leadDaoService.getLeadById(1)).thenReturn(Optional.of(lead));
 		when(employeeService.getById(1)).thenReturn(Optional.of(employee));
 		when(leadDaoService.addLead(any(Leads.class))).thenReturn(null);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.assignLead(map);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
-	
+
 	@Test
 	void assignLead_Exception() {
 		Map<String, Integer> map = new HashMap<>();
-	    map.put("leadId", 1);
-	    map.put("staffId", 1);
-	    when(leadDaoService.getLeadById(1)).thenThrow(new RuntimeException("Database error"));
-	    assertThrows(CRMException.class, () -> leadService.assignLead(map));
+		map.put("leadId", 1);
+		map.put("staffId", 1);
+		when(leadDaoService.getLeadById(1)).thenThrow(new RuntimeException("Database error"));
+		assertThrows(CRMException.class, () -> leadService.assignLead(map));
 	}
 
 	@Test
-    void testUpdateLeadContact_Success() {
-        Integer leadId = 1;
-        UpdateLeadDto dto =mock(UpdateLeadDto.class);
-        Leads lead = mock(Leads.class);
-        Contacts contact = mock(Contacts.class);
-        EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-        result.put(MESSAGE, "Lead Details Updated Successfully !!");
-        result.put(SUCCESS, true);
-        when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
-        when(lead.getContacts()).thenReturn(Arrays.asList(contact));
-        when(contact.getPrimary()).thenReturn(true);
-        when(contact.getPrimary()).thenReturn(true);
-        when(cityDaoService.existCityByName("dhjsd")).thenReturn(Optional.of(mock(CityMaster.class)));
-        when(stateDaoService.findBystate("dfs")).thenReturn(Optional.of(mock(StateMaster.class)));
-        when(countryDaoService.findByCountryName("sfgdfsd")).thenReturn(Optional.of(mock(CountryMaster.class)));
-        when(companyMasterDaoService.findByCompanyName("fsdfsdds")).thenReturn(Optional.of(mock(CompanyDto.class)));
-        when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(mock(CountryMaster.class));
-        when(stateDaoService.addState(any(StateMaster.class))).thenReturn(mock(StateMaster.class));
-        when(cityDaoService.addCity(any(CityMaster.class))).thenReturn(mock(CityMaster.class));
-        when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
-        ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = leadService.updateLeadContact(leadId, dto);
-        assertEquals(HttpStatus.CREATED,responseEntity.getStatusCode());
-    }
-	
-	@Test
-	void updateLead_Exception() {
+	void testUpdateLeadContact_Success() {
 		Integer leadId = 1;
-		UpdateLeadDto dto =mock(UpdateLeadDto.class);
-	    when(leadDaoService.getLeadById(leadId)).thenThrow(new RuntimeException("Database error"));
-	    assertThrows(CRMException.class, () -> leadService.updateLeadContact(leadId,dto));
+		UpdateLeadDto dto = mock(UpdateLeadDto.class);
+		Leads lead = mock(Leads.class);
+		Contacts contact = mock(Contacts.class);
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		result.put(MESSAGE, "Lead Details Updated Successfully !!");
+		result.put(SUCCESS, true);
+		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
+		when(lead.getContacts()).thenReturn(Arrays.asList(contact));
+		when(contact.getPrimary()).thenReturn(true);
+		when(contact.getPrimary()).thenReturn(true);
+		when(cityDaoService.existCityByName("dhjsd")).thenReturn(Optional.of(mock(CityMaster.class)));
+		when(stateDaoService.findBystate("dfs")).thenReturn(Optional.of(mock(StateMaster.class)));
+		when(countryDaoService.findByCountryName("sfgdfsd")).thenReturn(Optional.of(mock(CountryMaster.class)));
+		when(companyMasterDaoService.findByCompanyName("fsdfsdds")).thenReturn(Optional.of(mock(CompanyDto.class)));
+		when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(mock(CountryMaster.class));
+		when(stateDaoService.addState(any(StateMaster.class))).thenReturn(mock(StateMaster.class));
+		when(cityDaoService.addCity(any(CityMaster.class))).thenReturn(mock(CityMaster.class));
+		when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = leadService.updateLeadContact(leadId, dto);
+		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+	}
+
+	@Test
+	void updateLeadTestException() {
+		Integer leadId = 1;
+		UpdateLeadDto dto = mock(UpdateLeadDto.class);
+		when(leadDaoService.getLeadById(leadId)).thenThrow(new RuntimeException("Database error"));
+		assertThrows(CRMException.class, () -> leadService.updateLeadContact(leadId, dto));
+	}
+
+	// @Test
+	void testUploadExcelSuccessful() throws Exception {
+		InputStream stream = mock(InputStream.class);
+		MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
+		when(file.getInputStream()).thenReturn(stream);
+		Map<String, Object> mockExcelData = new HashMap<>();
+		mockExcelData.put("FLAG", true);
+		mockExcelData.put("LEAD_DATA", Arrays.asList(leadDto));
+		when(readExcelUtil.readExcelFile(any(), any())).thenReturn(mockExcelData);
+		when(contactDaoService.addContact(any())).thenReturn(new Contacts());
+		when(leadDaoService.getAllLeads()).thenReturn(Arrays.asList());
+		when(auditAwareUtil.getLoggedInUserName()).thenReturn("Test User");
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.uploadExcel(file);
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("1 Leads Added And 0 Duplicate Found!!", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testGetLeadsByStatusAdminNullStatus() {
+		String leadsStatus = null;
+		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+		expectedResponse.put(ApiResponse.SUCCESS, true);
+		when(auditAwareUtil.isAdmin()).thenReturn(true);
+		when(leadDaoService.getAllLeads()).thenReturn(Collections.emptyList());
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.getLeadsByStatus(leadsStatus);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		verify(leadDaoService).getAllLeads();
+	}
+
+	@Test
+	void testGetLeadsByStatusUserNullStatus() {
+		String leadsStatus = null;
+		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+		expectedResponse.put(ApiResponse.SUCCESS, true);
+		when(auditAwareUtil.isUser()).thenReturn(true);
+		when(leadDaoService.getAllLeads()).thenReturn(Collections.emptyList());
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.getLeadsByStatus(leadsStatus);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		verify(leadDaoService).getAllLeads();
+	}
+
+	@Test
+	void testGetLeadsByStatusWithStatus() {
+		String leadsStatus = "Open";
+		List<Leads> leads = Collections.singletonList(new Leads());
+		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+		expectedResponse.put(ApiResponse.SUCCESS, true);
+		when(auditAwareUtil.isAdmin()).thenReturn(false);
+		when(auditAwareUtil.isUser()).thenReturn(true);
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
+		when(leadDaoService.getLeadsByStatus(leadsStatus)).thenReturn(leads);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.getLeadsByStatus(leadsStatus);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		verify(leadDaoService).getLeadsByStatus(leadsStatus);
+	}
+
+	@Test
+	void testGetLeadsByStatusWithStatusException() {
+	    when(leadDaoService.getLeadsByStatus("All")).thenThrow(new RuntimeException("Database error"));
+	    assertThrows(CRMException.class, () -> leadService.getLeadsByStatus("All"));
+	}
+
+	@Test
+	void testEditLeadSuccess() {
+		Integer leadId = 1;
+		Integer contactId = 1;
+		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+		expectedResponse.put(ApiResponse.SUCCESS, true);
+		Leads lead = new Leads();
+		EditLeadDto dto = new EditLeadDto();
+		ContactDto contactDto = new ContactDto();
+		contactDto.setPrimary(true);
+		dto.setPrimaryContact(contactDto);
+		List<Contacts> contact = new ArrayList<>();
+		Contacts contact1 = new Contacts();
+		contact1.setPrimary(true);
+		contact1.setContactId(contactId);
+		contact.add(contact1);
+		lead.setContacts(contact);
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setFirstName("test");
+		employeeMaster.setLastName("data");
+		lead.setCreatedBy(1477);
+		employeeMaster.setStaffId(1477);
+		lead.setEmployee(employeeMaster);
+		List<Call> calls = new ArrayList<>();
+		List<Visit> visits = new ArrayList<>();
+		Call call = new Call();
+		Visit visit = new Visit();
+		call.setCallId(1);
+		visit.setVisitId(1);
+		visits.add(visit);
+		;
+		call.setCallTo("testcall");
+		call.setCallFrom(employeeMaster);
+		calls.add(call);
+		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
+		when(employeeService.getById(lead.getCreatedBy())).thenReturn(Optional.of(employeeMaster));
+		when(callDaoService.getCallsByLeadId(lead.getLeadId())).thenReturn(calls);
+		when(visitDaoService.getVisitsByLeadIdAndIsOpportunity(lead.getLeadId())).thenReturn(visits);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.editLead(leadId);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
+
+	@Test
+	void testEditLeadLeadNotFound() {
+		Integer leadId = 1;
+		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.empty());
+		assertThrows(CRMException.class, () -> leadService.editLead(leadId));
+	}
+
+	@Test
+	void testQualifyLeadUnSuccess() throws Exception {
+		Integer leadId = 1;
+		QualifyLeadDto dto = new QualifyLeadDto();
+		dto.setCustomerNeed("Test customer need");
+		dto.setProposedSolution("Test proposed solution");
+		dto.setIsFollowUpRemainder(true);
+		Leads lead = new Leads();
+		ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
+		serviceFalls.setServiceName("Test");
+		ServiceFallsDto serviceFallsDto = new ServiceFallsDto();
+		serviceFallsDto.setServiceFallsId(1);
+		serviceFallsDto.setServiceName("111ert");
+		dto.setServiceFallsMaster(serviceFallsDto);
+		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
+		when(leadDaoService.addLead(any())).thenReturn(lead);
+		when(serviceFallsDaoSevice.save(any())).thenReturn(Optional.of(serviceFallsDto));
+		when(serviceFallsDaoSevice.findByName("Other")).thenReturn(Optional.of(new ServiceFallsMaster()));
+		when(serviceFallsDaoSevice.getServiceFallById(1)).thenReturn(Optional.of(new ServiceFallsMaster()));
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Lead Not Qualify", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testQualifyLeadLeadNotFound() {
+		Integer leadId = 1;
+		QualifyLeadDto dto = new QualifyLeadDto();
+		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.empty());
+		assertThrows(CRMException.class, () -> leadService.qualifyLead(leadId, dto));
+	}
+
+	@Test
+	void testSetLocationToCompanyLocationNotNull() {
+		String location = "Some Location";
+		CompanyMaster company = new CompanyMaster();
+		when(countryDaoService.findByCountryName(location)).thenReturn(Optional.empty());
+		leadService.setLocationToCompany(location, company);
+		assertNull(company.getCountry());
+		verify(countryDaoService, times(1)).findByCountryName(location);
+	}
+
+	@Test
+	void testSetLocationToCompanyLocationExists() {
+		String location = "Some Location";
+		CompanyMaster company = new CompanyMaster();
+		CountryMaster countryMaster = new CountryMaster();
+		countryMaster.setCountry(location);
+		Optional<CountryMaster> countryOptional = Optional.of(countryMaster);
+		when(countryDaoService.findByCountryName(location)).thenReturn(countryOptional);
+		leadService.setLocationToCompany(location, company);
+		assertEquals(countryMaster, company.getCountry());
+		verify(countryDaoService, times(1)).findByCountryName(location);
+		verify(countryDaoService, never()).addCountry(any());
+	}
+
+	@Test
+	void testSetLocationToCompanyLocationDoesNotExist() {
+		String location = "New Location";
+		CompanyMaster company = new CompanyMaster();
+		CountryMaster countryMaster = new CountryMaster();
+		countryMaster.setCountry(location);
+		when(countryDaoService.findByCountryName(location)).thenReturn(Optional.empty());
+		when(countryDaoService.addCountry(any())).thenReturn(countryMaster);
+		leadService.setLocationToCompany(location, company);
+		assertEquals(countryMaster, company.getCountry());
+		verify(countryDaoService, times(1)).findByCountryName(location);
+		verify(countryDaoService, times(1)).addCountry(any());
 	}
 	
-	//@Test
-    void testUploadExcelSuccessful() throws Exception {
-		InputStream stream=mock(InputStream.class);
-        MockMultipartFile file = new MockMultipartFile("file", "test.xlsx",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", new byte[1]);
-        when(file.getInputStream()).thenReturn(stream);
-        Map<String, Object> mockExcelData =new HashMap<>(); 
-        mockExcelData.put("FLAG", true);
-        mockExcelData.put("LEAD_DATA", Arrays.asList(leadDto));
-        when(readExcelUtil.readExcelFile(any(), any())).thenReturn(mockExcelData);
-        when(contactDaoService.addContact(any())).thenReturn(new Contacts());
-        when(leadDaoService.getAllLeads()).thenReturn(Arrays.asList());
-        when(auditAwareUtil.getLoggedInUserName()).thenReturn("Test User");
-        ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.uploadExcel(file);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-        assertEquals("1 Leads Added And 0 Duplicate Found!!", response.getBody().get(ApiResponse.MESSAGE));
+	@Test
+    void testIsValidExcelAllHeadersExistInExcelAndDB() throws IOException {
+        Sheet sheet = mock(Sheet.class);
+        List<ExcelHeaderMaster> dbHeaderNames = new ArrayList<>();
+        ExcelHeaderMaster excelHeaderMaster = new ExcelHeaderMaster();
+        excelHeaderMaster.setHeaderName("Fname");
+        dbHeaderNames.add(excelHeaderMaster);
+        List<String> excelHeader = Arrays.asList("Name", "Age", "Address");
+        when(excelHeaderDaoService.getExcelHeadersFromDB()).thenReturn(dbHeaderNames);
+        when(readExcelUtil.readExcelHeaders(sheet)).thenReturn(excelHeader);
+        boolean isValid = leadService.isValidExcel(sheet);
+        assertFalse(isValid);
     }
-	
 }
