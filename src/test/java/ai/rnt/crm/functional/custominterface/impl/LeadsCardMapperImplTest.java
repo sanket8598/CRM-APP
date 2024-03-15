@@ -73,6 +73,7 @@ class LeadsCardMapperImplTest {
         secondaryField = "Lead Assign Username";
         EmployeeMaster emp=new EmployeeMaster();
         emp.setFirstName(secondaryField);
+        emp.setLastName(secondaryField);
         lead.setEmployee(emp);
         LeadsCardMapperImpl mapper8 = new LeadsCardMapperImpl();
         LeadsCardDto leadsCardDto8 = mapper8.mapLeadToLeadsCardDto(lead, primaryField, secondaryField, contacts);
