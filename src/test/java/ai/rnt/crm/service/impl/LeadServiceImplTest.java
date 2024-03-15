@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -68,6 +70,7 @@ import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
+import ai.rnt.crm.dto.LeadSourceDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.ServiceFallsDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
@@ -138,12 +141,15 @@ class LeadServiceImplTest {
 
 	@Mock
 	private ReadExcelUtil readExcelUtil;
-	
+
 	@Mock
-    private ExcelHeaderDaoService excelHeaderDaoService;
+	private ExcelHeaderDaoService excelHeaderDaoService;
 
 	@Mock
 	private CityDaoService cityDaoService;
+	
+	   @Mock
+	    private Logger log;
 
 	@Mock
 	private RoleMasterDaoService roleMasterDaoService;
@@ -876,18 +882,94 @@ class LeadServiceImplTest {
 		verify(countryDaoService, times(1)).findByCountryName(location);
 		verify(countryDaoService, times(1)).addCountry(any());
 	}
+
+	@Test
+	void testIsValidExcelAllHeadersExistInExcelAndDB() throws IOException {
+		Sheet sheet = mock(Sheet.class);
+		List<ExcelHeaderMaster> dbHeaderNames = new ArrayList<>();
+		ExcelHeaderMaster excelHeaderMaster = new ExcelHeaderMaster();
+		excelHeaderMaster.setHeaderName("Fname");
+		dbHeaderNames.add(excelHeaderMaster);
+		List<String> excelHeader = Arrays.asList("Name", "Age", "Address");
+		when(excelHeaderDaoService.getExcelHeadersFromDB()).thenReturn(dbHeaderNames);
+		when(readExcelUtil.readExcelHeaders(sheet)).thenReturn(excelHeader);
+		boolean isValid = leadService.isValidExcel(sheet);
+		assertFalse(isValid);
+	}
+
+	@Test
+	void testBuildLeadObjIfSuccess() {
+		LeadDto leadDto = new LeadDto();
+		leadDto.setCompanyName("Company1");
+		leadDto.setServiceFallsId("ServiceFall1");
+		leadDto.setLeadSourceId("LeadSource1");
+		leadDto.setDomainId("Domain1");
+		CompanyMaster companyMaster = new CompanyMaster();
+		companyMaster.setCompanyId(1);
+		Leads leads = new Leads();
+		Contacts contact = new Contacts();
+		when(companyMasterDaoService.findByCompanyName(leadDto.getCompanyName()))
+				.thenReturn(Optional.of(new CompanyDto()));
+		when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
+		when(serviceFallsDaoSevice.findByName(leadDto.getServiceFallsId()))
+				.thenReturn(Optional.of(new ServiceFallsMaster()));
+		when(leadSourceDaoService.getByName(leadDto.getLeadSourceId())).thenReturn(Optional.of(new LeadSourceMaster()));
+		when(domainMasterDaoService.findByName(leadDto.getDomainId())).thenReturn(Optional.of(new DomainMaster()));
+		Contacts result = leadService.buildLeadObj(leadDto);
+		assertNotNull(result);
+	}
+
+	@Test
+	void testBuildLeadObjElseSuccess1() {
+		LeadDto leadDto = new LeadDto();
+		leadDto.setCompanyName("Company1");
+		leadDto.setServiceFallsId(null);
+		leadDto.setLeadSourceId(null);
+		leadDto.setDomainId(null);
+		CompanyMaster companyMaster = new CompanyMaster();
+		companyMaster.setCompanyId(1);
+		when(companyMasterDaoService.findByCompanyName(leadDto.getCompanyName()))
+				.thenReturn(Optional.of(new CompanyDto()));
+		when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
+		when(serviceFallsDaoSevice.findByName(leadDto.getServiceFallsId()))
+				.thenReturn(Optional.of(new ServiceFallsMaster()));
+		when(leadSourceDaoService.getByName(leadDto.getLeadSourceId())).thenReturn(Optional.of(new LeadSourceMaster()));
+		when(domainMasterDaoService.findByName(leadDto.getDomainId())).thenReturn(Optional.of(new DomainMaster()));
+		Contacts result = leadService.buildLeadObj(leadDto);
+		assertNotNull(result);
+	}
+
+	@Test
+	void testBuildLeadObjElseSuccess() throws Exception {
+		LeadDto leadDto = new LeadDto();
+		leadDto.setCompanyName("Company1");
+		leadDto.setServiceFallsId("test");
+		leadDto.setLeadSourceId("Company1");
+		leadDto.setDomainId("test");
+		CompanyMaster companyMaster = new CompanyMaster();
+		companyMaster.setCompanyId(1);
+		LeadSourceMaster leadSources = new LeadSourceMaster();
+		leadSources.setSourceName(leadDto.getLeadSourceId());
+		ServiceFallsMaster serviceFall = new ServiceFallsMaster();
+		serviceFall.setServiceName(leadDto.getServiceFallsId());
+		DomainMaster newDomain = new DomainMaster();
+		newDomain.setDomainName(leadDto.getDomainId());
+		when(serviceFallsDaoSevice.save(any(ServiceFallsMaster.class)))
+				.thenReturn(Optional.of(mock(ServiceFallsDto.class)));
+		when(leadSourceDaoService.save(any(LeadSourceMaster.class))).thenReturn(Optional.of(mock(LeadSourceDto.class)));
+		when(domainMasterDaoService.addDomain(any(DomainMaster.class)))
+				.thenReturn(Optional.of(mock(DomainMaster.class)));
+		Contacts result = leadService.buildLeadObj(leadDto);
+		assertNotNull(result);
+	}
 	
 	@Test
-    void testIsValidExcelAllHeadersExistInExcelAndDB() throws IOException {
-        Sheet sheet = mock(Sheet.class);
-        List<ExcelHeaderMaster> dbHeaderNames = new ArrayList<>();
-        ExcelHeaderMaster excelHeaderMaster = new ExcelHeaderMaster();
-        excelHeaderMaster.setHeaderName("Fname");
-        dbHeaderNames.add(excelHeaderMaster);
-        List<String> excelHeader = Arrays.asList("Name", "Age", "Address");
-        when(excelHeaderDaoService.getExcelHeadersFromDB()).thenReturn(dbHeaderNames);
-        when(readExcelUtil.readExcelHeaders(sheet)).thenReturn(excelHeader);
-        boolean isValid = leadService.isValidExcel(sheet);
-        assertFalse(isValid);
+    void testBuildLeadObjException() {
+        LeadDto leadDto = new LeadDto();
+        leadDto.setCompanyName("Company1");
+        when(companyMasterDaoService.findByCompanyName(leadDto.getCompanyName()))
+            .thenThrow(new RuntimeException("Simulated Exception"));
+        Contacts result = leadService.buildLeadObj(leadDto);
+        assertNull(result);
     }
 }
