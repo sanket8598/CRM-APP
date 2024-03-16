@@ -114,7 +114,10 @@ class ApiErrorTest {
 		j.isFromCorp();
 		j.getPassword();
 		j.getUserId();
+		JwtAuthResponse build = JwtAuthResponse.builder().status(false).token("sdfds").build();
 		assertNotNull(js);
+		assertNotNull(build);
+		assertNotNull(JwtAuthResponse.builder().toString());
 
 	}
 }

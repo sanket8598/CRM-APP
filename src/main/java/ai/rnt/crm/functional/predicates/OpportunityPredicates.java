@@ -24,9 +24,9 @@ public class OpportunityPredicates {
 	 * @since version 1.0
 	 */
 	public static final Predicate<Opportunity> IN_PIPELINE_OPPORTUNITIES = l -> nonNull(l.getStatus())
-			&& l.getStatus().equalsIgnoreCase(QUALIFY)
+			&& (l.getStatus().equalsIgnoreCase(QUALIFY)
 			|| (l.getStatus().equalsIgnoreCase(ANALYSIS) || l.getStatus().equalsIgnoreCase(PROPOSE)
-					|| l.getStatus().equalsIgnoreCase(CLOSE));
+					|| l.getStatus().equalsIgnoreCase(CLOSE)));
 	/*
 	 * * This Predicate return true if it the opportunity has Won.
 	 * 
