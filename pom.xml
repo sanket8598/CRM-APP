@@ -24,6 +24,10 @@
 		<swagger.version>3.0.0</swagger.version>
 		<mail.version>1.6.2</mail.version>
 		<phoneNumValid.version>8.13.22</phoneNumValid.version>
+		<sonar.language>java</sonar.language>
+		<sonar.coverage.exclusions>
+			src/main/resources/**/*
+		</sonar.coverage.exclusions>
 	</properties>
 	<dependencies>
 		<dependency>

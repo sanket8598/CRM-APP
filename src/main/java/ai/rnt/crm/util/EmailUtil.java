@@ -124,7 +124,7 @@ public class EmailUtil {
 		}
 	}
 
-	private static Session getSession() {
+	public static Session getSession() {
 		return Session.getInstance(PROPERTIES, new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -334,7 +334,7 @@ public class EmailUtil {
 		}
 	}
 
-	private static String formatDate(LocalDate date) {
+	public static String formatDate(LocalDate date) {
 		log.info("inside the formatDate method...{}", date);
 		try {
 			return ofPattern("dd-MMM-yyyy").format(date);
