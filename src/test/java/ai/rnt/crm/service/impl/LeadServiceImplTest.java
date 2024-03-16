@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -146,9 +147,9 @@ class LeadServiceImplTest {
 
 	@Mock
 	private CityDaoService cityDaoService;
-	
-	   @Mock
-	    private Logger log;
+
+	@Mock
+	private Logger log;
 
 	@Mock
 	private RoleMasterDaoService roleMasterDaoService;
@@ -212,6 +213,7 @@ class LeadServiceImplTest {
 
 	@BeforeEach
 	void setUp() {
+		leadDaoService = mock(LeadDaoService.class);
 		MockitoAnnotations.openMocks(this);
 		this.mockMvc = MockMvcBuilders.standaloneSetup(leadService).build();
 	}
@@ -779,30 +781,54 @@ class LeadServiceImplTest {
 		contact1.setContactId(contactId);
 		contact.add(contact1);
 		lead.setContacts(contact);
-		EmployeeMaster employeeMaster = new EmployeeMaster();
+		EmployeeMaster employeeMaster = mock(EmployeeMaster.class);
 		employeeMaster.setFirstName("test");
 		employeeMaster.setLastName("data");
-		lead.setCreatedBy(1477);
-		employeeMaster.setStaffId(1477);
+		lead.setCreatedBy(1375);
+		employeeMaster.setStaffId(1375);
 		lead.setEmployee(employeeMaster);
 		List<Call> calls = new ArrayList<>();
+		List<Email> emails = new ArrayList<>();
 		List<Visit> visits = new ArrayList<>();
-		Call call =mock(Call.class);
-		Visit visit = new Visit();
+		List<Meetings> meetings = new ArrayList<>();
+		Call call = mock(Call.class);
+		Email email = mock(Email.class);
+		Visit visit = mock(Visit.class);
 		call.setCallId(1);
+		visit.setVisitBy(employeeMaster);
 		visit.setVisitId(1);
 		visits.add(visit);
-		call.setStatus("complete");
-		call.setCallTo("testcall");
-		call.setCallFrom(employeeMaster);
 		calls.add(call);
-		when(call.getStatus()).thenReturn("complete");
+		emails.add(email);
+		Meetings m =mock(Meetings.class);
+		m.setMeetingStatus("asa");
+		meetings.add(m);
+		when(call.getCallTo()).thenReturn("Sanket wakankar");
+		when(email.getMailFrom()).thenReturn("s.waknakr@rnt.ai");
+		when(call.getCallFrom()).thenReturn(employeeMaster);
+		when(visit.getVisitBy()).thenReturn(employeeMaster);
+		when(m.getAssignTo()).thenReturn(employeeMaster);
+		when(m.getCreatedDate()).thenReturn(LocalDateTime.now());
+		when(call.getCreatedDate()).thenReturn(LocalDateTime.now());
+		when(visit.getCreatedDate()).thenReturn(LocalDateTime.now());
+		when(email.getCreatedDate()).thenReturn(LocalDateTime.now());
 		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
 		when(employeeService.getById(lead.getCreatedBy())).thenReturn(Optional.of(employeeMaster));
-		when(callDaoService.getCallsByLeadId(lead.getLeadId())).thenReturn(calls);
-		when(visitDaoService.getVisitsByLeadIdAndIsOpportunity(lead.getLeadId())).thenReturn(visits);
+		when(callDaoService.getCallsByLeadIdAndIsOpportunity(anyInt())).thenReturn(calls);
+		when(visitDaoService.getVisitsByLeadIdAndIsOpportunity(anyInt())).thenReturn(visits);
+		when(emailDaoService.getEmailByLeadIdAndIsOpportunity(anyInt())).thenReturn(emails);
+		when(meetingDaoService.getMeetingByLeadIdAndIsOpportunity(anyInt())).thenReturn(meetings);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.editLead(leadId);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
+		when(visit.getStatus()).thenReturn("Complete");
+		when(call.getStatus()).thenReturn("Complete");
+		when(email.getStatus()).thenReturn("Send");
+		when(m.getMeetingStatus()).thenReturn("Complete");
+		when(m.getUpdatedDate()).thenReturn(LocalDateTime.now());
+		when(visit.getUpdatedDate()).thenReturn(LocalDateTime.now());
+		when(call.getUpdatedDate()).thenReturn(LocalDateTime.now());
+		when(email.getUpdatedDate()).thenReturn(LocalDateTime.now());
+		ResponseEntity<EnumMap<ApiResponse, Object>> response2 = leadService.editLead(leadId);
 	}
 
 	@Test
@@ -962,14 +988,14 @@ class LeadServiceImplTest {
 		Contacts result = leadService.buildLeadObj(leadDto);
 		assertNotNull(result);
 	}
-	
+
 	@Test
-    void testBuildLeadObjException() {
-        LeadDto leadDto = new LeadDto();
-        leadDto.setCompanyName("Company1");
-        when(companyMasterDaoService.findByCompanyName(leadDto.getCompanyName()))
-            .thenThrow(new RuntimeException("Simulated Exception"));
-        Contacts result = leadService.buildLeadObj(leadDto);
-        assertNull(result);
-    }
+	void testBuildLeadObjException() {
+		LeadDto leadDto = new LeadDto();
+		leadDto.setCompanyName("Company1");
+		when(companyMasterDaoService.findByCompanyName(leadDto.getCompanyName()))
+				.thenThrow(new RuntimeException("Simulated Exception"));
+		Contacts result = leadService.buildLeadObj(leadDto);
+		assertNull(result);
+	}
 }
