@@ -105,7 +105,7 @@ public class MeetingUtil {
 		}
 	}
 
-	private String getBufferString(MeetingDto dto) {
+	public String getBufferString(MeetingDto dto) {
 		log.info("inside the meetingUtil getBufferString method...{}");
 		StringBuilder sb = new StringBuilder();
 		String dtStamp = formatDate(dto.getStartDate());
@@ -122,7 +122,7 @@ public class MeetingUtil {
 		return buffer.toString();
 	}
 
-	private String extractDstartDend(MeetingDto dto) {
+	public String extractDstartDend(MeetingDto dto) {
 		log.info("inside the meetingUtil extractDstartDend method...{}");
 		StringBuilder res = new StringBuilder();
 		if (dto.isAllDay()) {

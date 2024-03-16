@@ -228,7 +228,7 @@ public class TaskRemainderUtil {
 		}
 	}
 
-	private void leadNotification(Integer leadTaskId) {
+	public void leadNotification(Integer leadTaskId) {
 		log.info("inside leadNotification method...{}", leadTaskId);
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
@@ -244,7 +244,7 @@ public class TaskRemainderUtil {
 		}
 	}
 
-	private void followUpLeadNotification(Integer leadId) {
+	public void followUpLeadNotification(Integer leadId) {
 		log.info("inside followUpLeadNotification method...{}", leadId);
 		try {
 			TaskNotifications taskNotifications = new TaskNotifications();
