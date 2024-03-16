@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -765,7 +766,7 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void testEditLeadSuccess() {
+	void testEditLeadSuccess() throws ParseException {
 		Integer leadId = 1;
 		Integer contactId = 1;
 		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
@@ -828,9 +829,10 @@ class LeadServiceImplTest {
 		when(visit.getUpdatedDate()).thenReturn(LocalDateTime.now());
 		when(call.getUpdatedDate()).thenReturn(LocalDateTime.now());
 		when(email.getUpdatedDate()).thenReturn(LocalDateTime.now());
-		ResponseEntity<EnumMap<ApiResponse, Object>> response2 = leadService.editLead(leadId);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response1 = leadService.editLead(leadId);
 	}
 
+	
 	@Test
 	void testEditLeadLeadNotFound() {
 		Integer leadId = 1;
