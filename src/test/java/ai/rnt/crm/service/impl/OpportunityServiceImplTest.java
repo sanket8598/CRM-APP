@@ -45,6 +45,7 @@ import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
+import ai.rnt.crm.dto.ContactDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditMeetingDto;
@@ -186,6 +187,27 @@ class OpportunityServiceImplTest {
 		assertEquals(true, response.getBody().get(ApiResponse.SUCCESS));
 		assertNotNull(response.getBody().get(ApiResponse.DATA));
 	}
+	@Test
+	void testGetDashBoardDataForNoUser() {
+		when(auditAwareUtil.isAdmin()).thenReturn(false);
+		when(auditAwareUtil.isUser()).thenReturn(false);
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(null);
+		Opportunity opt=new Opportunity();
+		opt.setStatus("Qualify");
+		Opportunity opt2=new Opportunity();
+		opt.setStatus("Open");
+		Opportunity opt3=new Opportunity();
+		opt.setStatus(null);
+		List<Opportunity> dashboardData = new ArrayList<>();
+		dashboardData.add(opt);
+		dashboardData.add(opt2);
+		dashboardData.add(opt3);
+		when(opportunityDaoService.getOpportunityDashboardData()).thenReturn(dashboardData);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.getDashBoardData(null);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(true, response.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(response.getBody().get(ApiResponse.DATA));
+	}
 
 	@Test
 	void testGetDashBoardDataAdmin() {
@@ -220,11 +242,39 @@ class OpportunityServiceImplTest {
 
 	@Test
 	void testGetDashBoardDataUser() {
+		List<Contacts> contList = new ArrayList<>();
+		Opportunity opt=new Opportunity();
+		Opportunity opt2=new Opportunity();
+		opt.setStatus("Anaysis");
+		EmployeeMaster emp=new EmployeeMaster();
+		Leads lead=new Leads();
+		emp.setStaffId(1477);
+		opt.setEmployee(emp);
+		Contacts cont=new Contacts();
+		CompanyMaster comp=new CompanyMaster();
+		comp.setCompanyName("Company Name");
+		cont.setCompanyMaster(comp);
+		cont.setPrimary(true);
+		Contacts cont1=new Contacts();
+		CompanyMaster comp1=new CompanyMaster();
+		comp1.setCompanyName("Company Name");
+		cont1.setCompanyMaster(comp1);
+		cont1.setPrimary(false);
+		contList.add(cont);
+		contList.add(cont1);
+		lead.setContacts(contList);
+		opt.setLeads(lead);
+		opt.setBudgetAmount("13,3232");
 		List<Opportunity> dashboardData = new ArrayList<>();
+		dashboardData.add(opt);
+		opt2.setEmployee(emp);
+		opt2.setLeads(lead);
+		opt2.setStatus("Qualify");
+		dashboardData.add(opt2);
 		when(auditAwareUtil.isUser()).thenReturn(true);
 		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1477);
 		when(opportunityDaoService.getOpportunityDashboardData()).thenReturn(dashboardData);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.getDashBoardData(1477);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.getDashBoardData(null);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(true, response.getBody().get(ApiResponse.SUCCESS));
 		assertNotNull(response.getBody().get(ApiResponse.DATA));
@@ -533,8 +583,17 @@ class OpportunityServiceImplTest {
 		Integer contactId = 1;
 		QualifyOpportunityDto dto = new QualifyOpportunityDto();
 		dto.setAssignTo(staffId);
+		ContactDto contDto=new ContactDto();
+		contDto.setContactId(contactId);
+		contDto.setClient(true);
+		List<ContactDto> clients=new ArrayList<>();
+		clients.add(contDto);
+		dto.setClients(clients);
 		Leads leads = new Leads();
 		Opportunity opportunity = new Opportunity();
+		EmployeeMaster emp=new EmployeeMaster();
+		emp.setStaffId(staffId);
+		opportunity.setEmployee(emp);
 		List<Contacts> contact = new ArrayList<>();
 		Contacts contact1 = new Contacts();
 		contact1.setPrimary(true);
@@ -581,7 +640,7 @@ class OpportunityServiceImplTest {
         when(opportunityDaoService.getOpportunityDashboardData()).thenReturn(opportunityData);
         ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = opportunityServiceImpl.getOpportunityDataByStatus("All");
         ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity1 = opportunityServiceImpl.getOpportunityDataByStatus("in-pipeline");
-        ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity2 = opportunityServiceImpl.getOpportunityDataByStatus("other");
+        ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity2 = opportunityServiceImpl.getOpportunityDataByStatus(null);
         assertNotNull(responseEntity);
         assertNotNull(responseEntity1);
         assertNotNull(responseEntity2);
@@ -590,6 +649,17 @@ class OpportunityServiceImplTest {
         assertTrue((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
         assertNotNull(responseEntity.getBody().get(ApiResponse.DATA));
     }
+	@Test
+	void testGetOpportunityDataWithNoUser() {
+		when(auditAwareUtil.isAdmin()).thenReturn(false);
+		when(auditAwareUtil.isUser()).thenReturn(false);
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(null);
+		List<Opportunity> opportunityData = Arrays.asList();
+		when(opportunityDaoService.getOpportunityDashboardData()).thenReturn(opportunityData);
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = opportunityServiceImpl.getOpportunityDataByStatus("All");
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+	
+	}
 
 	@Test
 	void testGetOpportunityDataByStatusUserAllStatus() {

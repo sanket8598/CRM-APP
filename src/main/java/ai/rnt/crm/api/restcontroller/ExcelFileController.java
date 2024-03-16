@@ -3,7 +3,6 @@ package ai.rnt.crm.api.restcontroller;
 import static ai.rnt.crm.constants.ApiConstants.DOWNLOAD;
 import static ai.rnt.crm.constants.ApiConstants.EXCEL;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
-import static java.util.Objects.isNull;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_LENGTH;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
@@ -32,7 +31,7 @@ public class ExcelFileController {
 	public ResponseEntity<Resource> downloadFile() throws IOException {
 		String fileName = "excelFormat.xlsx";
 		Resource resource = new ClassPathResource(fileName);
-		if (isNull(resource) || !resource.exists()) {
+		if (!resource.exists()) {
 			log.error("File not exist in the directory. i.e src/main/resource.. {}", fileName);
 			throw new FileNotFoundException("File not found: " + fileName);
 		}
