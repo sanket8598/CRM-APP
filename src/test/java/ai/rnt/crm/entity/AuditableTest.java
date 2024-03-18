@@ -38,6 +38,8 @@ class AuditableTest {
 		Auditable auditable = new Auditable() {
 		};
 		auditable.beforUpdate();
+		auditable.getUpdatedBy();
+		auditable.setUpdatedBy(1375);
 	}
 
 	@Test
