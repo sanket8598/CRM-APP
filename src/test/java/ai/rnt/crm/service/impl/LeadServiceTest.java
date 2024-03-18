@@ -3,7 +3,6 @@ package ai.rnt.crm.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
@@ -40,7 +39,6 @@ import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.entity.Contacts;
-import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.ExcelHeaderMaster;
 import ai.rnt.crm.entity.Leads;
@@ -74,12 +72,9 @@ public class LeadServiceTest {
     @InjectMocks
     private LeadServiceImpl leadService;
     
-   
-    private MultipartFile invalidFile;
 
     @BeforeEach
     void setUp() throws InvalidFormatException, IOException {
-        invalidFile = new MockMultipartFile("data", "filename.xlsx", "text/plain", new byte[0]);
         when(readExcelUtil.readExcelFile(any(), any())).thenReturn(mockValidExcelData());
     }
 
@@ -95,7 +90,7 @@ public class LeadServiceTest {
     
     
     @Test
-    void testUploadExcel_ValidData1() throws Exception {
+    void testUploadExcel_ValidData() throws Exception {
         try (Workbook workbook = new XSSFWorkbook()) {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             workbook.createSheet(); 
