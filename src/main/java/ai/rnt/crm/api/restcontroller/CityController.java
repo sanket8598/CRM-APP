@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(CITY)
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class CityController {
 

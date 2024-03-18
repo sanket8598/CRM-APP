@@ -43,7 +43,6 @@ import lombok.RequiredArgsConstructor;
  */
 @RestController
 @RequestMapping(MEETING)
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class MeetingController {
 

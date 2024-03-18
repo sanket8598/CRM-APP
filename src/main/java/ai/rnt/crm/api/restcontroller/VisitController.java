@@ -43,7 +43,6 @@ import lombok.RequiredArgsConstructor;
  */
 @RestController
 @RequestMapping(VISIT)
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class VisitController {
 
