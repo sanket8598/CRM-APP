@@ -74,6 +74,8 @@ class TaskRemainderUtilTest {
 
 	@Mock
 	LeadService leadService;
+	@Mock
+	EmailUtil emailUtil;
 
 	@Autowired
 	MockMvc mockMvc;
