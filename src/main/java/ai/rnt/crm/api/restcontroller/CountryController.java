@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(COUNTRY)
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class CountryController {
 

@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.mail.internet.AddressException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -43,6 +45,7 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.EmailUtil;
 
 class EmailServiceImplTest {
 
@@ -60,6 +63,8 @@ class EmailServiceImplTest {
 	
 	@Mock
 	private AuditAwareUtil auditAwareUtil;
+	@Mock
+	private EmailUtil emailUtil;
 	
 	@Mock
 	private Leads lead;
@@ -134,10 +139,10 @@ class EmailServiceImplTest {
         assertTrue(response.getBody().containsKey(ApiResponse.SUCCESS));
     }
 	@Test
-	void sendEmailSuccessWithoutAttachments() {
+	void sendEmailSuccessWithoutAttachments() throws AddressException {
 		when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(lead));
 		when(emailDaoService.email(any(Email.class))).thenReturn(email);
-		
+		when(emailUtil.sendEmail(any(Email.class))).thenReturn(true);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = emailServiceImpl.addEmail(emailDto, 1, "SEND");
 		assertEquals(201, response.getStatusCodeValue());
 	}
@@ -282,9 +287,10 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void updateEmail_Success_Send() {
+    void updateEmail_Success_Send() throws AddressException {
         when(emailDaoService.findById(anyInt())).thenReturn(email);
         when(emailDaoService.email(any(Email.class))).thenReturn(email);
+        when(emailUtil.sendEmail(any(Email.class))).thenReturn(true);
         when(attachmentDaoService.addAttachment(any(Attachment.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
         ResponseEntity<EnumMap<ApiResponse, Object>> response = emailServiceImpl.updateEmail(emailDto, "SEND", 1);

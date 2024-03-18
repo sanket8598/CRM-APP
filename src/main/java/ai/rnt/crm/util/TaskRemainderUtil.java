@@ -2,12 +2,6 @@ package ai.rnt.crm.util;
 
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
-import static ai.rnt.crm.util.EmailUtil.sendCallTaskReminderMail;
-import static ai.rnt.crm.util.EmailUtil.sendEmail;
-import static ai.rnt.crm.util.EmailUtil.sendFollowUpLeadReminderMail;
-import static ai.rnt.crm.util.EmailUtil.sendLeadTaskReminderMail;
-import static ai.rnt.crm.util.EmailUtil.sendMeetingTaskReminderMail;
-import static ai.rnt.crm.util.EmailUtil.sendVisitTaskReminderMail;
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
@@ -20,7 +14,6 @@ import java.util.List;
 
 import javax.mail.internet.AddressException;
 
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dao.service.CallDaoService;
@@ -78,7 +71,9 @@ public class TaskRemainderUtil {
 
 	private final LeadService leadService;
 
-	//@Scheduled(cron = "0 * * * * ?") // for every minute.
+	private final EmailUtil emailUtil;
+
+	// @Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
 		log.info("inside the reminderForTask method...{}");
 		try {
@@ -93,10 +88,10 @@ public class TaskRemainderUtil {
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
-					sendCallTaskReminderMail(e, emailId);
+					emailUtil.sendCallTaskReminderMail(e, emailId);
 					callNotification(e.getCallTaskId());
 				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
-					sendCallTaskReminderMail(e, emailId);
+					emailUtil.sendCallTaskReminderMail(e, emailId);
 
 				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					callNotification(e.getCallTaskId());
@@ -108,10 +103,10 @@ public class TaskRemainderUtil {
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
-					sendVisitTaskReminderMail(e, emailId);
+					emailUtil.sendVisitTaskReminderMail(e, emailId);
 					visitNotification(e.getVisitTaskId());
 				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
-					sendVisitTaskReminderMail(e, emailId);
+					emailUtil.sendVisitTaskReminderMail(e, emailId);
 
 				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					visitNotification(e.getVisitTaskId());
@@ -123,10 +118,10 @@ public class TaskRemainderUtil {
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
-					sendMeetingTaskReminderMail(e, emailId);
+					emailUtil.sendMeetingTaskReminderMail(e, emailId);
 					meetingNotification(e.getMeetingTaskId());
 				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
-					sendMeetingTaskReminderMail(e, emailId);
+					emailUtil.sendMeetingTaskReminderMail(e, emailId);
 				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					meetingNotification(e.getMeetingTaskId());
 			});
@@ -137,10 +132,10 @@ public class TaskRemainderUtil {
 				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
-					sendLeadTaskReminderMail(e, emailId);
+					emailUtil.sendLeadTaskReminderMail(e, emailId);
 					leadNotification(e.getLeadTaskId());
 				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
-					sendLeadTaskReminderMail(e, emailId);
+					emailUtil.sendLeadTaskReminderMail(e, emailId);
 				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					leadNotification(e.getLeadTaskId());
 			});
@@ -151,11 +146,11 @@ public class TaskRemainderUtil {
 				if (!e.getEmployee().getStaffId().equals(e.getCreatedBy()))
 					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
 				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
-					sendFollowUpLeadReminderMail(e, emailId);
+					emailUtil.sendFollowUpLeadReminderMail(e, emailId);
 					followUpLeadNotification(e.getLeadId());
 					leadService.updateLeadsStatus(e.getLeadId());
 				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia())) {
-					sendFollowUpLeadReminderMail(e, emailId);
+					emailUtil.sendFollowUpLeadReminderMail(e, emailId);
 					leadService.updateLeadsStatus(e.getLeadId());
 				} else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia())) {
 					followUpLeadNotification(e.getLeadId());
@@ -165,15 +160,15 @@ public class TaskRemainderUtil {
 
 			List<Email> emails = emailDaoService.isScheduledEmails(todayAsDate, time);
 			emails.forEach(email -> {
-					try {
-						if (sendEmail(email)){
-								email.setStatus(SEND);
-								emailDaoService.email(email);
-							}
-					} catch (AddressException e1) {
-						log.error("Got exception while sending the scheduled emails...{}", e1);
+				try {
+					if (emailUtil.sendEmail(email)) {
+						email.setStatus(SEND);
+						emailDaoService.email(email);
 					}
-				});
+				} catch (AddressException e1) {
+					log.error("Got exception while sending the scheduled emails...{}", e1);
+				}
+			});
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);
 			throw new CRMException(e);

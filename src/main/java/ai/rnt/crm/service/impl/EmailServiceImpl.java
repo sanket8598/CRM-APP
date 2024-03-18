@@ -10,7 +10,6 @@ import static ai.rnt.crm.dto_mapper.EmailDtoMapper.TO_EMAIL_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static ai.rnt.crm.util.EmailUtil.sendEmail;
 import static java.lang.Boolean.TRUE;
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
@@ -47,6 +46,7 @@ import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmailService;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,6 +65,7 @@ public class EmailServiceImpl implements EmailService {
 	private final AttachmentDaoService attachmentDaoService;
 	private final EmployeeService employeeService;
 	private final AuditAwareUtil auditAwareUtil;
+	private final EmailUtil emailUtil;
 
 	@Override
 	@Transactional
@@ -100,7 +101,7 @@ public class EmailServiceImpl implements EmailService {
 				result.put(MESSAGE, "Email Added Successfully");
 				result.put(DATA, sendEmail.getMailId());
 			} else if (SEND.equalsIgnoreCase(status)) {
-				boolean sendEmailStatus = sendEmail(sendEmail);
+				boolean sendEmailStatus = emailUtil.sendEmail(sendEmail);
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Saved and Sent Successfully!!");
@@ -282,7 +283,7 @@ public class EmailServiceImpl implements EmailService {
 				result.put(SUCCESS, true);
 				result.put(MESSAGE, "Email Updated Successfully");
 			} else if (SEND.equalsIgnoreCase(status)) {
-				boolean sendEmailStatus = sendEmail(sendEmail);
+				boolean sendEmailStatus = emailUtil.sendEmail(sendEmail);
 				if (saveStatus && sendEmailStatus) {
 					result.put(SUCCESS, true);
 					result.put(MESSAGE, "Email Updated and Sent Successfully!!");

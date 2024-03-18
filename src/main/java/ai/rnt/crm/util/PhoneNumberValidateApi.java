@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import com.google.i18n.phonenumbers.NumberParseException;
@@ -18,11 +20,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@PropertySource("classpath:confidential.properties")
 public class PhoneNumberValidateApi {
 
+	@Value("${rapid.api.host.key}")
+	private String apiKey;
 	private static final String API_KEY_NAME = "X-RapidAPI-Key";
 	private static final String API_HOST_NAME = "X-RapidAPI-Host";
-	private static final String API_KEY_VALUE = "e6d2e92131msh337aa15cbae4edep1a7dfdjsn615e63686049";
 	private static final String API_HOST_VALUE = "phonenumbervalidatefree.p.rapidapi.com";
 	private static final String KEY="Success";
 
@@ -34,7 +38,7 @@ public class PhoneNumberValidateApi {
 			String url = "https://phonenumbervalidatefree.p.rapidapi.com/ts_PhoneNumberValidateTest.jsp?number="
 					+ number + "&country=" + getRegionCode(number);
 
-			HttpResponse<String> response = Unirest.get(url).header(API_KEY_NAME, API_KEY_VALUE)
+			HttpResponse<String> response = Unirest.get(url).header(API_KEY_NAME, apiKey)
 					.header(API_HOST_NAME, API_HOST_VALUE).asString();
 
 			if (response.getStatus() == 200) {

@@ -872,36 +872,41 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file) {
 		log.info("inside the uploadExcel method...");
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		try {
+		try (Workbook workbook = create(file.getInputStream())) {
 			result.put(SUCCESS, false);
-			Workbook workbook = create(file.getInputStream());
 			Sheet sheet = workbook.getSheetAt(0);
 			if (isValidExcel(sheet)) {
 				Map<String, Object> excelData = readExcelUtil.readExcelFile(workbook, sheet);
-				if ((nonNull(excelData) && !excelData.isEmpty())
-						&& (excelData.containsKey(FLAG) && (boolean) excelData.get(FLAG))) {
-					List<LeadDto> leadDtos = (List<LeadDto>) excelData.get(LEAD_DATA);
-					int saveLeadCount = leadDtos.stream().filter(Objects::nonNull).mapToInt(leadDto -> {
-						Contacts contact = buildLeadObj(leadDto);
-						Leads leads = contact.getLead();
-						setAssignToNameForTheLead(leads,
-								nonNull(leadDto.getPseudoName()) && !leadDto.getPseudoName().isEmpty()
-										? leadDto.getPseudoName().split(" ")
-										: auditAwareUtil.getLoggedInUserName().split(" "));
-						leads.setPseudoName(null);// because we added the assign to person name from excel data object
-						if (checkDuplicateLead(leadDaoService.getAllLeads(), leads))
-							return 0;
-						return nonNull(contactDaoService.addContact(contact)) ? 1 : 0;
-					}).sum();
-					int duplicateLead = leadDtos.size() - saveLeadCount;
-					result.put(SUCCESS, saveLeadCount > 0);
-					result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
-					if (duplicateLead == 0 && saveLeadCount == 0)
-						result.put(MESSAGE, "No Lead Found To Add !!");
-					return new ResponseEntity<>(result, CREATED);
-				} else {
-					result.put(MESSAGE, excelData.get(MSG));
+				if (isNull(excelData) || excelData.isEmpty()) {
+					result.put(MESSAGE, "Excel Contains No Data!!");
 					return new ResponseEntity<>(result, BAD_REQUEST);
+				} else {
+					if ((nonNull(excelData) && !excelData.isEmpty() && excelData.containsKey(FLAG)
+							&& (boolean) excelData.get(FLAG))) {
+						List<LeadDto> leadDtos = (List<LeadDto>) excelData.get(LEAD_DATA);
+						int saveLeadCount = leadDtos.stream().filter(Objects::nonNull).mapToInt(leadDto -> {
+							Contacts contact = buildLeadObj(leadDto);
+							Leads leads = contact.getLead();
+							setAssignToNameForTheLead(leads,
+									nonNull(leadDto.getPseudoName()) && !leadDto.getPseudoName().isEmpty()
+											? leadDto.getPseudoName().split(" ")
+											: auditAwareUtil.getLoggedInUserName().split(" "));
+							leads.setPseudoName(null);// because we added the assign to person name from excel data
+														// object
+							if (checkDuplicateLead(leadDaoService.getAllLeads(), leads))
+								return 0;
+							return nonNull(contactDaoService.addContact(contact)) ? 1 : 0;
+						}).sum();
+						int duplicateLead = leadDtos.size() - saveLeadCount;
+						result.put(SUCCESS, saveLeadCount > 0);
+						result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
+						if (duplicateLead == 0 && saveLeadCount == 0)
+							result.put(MESSAGE, "No Lead Found To Add !!");
+						return new ResponseEntity<>(result, CREATED);
+					} else {
+						result.put(MESSAGE, excelData.get(MSG));
+						return new ResponseEntity<>(result, BAD_REQUEST);
+					}
 				}
 			} else {
 				result.put(MESSAGE, "Invalid Excel Format!!");

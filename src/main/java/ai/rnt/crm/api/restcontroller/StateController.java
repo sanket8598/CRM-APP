@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(STATE)
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class StateController {
 

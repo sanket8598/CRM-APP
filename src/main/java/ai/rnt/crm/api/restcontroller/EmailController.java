@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping(EMAIL)
-@CrossOrigin("*")
 @RequiredArgsConstructor
 public class EmailController {
 

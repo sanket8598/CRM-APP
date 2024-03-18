@@ -83,8 +83,6 @@ public class ReadExcelUtil {
 		} catch (Exception e) {
 			log.info("Got Exception while reading data from excel file..{}", e.getMessage());
 			throw new CRMException(e);
-		} finally {
-			workbook.close();
 		}
 	}
 
