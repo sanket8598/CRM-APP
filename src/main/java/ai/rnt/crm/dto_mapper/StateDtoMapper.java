@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto_mapper;
 
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Collection;
 import java.util.List;
@@ -10,12 +11,10 @@ import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.StateDto;
 import ai.rnt.crm.entity.StateMaster;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = PRIVATE)
 public class StateDtoMapper {
-
-	StateDtoMapper() {
-
-	}
 
 	/**
 	 * This function will convert StateDto into optional State Entity. <b>This

@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto_mapper;
 
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,12 +12,10 @@ import java.util.stream.Collectors;
 import ai.rnt.crm.dto.GetMeetingTaskDto;
 import ai.rnt.crm.dto.MeetingTaskDto;
 import ai.rnt.crm.entity.MeetingTask;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = PRIVATE)
 public class MeetingTaskDtoMapper {
-
-	private MeetingTaskDtoMapper() {
-
-	}
 
 	/**
 	 * This function will convert MeetingTaskDto into optional MeetingTask Entity.
