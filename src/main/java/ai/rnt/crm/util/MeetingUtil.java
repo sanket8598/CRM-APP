@@ -37,6 +37,8 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dto.MeetingAttachmentsDto;
@@ -53,11 +55,16 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@PropertySource("classpath:confidential.properties")
 public class MeetingUtil {
 
+	@Value("${email.userName}")
+	private String userName;
+
+	@Value("${email.password}")
+	private String password;
+
 	private static final Properties PROPERTIES = new Properties();
-	private static final String USERNAME = "info@rnt.ai"; // change it 
-	private static final String PASSWORD = "Rnt@2030"; // change it
 	private static final String HOST = "smtp.zoho.com";
 
 	static {
@@ -71,7 +78,7 @@ public class MeetingUtil {
 		log.info("inside the scheduleMeetingInOutlook method...{}");
 		try {
 			Message msg = new MimeMessage(getSession());
-			msg.setFrom(new InternetAddress(USERNAME));
+			msg.setFrom(new InternetAddress(userName));
 			((MimePart) msg).addHeaderLine("method=REQUEST");
 			((MimePart) msg).addHeaderLine("charset=UTF-8");
 			((MimePart) msg).addHeaderLine("component=VEVENT");
@@ -113,7 +120,7 @@ public class MeetingUtil {
 				+ "METHOD:REQUEST\n" + "BEGIN:VEVENT\n" + "DTSTAMP:" + dtStamp + "\n" + extractDstartDend(dto) + "UID:"
 				+ randomUUID().toString() + "\n" + "DESCRIPTION:" + dto.getDescription() + "\n"
 				+ "X-ALT-DESC;FMTTYPE=text/html:" + dto.getDescription() + "\n" + "SUMMARY:" + dto.getMeetingTitle()
-				+ "\n" + "ORGANIZER:MAILTO:" + USERNAME + "\n"
+				+ "\n" + "ORGANIZER:MAILTO:" + userName + "\n"
 				+ format("ATTENDEE;CN=%s;RSVP=TRUE:mailto:%s", dto.getParticipates().stream().collect(joining(",")),
 						"\n" + "X-MICROSOFT-CDO-BUSYSTATUS:FREE" + "\n" + "BEGIN:VALARM\n" + "ACTION:DISPLAY\n"
 								+ "DESCRIPTION:Reminder\n" + "TRIGGER:-P1D\n" + "END:VALARM\n" + "END:VEVENT\n"
@@ -135,11 +142,11 @@ public class MeetingUtil {
 		return res.toString();
 	}
 
-	private static Session getSession() {
+	private Session getSession() {
 		return Session.getInstance(PROPERTIES, new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(USERNAME, PASSWORD);
+				return new PasswordAuthentication(userName, password);
 			}
 		});
 	}
