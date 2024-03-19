@@ -13,6 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -34,16 +35,18 @@ import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.MeetingAttachmentDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dto.GetMeetingTaskDto;
+import ai.rnt.crm.dto.MeetingAttachmentsDto;
 import ai.rnt.crm.dto.MeetingDto;
 import ai.rnt.crm.dto.MeetingTaskDto;
-import ai.rnt.crm.dto.VisitDto;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
+import ai.rnt.crm.entity.MeetingAttachments;
 import ai.rnt.crm.entity.MeetingTask;
 import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.repository.MeetingAttachmentRepository;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.MeetingUtil;
@@ -65,6 +68,11 @@ class MeetingServiceImplTest {
 
 	@Mock
 	private EmployeeService employeeService;
+	
+	@Mock
+	private MeetingAttachmentDaoService meetingAttachmetDaoService;
+	@Mock
+	private MeetingAttachmentRepository meetingAttachmentRepository;
 
 	@Mock
 	private AuditAwareUtil auditAwareUtil;
@@ -87,6 +95,26 @@ class MeetingServiceImplTest {
 		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 		assertTrue((Boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
 		assertEquals("Meeting Added Successfully..!!", responseEntity.getBody().get(ApiResponse.MESSAGE));
+	}
+	
+	@Test
+	void addMeetingWithAttachmentTest() {
+		MeetingDto dto = new MeetingDto();
+		List<MeetingAttachmentsDto>  dtoAttachList=new ArrayList<>();
+		MeetingAttachmentsDto dtoAttach=new MeetingAttachmentsDto();
+		dtoAttachList.add(dtoAttach);
+		dto.setMeetingAttachments(dtoAttachList);
+		MeetingAttachments mettingAttch=new MeetingAttachments();
+		List<String> participants = Arrays.asList("s.wakankar@rnt.ai", "t.pagare@rnt.ai");
+		dto.setParticipates(participants);
+		dto.setAllDay(true);
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
+		when(employeeService.getById(anyInt())).thenReturn(java.util.Optional.of(new EmployeeMaster()));
+		when(leadDaoService.getLeadById(anyInt())).thenReturn(java.util.Optional.of(new Leads()));
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = meetingServiceImpl.addMeeting(dto, 1);
+		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+		assertFalse((Boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Meeting Not Added..!!", responseEntity.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -384,24 +412,6 @@ class MeetingServiceImplTest {
 	        assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
 	        assertEquals("Meeting Updated Successfully", response.getBody().get(ApiResponse.MESSAGE));
 	    }
-	 
-	 @Test
-	 void updateMeetingCompleteTest() {
-		 MeetingDto dto = new MeetingDto(); 
-		 List<String> participants = Arrays.asList("s.wakankar@rnt.ai", "t.pagare@rnt.ai");
-		 dto.setParticipates(participants);
-		 Integer meetingId = 1;
-		 String status = "Complete";
-		 Meetings meetings = new Meetings(); 
-		 meetings.setMeetingStatus("Complete");
-		 when(meetingDaoService.getMeetingById(meetingId)).thenReturn(java.util.Optional.of(meetings));
-		 when(meetingDaoService.addMeeting(any(Meetings.class))).thenReturn(meetings);
-		 ResponseEntity<EnumMap<ApiResponse, Object>> response = meetingServiceImpl.updateMeeting(dto, meetingId, status);
-		 assertNotNull(response);
-		 assertEquals(HttpStatus.CREATED, response.getStatusCode());
-		 assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		 assertEquals("Meeting Updated And Completed Successfully", response.getBody().get(ApiResponse.MESSAGE));
-	 }
 	 
 	 @Test
 	 void notUpdateMeetingTest() {

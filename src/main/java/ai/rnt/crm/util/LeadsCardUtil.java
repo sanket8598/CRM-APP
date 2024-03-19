@@ -35,7 +35,7 @@ public class LeadsCardUtil {
 			Matcher firstNameMatcher = pattern.matcher(fName);
 			Matcher lastNameMatcher = pattern.matcher(lName);
 			if (firstNameMatcher.find() && lastNameMatcher.find())
-				return nonNull(firstNameMatcher.group() + lastNameMatcher.group())
+				return (nonNull(firstNameMatcher.group()) && nonNull(lastNameMatcher.group()))
 						? (firstNameMatcher.group() + lastNameMatcher.group()).toUpperCase()
 						: null;
 			return null;
@@ -57,11 +57,12 @@ public class LeadsCardUtil {
 				firstNameMatcher = pattern.matcher(result[0]);
 				lastNameMatcher = pattern.matcher(result[1]);
 				if (firstNameMatcher.find() && lastNameMatcher.find())
-					return (nonNull(firstNameMatcher.group() + lastNameMatcher.group())
-							? firstNameMatcher.group() + lastNameMatcher.group().toUpperCase()
-							: null);
+					return (nonNull(firstNameMatcher.group()) && nonNull(lastNameMatcher.group()))
+							? (firstNameMatcher.group() + lastNameMatcher.group()).toUpperCase()
+							: null;
 			} else {
-				firstNameMatcher = pattern.matcher(fullName.charAt(0) + "");
+				Character fname=(nonNull(fullName) && !fullName.isEmpty()) ? fullName.charAt(0):null;
+				firstNameMatcher = pattern.matcher(fname + "");
 				if (firstNameMatcher.find())
 					return (nonNull(firstNameMatcher.group()) ? firstNameMatcher.group().toUpperCase() : null);
 			}

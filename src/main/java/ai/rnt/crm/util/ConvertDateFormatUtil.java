@@ -10,6 +10,7 @@ import static java.util.Objects.isNull;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -38,26 +39,42 @@ public class ConvertDateFormatUtil {
 	 * @param toConvertDate
 	 * @return
 	 */
+	private static final ThreadLocal<SimpleDateFormat> DEFAULT_UTIL_DATE_FORMAT_THREAD_LOCAL = ThreadLocal
+			.withInitial(() -> new SimpleDateFormat(DEFAULT_UTIL_DATE_FORMAT));
+	private static final ThreadLocal<SimpleDateFormat> DATE_TIME_WITH_AM_AND_PM_THREAD_LOCAL = ThreadLocal
+			.withInitial(() -> new SimpleDateFormat(DATE_TIME_WITH_AM_AND_PM));
+	private static final ThreadLocal<SimpleDateFormat> DD_MMM_YYYY_THREAD_LOCAL = ThreadLocal
+			.withInitial(() -> new SimpleDateFormat(DD_MMM_YYYY));
+	private static final ThreadLocal<SimpleDateFormat> YYYY_MM_DD_THREAD_LOCAL = ThreadLocal
+			.withInitial(() -> new SimpleDateFormat(YYYY_MM_DD));
 
 	public static String convertDate(LocalDateTime toConvertDate) {
 		log.info("inside the convertDate method...{}", toConvertDate);
 		try {
 			return isNull(toConvertDate) ? null
-					: DATE_TIME_WITH_AM_AND_PM.format(DEFAULT_UTIL_DATE_FORMAT
+					: DATE_TIME_WITH_AM_AND_PM_THREAD_LOCAL.get().format(DEFAULT_UTIL_DATE_FORMAT_THREAD_LOCAL.get()
 							.parse(from(toConvertDate.atZone(systemDefault()).toInstant()).toString()));
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format:", e.getMessage());
 			throw new CRMException("error while date conversion: " + toConvertDate);
+		} finally {
+			DEFAULT_UTIL_DATE_FORMAT_THREAD_LOCAL.remove();
+			DATE_TIME_WITH_AM_AND_PM_THREAD_LOCAL.remove();
 		}
 	}
 
 	public static String convertDateUtilDate(Date date) throws ParseException {
 		log.info("inside the convertDateUtilDate method...{}", date);
 		try {
-			return isNull(date) ? null : DD_MMM_YYYY.format(DEFAULT_UTIL_DATE_FORMAT.parse(date.toString()));
+			return isNull(date) ? null
+					: DD_MMM_YYYY_THREAD_LOCAL.get()
+							.format(DEFAULT_UTIL_DATE_FORMAT_THREAD_LOCAL.get().parse(date.toString()));
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format in convertDateUtilDate:", e.getMessage());
 			throw new CRMException("error while date convertDateUtilDate: " + date);
+		} finally {
+			DD_MMM_YYYY_THREAD_LOCAL.remove();
+			DEFAULT_UTIL_DATE_FORMAT_THREAD_LOCAL.remove();
 		}
 	}
 
@@ -75,12 +92,19 @@ public class ConvertDateFormatUtil {
 	public static String convertDateDateWithTime(Date date, String endTime) {
 		log.info("inside the convertDateDateWithTime method...{} {}", date, endTime);
 		try {
-			return isNull(date) ? null : DD_MMM_YYYY.format(YYYY_MM_DD.parse(date.toString())) + " " + endTime;
+			return isNull(date) ? null
+					: DD_MMM_YYYY_THREAD_LOCAL.get().format(YYYY_MM_DD_THREAD_LOCAL.get().parse(date.toString())) + " "
+							+ endTime;
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("Got Excetion while converting date format in convertDateDateWithTime:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime: " + date);
+		} finally {
+			DD_MMM_YYYY_THREAD_LOCAL.remove();
+			YYYY_MM_DD_THREAD_LOCAL.remove();
 		}
 	}
+
 	/**
 	 * This method is used to convert the given date(yyyy-MM-dd) to the format
 	 * (dd-MMM-yyyy) with give String time added to it. e.g 2023-12-04 is converted
@@ -95,12 +119,18 @@ public class ConvertDateFormatUtil {
 	public static String convertDateDateWithTime(LocalDate date, String endTime) {
 		log.info("inside the convertDateDateWithTime method...{} {}", date, endTime);
 		try {
-			return isNull(date) ? null : DD_MMM_YYYY.format(YYYY_MM_DD.parse(date.toString())) + " " + endTime;
+			return isNull(date) ? null
+					: DD_MMM_YYYY_THREAD_LOCAL.get().format(YYYY_MM_DD_THREAD_LOCAL.get().parse(date.toString())) + " "
+							+ endTime;
 		} catch (Exception e) {
 			log.error("Got Excetion while converting local date format in convertDateDateWithTime:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime for local date: " + date);
+		} finally {
+			DD_MMM_YYYY_THREAD_LOCAL.remove();
+			YYYY_MM_DD_THREAD_LOCAL.remove();
 		}
 	}
+
 	/**
 	 * This method is used to convert the given date(yyyy-MM-dd) to the format
 	 * (dd-MMM-yyyy) with give String time added to it. e.g 2023-12-04 is converted
@@ -115,10 +145,14 @@ public class ConvertDateFormatUtil {
 	public static String convertLocalDate(LocalDate date) {
 		log.info("inside the convertLocalDate method...{} {}", date);
 		try {
-			return isNull(date) ? null : DD_MMM_YYYY.format(YYYY_MM_DD.parse(date.toString()));
+			return isNull(date) ? null
+					: DD_MMM_YYYY_THREAD_LOCAL.get().format(YYYY_MM_DD_THREAD_LOCAL.get().parse(date.toString()));
 		} catch (Exception e) {
 			log.error("Got Excetion while converting local date format in convertLocalDate:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime for local date: " + date);
+		} finally {
+			DD_MMM_YYYY_THREAD_LOCAL.remove();
+			YYYY_MM_DD_THREAD_LOCAL.remove();
 		}
 	}
 }
