@@ -57,9 +57,6 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format:", e.getMessage());
 			throw new CRMException("error while date conversion: " + toConvertDate);
-		} finally {
-			DEFAULT_UTIL_DATE_FORMAT_THREAD_LOCAL.remove();
-			DATE_TIME_WITH_AM_AND_PM_THREAD_LOCAL.remove();
 		}
 	}
 
@@ -72,9 +69,6 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format in convertDateUtilDate:", e.getMessage());
 			throw new CRMException("error while date convertDateUtilDate: " + date);
-		} finally {
-			DD_MMM_YYYY_THREAD_LOCAL.remove();
-			DEFAULT_UTIL_DATE_FORMAT_THREAD_LOCAL.remove();
 		}
 	}
 
@@ -96,12 +90,8 @@ public class ConvertDateFormatUtil {
 					: DD_MMM_YYYY_THREAD_LOCAL.get().format(YYYY_MM_DD_THREAD_LOCAL.get().parse(date.toString())) + " "
 							+ endTime;
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error("Got Excetion while converting date format in convertDateDateWithTime:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime: " + date);
-		} finally {
-			DD_MMM_YYYY_THREAD_LOCAL.remove();
-			YYYY_MM_DD_THREAD_LOCAL.remove();
 		}
 	}
 
@@ -125,9 +115,6 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting local date format in convertDateDateWithTime:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime for local date: " + date);
-		} finally {
-			DD_MMM_YYYY_THREAD_LOCAL.remove();
-			YYYY_MM_DD_THREAD_LOCAL.remove();
 		}
 	}
 
@@ -150,9 +137,6 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting local date format in convertLocalDate:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime for local date: " + date);
-		} finally {
-			DD_MMM_YYYY_THREAD_LOCAL.remove();
-			YYYY_MM_DD_THREAD_LOCAL.remove();
 		}
 	}
 }
