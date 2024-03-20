@@ -3,6 +3,8 @@ package ai.rnt.crm.util;
 import static ai.rnt.crm.constants.DateFormatterConstant.DATE_TIME_WITH_AM_AND_PM;
 import static ai.rnt.crm.constants.DateFormatterConstant.DD_MMM_YYYY;
 import static ai.rnt.crm.constants.DateFormatterConstant.DEFAULT_UTIL_DATE_FORMAT;
+import static ai.rnt.crm.constants.DateFormatterConstant.TIME_12_HRS;
+import static ai.rnt.crm.constants.DateFormatterConstant.TIME_24_HRS;
 import static ai.rnt.crm.constants.DateFormatterConstant.YYYY_MM_DD;
 import static java.time.ZoneId.systemDefault;
 import static java.util.Date.from;
@@ -47,6 +49,10 @@ public class ConvertDateFormatUtil {
 			.withInitial(() -> new SimpleDateFormat(DD_MMM_YYYY));
 	private static final ThreadLocal<SimpleDateFormat> YYYY_MM_DD_THREAD_LOCAL = ThreadLocal
 			.withInitial(() -> new SimpleDateFormat(YYYY_MM_DD));
+	private static final ThreadLocal<SimpleDateFormat> TIME_24_HRS_THREAD_LOCAL = ThreadLocal
+			.withInitial(() -> new SimpleDateFormat(TIME_24_HRS));
+	private static final ThreadLocal<SimpleDateFormat> TIME_12_HRS_THREAD_LOCAL = ThreadLocal
+			.withInitial(() -> new SimpleDateFormat(TIME_12_HRS));
 
 	public static String convertDate(LocalDateTime toConvertDate) {
 		log.info("inside the convertDate method...{}", toConvertDate);
@@ -57,7 +63,7 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format:", e.getMessage());
 			throw new CRMException("error while date conversion: " + toConvertDate);
-		}finally {
+		} finally {
 			DEFAULT_UTIL_DATE_FORMAT_THREAD_LOCAL.remove();
 			DATE_TIME_WITH_AM_AND_PM_THREAD_LOCAL.remove();
 		}
@@ -72,7 +78,7 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format in convertDateUtilDate:", e.getMessage());
 			throw new CRMException("error while date convertDateUtilDate: " + date);
-		}finally {
+		} finally {
 			DEFAULT_UTIL_DATE_FORMAT_THREAD_LOCAL.remove();
 			DD_MMM_YYYY_THREAD_LOCAL.remove();
 		}
@@ -98,7 +104,7 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting date format in convertDateDateWithTime:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime: " + date);
-		}finally {
+		} finally {
 			YYYY_MM_DD_THREAD_LOCAL.remove();
 			DD_MMM_YYYY_THREAD_LOCAL.remove();
 		}
@@ -124,7 +130,7 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting local date format in convertDateDateWithTime:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime for local date: " + date);
-		}finally {
+		} finally {
 			YYYY_MM_DD_THREAD_LOCAL.remove();
 			DD_MMM_YYYY_THREAD_LOCAL.remove();
 		}
@@ -149,9 +155,31 @@ public class ConvertDateFormatUtil {
 		} catch (Exception e) {
 			log.error("Got Excetion while converting local date format in convertLocalDate:", e.getMessage());
 			throw new CRMException("error while date convertDateDateWithTime for local date: " + date);
-		}finally {
+		} finally {
 			YYYY_MM_DD_THREAD_LOCAL.remove();
 			DD_MMM_YYYY_THREAD_LOCAL.remove();
+		}
+	}
+
+	/**
+	 * This method is used to convert the given String time of 24 hrs format to the
+	 * 12 hrs format
+	 * 
+	 * @author Sanket Wakankar
+	 * @version 1.0
+	 * @since 08-02-2024.
+	 * @param time in String
+	 * @return String
+	 */
+	public static String convertTimeTo12Hours(String time) {
+		log.info("inside the convertTimeTo12Hours method...{} {}", time);
+		try {
+			return TIME_12_HRS_THREAD_LOCAL.get().format(TIME_24_HRS_THREAD_LOCAL.get().parse(time));
+		} catch (Exception e) {
+			return time;
+		} finally {
+			TIME_24_HRS_THREAD_LOCAL.remove();
+			TIME_12_HRS_THREAD_LOCAL.remove();
 		}
 	}
 }

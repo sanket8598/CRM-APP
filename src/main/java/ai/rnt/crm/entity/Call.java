@@ -39,7 +39,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "crm_call")
 @Where(clause = "deleted_by is null")
-public class Call extends Auditable {
+public class Call extends CommonField {
 
 	private static final long serialVersionUID = 1L;
 
