@@ -1,52 +1,17 @@
 package ai.rnt.crm.dto;
 
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
-import static javax.persistence.TemporalType.DATE;
-
-import java.time.LocalDate;
-
-import javax.persistence.Temporal;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class GetCallTaskDto {
-
+public class GetCallTaskDto extends GetTaskDto{
+	
+	private static final long serialVersionUID = 89098244403103795L;
+	
 	private Integer callTaskId;
-
-	private String subject;
-
-	private String description;
-
-	private String status;
-
-	private String priority;
-
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private LocalDate dueDate;
-
-	private String dueTime;
-
-	@Temporal(DATE)
-	private LocalDate updateDueDate;
-
-	private String dueTime12Hours;
-
-	private boolean remainderOn;
-
-	private String remainderVia;
-
-	private String remainderDueAt;
-
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private LocalDate remainderDueOn;
-
-	@Temporal(DATE)
-	private LocalDate updatedRemainderDueOn;
 
 	public String getCallTaskDueDate() {
 		return convertDateDateWithTime(getDueDate(), getDueTime12Hours());

@@ -1,13 +1,6 @@
 package ai.rnt.crm.dto.opportunity;
 
-import java.time.LocalDate;
-
-import javax.validation.constraints.FutureOrPresent;
-import javax.validation.constraints.NotNull;
-
-import ai.rnt.crm.entity.EmployeeMaster;
-import ai.rnt.crm.validation.ValidTaskPriority;
-import ai.rnt.crm.validation.ValidTaskStatus;
+import ai.rnt.crm.dto.EntityTaskDto;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,34 +12,10 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class OpportunityTaskDto {
+public class OpportunityTaskDto extends EntityTaskDto{
 
+	private static final long serialVersionUID = 8492122295506917268L;
+	
 	private Integer optyTaskId;
 
-	private String subject;
-
-	@ValidTaskStatus(message = "Please Enter Valid Task Status!!")
-	private String status;
-
-	@ValidTaskPriority(message = "Please Enter Valid Task Priority!!")
-	private String priority;
-
-	@NotNull(message = "Due date should not be null!!")
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
-	private LocalDate dueDate;
-
-	private String dueTime;
-
-	private String description;
-
-	private boolean remainderOn;
-
-	private String remainderVia;
-
-	private String remainderDueAt;
-
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
-	private LocalDate remainderDueOn;
-
-	private EmployeeMaster assignTo;
 }

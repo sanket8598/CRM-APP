@@ -2,6 +2,7 @@ package ai.rnt.crm.util;
 
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static java.util.Optional.ofNullable;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Optional;
 
@@ -17,9 +18,11 @@ import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.StateMaster;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@NoArgsConstructor(access = PRIVATE)
 public class CompanyUtil {
 
 	public static void addUpdateCompanyDetails(CityDaoService cityDaoService, StateDaoService stateDaoService,
@@ -34,32 +37,8 @@ public class CompanyUtil {
 			CompanyMaster companyMaster = TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
 					.orElseThrow(ResourceNotFoundException::new);
 			companyMaster.setCompanyWebsite(dto.getCompanyWebsite());
-			if (findByCountryName.isPresent())
-				findByCountryName.ifPresent(companyMaster::setCountry);
-			else {
-				CountryMaster country = new CountryMaster();
-				country.setCountry(dto.getCountry());
-				Optional<CountryMaster> newFindByCountryName = ofNullable(countryDaoService.addCountry(country));
-				newFindByCountryName.ifPresent(companyMaster::setCountry);
-			}
-			if (findBystate.isPresent())
-				findBystate.ifPresent(companyMaster::setState);
-			else {
-				StateMaster state = new StateMaster();
-				state.setState(dto.getState());
-				Optional<StateMaster> newFindBystate = ofNullable(stateDaoService.addState(state));
-				newFindBystate.ifPresent(companyMaster::setState);
-			}
-			if (existCityByName.isPresent())
-				existCityByName.ifPresent(companyMaster::setCity);
-			else {
-				CityMaster city = new CityMaster();
-				city.setCity(dto.getCity());
-				Optional<CityMaster> newExistCityByName = ofNullable(cityDaoService.addCity(city));
-				newExistCityByName.ifPresent(companyMaster::setCity);
-			}
-			companyMaster.setZipCode(dto.getZipCode());
-			companyMaster.setAddressLineOne(dto.getAddressLineOne());
+			setCompDetails(findByCountryName, findBystate, existCityByName, dto, companyMaster,
+					cityDaoService, stateDaoService, countryDaoService);
 			contact.setCompanyMaster(companyMaster);
 			companyMasterDaoService.save(companyMaster)
 					.ifPresent(comp -> TO_COMPANY.apply(comp).ifPresent(contact::setCompanyMaster));
@@ -76,27 +55,42 @@ public class CompanyUtil {
 				Optional<CountryMaster> newFindByCountryName = ofNullable(countryDaoService.addCountry(country));
 				newFindByCountryName.ifPresent(companyMaster::setCountry);
 			}
-			if (findBystate.isPresent())
-				findBystate.ifPresent(companyMaster::setState);
-			else {
-				StateMaster state = new StateMaster();
-				state.setState(dto.getState());
-				Optional<StateMaster> newFindBystate = ofNullable(stateDaoService.addState(state));
-				newFindBystate.ifPresent(companyMaster::setState);
-			}
-			if (existCityByName.isPresent())
-				existCityByName.ifPresent(companyMaster::setCity);
-			else {
-				CityMaster city = new CityMaster();
-				city.setCity(dto.getCity());
-				Optional<CityMaster> newExistCityByName = ofNullable(cityDaoService.addCity(city));
-				newExistCityByName.ifPresent(companyMaster::setCity);
-			}
-			companyMaster.setZipCode(dto.getZipCode());
-			companyMaster.setAddressLineOne(dto.getAddressLineOne());
+			setCompDetails(findByCountryName, findBystate, existCityByName, dto, companyMaster,
+					cityDaoService, stateDaoService, countryDaoService);
 			companyMasterDaoService.save(companyMaster)
-			.ifPresent(comp -> TO_COMPANY.apply(comp).ifPresent(contact::setCompanyMaster));
+					.ifPresent(comp -> TO_COMPANY.apply(comp).ifPresent(contact::setCompanyMaster));
 		}
 	}
 
+	private static void setCompDetails(Optional<CountryMaster> findByCountryName,
+			Optional<StateMaster> findBystate, Optional<CityMaster> existCityByName, UpdateLeadDto dto,
+			CompanyMaster companyMaster, CityDaoService cityDaoService, StateDaoService stateDaoService,
+			CountryDaoService countryDaoService) {
+		if (findByCountryName.isPresent())
+			findByCountryName.ifPresent(companyMaster::setCountry);
+		else {
+			CountryMaster country = new CountryMaster();
+			country.setCountry(dto.getCountry());
+			Optional<CountryMaster> newFindByCountryName = ofNullable(countryDaoService.addCountry(country));
+			newFindByCountryName.ifPresent(companyMaster::setCountry);
+		}
+		if (findBystate.isPresent())
+			findBystate.ifPresent(companyMaster::setState);
+		else {
+			StateMaster state = new StateMaster();
+			state.setState(dto.getState());
+			Optional<StateMaster> newFindBystate = ofNullable(stateDaoService.addState(state));
+			newFindBystate.ifPresent(companyMaster::setState);
+		}
+		if (existCityByName.isPresent())
+			existCityByName.ifPresent(companyMaster::setCity);
+		else {
+			CityMaster city = new CityMaster();
+			city.setCity(dto.getCity());
+			Optional<CityMaster> newExistCityByName = ofNullable(cityDaoService.addCity(city));
+			newExistCityByName.ifPresent(companyMaster::setCity);
+		}
+		companyMaster.setZipCode(dto.getZipCode());
+		companyMaster.setAddressLineOne(dto.getAddressLineOne());
+	}
 }
