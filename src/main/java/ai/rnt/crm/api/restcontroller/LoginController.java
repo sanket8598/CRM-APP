@@ -12,7 +12,6 @@ import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.CRMConstants.TOKEN;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_ADMIN_ACCESS;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
-import static ai.rnt.crm.util.Sha1Encryptor.encryptThisString;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -28,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -54,6 +55,7 @@ import ai.rnt.crm.security.config.CustomUserDetails;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.JwtTokenDecoder;
 import ai.rnt.crm.util.PhoneNumberValidateApi;
+import ai.rnt.crm.util.Sha1Encryptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,7 +64,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@PropertySource("classpath:confidential.properties")
 public class LoginController {
+
+	@Value("${pass.enc.algo}")
+	private String algo;
 
 	private final AuthenticationManager authenticationManager;
 
@@ -78,12 +84,13 @@ public class LoginController {
 		log.info("calling login api...");
 		try {
 			if (!jwtAuthRequest.isFromCorp())
-				jwtAuthRequest.setPassword(encryptThisString(jwtAuthRequest.getPassword()));
+				jwtAuthRequest.setPassword(new Sha1Encryptor(algo).encryptThisString(jwtAuthRequest.getPassword()));
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
 			String token = helper.generateToken(customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()));
 			if (nonNull(token))
-				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).csrfToken((CsrfToken) request.getAttribute(CsrfToken.class.getName())).build(), OK);
+				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token)
+						.csrfToken((CsrfToken) request.getAttribute(CsrfToken.class.getName())).build(), OK);
 			return new ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(), NO_CONTENT);
 		} catch (Exception e) {
 			log.error("Error Occured while login.. {}", e.getLocalizedMessage());
@@ -121,7 +128,7 @@ public class LoginController {
 			@PathVariable(name = "email", required = false) String mail) {
 		return employeeService.getAdminAndUser(mail);
 	}
-	
+
 	@GetMapping("/users")
 	@PreAuthorize(CHECK_ADMIN_ACCESS)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getCRMUser() {
