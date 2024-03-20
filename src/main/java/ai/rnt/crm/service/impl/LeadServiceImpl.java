@@ -18,30 +18,23 @@ import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.CRMConstants.TASK;
 import static ai.rnt.crm.constants.CRMConstants.TIMELINE;
 import static ai.rnt.crm.constants.CRMConstants.UPNEXT_DATA;
-import static ai.rnt.crm.constants.DateFormatterConstant.DATE_TIME_WITH_AM_OR_PM;
 import static ai.rnt.crm.constants.ExcelConstants.FLAG;
 import static ai.rnt.crm.constants.ExcelConstants.LEAD_DATA;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
 import static ai.rnt.crm.constants.MessageConstants.MSG;
-import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
-import static ai.rnt.crm.constants.StatusConstants.CALL;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_DISQUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.DISQUALIFIED_LEAD;
-import static ai.rnt.crm.constants.StatusConstants.EMAIL;
 import static ai.rnt.crm.constants.StatusConstants.FOLLOW_UP;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
-import static ai.rnt.crm.constants.StatusConstants.MEETING;
 import static ai.rnt.crm.constants.StatusConstants.OPEN;
 import static ai.rnt.crm.constants.StatusConstants.OPEN_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.QUALIFIED_LEAD;
-import static ai.rnt.crm.constants.StatusConstants.VISIT;
-import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
 import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
@@ -55,54 +48,33 @@ import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_QUALIFY_LEAD;
-import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_CALL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_EMAIL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_MEETING;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_VISIT;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.ASSIGNED_TO_FILTER;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.CLOSE_LEAD_FILTER;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.DISQUALIFIED_LEAD_FILTER;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.OPEN_LEAD_FILTER;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.QUALIFIED_LEAD_FILTER;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_CALL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_EMAIL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_MEETING;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_VISIT;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_CALL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_MEETING;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_VISIT;
-import static ai.rnt.crm.functional.predicates.OverDueActivity.OVER_DUE;
+import static ai.rnt.crm.util.CommonUtil.getActivityData;
 import static ai.rnt.crm.util.CommonUtil.getTaskDataMap;
+import static ai.rnt.crm.util.CommonUtil.getTimelineData;
+import static ai.rnt.crm.util.CommonUtil.getUpnextData;
 import static ai.rnt.crm.util.CommonUtil.setDomainToLead;
 import static ai.rnt.crm.util.CommonUtil.setLeadSourceToLead;
 import static ai.rnt.crm.util.CommonUtil.setServiceFallToLead;
 import static ai.rnt.crm.util.CommonUtil.upNextActivities;
 import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
-import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
-import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
-import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
 import static java.lang.Boolean.TRUE;
-import static java.time.LocalDateTime.now;
-import static java.time.LocalDateTime.parse;
-import static java.time.ZoneId.of;
-import static java.time.ZoneId.systemDefault;
-import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Map.Entry.comparingByKey;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.poi.ss.usermodel.WorkbookFactory.create;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -147,15 +119,10 @@ import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
-import ai.rnt.crm.dto.EditCallDto;
-import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditLeadDto;
-import ai.rnt.crm.dto.EditMeetingDto;
-import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
-import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.CompanyMaster;
@@ -355,17 +322,17 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getAllDropDownData() {
 		log.info("inside the getAllDropDownData method...");
-		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> allDataMap = new EnumMap<>(ApiResponse.class);
 		try {
-			resultMap.put(SUCCESS, true);
+			allDataMap.put(SUCCESS, true);
 			Map<String, Object> dataMap = new HashMap<>();
 			dataMap.put(SERVICE_FALL_DATA,
 					TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE_DATA, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put(DOMAIN_MASTER_DATA, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
 			dataMap.put(ASSIGN_DATA, TO_Employees.apply(roleMasterDaoService.getAdminAndUser()));
-			resultMap.put(DATA, dataMap);
-			return new ResponseEntity<>(resultMap, OK);
+			allDataMap.put(DATA, dataMap);
+			return new ResponseEntity<>(allDataMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting all dropdown data..{}", e.getMessage());
 			throw new CRMException(e);
@@ -470,185 +437,15 @@ public class LeadServiceImpl implements LeadService {
 			List<Visit> visits = visitDaoService.getVisitsByLeadIdAndIsOpportunity(leadId);
 			List<Email> emails = emailDaoService.getEmailByLeadIdAndIsOpportunity(leadId);
 			List<Meetings> meetings = meetingDaoService.getMeetingByLeadIdAndIsOpportunity(leadId);
-			List<TimeLineActivityDto> timeLine = calls.stream().filter(TIMELINE_CALL).map(call -> {
-				EditCallDto callDto = new EditCallDto();
-				callDto.setId(call.getCallId());
-				callDto.setSubject(call.getSubject());
-				callDto.setType(CALL);
-				callDto.setBody(call.getComment());
-				callDto.setStatus(call.getStatus());
-				callDto.setCreatedOn(convertDate(call.getUpdatedDate()));
-				callDto.setShortName(shortName(call.getCallTo()));
-				TO_EMPLOYEE.apply(call.getCallFrom())
-						.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
-				return callDto;
-			}).collect(toList());
-			timeLine.addAll(emails.stream().filter(TIMELINE_EMAIL).map(email -> {
-				EditEmailDto editEmailDto = new EditEmailDto();
-				editEmailDto.setId(email.getMailId());
-				editEmailDto.setType(EMAIL);
-				editEmailDto.setSubject(email.getSubject());
-				editEmailDto.setBody(email.getContent());
-				editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
-				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
-				editEmailDto.setShortName(shortName(email.getMailFrom()));
-				editEmailDto.setStatus(email.getStatus());
-				return editEmailDto;
-			}).collect(toList()));
-			timeLine.addAll(visits.stream().filter(TIMELINE_VISIT).map(visit -> {
-				EditVisitDto visitDto = new EditVisitDto();
-				visitDto.setId(visit.getVisitId());
-				visitDto.setLocation(visit.getLocation());
-				visitDto.setSubject(visit.getSubject());
-				visitDto.setType(VISIT);
-				visitDto.setBody(visit.getContent());
-				visitDto.setStatus(visit.getStatus());
-				employeeService.getById(visit.getCreatedBy()).ifPresent(
-						byId -> visitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				visitDto.setCreatedOn(convertDate(visit.getUpdatedDate()));
-				return visitDto;
-			}).collect(toList()));
-			timeLine.addAll(meetings.stream().filter(TIMELINE_MEETING).map(meet -> {
-				EditMeetingDto meetDto = new EditMeetingDto();
-				meetDto.setId(meet.getMeetingId());
-				meetDto.setType(MEETING);
-				employeeService.getById(meet.getCreatedBy()).ifPresent(
-						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				meetDto.setSubject(meet.getMeetingTitle());
-				meetDto.setBody(meet.getDescription());
-				meetDto.setStatus(meet.getMeetingStatus());
-				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-				meetDto.setCreatedOn(convertDate(meet.getUpdatedDate()));
-				return meetDto;
-			}).collect(toList()));
-			timeLine.sort((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
-					.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
-			List<TimeLineActivityDto> activity = calls.stream().filter(ACTIVITY_CALL).map(call -> {
-				EditCallDto callDto = new EditCallDto();
-				callDto.setId(call.getCallId());
-				callDto.setSubject(call.getSubject());
-				callDto.setType(CALL);
-				callDto.setBody(call.getComment());
-				callDto.setShortName(shortName(call.getCallTo()));
-				callDto.setDueDate(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
-				callDto.setCreatedOn(convertDate(call.getCreatedDate()));
-				TO_EMPLOYEE.apply(call.getCallFrom()).ifPresent(e -> {
-					callDto.setCallFrom(e.getFirstName() + " " + e.getLastName());
-					callDto.setAssignTo(e.getStaffId());
-				});
-				callDto.setOverDue(OVER_DUE.test(callDto.getDueDate()));
-				callDto.setStatus(call.getStatus());
-				return callDto;
-			}).collect(toList());
-			activity.addAll(emails.stream().filter(ACTIVITY_EMAIL).map(email -> {
-				EditEmailDto editEmailDto = new EditEmailDto();
-				editEmailDto.setId(email.getMailId());
-				editEmailDto.setType(EMAIL);
-				editEmailDto.setSubject(email.getSubject());
-				editEmailDto.setBody(email.getContent());
-				editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
-				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
-				editEmailDto.setShortName(shortName(email.getMailFrom()));
-				editEmailDto.setOverDue(false);
-				editEmailDto.setStatus(email.getStatus());
-				editEmailDto.setAssignTo(employeeService.findByEmailId(email.getMailFrom()));
-				editEmailDto.setScheduledDate(
-						convertDateDateWithTime(email.getScheduledOn(), email.getScheduledAtTime12Hours()));
-				return editEmailDto;
-			}).collect(toList()));
-			activity.addAll(visits.stream().filter(ACTIVITY_VISIT).map(visit -> {
-				EditVisitDto editVisitDto = new EditVisitDto();
-				editVisitDto.setId(visit.getVisitId());
-				editVisitDto.setLocation(visit.getLocation());
-				editVisitDto.setSubject(visit.getSubject());
-				editVisitDto.setType(VISIT);
-				editVisitDto.setBody(visit.getContent());
-				editVisitDto.setDueDate(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
-				employeeService.getById(visit.getCreatedBy()).ifPresent(
-						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				editVisitDto.setAssignTo(visit.getVisitBy().getStaffId());
-				editVisitDto.setCreatedOn(convertDate(visit.getCreatedDate()));
-				editVisitDto.setOverDue(OVER_DUE.test(editVisitDto.getDueDate()));
-				editVisitDto.setStatus(visit.getStatus());
-				return editVisitDto;
-			}).collect(toList()));
-			activity.addAll(meetings.stream().filter(ACTIVITY_MEETING).map(meet -> {
-				EditMeetingDto meetDto = new EditMeetingDto();
-				meetDto.setId(meet.getMeetingId());
-				meetDto.setType(MEETING);
-				employeeService.getById(meet.getCreatedBy()).ifPresent(
-						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				meetDto.setSubject(meet.getMeetingTitle());
-				meetDto.setBody(meet.getDescription());
-				meetDto.setDueDate(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
-				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-				meetDto.setCreatedOn(convertDate(meet.getCreatedDate()));
-				meetDto.setOverDue(OVER_DUE.test(meetDto.getDueDate()));
-				meetDto.setStatus(meet.getMeetingStatus());
-				meetDto.setAssignTo(meet.getAssignTo().getStaffId());
-				return meetDto;
-			}).collect(toList()));
-			Comparator<TimeLineActivityDto> overDueActivity = (a1, a2) -> a2.getOverDue().compareTo(a1.getOverDue());
-			activity.sort(overDueActivity.thenComparing((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
-					.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))));
-			List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
-				EditCallDto callDto = new EditCallDto();
-				callDto.setId(call.getCallId());
-				callDto.setSubject(call.getSubject());
-				callDto.setType(CALL);
-				callDto.setBody(call.getComment());
-				callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
-				TO_EMPLOYEE.apply(call.getCallFrom()).ifPresent(e -> {
-					callDto.setCallFrom(e.getFirstName() + " " + e.getLastName());
-					callDto.setAssignTo(e.getStaffId());
-				});
-				callDto.setStatus(call.getStatus());
-				return callDto;
-			}).collect(toList());
-
-			upNext.addAll(visits.stream().filter(UPNEXT_VISIT).map(visit -> {
-				EditVisitDto editVisitDto = new EditVisitDto();
-				editVisitDto.setId(visit.getVisitId());
-				editVisitDto.setLocation(visit.getLocation());
-				editVisitDto.setSubject(visit.getSubject());
-				editVisitDto.setType(VISIT);
-				editVisitDto.setBody(visit.getContent());
-				employeeService.getById(visit.getCreatedBy()).ifPresent(
-						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				editVisitDto.setCreatedOn(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
-				editVisitDto.setStatus(visit.getStatus());
-				editVisitDto.setAssignTo(visit.getVisitBy().getStaffId());
-				return editVisitDto;
-			}).collect(toList()));
-			upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
-				EditMeetingDto meetDto = new EditMeetingDto();
-				meetDto.setId(meet.getMeetingId());
-				meetDto.setType(MEETING);
-				employeeService.getById(meet.getCreatedBy()).ifPresent(
-						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				meetDto.setSubject(meet.getMeetingTitle());
-				meetDto.setBody(meet.getDescription());
-				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-				meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
-				meetDto.setStatus(meet.getMeetingStatus());
-				meetDto.setAssignTo(meet.getAssignTo().getStaffId());
-				return meetDto;
-			}).collect(toList()));
-			upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
-					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
-			LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities = upNext.stream()
-					.collect(groupingBy(e -> DAYS.between(
-							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime(),
-							parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
-					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
-							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
+  
+			   
 			dataMap.put(LEAD_INFO, dto);
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
-			dataMap.put(TIMELINE, timeLine);
-			dataMap.put(ACTIVITY, activity);
-			dataMap.put(UPNEXT_DATA, upNextActivities(upNextActivities));
+			dataMap.put(TIMELINE, getTimelineData(calls,visits,emails,meetings,employeeService));
+			dataMap.put(ACTIVITY, getActivityData(calls,visits,emails,meetings,employeeService));
+			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls,visits,emails,meetings,employeeService)));
 			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, leadById));
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);
@@ -662,10 +459,10 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(Integer leadId, QualifyLeadDto dto) {
 		log.info("inside the qualifyLead method...{}", leadId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> qualifyLeadMap = new EnumMap<>(ApiResponse.class);
 		try {
-			result.put(SUCCESS, true);
-			result.put(MESSAGE, "Lead Not Qualify");
+			qualifyLeadMap.put(SUCCESS, true);
+			qualifyLeadMap.put(MESSAGE, "Lead Not Qualify");
 			Leads lead = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			lead.setCustomerNeed(dto.getCustomerNeed());
@@ -680,10 +477,10 @@ public class LeadServiceImpl implements LeadService {
 			lead.setStatus(CLOSE_AS_QUALIFIED);
 			setServiceFallToLead(dto.getServiceFallsMaster().getServiceName(), lead, serviceFallsDaoSevice);
 			if (nonNull(leadDaoService.addLead(lead)) && addToOpputunity(lead))
-				result.put(MESSAGE, "Lead Qualified SuccessFully");
+				qualifyLeadMap.put(MESSAGE, "Lead Qualified SuccessFully");
 			else
-				result.put(SUCCESS, false);
-			return new ResponseEntity<>(result, OK);
+				qualifyLeadMap.put(SUCCESS, false);
+			return new ResponseEntity<>(qualifyLeadMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while qualifying the lead..{}", e.getMessage());
 			throw new CRMException(e);
@@ -717,7 +514,7 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> disQualifyLead(Integer leadId, LeadDto dto) {
 		log.info("inside the disQualifyLead method...{}", leadId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> disQualifiedMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
@@ -725,13 +522,13 @@ public class LeadServiceImpl implements LeadService {
 			lead.setDisqualifyReason(dto.getDisqualifyReason());
 			lead.setStatus(CLOSE_AS_DISQUALIFIED);
 			if (nonNull(leadDaoService.addLead(lead))) {
-				result.put(MESSAGE, "Lead Disqualified SuccessFully");
-				result.put(SUCCESS, true);
+				disQualifiedMap.put(MESSAGE, "Lead Disqualified SuccessFully");
+				disQualifiedMap.put(SUCCESS, true);
 			} else {
-				result.put(MESSAGE, "Lead Not Disqualify");
-				result.put(SUCCESS, false);
+				disQualifiedMap.put(MESSAGE, "Lead Not Disqualify");
+				disQualifiedMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(disQualifiedMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while disQualifyLead the lead..{}", e.getMessage());
 			throw new CRMException(e);
@@ -742,7 +539,7 @@ public class LeadServiceImpl implements LeadService {
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateLeadContact(Integer leadId, UpdateLeadDto dto) {
 		log.info("inside the updateLeadContact method...{}", leadId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> updateMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
@@ -761,11 +558,11 @@ public class LeadServiceImpl implements LeadService {
 			setDomainToLead(dto.getDomainId(), lead, domainMasterDaoService);
 			contact.setLinkedinId(dto.getLinkedinId());
 			if (nonNull(contactDaoService.addContact(contact)) && nonNull(leadDaoService.addLead(lead)))
-				result.put(MESSAGE, "Lead Details Updated Successfully !!");
+				updateMap.put(MESSAGE, "Lead Details Updated Successfully !!");
 			else
-				result.put(MESSAGE, "Lead Details Not Updated !!");
-			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, CREATED);
+				updateMap.put(MESSAGE, "Lead Details Not Updated !!");
+			updateMap.put(SUCCESS, true);
+			return new ResponseEntity<>(updateMap, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while updateLeadContact..{}", e.getMessage());
 			throw new CRMException(e);
@@ -775,8 +572,8 @@ public class LeadServiceImpl implements LeadService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> importantLead(Integer leadId, boolean status) {
 		log.info("inside the importantLead method...{} {}", leadId, status);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		result.put(SUCCESS, true);
+		EnumMap<ApiResponse, Object> impLeadMap = new EnumMap<>(ApiResponse.class);
+		impLeadMap.put(SUCCESS, true);
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			if (status) {
@@ -785,28 +582,28 @@ public class LeadServiceImpl implements LeadService {
 						.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId)));
 				importantLead.setEmployee(employeeService.getById(loggedInStaffId)
 						.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, loggedInStaffId)));
-				result.put(MESSAGE, "Problem Occurred While Making Lead Important !!");
+				impLeadMap.put(MESSAGE, "Problem Occurred While Making Lead Important !!");
 				if (leadDaoService.addImportantLead(importantLead).isPresent())
-					result.put(MESSAGE, "Lead marked as Important !!");
+					impLeadMap.put(MESSAGE, "Lead marked as Important !!");
 			} else {
-				result.put(MESSAGE, "Lead not found as important !!");
+				impLeadMap.put(MESSAGE, "Lead not found as important !!");
 				if (leadDaoService.deleteImportantLead(leadId, loggedInStaffId))
-					result.put(MESSAGE, "Lead marked as Unimportant !!");
+					impLeadMap.put(MESSAGE, "Lead marked as Unimportant !!");
 			}
 		} catch (Exception e) {
 			log.error("error occured while updating the Lead in ImportandLead API... {}", e.getMessage());
 			if (e instanceof DataIntegrityViolationException)
-				result.put(MESSAGE, "Lead already marked as important !!");
+				impLeadMap.put(MESSAGE, "Lead already marked as important !!");
 			else
 				throw new CRMException(e);
 		}
-		return new ResponseEntity<>(result, CREATED);
+		return new ResponseEntity<>(impLeadMap, CREATED);
 	}
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveLead(Integer leadId) {
 		log.info("inside the reactiveLead method...{}", leadId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> reactiveLeadMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Leads lead = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
@@ -814,13 +611,13 @@ public class LeadServiceImpl implements LeadService {
 			lead.setDisqualifyReason(null);
 			lead.setStatus(OPEN);
 			if (nonNull(leadDaoService.addLead(lead))) {
-				result.put(MESSAGE, "Lead Reactivate SuccessFully");
-				result.put(SUCCESS, true);
+				reactiveLeadMap.put(MESSAGE, "Lead Reactivate SuccessFully");
+				reactiveLeadMap.put(SUCCESS, true);
 			} else {
-				result.put(MESSAGE, "Lead Not Reactivate");
-				result.put(SUCCESS, false);
+				reactiveLeadMap.put(MESSAGE, "Lead Not Reactivate");
+				reactiveLeadMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(reactiveLeadMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while reactivating the lead..{}", e.getMessage());
 			throw new CRMException(e);
@@ -831,20 +628,20 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addSortFilterForLeads(LeadSortFilterDto sortFilter) {
 		log.info("inside the addSortFilterForLeads method...");
 		try {
-			EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+			EnumMap<ApiResponse, Object> sortFilterMap = new EnumMap<>(ApiResponse.class);
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			sortFilter.setEmployee(TO_EMPLOYEE
 					.apply(employeeService.getById(loggedInStaffId)
 							.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, loggedInStaffId)))
 					.orElseThrow(null));
 			if (nonNull(leadSortFilterDaoService.save(TO_LEAD_SORT_FILTER.apply(sortFilter).orElse(null)))) {
-				result.put(MESSAGE, "Lead Sort Filter Added Successfully!!");
-				result.put(SUCCESS, true);
+				sortFilterMap.put(MESSAGE, "Lead Sort Filter Added Successfully!!");
+				sortFilterMap.put(SUCCESS, true);
 			} else {
-				result.put(MESSAGE, "Lead Sort Filter Not Added!!");
-				result.put(SUCCESS, false);
+				sortFilterMap.put(MESSAGE, "Lead Sort Filter Not Added!!");
+				sortFilterMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(sortFilterMap, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while adding the sort filter for lead..{}", e.getMessage());
 			throw new CRMException(e);
@@ -855,11 +652,11 @@ public class LeadServiceImpl implements LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getForQualifyLead(Integer leadId) {
 		log.info("inside the getForQualifyLead method...{}", leadId);
 		try {
-			EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-			result.put(DATA, TO_QUALIFY_LEAD.apply(leadDaoService.getLeadById(leadId)
+			EnumMap<ApiResponse, Object> qualifiedLeadMap = new EnumMap<>(ApiResponse.class);
+			qualifiedLeadMap.put(DATA, TO_QUALIFY_LEAD.apply(leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId))));
-			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, OK);
+			qualifiedLeadMap.put(SUCCESS, true);
+			return new ResponseEntity<>(qualifiedLeadMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting the Qualified lead for edit..{}", e.getMessage());
 			throw new CRMException(e);
@@ -871,15 +668,15 @@ public class LeadServiceImpl implements LeadService {
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> uploadExcel(MultipartFile file) {
 		log.info("inside the uploadExcel method...");
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> excelMap = new EnumMap<>(ApiResponse.class);
 		try (Workbook workbook = create(file.getInputStream())) {
-			result.put(SUCCESS, false);
+			excelMap.put(SUCCESS, false);
 			Sheet sheet = workbook.getSheetAt(0);
 			if (isValidExcel(sheet)) {
 				Map<String, Object> excelData = readExcelUtil.readExcelFile(workbook, sheet);
 				if (isNull(excelData) || excelData.isEmpty()) {
-					result.put(MESSAGE, "Excel Contains No Data!!");
-					return new ResponseEntity<>(result, BAD_REQUEST);
+					excelMap.put(MESSAGE, "Excel Contains No Data!!");
+					return new ResponseEntity<>(excelMap, BAD_REQUEST);
 				} else {
 					if ((nonNull(excelData) && !excelData.isEmpty() && excelData.containsKey(FLAG)
 							&& (boolean) excelData.get(FLAG))) {
@@ -898,19 +695,19 @@ public class LeadServiceImpl implements LeadService {
 							return nonNull(contactDaoService.addContact(contact)) ? 1 : 0;
 						}).sum();
 						int duplicateLead = leadDtos.size() - saveLeadCount;
-						result.put(SUCCESS, saveLeadCount > 0);
-						result.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
+						excelMap.put(SUCCESS, saveLeadCount > 0);
+						excelMap.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
 						if (duplicateLead == 0 && saveLeadCount == 0)
-							result.put(MESSAGE, "No Lead Found To Add !!");
-						return new ResponseEntity<>(result, CREATED);
+							excelMap.put(MESSAGE, "No Lead Found To Add !!");
+						return new ResponseEntity<>(excelMap, CREATED);
 					} else {
-						result.put(MESSAGE, excelData.get(MSG));
-						return new ResponseEntity<>(result, BAD_REQUEST);
+						excelMap.put(MESSAGE, excelData.get(MSG));
+						return new ResponseEntity<>(excelMap, BAD_REQUEST);
 					}
 				}
 			} else {
-				result.put(MESSAGE, "Invalid Excel Format!!");
-				return new ResponseEntity<>(result, BAD_REQUEST);
+				excelMap.put(MESSAGE, "Invalid Excel Format!!");
+				return new ResponseEntity<>(excelMap, BAD_REQUEST);
 			}
 		} catch (Exception e) {
 			log.error("Got Exception while uploading the Excel of lead..{}", e.getMessage());

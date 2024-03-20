@@ -84,12 +84,12 @@ public class ContactServiceImpl implements ContactService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getContact(Integer contactId) {
 		log.info("inside the getContact method...{}", contactId);
-		EnumMap<ApiResponse, Object> contactMap = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> getContactMap = new EnumMap<>(ApiResponse.class);
 		try {
-			contactMap.put(SUCCESS, true);
-			contactMap.put(DATA, TO_CONTACT_DTO.apply(contactDaoService.findById(contactId)
+			getContactMap.put(SUCCESS, true);
+			getContactMap.put(DATA, TO_CONTACT_DTO.apply(contactDaoService.findById(contactId)
 					.orElseThrow(() -> new ResourceNotFoundException("Contact", "contactId", contactId))));
-			return new ResponseEntity<>(contactMap, OK);
+			return new ResponseEntity<>(getContactMap, OK);
 		} catch (Exception e) {
 			log.error("error occured while getting the contact of a lead...{}", e.getMessage());
 			throw new CRMException(e);
@@ -99,9 +99,9 @@ public class ContactServiceImpl implements ContactService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateContact(ContactDto contactDto, Integer contactId) {
 		log.info("inside the updateContact method...{}", contactId);
-		EnumMap<ApiResponse, Object> contactMap = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> updateContactMap = new EnumMap<>(ApiResponse.class);
 		try {
-			contactMap.put(SUCCESS, true);
+			updateContactMap.put(SUCCESS, true);
 			Contacts contact = contactDaoService.findById(contactId)
 					.orElseThrow(() -> new ResourceNotFoundException("Contact", "contactId", contactId));
 			if (nonNull(contactDto.getName())) {
@@ -133,18 +133,18 @@ public class ContactServiceImpl implements ContactService {
 				});
 			else if (FALSE.equals(contactDto.getPrimary()) && (existingContacts.size() == 1
 					|| (primaryContact.isPresent() && primaryContact.get().getContactId().equals(contactId)))) {
-				contactMap.put(SUCCESS, false);
-				contactMap.put(MESSAGE, "Cannot unmark the only contact as primary !!");
-				return new ResponseEntity<>(contactMap, BAD_REQUEST);
+				updateContactMap.put(SUCCESS, false);
+				updateContactMap.put(MESSAGE, "Cannot unmark the only contact as primary !!");
+				return new ResponseEntity<>(updateContactMap, BAD_REQUEST);
 			}
 			contact.setPrimary(contactDto.getPrimary());
 			if (nonNull(contactDaoService.addContact(contact)))
-				contactMap.put(MESSAGE, "Contact Updated Successfully !!");
+				updateContactMap.put(MESSAGE, "Contact Updated Successfully !!");
 			else {
-				contactMap.put(SUCCESS, false);
-				contactMap.put(MESSAGE, "Contact Not Updated !!");
+				updateContactMap.put(SUCCESS, false);
+				updateContactMap.put(MESSAGE, "Contact Not Updated !!");
 			}
-			return new ResponseEntity<>(contactMap, OK);
+			return new ResponseEntity<>(updateContactMap, OK);
 		} catch (Exception e) {
 			log.error("error occured while updating the contact of a lead...{}", e.getMessage());
 			throw new CRMException(e);
