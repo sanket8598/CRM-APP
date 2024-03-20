@@ -9,13 +9,11 @@ import static javax.mail.Message.RecipientType.BCC;
 import static javax.mail.Message.RecipientType.CC;
 import static javax.mail.Message.RecipientType.TO;
 import static javax.mail.Transport.send;
-import static lombok.AccessLevel.PRIVATE;
 
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.mail.Authenticator;
@@ -31,7 +29,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
@@ -44,30 +41,18 @@ import ai.rnt.crm.entity.MeetingTask;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.exception.CRMException;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @author Sanket Wakankar
+ * @since 21/12/2023
+ * @version 1.0
+ *
+ */
 @Slf4j
 @Component
-@NoArgsConstructor(access = PRIVATE)
 @PropertySource("classpath:confidential.properties")
-public class EmailUtil {
-
-	@Value("${email.userName}")
-	private String userName;
-	
-	@Value("${email.password}")
-	private String password;
-	
-	private static final Properties PROPERTIES = new Properties();
-	private static final String HOST = "smtp.zoho.com";
-
-	static {
-		PROPERTIES.put("mail.smtp.host", HOST);
-		PROPERTIES.put("mail.smtp.port", "587");
-		PROPERTIES.put("mail.smtp.auth", true);
-		PROPERTIES.put("mail.smtp.starttls.enable", true);
-	}
+public class EmailUtil extends PropertyUtil {
 
 	private static final String THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY = " The task is scheduled for completion by ";
 	private static final String I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE = "I hope this email finds you well. This is a friendly reminder about the Task for the ";
@@ -88,7 +73,7 @@ public class EmailUtil {
 
 			List<String> recipientList = nonNull(email.getToMail())
 					? of(email.getToMail().split(",")).map(String::trim).collect(toList())
-					:emptyList();
+					: emptyList();
 			InternetAddress[] recipientAddress = new InternetAddress[recipientList.size()];
 			int counter = 0;
 			for (String recipient : recipientList)
@@ -140,8 +125,7 @@ public class EmailUtil {
 		});
 	}
 
-	public Message sendWithAttachments(Message msg, String content, List<Attachment> list)
-			throws MessagingException {
+	public Message sendWithAttachments(Message msg, String content, List<Attachment> list) throws MessagingException {
 		log.info("inside the sendWithAttachments method...}");
 		try {
 			MimeBodyPart messageBodyPart = new MimeBodyPart();
