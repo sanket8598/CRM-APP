@@ -189,7 +189,7 @@ public class EmailServiceImpl implements EmailService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignEmail(Map<String, Integer> map) {
-		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> asgmMailMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign Email staffId: {} addMailId:{}", map.get(STAFF_ID), map.get("addMailId"));
 		try {
 			Email email = emailDaoService.findById(map.get("addMailId"));
@@ -197,13 +197,13 @@ public class EmailServiceImpl implements EmailService {
 					.orElseThrow(() -> new ResourceNotFoundException("Employee", STAFF_ID, map.get(STAFF_ID)));
 			email.setMailFrom(employee.getEmailId());
 			if (nonNull(emailDaoService.email(email))) {
-				resultMap.put(MESSAGE, "Email Assigned SuccessFully");
-				resultMap.put(SUCCESS, true);
+				asgmMailMap.put(MESSAGE, "Email Assigned SuccessFully");
+				asgmMailMap.put(SUCCESS, true);
 			} else {
-				resultMap.put(MESSAGE, "Email Not Assigned");
-				resultMap.put(SUCCESS, false);
+				asgmMailMap.put(MESSAGE, "Email Not Assigned");
+				asgmMailMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(resultMap, OK);
+			return new ResponseEntity<>(asgmMailMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while assign the mail..{}", e.getMessage());
 			throw new CRMException(e);
@@ -213,7 +213,7 @@ public class EmailServiceImpl implements EmailService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getEmail(Integer mailId) {
 		log.info("inside the getEmail method...{}", mailId);
-		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> mailMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Email email = emailDaoService.findById(mailId);
 			Optional<EmailDto> mailDto = TO_EMAIL_DTO.apply(email);
@@ -228,9 +228,9 @@ public class EmailServiceImpl implements EmailService {
 						? Stream.of(email.getToMail().split(",")).map(String::trim).collect(Collectors.toList())
 						: Collections.emptyList());
 			});
-			resultMap.put(DATA, mailDto);
-			resultMap.put(SUCCESS, true);
-			return new ResponseEntity<>(resultMap, OK);
+			mailMap.put(DATA, mailDto);
+			mailMap.put(SUCCESS, true);
+			return new ResponseEntity<>(mailMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting mail..{}", e.getMessage());
 			throw new CRMException(e);
