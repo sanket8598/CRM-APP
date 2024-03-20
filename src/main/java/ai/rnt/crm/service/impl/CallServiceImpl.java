@@ -74,7 +74,7 @@ public class CallServiceImpl implements CallService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCall(CallDto dto, Integer leadsId) {
 		log.info("inside the add call method...{}", leadsId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> callMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Call call = TO_CALL.apply(dto)
 					.orElseThrow(() -> new ResourceNotFoundException("Call", CALL_ID, dto.getCallId()));
@@ -89,11 +89,11 @@ public class CallServiceImpl implements CallService {
 			}
 			call.setStatus(SAVE);
 			if (nonNull(callDaoService.call(call)))
-				result.put(MESSAGE, "Call Added Successfully");
+				callMap.put(MESSAGE, "Call Added Successfully");
 			else
-				result.put(MESSAGE, "Call Not Added");
-			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, CREATED);
+				callMap.put(MESSAGE, "Call Not Added");
+			callMap.put(SUCCESS, true);
+			return new ResponseEntity<>(callMap, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while adding the call..{}", e.getMessage());
 			throw new CRMException(e);
@@ -118,7 +118,7 @@ public class CallServiceImpl implements CallService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(CallDto dto, Integer callId, String status) {
 		log.info("inside the update call method...{} {}", callId, status);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> updateCallMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Call call = callDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException(ADD_CALL, CALL_ID, dto.getCallId()));
@@ -143,13 +143,13 @@ public class CallServiceImpl implements CallService {
 			call.setStatus(status);
 			if (nonNull(callDaoService.call(call))) {
 				if (SAVE.equalsIgnoreCase(status))
-					result.put(MESSAGE, "Call Updated Successfully");
+					updateCallMap.put(MESSAGE, "Call Updated Successfully");
 				else
-					result.put(MESSAGE, "Call Updated And Completed Successfully");
+					updateCallMap.put(MESSAGE, "Call Updated And Completed Successfully");
 			} else
-				result.put(MESSAGE, "Call Not Updated");
-			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, CREATED);
+				updateCallMap.put(MESSAGE, "Call Not Updated");
+			updateCallMap.put(SUCCESS, true);
+			return new ResponseEntity<>(updateCallMap, CREATED);
 		} catch (Exception e) {
 			log.error("Got exception while update call..{}", e.getMessage());
 			throw new CRMException(e);
@@ -189,20 +189,20 @@ public class CallServiceImpl implements CallService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> markAsCompleted(Integer callId) {
 		log.info("inside the markasComplete call method...{}", callId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> markCompllMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Call call = callDaoService.getCallById(callId)
 					.orElseThrow(() -> new ResourceNotFoundException("Call", CALL_ID, callId));
 			call.setUpdatedDate(now());
 			call.setStatus(COMPLETE);
 			if (nonNull(callDaoService.call(call))) {
-				result.put(MESSAGE, "Call updated SuccessFully");
-				result.put(SUCCESS, true);
+				markCompllMap.put(MESSAGE, "Call updated SuccessFully");
+				markCompllMap.put(SUCCESS, true);
 			} else {
-				result.put(MESSAGE, "Call Not updated");
-				result.put(SUCCESS, false);
+				markCompllMap.put(MESSAGE, "Call Not updated");
+				markCompllMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(markCompllMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while markAsCompleted the call..{}", e.getMessage());
 			throw new CRMException(e);
@@ -213,7 +213,7 @@ public class CallServiceImpl implements CallService {
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteCall(Integer callId) {
 		log.info("inside the delete call method...{}", callId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> delCallMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			Call call = callDaoService.getCallById(callId)
@@ -230,13 +230,13 @@ public class CallServiceImpl implements CallService {
 		            .withZoneSameInstant(of(INDIA_ZONE))
 		            .toLocalDateTime());
 			if (nonNull(callDaoService.call(call))) {
-				result.put(MESSAGE, "Call deleted SuccessFully.");
-				result.put(SUCCESS, true);
+				delCallMap.put(MESSAGE, "Call deleted SuccessFully.");
+				delCallMap.put(SUCCESS, true);
 			} else {
-				result.put(MESSAGE, "Call Not delete.");
-				result.put(SUCCESS, false);
+				delCallMap.put(MESSAGE, "Call Not delete.");
+				delCallMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(delCallMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while delete the call..{}", e.getMessage());
 			throw new CRMException(e);
@@ -247,7 +247,7 @@ public class CallServiceImpl implements CallService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addCallTask(@Valid CallTaskDto dto, Integer leadsId,
 			Integer callId) {
 		log.info("inside the add call task method...{} {}", leadsId, callId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> addCallTaskMap = new EnumMap<>(ApiResponse.class);
 		try {
 			PhoneCallTask phoneCallTask = TO_CALL_TASK.apply(dto).orElseThrow(ResourceNotFoundException::new);
 			Optional<Leads> lead = leadDaoService.getLeadById(leadsId);
@@ -255,16 +255,16 @@ public class CallServiceImpl implements CallService {
 				phoneCallTask.setAssignTo(lead.get().getEmployee());
 			callDaoService.getCallById(callId).ifPresent(phoneCallTask::setCall);
 			if (checkDuplicateTask(callDaoService.getAllTask(), phoneCallTask)) {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Already Exists !!");
+				addCallTaskMap.put(SUCCESS, false);
+				addCallTaskMap.put(MESSAGE, "Task Already Exists !!");
 			} else if (nonNull(callDaoService.addCallTask(phoneCallTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Added Successfully..!!");
+				addCallTaskMap.put(SUCCESS, true);
+				addCallTaskMap.put(MESSAGE, "Task Added Successfully..!!");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Added");
+				addCallTaskMap.put(SUCCESS, false);
+				addCallTaskMap.put(MESSAGE, "Task Not Added");
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(addCallTaskMap, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while adding phone call tasks..{}", e.getMessage());
 			throw new CRMException(e);
@@ -319,7 +319,7 @@ public class CallServiceImpl implements CallService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCallTask(Map<String, Integer> map) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> asgnCallTaskMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign task staffId: {} taskId:{}", map.get(STAFF_ID), map.get(TASK_ID));
 		try {
 			PhoneCallTask callTask = callDaoService.getCallTaskById(map.get(TASK_ID))
@@ -328,13 +328,13 @@ public class CallServiceImpl implements CallService {
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			callTask.setAssignTo(employee);
 			if (nonNull(callDaoService.addCallTask(callTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Assigned SuccessFully");
+				asgnCallTaskMap.put(SUCCESS, true);
+				asgnCallTaskMap.put(MESSAGE, "Task Assigned SuccessFully");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Assigned");
+				asgnCallTaskMap.put(SUCCESS, false);
+				asgnCallTaskMap.put(MESSAGE, "Task Not Assigned");
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(asgnCallTaskMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while assigning the PhoneCallTask task..{}", e.getMessage());
 			throw new CRMException(e);

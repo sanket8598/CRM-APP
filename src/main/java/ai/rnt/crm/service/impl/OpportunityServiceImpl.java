@@ -10,7 +10,6 @@ import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.CRMConstants.TASK;
 import static ai.rnt.crm.constants.CRMConstants.TIMELINE;
 import static ai.rnt.crm.constants.CRMConstants.UPNEXT_DATA;
-import static ai.rnt.crm.constants.DateFormatterConstant.DATE_TIME_WITH_AM_OR_PM;
 import static ai.rnt.crm.constants.OppurtunityStatus.ANALYSIS;
 import static ai.rnt.crm.constants.OppurtunityStatus.CLOSE;
 import static ai.rnt.crm.constants.OppurtunityStatus.IN_PIPELINE;
@@ -21,10 +20,6 @@ import static ai.rnt.crm.constants.OppurtunityStatus.QUALIFY;
 import static ai.rnt.crm.constants.OppurtunityStatus.WON;
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
-import static ai.rnt.crm.constants.StatusConstants.CALL;
-import static ai.rnt.crm.constants.StatusConstants.EMAIL;
-import static ai.rnt.crm.constants.StatusConstants.MEETING;
-import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_ANALYSIS_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_CLOSE_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTO;
@@ -34,65 +29,44 @@ import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUN
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUNITY_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_PROPOSE_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_OPPORTUNITY_DTO;
-import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_OPTY_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
-import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
-import static ai.rnt.crm.dto_mapper.MeetingAttachmentDtoMapper.TO_METTING_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_CALL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_EMAIL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_MEETING;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.ACTIVITY_VISIT;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_CALL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_EMAIL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_MEETING;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.TIMELINE_VISIT;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_CALL;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_MEETING;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.UPNEXT_VISIT;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.ASSIGNED_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.IN_PIPELINE_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.WON_OPPORTUNITIES;
-import static ai.rnt.crm.functional.predicates.OverDueActivity.OVER_DUE;
+import static ai.rnt.crm.util.CommonUtil.getActivityData;
 import static ai.rnt.crm.util.CommonUtil.getTaskDataMap;
+import static ai.rnt.crm.util.CommonUtil.getTimelineData;
+import static ai.rnt.crm.util.CommonUtil.getUpnextData;
 import static ai.rnt.crm.util.CommonUtil.setDomainToLead;
 import static ai.rnt.crm.util.CommonUtil.setLeadSourceToLead;
 import static ai.rnt.crm.util.CommonUtil.setServiceFallToLead;
 import static ai.rnt.crm.util.CommonUtil.upNextActivities;
 import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
-import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
-import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertLocalDate;
-import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static ai.rnt.crm.util.OpportunityUtil.amountInWords;
 import static ai.rnt.crm.util.OpportunityUtil.calculateBubbleSize;
 import static ai.rnt.crm.util.OpportunityUtil.checkPhase;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Double.valueOf;
 import static java.time.LocalDateTime.now;
-import static java.time.LocalDateTime.parse;
 import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
-import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Map.Entry.comparingByKey;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -122,11 +96,6 @@ import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.ContactDto;
-import ai.rnt.crm.dto.EditCallDto;
-import ai.rnt.crm.dto.EditEmailDto;
-import ai.rnt.crm.dto.EditMeetingDto;
-import ai.rnt.crm.dto.EditVisitDto;
-import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
@@ -340,178 +309,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			List<Visit> visits = visitDaoService.getVisitsByLeadId(leadId);
 			List<Email> emails = emailDaoService.getEmailByLeadId(leadId);
 			List<Meetings> meetings = meetingDaoService.getMeetingByLeadId(leadId);
-			List<TimeLineActivityDto> timeLine = calls.stream().filter(TIMELINE_CALL).map(call -> {
-				EditCallDto callDto = new EditCallDto();
-				callDto.setId(call.getCallId());
-				callDto.setSubject(call.getSubject());
-				callDto.setType(CALL);
-				callDto.setBody(call.getComment());
-				callDto.setStatus(call.getStatus());
-				callDto.setCreatedOn(convertDate(call.getUpdatedDate()));
-				callDto.setShortName(shortName(call.getCallTo()));
-				TO_EMPLOYEE.apply(call.getCallFrom())
-						.ifPresent(e -> callDto.setCallFrom(e.getFirstName() + " " + e.getLastName()));
-				return callDto;
-			}).collect(toList());
-			timeLine.addAll(emails.stream().filter(TIMELINE_EMAIL).map(email -> {
-				EditEmailDto editEmailDto = new EditEmailDto();
-				editEmailDto.setId(email.getMailId());
-				editEmailDto.setType(EMAIL);
-				editEmailDto.setSubject(email.getSubject());
-				editEmailDto.setBody(email.getContent());
-				editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
-				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
-				editEmailDto.setShortName(shortName(email.getMailFrom()));
-				editEmailDto.setStatus(email.getStatus());
-				return editEmailDto;
-			}).collect(toList()));
-			timeLine.addAll(visits.stream().filter(TIMELINE_VISIT).map(visit -> {
-				EditVisitDto visitDto = new EditVisitDto();
-				visitDto.setId(visit.getVisitId());
-				visitDto.setLocation(visit.getLocation());
-				visitDto.setSubject(visit.getSubject());
-				visitDto.setType(VISIT);
-				visitDto.setBody(visit.getContent());
-				visitDto.setStatus(visit.getStatus());
-				employeeService.getById(visit.getCreatedBy()).ifPresent(
-						byId -> visitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				visitDto.setCreatedOn(convertDate(visit.getUpdatedDate()));
-				return visitDto;
-			}).collect(toList()));
-			timeLine.addAll(meetings.stream().filter(TIMELINE_MEETING).map(meet -> {
-				EditMeetingDto meetDto = new EditMeetingDto();
-				meetDto.setId(meet.getMeetingId());
-				meetDto.setType(MEETING);
-				employeeService.getById(meet.getCreatedBy()).ifPresent(
-						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				meetDto.setSubject(meet.getMeetingTitle());
-				meetDto.setBody(meet.getDescription());
-				meetDto.setStatus(meet.getMeetingStatus());
-				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-				meetDto.setCreatedOn(convertDate(meet.getUpdatedDate()));
-				return meetDto;
-			}).collect(toList()));
-			timeLine.sort((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
-					.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
-			List<TimeLineActivityDto> activity = calls.stream().filter(ACTIVITY_CALL).map(call -> {
-				EditCallDto callDto = new EditCallDto();
-				callDto.setId(call.getCallId());
-				callDto.setSubject(call.getSubject());
-				callDto.setType(CALL);
-				callDto.setBody(call.getComment());
-				callDto.setShortName(shortName(call.getCallTo()));
-				callDto.setDueDate(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
-				callDto.setCreatedOn(convertDate(call.getCreatedDate()));
-				TO_EMPLOYEE.apply(call.getCallFrom()).ifPresent(e -> {
-					callDto.setCallFrom(e.getFirstName() + " " + e.getLastName());
-					callDto.setAssignTo(e.getStaffId());
-				});
-				callDto.setOverDue(OVER_DUE.test(callDto.getDueDate()));
-				callDto.setStatus(call.getStatus());
-				return callDto;
-			}).collect(toList());
-			activity.addAll(emails.stream().filter(ACTIVITY_EMAIL).map(email -> {
-				EditEmailDto editEmailDto = new EditEmailDto();
-				editEmailDto.setId(email.getMailId());
-				editEmailDto.setType(EMAIL);
-				editEmailDto.setSubject(email.getSubject());
-				editEmailDto.setBody(email.getContent());
-				editEmailDto.setAttachments(TO_ATTACHMENT_DTOS.apply(email.getAttachment()));
-				editEmailDto.setCreatedOn(convertDate(email.getCreatedDate()));
-				editEmailDto.setShortName(shortName(email.getMailFrom()));
-				editEmailDto.setOverDue(false);
-				editEmailDto.setStatus(email.getStatus());
-				editEmailDto.setAssignTo(employeeService.findByEmailId(email.getMailFrom()));
-				editEmailDto.setScheduledDate(
-						convertDateDateWithTime(email.getScheduledOn(), email.getScheduledAtTime12Hours()));
-				return editEmailDto;
-			}).collect(toList()));
-			activity.addAll(visits.stream().filter(ACTIVITY_VISIT).map(visit -> {
-				EditVisitDto editVisitDto = new EditVisitDto();
-				editVisitDto.setId(visit.getVisitId());
-				editVisitDto.setLocation(visit.getLocation());
-				editVisitDto.setSubject(visit.getSubject());
-				editVisitDto.setType(VISIT);
-				editVisitDto.setBody(visit.getContent());
-				editVisitDto.setDueDate(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
-				employeeService.getById(visit.getCreatedBy()).ifPresent(
-						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				editVisitDto.setAssignTo(visit.getVisitBy().getStaffId());
-				editVisitDto.setCreatedOn(convertDate(visit.getCreatedDate()));
-				editVisitDto.setOverDue(OVER_DUE.test(editVisitDto.getDueDate()));
-				editVisitDto.setStatus(visit.getStatus());
-				return editVisitDto;
-			}).collect(toList()));
-			activity.addAll(meetings.stream().filter(ACTIVITY_MEETING).map(meet -> {
-				EditMeetingDto meetDto = new EditMeetingDto();
-				meetDto.setId(meet.getMeetingId());
-				meetDto.setType(MEETING);
-				employeeService.getById(meet.getCreatedBy()).ifPresent(
-						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				meetDto.setSubject(meet.getMeetingTitle());
-				meetDto.setBody(meet.getDescription());
-				meetDto.setDueDate(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
-				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-				meetDto.setCreatedOn(convertDate(meet.getCreatedDate()));
-				meetDto.setOverDue(OVER_DUE.test(meetDto.getDueDate()));
-				meetDto.setStatus(meet.getMeetingStatus());
-				meetDto.setAssignTo(meet.getAssignTo().getStaffId());
-				return meetDto;
-			}).collect(toList()));
-			Comparator<TimeLineActivityDto> overDueActivity = (a1, a2) -> a2.getOverDue().compareTo(a1.getOverDue());
-			activity.sort(overDueActivity.thenComparing((t1, t2) -> parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
-					.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))));
-			List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
-				EditCallDto callDto = new EditCallDto();
-				callDto.setId(call.getCallId());
-				callDto.setSubject(call.getSubject());
-				callDto.setType(CALL);
-				callDto.setBody(call.getComment());
-				callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
-				TO_EMPLOYEE.apply(call.getCallFrom()).ifPresent(e -> {
-					callDto.setCallFrom(e.getFirstName() + " " + e.getLastName());
-					callDto.setAssignTo(e.getStaffId());
-				});
-				callDto.setStatus(call.getStatus());
-				return callDto;
-			}).collect(toList());
-
-			upNext.addAll(visits.stream().filter(UPNEXT_VISIT).map(visit -> {
-				EditVisitDto editVisitDto = new EditVisitDto();
-				editVisitDto.setId(visit.getVisitId());
-				editVisitDto.setLocation(visit.getLocation());
-				editVisitDto.setSubject(visit.getSubject());
-				editVisitDto.setType(VISIT);
-				editVisitDto.setBody(visit.getContent());
-				employeeService.getById(visit.getCreatedBy()).ifPresent(
-						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				editVisitDto.setCreatedOn(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
-				editVisitDto.setStatus(visit.getStatus());
-				editVisitDto.setAssignTo(visit.getVisitBy().getStaffId());
-				return editVisitDto;
-			}).collect(toList()));
-			upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
-				EditMeetingDto meetDto = new EditMeetingDto();
-				meetDto.setId(meet.getMeetingId());
-				meetDto.setType(MEETING);
-				employeeService.getById(meet.getCreatedBy()).ifPresent(
-						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				meetDto.setSubject(meet.getMeetingTitle());
-				meetDto.setBody(meet.getDescription());
-				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-				meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
-				meetDto.setStatus(meet.getMeetingStatus());
-				meetDto.setAssignTo(meet.getAssignTo().getStaffId());
-				return meetDto;
-			}).collect(toList()));
-			upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
-					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
-			LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities = upNext.stream()
-					.collect(groupingBy(e -> DAYS.between(
-							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime(),
-							parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
-					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
-							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
+			
 			OpportunityDto dto = TO_DASHBOARD_OPPORTUNITY_DTO.apply(opportunity)
 					.orElseThrow(ResourceNotFoundException::new);
 			dto.setContacts(TO_CONTACT_DTOS.apply(opportunity.getLeads().getContacts()));
@@ -525,9 +323,9 @@ public class OpportunityServiceImpl implements OpportunityService {
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
-			dataMap.put(TIMELINE, timeLine);
-			dataMap.put(ACTIVITY, activity);
-			dataMap.put(UPNEXT_DATA, upNextActivities(upNextActivities));
+			dataMap.put(TIMELINE, getTimelineData(calls,visits,emails,meetings,employeeService));
+			dataMap.put(ACTIVITY, getActivityData(calls,visits,emails,meetings,employeeService));
+			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls,visits,emails,meetings,employeeService)));
 			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, opportunity.getLeads()));
 			dashBoardData.put(SUCCESS, true);
 			dashBoardData.put(DATA, dataMap);
@@ -829,7 +627,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunity(UpdateLeadDto dto, Integer opportunityId) {
 		log.info("inside the updateOpportunity method...{}", opportunityId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> updOpptMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Opportunity opportunity = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
@@ -850,11 +648,11 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunity.setLeads(lead);
 			if (nonNull(contactDaoService.addContact(contact)) && nonNull(leadDaoService.addLead(lead))
 					&& nonNull(opportunityDaoService.addOpportunity(opportunity)))
-				result.put(MESSAGE, "Opportunity Details Updated Successfully !!");
+				updOpptMap.put(MESSAGE, "Opportunity Details Updated Successfully !!");
 			else
-				result.put(MESSAGE, "Opportunity Details Not Updated !!");
-			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, CREATED);
+				updOpptMap.put(MESSAGE, "Opportunity Details Not Updated !!");
+			updOpptMap.put(SUCCESS, true);
+			return new ResponseEntity<>(updOpptMap, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while updateOpportunity..{}", e.getMessage());
 			throw new CRMException(e);

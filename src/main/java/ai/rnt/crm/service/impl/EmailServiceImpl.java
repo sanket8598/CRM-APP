@@ -71,7 +71,7 @@ public class EmailServiceImpl implements EmailService {
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addEmail(EmailDto dto, Integer leadId, String status) {
 		log.info("inside the addEmail method...{} {}", leadId, status);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> addEmailMap = new EnumMap<>(ApiResponse.class);
 		try {
 			boolean saveStatus = false;
 			Email sendEmail = null;
@@ -97,28 +97,28 @@ public class EmailServiceImpl implements EmailService {
 				}
 			}
 			if (saveStatus && SAVE.equalsIgnoreCase(status)) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Email Added Successfully");
-				result.put(DATA, sendEmail.getMailId());
+				addEmailMap.put(SUCCESS, true);
+				addEmailMap.put(MESSAGE, "Email Added Successfully");
+				addEmailMap.put(DATA, sendEmail.getMailId());
 			} else if (SEND.equalsIgnoreCase(status)) {
 				boolean sendEmailStatus = emailUtil.sendEmail(sendEmail);
 				if (saveStatus && sendEmailStatus) {
-					result.put(SUCCESS, true);
-					result.put(MESSAGE, "Email Saved and Sent Successfully!!");
+					addEmailMap.put(SUCCESS, true);
+					addEmailMap.put(MESSAGE, "Email Saved and Sent Successfully!!");
 				} else {
-					result.put(SUCCESS, true);
+					addEmailMap.put(SUCCESS, true);
 					if (saveStatus && !sendEmailStatus) {
 						email.setStatus(SAVE);
 						emailDaoService.email(email);
-						result.put(MESSAGE, "Email Saved but Problem while Sending Email!!");
+						addEmailMap.put(MESSAGE, "Email Saved but Problem while Sending Email!!");
 					} else
-						result.put(MESSAGE, "Problem Occured while saving the Email");
+						addEmailMap.put(MESSAGE, "Problem Occured while saving the Email");
 				}
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Email Not Added");
+				addEmailMap.put(SUCCESS, false);
+				addEmailMap.put(MESSAGE, "Email Not Added");
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(addEmailMap, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while sending and saving add email for the Lead Api..{}", e.getMessage());
 			throw new CRMException(e);
@@ -128,27 +128,27 @@ public class EmailServiceImpl implements EmailService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> checkMailId(Integer addMailId, Integer leadId) {
 		log.info("inside the checkMailId method...{} {}", addMailId, leadId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> verifyEmailMap = new EnumMap<>(ApiResponse.class);
 		try {
 			if (TRUE.equals(emailDaoService.emailPresentForLeadLeadId(addMailId, leadId))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "This email is already saved");
-				result.put(DATA, addMailId);
+				verifyEmailMap.put(SUCCESS, true);
+				verifyEmailMap.put(MESSAGE, "This email is already saved");
+				verifyEmailMap.put(DATA, addMailId);
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "This email is not saved");
+				verifyEmailMap.put(SUCCESS, false);
+				verifyEmailMap.put(MESSAGE, "This email is not saved");
 			}
 		} catch (Exception e) {
 			log.error("error occured while checking add email for the Lead Id..{}", e.getMessage());
 			throw new CRMException(e);
 		}
-		return new ResponseEntity<>(result, OK);
+		return new ResponseEntity<>(verifyEmailMap, OK);
 	}
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteEmail(Integer mailId) {
 		log.info("inside the deleteEmail method...{}", mailId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> delEmailMap = new EnumMap<>(ApiResponse.class);
 		Email updatedEmail = null;
 		try {
                 Integer staffId=auditAwareUtil.getLoggedInStaffId();
@@ -174,13 +174,13 @@ public class EmailServiceImpl implements EmailService {
 					updatedEmail = emailDaoService.email(mail);
 				}
 			if (nonNull(updatedEmail)) {
-				result.put(MESSAGE, "Email deleted SuccessFully.");
-				result.put(SUCCESS, true);
+				delEmailMap.put(MESSAGE, "Email deleted SuccessFully.");
+				delEmailMap.put(SUCCESS, true);
 			} else {
-				result.put(MESSAGE, "Email Not deleted.");
-				result.put(SUCCESS, false);
+				delEmailMap.put(MESSAGE, "Email Not deleted.");
+				delEmailMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(delEmailMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while deleting the mail..{}", e.getMessage());
 			throw new CRMException(e);
@@ -241,7 +241,7 @@ public class EmailServiceImpl implements EmailService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateEmail(EmailDto dto, String status, Integer mailId) {
 		log.info("inside the updateEmail method...{} {}", mailId, status);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> updEmailMap = new EnumMap<>(ApiResponse.class);
 		try {
 			boolean saveStatus = false;
 			Email sendEmail = null;
@@ -280,25 +280,25 @@ public class EmailServiceImpl implements EmailService {
 				}
 			}
 			if (saveStatus && SAVE.equalsIgnoreCase(status)) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Email Updated Successfully");
+				updEmailMap.put(SUCCESS, true);
+				updEmailMap.put(MESSAGE, "Email Updated Successfully");
 			} else if (SEND.equalsIgnoreCase(status)) {
 				boolean sendEmailStatus = emailUtil.sendEmail(sendEmail);
 				if (saveStatus && sendEmailStatus) {
-					result.put(SUCCESS, true);
-					result.put(MESSAGE, "Email Updated and Sent Successfully!!");
+					updEmailMap.put(SUCCESS, true);
+					updEmailMap.put(MESSAGE, "Email Updated and Sent Successfully!!");
 				} else {
-					result.put(SUCCESS, false);
+					updEmailMap.put(SUCCESS, false);
 					if (saveStatus && !sendEmailStatus)
-						result.put(MESSAGE, "Email Updated but Problem while Sending Email!!");
+						updEmailMap.put(MESSAGE, "Email Updated but Problem while Sending Email!!");
 					else
-						result.put(MESSAGE, "Problem while Sending Email!!");
+						updEmailMap.put(MESSAGE, "Problem while Sending Email!!");
 				}
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Email Not Updated");
+				updEmailMap.put(SUCCESS, false);
+				updEmailMap.put(MESSAGE, "Email Not Updated");
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(updEmailMap, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while updating email for the Email Api..{}", e.getMessage());
 			throw new CRMException(e);

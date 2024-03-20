@@ -84,7 +84,7 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeeting(@Valid MeetingDto dto, Integer leadsId) {
 		log.info("inside the addMeeting method...{}", leadsId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> addMeetMap = new EnumMap<>(ApiResponse.class);
 		try {
 			boolean saveStatus = false;
 			Meetings meeting = TO_MEETING.apply(dto).orElseThrow(ResourceNotFoundException::new);
@@ -112,13 +112,13 @@ public class MeetingServiceImpl implements MeetingService {
 			if (saveStatus) {
 				if (nonNull(dto.getMeetingMode()) && "Online".equalsIgnoreCase(dto.getMeetingMode()))
 					meetingUtil.scheduleMeetingInOutlook(dto);
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Meeting Added Successfully..!!");
+				addMeetMap.put(SUCCESS, true);
+				addMeetMap.put(MESSAGE, "Meeting Added Successfully..!!");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Meeting Not Added..!!");
+				addMeetMap.put(SUCCESS, false);
+				addMeetMap.put(MESSAGE, "Meeting Not Added..!!");
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(addMeetMap, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while adding meeting..{}", e.getMessage());
 			throw new CRMException(e);
@@ -144,7 +144,7 @@ public class MeetingServiceImpl implements MeetingService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeeting(MeetingDto dto, Integer meetingId,
 			String status) {
 		log.info("inside the updateMeeting method...{} {}", meetingId, status);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> updMeetMap = new EnumMap<>(ApiResponse.class);
 		try {
 			boolean meetingStatus = false;
 			Meetings saveMeeting = null;
@@ -194,16 +194,16 @@ public class MeetingServiceImpl implements MeetingService {
 				}
 			}
 			if (meetingStatus && SAVE.equalsIgnoreCase(status)) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Meeting Updated Successfully");
+				updMeetMap.put(SUCCESS, true);
+				updMeetMap.put(MESSAGE, "Meeting Updated Successfully");
 			} else if (meetingStatus && COMPLETE.equalsIgnoreCase(status)) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Meeting Updated And Completed Successfully");
+				updMeetMap.put(SUCCESS, true);
+				updMeetMap.put(MESSAGE, "Meeting Updated And Completed Successfully");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Meeting Not Updated");
+				updMeetMap.put(SUCCESS, false);
+				updMeetMap.put(MESSAGE, "Meeting Not Updated");
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(updMeetMap, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while updating the meeting by id..{} " + meetingId, e.getMessage());
 			throw new CRMException(e);
@@ -214,7 +214,7 @@ public class MeetingServiceImpl implements MeetingService {
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeeting(Integer meetingId) {
 		log.info("inside the deleteMeeting method...{}", meetingId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> delMeetMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			Meetings meetings = meetingDaoService.getMeetingById(meetingId)
@@ -238,13 +238,13 @@ public class MeetingServiceImpl implements MeetingService {
 		            .withZoneSameInstant(of(INDIA_ZONE))
 		            .toLocalDateTime());
 			if (nonNull(meetingDaoService.addMeeting(meetings))) {
-				result.put(MESSAGE, "Meeting deleted SuccessFully.");
-				result.put(SUCCESS, true);
+				delMeetMap.put(MESSAGE, "Meeting deleted SuccessFully.");
+				delMeetMap.put(SUCCESS, true);
 			} else {
-				result.put(MESSAGE, "Meeting Not delete.");
-				result.put(SUCCESS, false);
+				delMeetMap.put(MESSAGE, "Meeting Not delete.");
+				delMeetMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(delMeetMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while deleting the meeting by id..{} " + meetingId, e.getMessage());
 			throw new CRMException(e);
@@ -255,7 +255,7 @@ public class MeetingServiceImpl implements MeetingService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addMeetingTask(@Valid MeetingTaskDto dto, Integer leadsId,
 			Integer meetingId) {
 		log.info("inside the addMeetingTask method...{} {}", leadsId, meetingId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> addMeetTaskMap = new EnumMap<>(ApiResponse.class);
 		try {
 			MeetingTask meetingTask = TO_MEETING_TASK.apply(dto).orElseThrow(ResourceNotFoundException::new);
 			Optional<Leads> lead = leadDaoService.getLeadById(leadsId);
@@ -263,16 +263,16 @@ public class MeetingServiceImpl implements MeetingService {
 				meetingTask.setAssignTo(lead.get().getEmployee());
 			meetingDaoService.getMeetingById(meetingId).ifPresent(meetingTask::setMeetings);
 			if (checkDuplicateMeetingTask(meetingDaoService.getAllMeetingTask(), meetingTask)) {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Already Exists !!");
+				addMeetTaskMap.put(SUCCESS, false);
+				addMeetTaskMap.put(MESSAGE, "Task Already Exists !!");
 			} else if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Added Successfully..!!");
+				addMeetTaskMap.put(SUCCESS, true);
+				addMeetTaskMap.put(MESSAGE, "Task Added Successfully..!!");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Added");
+				addMeetTaskMap.put(SUCCESS, false);
+				addMeetTaskMap.put(MESSAGE, "Task Not Added");
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(addMeetTaskMap, CREATED);
 		} catch (Exception e) {
 			log.error("error occured while adding meeting tasks..{}", e.getMessage());
 			throw new CRMException(e);
@@ -297,7 +297,7 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateMeetingTask(GetMeetingTaskDto dto, Integer taskId) {
 		log.info("inside the updateMeetingTask method...{}", taskId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> updMeetTaskMap = new EnumMap<>(ApiResponse.class);
 		try {
 			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(MEETING_TASK, TASK_ID, taskId));
@@ -312,13 +312,13 @@ public class MeetingServiceImpl implements MeetingService {
 			meetingTask.setRemainderVia(dto.getRemainderVia());
 			meetingTask.setDescription(dto.getDescription());
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Updated Successfully..!!");
+				updMeetTaskMap.put(SUCCESS, true);
+				updMeetTaskMap.put(MESSAGE, "Task Updated Successfully..!!");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Updated");
+				updMeetTaskMap.put(SUCCESS, false);
+				updMeetTaskMap.put(MESSAGE, "Task Not Updated");
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(updMeetTaskMap, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while updating the meeting task by id..{} " + taskId, e.getMessage());
 			throw new CRMException(e);
@@ -327,7 +327,7 @@ public class MeetingServiceImpl implements MeetingService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignMeetingTask(Map<String, Integer> map) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> asgnMeetTaskMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign task staffId: {} taskId:{}", map.get(STAFF_ID), map.get(TASK_ID));
 		try {
 			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(map.get(TASK_ID))
@@ -336,13 +336,13 @@ public class MeetingServiceImpl implements MeetingService {
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			meetingTask.setAssignTo(employee);
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Assigned SuccessFully");
+				asgnMeetTaskMap.put(SUCCESS, true);
+				asgnMeetTaskMap.put(MESSAGE, "Task Assigned SuccessFully");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Assigned");
+				asgnMeetTaskMap.put(SUCCESS, false);
+				asgnMeetTaskMap.put(MESSAGE, "Task Not Assigned");
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(asgnMeetTaskMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while assigning the MeetingTask..{}", e.getMessage());
 			throw new CRMException(e);
@@ -352,7 +352,7 @@ public class MeetingServiceImpl implements MeetingService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteMeetingTask(Integer taskId) {
 		log.info("inside the deleteMeetingTask method...{}", taskId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> delMeetTaskMap = new EnumMap<>(ApiResponse.class);
 		try {
 			MeetingTask meetingTask = meetingDaoService.getMeetingTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(MEETING_TASK, TASK_ID, taskId));
@@ -361,13 +361,13 @@ public class MeetingServiceImpl implements MeetingService {
 		            .withZoneSameInstant(of(INDIA_ZONE))
 		            .toLocalDateTime());
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
-				result.put(MESSAGE, "Meeting Task Deleted SuccessFully.");
-				result.put(SUCCESS, true);
+				delMeetTaskMap.put(MESSAGE, "Meeting Task Deleted SuccessFully.");
+				delMeetTaskMap.put(SUCCESS, true);
 			} else {
-				result.put(MESSAGE, "Meeting Task Not delete.");
-				result.put(SUCCESS, false);
+				delMeetTaskMap.put(MESSAGE, "Meeting Task Not delete.");
+				delMeetTaskMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(delMeetTaskMap, OK);
 
 		} catch (Exception e) {
 			log.error("Got Exception while deleting the meeting task by id..{} " + taskId, e.getMessage());

@@ -63,7 +63,7 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addOpportunityTask(@Valid OpportunityTaskDto dto,
 			Integer optyId) {
 		log.info("inside the addOpportunityTask method...{}", optyId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> addOpptTaskMap = new EnumMap<>(ApiResponse.class);
 		try {
 			OpportunityTask opportunityTask = TO_OPPORTUNITY_TASK.apply(dto)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY_TASK, TASK_ID, dto.getOptyTaskId()));
@@ -72,16 +72,16 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(opportunityTask::setAssignTo);
 			opportunityTask.setOpportunity(opportunity);
 			if (checkDuplicateOptyTask(opportunityTaskDaoService.getAllTask(), opportunityTask)) {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Already Exists !!");
+				addOpptTaskMap.put(SUCCESS, false);
+				addOpptTaskMap.put(MESSAGE, "Task Already Exists !!");
 			} else if (nonNull(opportunityTaskDaoService.addOptyTask(opportunityTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Added Successfully");
+				addOpptTaskMap.put(SUCCESS, true);
+				addOpptTaskMap.put(MESSAGE, "Task Added Successfully");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Added");
+				addOpptTaskMap.put(SUCCESS, false);
+				addOpptTaskMap.put(MESSAGE, "Task Not Added");
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(addOpptTaskMap, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while adding the opportunity task..{}", e.getMessage());
 			throw new CRMException(e);
@@ -91,12 +91,12 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityTask(Integer taskId) {
 		log.info("inside the getOpportunityTask method...{}", taskId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> opptTaskMap = new EnumMap<>(ApiResponse.class);
 		try {
-			result.put(DATA, TO_GET_OPPORTUNITY_TASK_DTO.apply(opportunityTaskDaoService.getOptyTaskById(taskId)
+			opptTaskMap.put(DATA, TO_GET_OPPORTUNITY_TASK_DTO.apply(opportunityTaskDaoService.getOptyTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY_TASK, TASK_ID, taskId))));
-			result.put(SUCCESS, true);
-			return new ResponseEntity<>(result, OK);
+			opptTaskMap.put(SUCCESS, true);
+			return new ResponseEntity<>(opptTaskMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting the opportunity task..{}", e.getMessage());
 			throw new CRMException(e);
@@ -107,7 +107,7 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunityTask(GetOpportunityTaskDto dto,
 			Integer taskId) {
 		log.info("inside the updateOpportunityTask method...{}", taskId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> updOpptTaskMap = new EnumMap<>(ApiResponse.class);
 		try {
 			OpportunityTask opportunityTask = opportunityTaskDaoService.getOptyTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY_TASK, TASK_ID, taskId));
@@ -122,13 +122,13 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 			opportunityTask.setRemainderVia(dto.getRemainderVia());
 			opportunityTask.setDescription(dto.getDescription());
 			if (nonNull(opportunityTaskDaoService.addOptyTask(opportunityTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Updated Successfully");
+				updOpptTaskMap.put(SUCCESS, true);
+				updOpptTaskMap.put(MESSAGE, "Task Updated Successfully");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Updated");
+				updOpptTaskMap.put(SUCCESS, false);
+				updOpptTaskMap.put(MESSAGE, "Task Not Updated");
 			}
-			return new ResponseEntity<>(result, CREATED);
+			return new ResponseEntity<>(updOpptTaskMap, CREATED);
 
 		} catch (Exception e) {
 			log.error("Got Exception while updating the opportunity task..{}", e.getMessage());
@@ -138,7 +138,7 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignOpportunityTask(Map<String, Integer> map) {
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> asgnOpptTaskMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside the assignOpportunityTask staffId: {} taskId:{}", map.get(STAFF_ID), map.get(TASK_ID));
 		try {
 			OpportunityTask opportunityTask = opportunityTaskDaoService.getOptyTaskById(map.get(TASK_ID))
@@ -147,13 +147,13 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			opportunityTask.setAssignTo(employee);
 			if (nonNull(opportunityTaskDaoService.addOptyTask(opportunityTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task Assigned SuccessFully");
+				asgnOpptTaskMap.put(SUCCESS, true);
+				asgnOpptTaskMap.put(MESSAGE, "Task Assigned SuccessFully");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not Assigned");
+				asgnOpptTaskMap.put(SUCCESS, false);
+				asgnOpptTaskMap.put(MESSAGE, "Task Not Assigned");
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(asgnOpptTaskMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while assigning the opportunity task..{}", e.getMessage());
 			throw new CRMException(e);
@@ -163,7 +163,7 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteOpportunityTask(Integer taskId) {
 		log.info("inside the deleteOpportunityTask method...{}", taskId);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> delOpptTaskMap = new EnumMap<>(ApiResponse.class);
 		try {
 			OpportunityTask opportunityTask = opportunityTaskDaoService.getOptyTaskById(taskId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY_TASK, TASK_ID, taskId));
@@ -171,13 +171,13 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 			opportunityTask.setDeletedDate(
 					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 			if (nonNull(opportunityTaskDaoService.addOptyTask(opportunityTask))) {
-				result.put(SUCCESS, true);
-				result.put(MESSAGE, "Task deleted SuccessFully");
+				delOpptTaskMap.put(SUCCESS, true);
+				delOpptTaskMap.put(MESSAGE, "Task deleted SuccessFully");
 			} else {
-				result.put(SUCCESS, false);
-				result.put(MESSAGE, "Task Not delete.");
+				delOpptTaskMap.put(SUCCESS, false);
+				delOpptTaskMap.put(MESSAGE, "Task Not delete.");
 			}
-			return new ResponseEntity<>(result, OK);
+			return new ResponseEntity<>(delOpptTaskMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while deleting the opportunity task..{}", e.getMessage());
 			throw new CRMException(e);
