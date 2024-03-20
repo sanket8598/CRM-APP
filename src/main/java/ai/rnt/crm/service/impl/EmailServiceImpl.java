@@ -84,19 +84,10 @@ public class EmailServiceImpl implements EmailService {
 				email.setCcMail(dto.getCc().stream().collect(Collectors.joining(",")));
 			email.setStatus(status);
 			leadDaoService.getLeadById(leadId).ifPresent(email::setLead);
-			if (dto.getAttachment().isEmpty()) {
-				sendEmail = emailDaoService.email(email);
-				saveStatus = nonNull(sendEmail);
-			} else {
-				for (AttachmentDto attach : dto.getAttachment()) {
-					Attachment attachment = TO_ATTACHMENT.apply(attach).orElseThrow(ResourceNotFoundException::new);
-					attachment.setMail(email);
-					Attachment addAttachment = attachmentDaoService.addAttachment(attachment);
-					sendEmail = addAttachment.getMail();
-					saveStatus = nonNull(addAttachment);
-				}
-			}
-			if (saveStatus && SAVE.equalsIgnoreCase(status)) {
+
+			saveEmail(dto, email, sendEmail, saveStatus);
+
+			if (saveStatus && SAVE.equalsIgnoreCase(status) && nonNull(sendEmail)) {
 				addEmailMap.put(SUCCESS, true);
 				addEmailMap.put(MESSAGE, "Email Added Successfully");
 				addEmailMap.put(DATA, sendEmail.getMailId());
@@ -151,28 +142,27 @@ public class EmailServiceImpl implements EmailService {
 		EnumMap<ApiResponse, Object> delEmailMap = new EnumMap<>(ApiResponse.class);
 		Email updatedEmail = null;
 		try {
-                Integer staffId=auditAwareUtil.getLoggedInStaffId();
-				Email mail = emailDaoService.findById(mailId);
-				List<Attachment> attachment = mail.getAttachment();
-				if (nonNull(attachment) && !attachment.isEmpty()) {
-					for (Attachment e : attachment) {
-						e.setDeletedBy(staffId);
-						e.setDeletedDate(
-								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
-						e.getMail().setDeletedBy(staffId);
-						e.getMail().setDeletedDate(
-								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
-						e.setMail(e.getMail());
-						attachmentDaoService.addAttachment(e);
-						updatedEmail = emailDaoService.email(mail);
-					}
-				} else {
-					mail.setDeletedBy(staffId);
-					mail.setDeletedDate(now().atZone(systemDefault())
-				            .withZoneSameInstant(of(INDIA_ZONE))
-				            .toLocalDateTime());
+			Integer staffId = auditAwareUtil.getLoggedInStaffId();
+			Email mail = emailDaoService.findById(mailId);
+			List<Attachment> attachment = mail.getAttachment();
+			if (nonNull(attachment) && !attachment.isEmpty()) {
+				for (Attachment e : attachment) {
+					e.setDeletedBy(staffId);
+					e.setDeletedDate(
+							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+					e.getMail().setDeletedBy(staffId);
+					e.getMail().setDeletedDate(
+							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+					e.setMail(e.getMail());
+					attachmentDaoService.addAttachment(e);
 					updatedEmail = emailDaoService.email(mail);
 				}
+			} else {
+				mail.setDeletedBy(staffId);
+				mail.setDeletedDate(
+						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+				updatedEmail = emailDaoService.email(mail);
+			}
 			if (nonNull(updatedEmail)) {
 				delEmailMap.put(MESSAGE, "Email deleted SuccessFully.");
 				delEmailMap.put(SUCCESS, true);
@@ -258,27 +248,17 @@ public class EmailServiceImpl implements EmailService {
 			email.setScheduledAt(dto.getScheduledAt());
 
 			List<Integer> newIds = dto.getAttachment().stream().map(AttachmentDto::getEmailAttchId).collect(toList());
-		List<Attachment> emailList=email.getAttachment().stream().filter(e -> !newIds.contains(e.getEmailAttchId()))
-			.filter(Objects::nonNull)
-			.collect(toList());
-		emailList.stream().forEach(data -> {
-			data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			data.setDeletedDate(
-					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
-			attachmentDaoService.addAttachment(data);
-		});
-			if (dto.getAttachment().isEmpty()) {
-				sendEmail = emailDaoService.email(email);
-				saveStatus = nonNull(sendEmail);
-			} else {
-				for (AttachmentDto attach : dto.getAttachment()) {
-					Attachment attachment = TO_ATTACHMENT.apply(attach).orElseThrow(ResourceNotFoundException::new);
-					attachment.setMail(email);
-					Attachment addAttachment = attachmentDaoService.addAttachment(attachment);
-					sendEmail = addAttachment.getMail();
-					saveStatus = nonNull(addAttachment);
-				}
-			}
+			List<Attachment> emailList = email.getAttachment().stream()
+					.filter(e -> !newIds.contains(e.getEmailAttchId())).filter(Objects::nonNull).collect(toList());
+			emailList.stream().forEach(data -> {
+				data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+				data.setDeletedDate(
+						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+				attachmentDaoService.addAttachment(data);
+			});
+
+			saveEmail(dto, email, sendEmail, saveStatus);
+
 			if (saveStatus && SAVE.equalsIgnoreCase(status)) {
 				updEmailMap.put(SUCCESS, true);
 				updEmailMap.put(MESSAGE, "Email Updated Successfully");
@@ -302,6 +282,21 @@ public class EmailServiceImpl implements EmailService {
 		} catch (Exception e) {
 			log.error("error occured while updating email for the Email Api..{}", e.getMessage());
 			throw new CRMException(e);
+		}
+	}
+
+	private void saveEmail(EmailDto dto, Email email, Email sendEmail, boolean saveStatus) {
+		if (dto.getAttachment().isEmpty()) {
+			sendEmail = emailDaoService.email(email);
+			saveStatus = nonNull(sendEmail);
+		} else {
+			for (AttachmentDto attach : dto.getAttachment()) {
+				Attachment attachment = TO_ATTACHMENT.apply(attach).orElseThrow(ResourceNotFoundException::new);
+				attachment.setMail(email);
+				Attachment addAttachment = attachmentDaoService.addAttachment(attachment);
+				sendEmail = addAttachment.getMail();
+				saveStatus = nonNull(addAttachment);
+			}
 		}
 	}
 }
