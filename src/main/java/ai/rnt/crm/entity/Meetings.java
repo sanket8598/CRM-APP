@@ -1,14 +1,12 @@
 package ai.rnt.crm.entity;
 
-import static ai.rnt.crm.constants.DateFormatterConstant.TIME_12_HRS;
-import static ai.rnt.crm.constants.DateFormatterConstant.TIME_24_HRS;
+import static ai.rnt.crm.util.ConvertDateFormatUtil.convertTimeTo12Hours;
 import static java.util.Objects.nonNull;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,36 +92,27 @@ public class Meetings extends Auditable {
 	@ManyToOne
 	@JoinColumn(name = "lead_id")
 	private Leads lead;
-	
-	@Column(name="is_opportunity",columnDefinition = "default false")
+
+	@Column(name = "is_opportunity", columnDefinition = "default false")
 	private Boolean isOpportunity;
-	
+
 	@OneToMany(mappedBy = "meetings", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
 	private List<MeetingAttachments> meetingAttachments = new ArrayList<>();
 
 	@OneToMany(mappedBy = "meetings", cascade = ALL, orphanRemoval = true)
 	private List<MeetingTask> meetingTasks = new ArrayList<>();
-	
+
 	@Transient
 	public String getStartTime12Hours() {
-		if (nonNull(getStartTime())) {
-			try {
-				return TIME_12_HRS.format(TIME_24_HRS.parse(getStartTime()));
-			} catch (ParseException e) {
-				return getStartTime();
-			}
-		}
+		if (nonNull(getStartTime()))
+			return convertTimeTo12Hours(getStartTime());
 		return null;
 	}
 
 	@Transient
 	public String getEndTime12Hours() {
 		if (nonNull(getEndTime()))
-			try {
-				return TIME_12_HRS.format(TIME_24_HRS.parse(getEndTime()));
-			} catch (ParseException e) {
-				return getEndTime();
-			}
+			return convertTimeTo12Hours(getEndTime());
 		return null;
 	}
 

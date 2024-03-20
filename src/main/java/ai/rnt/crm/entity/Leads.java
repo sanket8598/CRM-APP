@@ -1,7 +1,6 @@
 package ai.rnt.crm.entity;
 
-import static ai.rnt.crm.constants.DateFormatterConstant.TIME_12_HRS;
-import static ai.rnt.crm.constants.DateFormatterConstant.TIME_24_HRS;
+import static ai.rnt.crm.util.ConvertDateFormatUtil.convertTimeTo12Hours;
 import static java.util.Objects.nonNull;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.DETACH;
@@ -10,7 +9,6 @@ import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.GenerationType.IDENTITY;
 import static org.hibernate.annotations.LazyCollectionOption.FALSE;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,19 +127,14 @@ public class Leads extends Auditable {
 
 	@OneToMany(mappedBy = "lead", cascade = ALL, orphanRemoval = true)
 	private List<LeadTask> leadTasks = new ArrayList<>();
-	
+
 	@OneToOne(mappedBy = "leads", cascade = ALL, orphanRemoval = true)
 	private Opportunity opportunity;
 
 	@Transient
 	public String getRemainderDueAt12Hours() {
-		if (nonNull(getRemainderDueAt())) {
-			try {
-				return TIME_12_HRS.format(TIME_24_HRS.parse(getRemainderDueAt()));
-			} catch (ParseException e) {
-				return getRemainderDueAt();
-			}
-		}
+		if (nonNull(getRemainderDueAt()))
+			return convertTimeTo12Hours(getRemainderDueAt());
 		return null;
 	}
 }

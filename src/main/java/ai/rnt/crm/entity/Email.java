@@ -1,13 +1,11 @@
 package ai.rnt.crm.entity;
 
-import static ai.rnt.crm.constants.DateFormatterConstant.TIME_12_HRS;
-import static ai.rnt.crm.constants.DateFormatterConstant.TIME_24_HRS;
+import static ai.rnt.crm.util.ConvertDateFormatUtil.convertTimeTo12Hours;
 import static java.util.Objects.nonNull;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
 
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,39 +67,33 @@ public class Email extends Auditable {
 
 	@Column(name = "content")
 	private String content;
-	
+
 	private String status;
-	
+
 	@Column(name = "is_scheduled")
 	private Boolean scheduled;
-	
-	@Column(name = "scheduled_on",columnDefinition = "date")
+
+	@Column(name = "scheduled_on", columnDefinition = "date")
 	private LocalDate scheduledOn;
-	
+
 	@Column(name = "scheduled_at")
 	private String scheduledAt;
-	
-	@Column(name="is_opportunity",columnDefinition = "default false")
+
+	@Column(name = "is_opportunity", columnDefinition = "default false")
 	private Boolean isOpportunity;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="lead_id")
+	@JoinColumn(name = "lead_id")
 	private Leads lead;
-	
-	@OneToMany(mappedBy = "mail",cascade = {REMOVE,REFRESH},orphanRemoval = true)
+
+	@OneToMany(mappedBy = "mail", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
 	@Fetch(FetchMode.JOIN)
 	private List<Attachment> attachment = new ArrayList<>();
-	
+
 	@Transient
 	public String getScheduledAtTime12Hours() {
-		if (nonNull(getScheduledAt())) {
-			try {
-				return TIME_12_HRS.format(TIME_24_HRS.parse(getScheduledAt()));
-			} catch (ParseException e) {
-				return getScheduledAt();
-			}
-		}
+		if (nonNull(getScheduledAt()))
+			return convertTimeTo12Hours(getScheduledAt());
 		return null;
 	}
-
 }
