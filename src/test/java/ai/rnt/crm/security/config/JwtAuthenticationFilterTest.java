@@ -1,7 +1,6 @@
 package ai.rnt.crm.security.config;
 
 import static ai.rnt.crm.constants.SecurityConstant.TOKEN_PREFIX_BEARER;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;

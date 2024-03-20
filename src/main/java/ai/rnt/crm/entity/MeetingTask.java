@@ -7,7 +7,6 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -34,7 +33,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Where(clause = "deleted_by is null")
-public class MeetingTask extends Auditable {
+public class MeetingTask extends Task {
 
 	private static final long serialVersionUID = -3854915649423434269L;
 
@@ -42,37 +41,6 @@ public class MeetingTask extends Auditable {
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "mtg_task_id")
 	private Integer meetingTaskId;
-
-	@Column(name = "subject")
-	private String subject;
-
-	@Column(name = "task_status")
-	private String status;
-
-	@Column(name = "task_priority")
-	private String priority;
-
-	@Column(name = "task_due_date")
-	private LocalDate dueDate;
-
-	@Column(name = "task_due_time")
-	private String dueTime;
-
-	@Column(name = "task_description")
-	private String description;
-
-	@Column(name = "remainder", columnDefinition = "boolean default false")
-	private boolean remainderOn;
-
-	@Column(name = "remainder_via")
-	private String remainderVia;
-
-	@Column(name = "remainder_due_at")
-	// @Temporal(TIME)
-	private String remainderDueAt;
-
-	@Column(name = "remainder_due_on", columnDefinition = "date")
-	private LocalDate remainderDueOn;
 
 	@JoinColumn(name = "crm_mtg_id", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)

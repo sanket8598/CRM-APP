@@ -24,6 +24,7 @@ import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 
@@ -31,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -71,7 +73,7 @@ public class LoginController {
 	private final JWTTokenHelper helper;
 
 	@PostMapping(LOGIN)
-	public ResponseEntity<JwtAuthResponse> createAuthenticationToken(
+	public ResponseEntity<JwtAuthResponse> createAuthenticationToken(HttpServletRequest request,
 			@RequestBody @Valid JwtAuthRequest jwtAuthRequest) {
 		log.info("calling login api...");
 		try {
@@ -81,7 +83,7 @@ public class LoginController {
 					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
 			String token = helper.generateToken(customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()));
 			if (nonNull(token))
-				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).build(), OK);
+				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).csrfToken((CsrfToken) request.getAttribute(CsrfToken.class.getName())).build(), OK);
 			return new ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(), NO_CONTENT);
 		} catch (Exception e) {
 			log.error("Error Occured while login.. {}", e.getLocalizedMessage());

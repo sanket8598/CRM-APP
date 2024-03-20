@@ -1,6 +1,5 @@
 package ai.rnt.crm.util;
 
-import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

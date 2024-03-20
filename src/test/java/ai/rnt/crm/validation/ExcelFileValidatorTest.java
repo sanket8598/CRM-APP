@@ -1,7 +1,6 @@
 package ai.rnt.crm.validation;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import javax.validation.ConstraintValidatorContext;
 
