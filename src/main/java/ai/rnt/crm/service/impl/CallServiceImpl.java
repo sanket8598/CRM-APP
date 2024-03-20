@@ -159,7 +159,7 @@ public class CallServiceImpl implements CallService {
 	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignCall(Map<String, Integer> map) {
-		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> asgnCallMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign call staffId: {} callId:{}", map.get(STAFF_ID), map.get(ADD_CALL_ID));
 		try {
 			Call call = callDaoService.getCallById(map.get(ADD_CALL_ID))
@@ -173,13 +173,13 @@ public class CallServiceImpl implements CallService {
 					});
 			call.setCallFrom(employee);
 			if (nonNull(callDaoService.call(call))) {
-				resultMap.put(MESSAGE, "Call Assigned SuccessFully");
-				resultMap.put(SUCCESS, true);
+				asgnCallMap.put(MESSAGE, "Call Assigned SuccessFully");
+				asgnCallMap.put(SUCCESS, true);
 			} else {
-				resultMap.put(MESSAGE, "Call Not Assigned");
-				resultMap.put(SUCCESS, false);
+				asgnCallMap.put(MESSAGE, "Call Not Assigned");
+				asgnCallMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(resultMap, OK);
+			return new ResponseEntity<>(asgnCallMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while assign the call..{}", e.getMessage());
 			throw new CRMException(e);

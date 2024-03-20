@@ -163,7 +163,7 @@ public class VisitServiceImpl implements VisitService {
 	@Override
 	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignVisit(Map<String, Integer> map) {
-		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> asgnVisitMap = new EnumMap<>(ApiResponse.class);
 		log.info("inside assign Visit staffId: {} visitId:{}", map.get(STAFF_ID), map.get(VISIT_ID));
 		try {
 			Visit visit = visitDaoService.getVisitsByVisitId(map.get(VISIT_ID))
@@ -177,13 +177,13 @@ public class VisitServiceImpl implements VisitService {
 					});
 			visit.setVisitBy(employee);
 			if (nonNull(visitDaoService.saveVisit(visit))) {
-				resultMap.put(MESSAGE, "Visit Assigned SuccessFully");
-				resultMap.put(SUCCESS, true);
+				asgnVisitMap.put(MESSAGE, "Visit Assigned SuccessFully");
+				asgnVisitMap.put(SUCCESS, true);
 			} else {
-				resultMap.put(MESSAGE, "Visit Not Assigned");
-				resultMap.put(SUCCESS, false);
+				asgnVisitMap.put(MESSAGE, "Visit Not Assigned");
+				asgnVisitMap.put(SUCCESS, false);
 			}
-			return new ResponseEntity<>(resultMap, OK);
+			return new ResponseEntity<>(asgnVisitMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while assign the visit..{}", e.getMessage());
 			throw new CRMException(e);

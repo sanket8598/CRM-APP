@@ -298,8 +298,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityData(Integer optId) {
 		log.info("inside the getOpportunityData by optId method...{}", optId);
-		EnumMap<ApiResponse, Object> dashBoardData = new EnumMap<>(ApiResponse.class);
-		dashBoardData.put(SUCCESS, false);
+		EnumMap<ApiResponse, Object> opptDataMap = new EnumMap<>(ApiResponse.class);
+		opptDataMap.put(SUCCESS, false);
 		try {
 			Map<String, Object> dataMap = new LinkedHashMap<>();
 			Opportunity opportunity = opportunityDaoService.findOpportunity(optId)
@@ -327,9 +327,9 @@ public class OpportunityServiceImpl implements OpportunityService {
 			dataMap.put(ACTIVITY, getActivityData(calls,visits,emails,meetings,employeeService));
 			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls,visits,emails,meetings,employeeService)));
 			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, opportunity.getLeads()));
-			dashBoardData.put(SUCCESS, true);
-			dashBoardData.put(DATA, dataMap);
-			return new ResponseEntity<>(dashBoardData, OK);
+			opptDataMap.put(SUCCESS, true);
+			opptDataMap.put(DATA, dataMap);
+			return new ResponseEntity<>(opptDataMap, OK);
 		} catch (Exception e) {
 			log.error("Got exception while getting the opportunity data by id...{}", e.getMessage());
 			throw new CRMException(e);
