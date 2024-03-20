@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.Date;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
@@ -37,42 +36,23 @@ import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dto.MeetingAttachmentsDto;
 import ai.rnt.crm.dto.MeetingDto;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author Nikhil Gaikwad
+ * @author Sanket Wakankar
  * @since 21/12/2023
  * @version 1.0
  *
  */
 @Component
 @Slf4j
-@RequiredArgsConstructor
 @PropertySource("classpath:confidential.properties")
-public class MeetingUtil {
-
-	@Value("${email.userName}")
-	private String userName;
-
-	@Value("${email.password}")
-	private String password;
-
-	private static final Properties PROPERTIES = new Properties();
-	private static final String HOST = "smtp.zoho.com";
-
-	static {
-		PROPERTIES.put("mail.smtp.host", HOST);
-		PROPERTIES.put("mail.smtp.port", "587");
-		PROPERTIES.put("mail.smtp.auth", true);
-		PROPERTIES.put("mail.smtp.starttls.enable", true);
-	}
+public class MeetingUtil extends PropertyUtil {
 
 	public void scheduleMeetingInOutlook(MeetingDto dto) throws Exception {
 		log.info("inside the scheduleMeetingInOutlook method...{}");
