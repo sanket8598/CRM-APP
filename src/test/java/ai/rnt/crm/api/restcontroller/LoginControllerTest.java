@@ -7,12 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,12 +69,13 @@ class LoginControllerTest {
 	void createAuthenticationTokenTest() {
 		JwtAuthRequest jwtAuthRequest = new JwtAuthRequest();
 		jwtAuthRequest.setUserId("Ng1477");
+		HttpServletRequest req=mock(HttpServletRequest.class);
 		jwtAuthRequest.setPassword("NG@@1477");
 		jwtAuthRequest.setFromCorp(false);
 		String token = "testToken";
 		when(helper.generateToken(any())).thenReturn(token);
 		when(authenticationManager.authenticate(any())).thenReturn(null);
-		ResponseEntity<JwtAuthResponse> response = loginController.createAuthenticationToken(jwtAuthRequest);
+		ResponseEntity<JwtAuthResponse> response = loginController.createAuthenticationToken(req,jwtAuthRequest);
 		verify(authenticationManager).authenticate(any());
 		verify(helper).generateToken(any());
 		assertAll(() -> assertEquals(HttpStatus.OK, response.getStatusCode()),
@@ -86,7 +90,8 @@ class LoginControllerTest {
 		jwtAuthRequest.setFromCorp(true);
 		when(helper.generateToken(any())).thenReturn(null);
 		when(authenticationManager.authenticate(any())).thenReturn(null);
-		ResponseEntity<JwtAuthResponse> response = loginController.createAuthenticationToken(jwtAuthRequest);
+		HttpServletRequest req=mock(HttpServletRequest.class);
+		ResponseEntity<JwtAuthResponse> response = loginController.createAuthenticationToken(req,jwtAuthRequest);
 		verify(authenticationManager).authenticate(any());
 		verify(helper).generateToken(any());
 		assertAll(() -> assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode()),
@@ -100,7 +105,8 @@ class LoginControllerTest {
 		jwtAuthRequest.setPassword("NG@@1477");
 		jwtAuthRequest.setFromCorp(false);
 		when(authenticationManager.authenticate(any())).thenThrow(CRMException.class);
-		assertThrows(CRMException.class,() -> loginController.createAuthenticationToken(jwtAuthRequest));
+		HttpServletRequest req=mock(HttpServletRequest.class);
+		assertThrows(CRMException.class,() -> loginController.createAuthenticationToken(req,jwtAuthRequest));
 	}
 	
 	

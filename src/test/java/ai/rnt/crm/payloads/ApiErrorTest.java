@@ -1,6 +1,11 @@
 package ai.rnt.crm.payloads;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -8,6 +13,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.web.csrf.CsrfToken;
 
 import ai.rnt.crm.exception.CRMException;
 
@@ -103,18 +109,21 @@ class ApiErrorTest {
 	@Test
 	void jwtAuthRequestTest() {
 		JwtAuthRequest j = new JwtAuthRequest();
-		JwtAuthResponse js = new JwtAuthResponse(false, "tokne");
+		CsrfToken t=mock(CsrfToken.class);
+		JwtAuthResponse js = new JwtAuthResponse(false, "tokne",t);
 		js.setStatus(false);
 		js.setToken("sfdfd");
 		j.setFromCorp(false);
 		j.setPassword(null);
 		j.setUserId("asdf");
 		js.isStatus();
+		js.setCsrfToken(t);
+		js.getCsrfToken();
 		js.getToken();
 		j.isFromCorp();
 		j.getPassword();
 		j.getUserId();
-		JwtAuthResponse build = JwtAuthResponse.builder().status(false).token("sdfds").build();
+		JwtAuthResponse build = JwtAuthResponse.builder().status(false).token("sdfds").csrfToken(t).build();
 		assertNotNull(js);
 		assertNotNull(build);
 		assertNotNull(JwtAuthResponse.builder().toString());

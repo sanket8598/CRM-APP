@@ -1,7 +1,6 @@
 package ai.rnt.crm.security.config;
 
 import static ai.rnt.crm.security.AuthenticationUtil.PUBLIC_URLS;
-import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,6 +18,9 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -45,13 +47,14 @@ public class SecurityConfig implements WebMvcConfigurer {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(withDefaults());
+        http.cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()));;
 		http.csrf(csrf -> {
 			try {
-				csrf.disable().authorizeHttpRequests()
+				csrf.csrfTokenRepository(csrfTokenRepository()).ignoringAntMatchers(PUBLIC_URLS).and()
 						// we can give give access to the api based on the role or using
 						// e.g.antMatchers("/api/users/{path}").hasRole(null)
-						.antMatchers(PUBLIC_URLS).permitAll().antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+						.authorizeHttpRequests().antMatchers(PUBLIC_URLS).permitAll()
+						.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						.requestMatchers(CorsUtils::isPreFlightRequest).permitAll().anyRequest().authenticated();
 			} catch (Exception e) {
 				log.error("error occurred in the securityFilterChain... {}", e.getMessage());
@@ -69,6 +72,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 	PasswordEncoder passwordEncoder() {
 		return NoOpPasswordEncoder.getInstance();
 	}
+
 	@Bean
 	JwtAuthenticationFilter authenticationFilter() {
 		return new JwtAuthenticationFilter(exceptionResolver);
@@ -97,5 +101,10 @@ public class SecurityConfig implements WebMvcConfigurer {
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/" + "**").allowedMethods("*").allowedHeaders("*").exposedHeaders("*");
 	}
-	
+
+	private CsrfTokenRepository csrfTokenRepository() {
+		CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+		repository.setHeaderName("X-XSRF-TOKEN");
+		return repository;
+	}
 }

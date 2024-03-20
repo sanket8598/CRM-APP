@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto_mapper;
 
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +12,6 @@ import java.util.stream.Collectors;
 import ai.rnt.crm.dto.ServiceFallsDto;
 import ai.rnt.crm.entity.ServiceFallsMaster;
 import lombok.NoArgsConstructor;
-import static lombok.AccessLevel.PRIVATE;
 
 @NoArgsConstructor(access = PRIVATE)
 public class ServiceFallsDtoMapper {

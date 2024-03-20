@@ -20,10 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.MeetingTask;
 import ai.rnt.crm.entity.Meetings;
-import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.repository.MeetingRepository;
 import ai.rnt.crm.repository.MeetingTaskRepository;
 
