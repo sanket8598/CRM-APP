@@ -1,14 +1,7 @@
 package ai.rnt.crm.util;
 
-import static lombok.AccessLevel.PRIVATE;
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-import ai.rnt.crm.constants.EncryptionAlgoConstants;
-import ai.rnt.crm.exception.CRMException;
-import lombok.NoArgsConstructor;
 
 /**
  * This Util class is used to encrypt the password into the SHA-1 type.
@@ -18,12 +11,18 @@ import lombok.NoArgsConstructor;
  * @version 1.0
  *
  */
-@NoArgsConstructor(access = PRIVATE)
 public final class Sha1Encryptor {
 
-	public static String encryptThisString(String input) {
+	private String algo;
+
+	public Sha1Encryptor(String algo) {
+		super();
+		this.algo = algo;
+	}
+
+	public String encryptThisString(String input) {
 		try {
-			MessageDigest md = MessageDigest.getInstance(EncryptionAlgoConstants.SHA1);
+			MessageDigest md = MessageDigest.getInstance(algo);
 			byte[] messageDigest = md.digest(input.getBytes());
 			BigInteger no = new BigInteger(1, messageDigest);
 			StringBuilder hashtext = new StringBuilder(no.toString(16));
@@ -31,8 +30,8 @@ public final class Sha1Encryptor {
 				hashtext = hashtext.append("0" + hashtext);
 			}
 			return hashtext.toString();
-		} catch (NoSuchAlgorithmException e) {
-			throw new CRMException(e);
+		} catch (Exception e) {
+			return null;
 		}
 	}
 }

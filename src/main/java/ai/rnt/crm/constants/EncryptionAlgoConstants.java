@@ -8,5 +8,4 @@ import lombok.NoArgsConstructor;
 public class EncryptionAlgoConstants {
 
 	public static final String RSA = "RSA";
-	public static final String SHA1 = "SHA-1";
 }
