@@ -54,6 +54,9 @@ public class SecurityConfig implements WebMvcConfigurer {
 
 	@Value("${csrf.token}")
 	private String token;
+	
+	@Value("${allowed.origin}")
+	private String allowedOrigin;
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		 http.cors(withDefaults());
@@ -110,7 +113,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/" + "**").allowedOrigins("*").allowedMethods("*").allowedHeaders("*").exposedHeaders("*");
+		registry.addMapping("/" + "**").allowedOrigins(allowedOrigin).allowedMethods("*").allowedHeaders("*").exposedHeaders("*");
 	}
 }
 class CsrfRequireMatcher implements RequestMatcher {
