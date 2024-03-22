@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +26,8 @@ class MeetingTaskTest {
 		task.setRemainderVia("Email");
 		task.setRemainderDueAt("14:30:00");
 		task.setRemainderDueOn(LocalDate.of(2024, 3, 1));
+		task.setTaskNotifications(new ArrayList<>());
+		task.getTaskNotifications();
 		Meetings meeting = new Meetings();
 		meeting.setMeetingId(1);
 		task.setMeetings(meeting);

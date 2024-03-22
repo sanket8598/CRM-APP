@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,6 +25,8 @@ class PhoneCallTaskTest {
 		task.setRemainderVia("Sample remainder via");
 		task.setRemainderDueAt("12:00 PM");
 		task.setRemainderDueOn(LocalDate.now());
+		task.setTaskNotifications(new ArrayList<>());
+		task.getTaskNotifications();
 		EmployeeMaster assignTo = new EmployeeMaster();
 		assignTo.setStaffId(1);
 		task.setAssignTo(assignTo);

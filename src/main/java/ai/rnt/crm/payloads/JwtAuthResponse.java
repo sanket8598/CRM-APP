@@ -1,7 +1,5 @@
 package ai.rnt.crm.payloads;
 
-import org.springframework.security.web.csrf.CsrfToken;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Builder;
@@ -25,8 +23,6 @@ public class JwtAuthResponse {
 	private boolean status;
 	@JsonProperty("TOKEN")
 	private String token;
-	@JsonProperty("CSRF_TOKEN")
-	private CsrfToken csrfToken;
 
 }
 //@formatter:on

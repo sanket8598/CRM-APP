@@ -4,6 +4,9 @@ import java.util.Properties;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+
+import lombok.Getter;
+import lombok.Setter;
 /**
  * @author Sanket Wakankar
  * @since 20/02/2024
@@ -11,6 +14,8 @@ import org.springframework.context.annotation.PropertySource;
  *
  */
 @PropertySource("classpath:confidential.properties")
+@Getter
+@Setter
 public class PropertyUtil {
 	
 	@Value("${email.userName}")
@@ -21,6 +26,7 @@ public class PropertyUtil {
 	
 	protected static final Properties PROPERTIES = new Properties();
 	protected static final String HOST = "smtp.zoho.com";
+	
 
 	static {
 		PROPERTIES.put("mail.smtp.host", HOST);
