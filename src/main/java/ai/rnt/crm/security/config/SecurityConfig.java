@@ -1,11 +1,18 @@
 package ai.rnt.crm.security.config;
 
+import static ai.rnt.crm.security.AuthenticationUtil.ALLOW_URL;
 import static ai.rnt.crm.security.AuthenticationUtil.PUBLIC_URLS;
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -17,9 +24,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.security.web.csrf.DefaultCsrfToken;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -35,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@PropertySource("classpath:confidential.properties")
 public class SecurityConfig implements WebMvcConfigurer {
 
 	@Qualifier("handlerExceptionResolver")
@@ -43,12 +52,16 @@ public class SecurityConfig implements WebMvcConfigurer {
 	private final CustomUserDetails customUserDetails;
 	private final JWTAuthenticationEntryPoint authenticationEntryPoint;
 
+	@Value("${csrf.token}")
+	private String token;
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()));;
+		 http.cors(withDefaults());
 		http.csrf(csrf -> {
 			try {
-				csrf.csrfTokenRepository(csrfTokenRepository()).ignoringAntMatchers(PUBLIC_URLS).and()
+				csrf
+				.requireCsrfProtectionMatcher(new CsrfRequireMatcher())
+				.csrfTokenRepository(new PerRequestCsrfTokenRepository(token)).and()
 						// we can give give access to the api based on the role or using
 						// e.g.antMatchers("/api/users/{path}").hasRole(null)
 						.authorizeHttpRequests().antMatchers(PUBLIC_URLS).permitAll()
@@ -97,12 +110,37 @@ public class SecurityConfig implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/" + "**").allowedMethods("*").allowedHeaders("*").exposedHeaders("*");
+		registry.addMapping("/" + "**").allowedOrigins("*").allowedMethods("*").allowedHeaders("*").exposedHeaders("*");
 	}
+}
+class CsrfRequireMatcher implements RequestMatcher {
+	
+    @Override
+    public boolean matches(HttpServletRequest request) {
+        return !(ALLOW_URL.test(request.getServletPath()) || request.getMethod().equalsIgnoreCase("GET"));
+    }
+}
+class PerRequestCsrfTokenRepository implements CsrfTokenRepository {
+    private static final String DEFAULT_CSRF_HEADER_NAME = "X-CSRF-TOKEN";
+    private static final String DEFAULT_CSRF_PARAMETER_NAME = "_csrf";
+    
+    private String token;
+    
+    public PerRequestCsrfTokenRepository(String token) {
+		this.token=token;
+	}
+    
+    @Override
+    public CsrfToken generateToken(HttpServletRequest request) {
+        return new DefaultCsrfToken(DEFAULT_CSRF_HEADER_NAME, DEFAULT_CSRF_PARAMETER_NAME,token);
+    }
 
-	private CsrfTokenRepository csrfTokenRepository() {
-		CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-		repository.setHeaderName("X-XSRF-TOKEN");
-		return repository;
-	}
+    @Override
+    public void saveToken(CsrfToken token, HttpServletRequest request, HttpServletResponse response) {
+    }
+
+    @Override
+    public CsrfToken loadToken(HttpServletRequest request) {
+        return null;
+    }
 }

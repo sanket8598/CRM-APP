@@ -29,7 +29,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.entity.Attachment;
@@ -51,7 +50,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-@PropertySource("classpath:confidential.properties")
 public class EmailUtil extends PropertyUtil {
 
 	private static final String THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY = " The task is scheduled for completion by ";
@@ -69,7 +67,7 @@ public class EmailUtil extends PropertyUtil {
 		try {
 			// create a message with headers
 			Message msg = new MimeMessage(getSession());
-			msg.setFrom(new InternetAddress(userName));// change it to mail from.
+			msg.setFrom(new InternetAddress(getUserName()));// change it to mail from.
 
 			List<String> recipientList = nonNull(email.getToMail())
 					? of(email.getToMail().split(",")).map(String::trim).collect(toList())
@@ -120,7 +118,7 @@ public class EmailUtil extends PropertyUtil {
 		return Session.getInstance(PROPERTIES, new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(userName, password);
+				return new PasswordAuthentication(getUserName(), getPassword());
 			}
 		});
 	}
@@ -166,7 +164,7 @@ public class EmailUtil extends PropertyUtil {
 				recipientAddress[0] = new InternetAddress(callTask.getAssignTo().getEmailId());
 				recipientAddress[1] = new InternetAddress(emailId);
 			}
-			msg.setFrom(new InternetAddress(userName));
+			msg.setFrom(new InternetAddress(getUserName()));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(TASK_REMINDER + callTask.getSubject() + " - " + formatDate(callTask.getDueDate()));
 			msg.setSentDate(new Date());
@@ -200,7 +198,7 @@ public class EmailUtil extends PropertyUtil {
 				recipientAddress[0] = new InternetAddress(visitTask.getAssignTo().getEmailId());
 				recipientAddress[1] = new InternetAddress(emailId);
 			}
-			msg.setFrom(new InternetAddress(userName));
+			msg.setFrom(new InternetAddress(getUserName()));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(TASK_REMINDER + visitTask.getSubject() + " - " + formatDate(visitTask.getDueDate()));
 			msg.setSentDate(new Date());
@@ -235,7 +233,7 @@ public class EmailUtil extends PropertyUtil {
 				recipientAddress[0] = new InternetAddress(meetingTask.getAssignTo().getEmailId());
 				recipientAddress[1] = new InternetAddress(emailId);
 			}
-			msg.setFrom(new InternetAddress(userName));
+			msg.setFrom(new InternetAddress(getUserName()));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(TASK_REMINDER + meetingTask.getSubject() + " - " + formatDate(meetingTask.getDueDate()));
 			msg.setSentDate(new Date());
@@ -270,7 +268,7 @@ public class EmailUtil extends PropertyUtil {
 				recipientAddress[0] = new InternetAddress(leadTask.getAssignTo().getEmailId());
 				recipientAddress[1] = new InternetAddress(emailId);
 			}
-			msg.setFrom(new InternetAddress(userName));
+			msg.setFrom(new InternetAddress(getUserName()));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject(TASK_REMINDER + leadTask.getSubject() + " - " + formatDate(leadTask.getDueDate()));
 			msg.setSentDate(new Date());
@@ -306,7 +304,7 @@ public class EmailUtil extends PropertyUtil {
 			}
 			String leadName = leads.getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
-			msg.setFrom(new InternetAddress(userName));
+			msg.setFrom(new InternetAddress(getUserName()));
 			msg.setRecipients(TO, recipientAddress);
 			msg.setSubject("Follow-Up Reminder : " + leads.getTopic() + " by " + leadName + "-"
 					+ formatDate(leads.getRemainderDueOn()) + " At " + leads.getRemainderDueAt12Hours());
