@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,8 @@ class VisitTaskTest {
 		visitTask.setRemainderVia("Email");
 		visitTask.setRemainderDueAt("18:45:00");
 		visitTask.setRemainderDueOn(LocalDate.now());
+		visitTask.setTaskNotifications(new ArrayList<>());
+		visitTask.getTaskNotifications();
 		assertEquals(1, visitTask.getVisitTaskId());
 		assertEquals("Test Subject", visitTask.getSubject());
 		assertEquals("Save", visitTask.getStatus());

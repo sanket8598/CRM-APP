@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
@@ -27,12 +28,14 @@ class MeetingsTest {
 		meeting.setDescription("Sample Description");
 		meeting.setMeetingMode("Virtual");
 		meeting.setMeetingStatus("Scheduled");
+		meeting.setMeetingTasks(new ArrayList<>());
 		EmployeeMaster assignTo = new EmployeeMaster();
 		assignTo.setStaffId(1);
 		meeting.setAssignTo(assignTo);
 		Leads lead = new Leads();
 		lead.setLeadId(1);
 		meeting.setLead(lead);
+		meeting.getMeetingTasks();
 		assertEquals(1, meeting.getMeetingId());
 		assertEquals("Sample Meeting", meeting.getMeetingTitle());
 		assertEquals("John, Jane", meeting.getParticipates());

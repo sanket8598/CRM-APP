@@ -9,7 +9,6 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.io.IOException;
-import java.util.Enumeration;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;

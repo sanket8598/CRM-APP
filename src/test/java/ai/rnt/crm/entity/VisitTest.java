@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
@@ -31,11 +32,14 @@ class VisitTest {
 		EmployeeMaster visitBy = new EmployeeMaster();
 		visitBy.setStaffId(1);
 		visit.setVisitBy(visitBy);
+		visit.setVisitTasks(new ArrayList<>());
+		visit.getVisitTasks();
 
 		Leads lead = new Leads();
 		lead.setLeadId(1);
 		visit.setLead(lead);
 		int visitId = visit.getVisitId();
+		visit.getLead();
 		String location = visit.getLocation();
 		String subject = visit.getSubject();
 		String content = visit.getContent();

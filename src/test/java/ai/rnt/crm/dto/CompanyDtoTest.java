@@ -12,6 +12,10 @@ class CompanyDtoTest {
 
 	@Test
 	void getterDataTest() {
+		CompanyDto build = CompanyDto.builder().zipCode("12343").companyId(1).companyName("abc").companyWebsite("abc").city(new CityDto()).
+		country(new CountryDto()).build();
+		build.toString();
+		CompanyDto.builder().toString();
 		companyDto.getCompanyId();
 		companyDto.getCompanyName();
 		companyDto.getCompanyWebsite();
@@ -24,7 +28,6 @@ class CompanyDtoTest {
 		companyDto.toString();
 		companyDto1.toString();
 		companyDto.equals(companyDto1);
-		companyDto.builder();
 		Assertions.assertNotNull(companyDto);
 
 	}

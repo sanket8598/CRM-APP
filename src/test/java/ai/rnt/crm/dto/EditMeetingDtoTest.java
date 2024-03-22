@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,5 +60,55 @@ class EditMeetingDtoTest {
 		assertEquals(assignTo, editMeetingDto.getAssignTo());
 		assertEquals(attachments, editMeetingDto.getAttachments());
 	}
+	
+	@Test
+     void testEqualityWithDifferentSuperclassFields() {
+        EditMeetingDto dto1 = new EditMeetingDto();
+        dto1.setId(1);
+        dto1.setSubject("Subject");
+        dto1.setBody("Body");
+        dto1.setType("Type");
+        dto1.setShortName("ShortName");
+        dto1.setDueDate("2024-03-22");
+        dto1.setStatus("Pending");
+        dto1.setAssignTo(10);
+        dto1.setAttachments(new ArrayList<>());
+        dto1.setCreatedOn("2024-03-22");
+        dto1.setWaitTwoDays(false);
+        dto1.setOverDue(false);
+        
+        EditMeetingDto dto2 = new EditMeetingDto();
+        dto2.setId(1);
+        dto2.setSubject("Subject");
+        dto2.setBody("Body");
+        dto2.setType("Type");
+        dto2.setShortName("ShortName");
+        dto2.setDueDate("2024-03-22");
+        dto2.setStatus("Pending");
+        dto2.setAssignTo(10);
+        dto2.setAttachments(new ArrayList<>());
+        dto2.setCreatedOn("2024-03-22");
+        dto2.setWaitTwoDays(true);
+        dto2.setOverDue(false);
+        
+        dto1.getCreatedOn();
+        dto1.isWaitTwoDays();
+        dto1.getOverDue();
+        dto1.equals(dto2);
+        assertEquals(dto1, dto2, "The two objects should be considered equal despite differences in superclass fields.");
+        assertEquals(dto1.hashCode(), dto2.hashCode(), "Hash codes should be equal for equal objects.");
+    }
+
+    @Test
+    void testInequalityBasedOnOwnFields() {
+        EditMeetingDto dto1 = new EditMeetingDto();
+        dto1.setId(1);
+        dto1.setSubject("Subject 1");
+
+        EditMeetingDto dto2 = new EditMeetingDto();
+        dto2.setId(2);
+        dto2.setSubject("Subject 2");
+        assertNotEquals(dto1, dto2, "The two objects should not be considered equal because of differences in their own fields.");
+    }
 
 }

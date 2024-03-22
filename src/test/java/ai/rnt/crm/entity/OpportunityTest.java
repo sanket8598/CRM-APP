@@ -3,6 +3,7 @@ package ai.rnt.crm.entity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +40,8 @@ class OpportunityTest {
 		opportunity.setSupportPlan("Sample Support Plan");
 		opportunity.setFinalBudget("20000");
 		opportunity.setProgressStatus("In Progress");
+		opportunity.setOpportunityTasks(new ArrayList<>());
+		opportunity.getOpportunityTasks();
 		EmployeeMaster employee = new EmployeeMaster();
 		employee.setStaffId(1);
 		opportunity.setEmployee(employee);
