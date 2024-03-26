@@ -30,6 +30,7 @@ class EmailTest {
 		email.getIsOpportunity();
 		email.getLead();
 		email.getAttachment();
+		assertNull(email.getMailFrom());
 	}
 
 	Leads lead = new Leads();
@@ -52,6 +53,8 @@ class EmailTest {
 		email.setIsOpportunity(false);
 		email.setLead(lead);
 		email.setAttachment(attachment);
+		assertEquals(1, email.getMailId());
+
 	}
 
 	@Test

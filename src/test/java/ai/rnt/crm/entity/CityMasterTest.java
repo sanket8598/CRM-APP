@@ -1,5 +1,8 @@
 package ai.rnt.crm.entity;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +18,7 @@ class CityMasterTest {
 		cityMaster.getState();
 		cityMaster.getCity();
 		cityMaster.getContacts();
+		assertNull(cityMaster.getCityId());
 	}
 
 	StateMaster stateMaster = new StateMaster();
@@ -26,5 +30,6 @@ class CityMasterTest {
 		cityMaster.setState(stateMaster);
 		cityMaster.setCity("Pune");
 		cityMaster.setContacts(contacts);
+		assertEquals(1, cityMaster.getCityId());
 	}
 }

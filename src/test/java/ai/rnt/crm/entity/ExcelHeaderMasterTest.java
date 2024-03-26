@@ -1,20 +1,24 @@
 package ai.rnt.crm.entity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import org.junit.jupiter.api.Test;
 
 class ExcelHeaderMasterTest {
 
-	ExcelHeaderMaster excelHeaderMaster = new ExcelHeaderMaster();
-
 	@Test
 	void getterTest() {
-		excelHeaderMaster.getHeaderId();
-		excelHeaderMaster.getHeaderName();
+		ExcelHeaderMaster excelHeaderMaster = new ExcelHeaderMaster();
+		String headerName = excelHeaderMaster.getHeaderName();
+		assertNull(headerName);
 	}
 
 	@Test
 	void setterTest() {
+		ExcelHeaderMaster excelHeaderMaster = new ExcelHeaderMaster();
 		excelHeaderMaster.setHeaderId(1);
 		excelHeaderMaster.setHeaderName("FirstName");
+		assertEquals(1, excelHeaderMaster.getHeaderId());
 	}
 }

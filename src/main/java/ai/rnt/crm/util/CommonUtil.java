@@ -69,6 +69,7 @@ import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -96,12 +97,13 @@ import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@NoArgsConstructor(access = PRIVATE)
 public class CommonUtil {
-	
-	
+
 	public static Map<String, Object> getTaskDataMap(List<Call> calls, List<Visit> visits, List<Meetings> meetings,
 			Leads lead) {
 		log.info("inside the getTaskDataMap method...");
@@ -189,8 +191,9 @@ public class CommonUtil {
 								: null))
 				.collect(toList());
 	}
-	
-	public static Map<String, Object> upNextActivities(LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities) {
+
+	public static Map<String, Object> upNextActivities(
+			LinkedHashMap<Long, List<TimeLineActivityDto>> upNextActivities) {
 		log.info("inside the upNextActivities method...{}", upNextActivities);
 		Map<String, Object> upNextDataMap = new HashMap<>();
 		upNextDataMap.put(MSG, NO_ACTIVITY);
@@ -215,8 +218,9 @@ public class CommonUtil {
 		}
 		return upNextDataMap;
 	}
-	
-	public static void setServiceFallToLead(String serviceFallsName, Leads leads,ServiceFallsDaoSevice serviceFallsDaoSevice) throws Exception {
+
+	public static void setServiceFallToLead(String serviceFallsName, Leads leads,
+			ServiceFallsDaoSevice serviceFallsDaoSevice) throws Exception {
 		log.info("inside the setServiceFallToLead method...{}", serviceFallsName);
 		if (nonNull(serviceFallsName) && compile(IS_DIGIT).matcher(serviceFallsName).matches())
 			serviceFallsDaoSevice.getServiceFallById(parseInt(serviceFallsName))
@@ -231,8 +235,9 @@ public class CommonUtil {
 					.ifPresent(leads::setServiceFallsMaster);
 		}
 	}
-	
-	public static void setLeadSourceToLead(String leadSourceName, Leads leads,LeadSourceDaoService leadSourceDaoService) throws Exception {
+
+	public static void setLeadSourceToLead(String leadSourceName, Leads leads,
+			LeadSourceDaoService leadSourceDaoService) throws Exception {
 		log.info("inside the setLeadSourceToLead method...{} ", leadSourceName);
 		if (nonNull(leadSourceName) && compile(IS_DIGIT).matcher(leadSourceName).matches())
 			leadSourceDaoService.getLeadSourceById(parseInt(leadSourceName)).ifPresent(leads::setLeadSourceMaster);
@@ -248,8 +253,9 @@ public class CommonUtil {
 		}
 
 	}
-	
-	public static void setDomainToLead(String domainName, Leads leads,DomainMasterDaoService domainMasterDaoService) throws Exception {
+
+	public static void setDomainToLead(String domainName, Leads leads, DomainMasterDaoService domainMasterDaoService)
+			throws Exception {
 		log.info("inside the setDomainToLead method...{} ", domainName);
 		if (nonNull(domainName) && compile(IS_DIGIT).matcher(domainName).matches())
 			domainMasterDaoService.findById(parseInt(domainName)).ifPresent(leads::setDomainMaster);
@@ -261,8 +267,9 @@ public class CommonUtil {
 			domainMasterDaoService.addDomain(domainMaster).ifPresent(leads::setDomainMaster);
 		}
 	}
-	
-	public static List<TimeLineActivityDto> getTimelineData(List<Call> calls,List<Visit> visits,List<Email> emails,List<Meetings> meetings,EmployeeService employeeService) {
+
+	public static List<TimeLineActivityDto> getTimelineData(List<Call> calls, List<Visit> visits, List<Email> emails,
+			List<Meetings> meetings, EmployeeService employeeService) {
 		List<TimeLineActivityDto> timeLine = calls.stream().filter(TIMELINE_CALL).map(call -> {
 			EditCallDto callDto = new EditCallDto();
 			callDto.setId(call.getCallId());
@@ -305,8 +312,8 @@ public class CommonUtil {
 			EditMeetingDto meetDto = new EditMeetingDto();
 			meetDto.setId(meet.getMeetingId());
 			meetDto.setType(MEETING);
-			employeeService.getById(meet.getCreatedBy()).ifPresent(
-					byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+			employeeService.getById(meet.getCreatedBy())
+					.ifPresent(byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
 			meetDto.setSubject(meet.getMeetingTitle());
 			meetDto.setBody(meet.getDescription());
 			meetDto.setStatus(meet.getMeetingStatus());
@@ -318,9 +325,9 @@ public class CommonUtil {
 				.compareTo(parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 		return timeLine;
 	}
-  
-	
-	public static List<TimeLineActivityDto> getActivityData(List<Call> calls,List<Visit> visits,List<Email> emails,List<Meetings> meetings,EmployeeService employeeService) {
+
+	public static List<TimeLineActivityDto> getActivityData(List<Call> calls, List<Visit> visits, List<Email> emails,
+			List<Meetings> meetings, EmployeeService employeeService) {
 		List<TimeLineActivityDto> activity = calls.stream().filter(ACTIVITY_CALL).map(call -> {
 			EditCallDto callDto = new EditCallDto();
 			callDto.setId(call.getCallId());
@@ -374,8 +381,8 @@ public class CommonUtil {
 			EditMeetingDto meetDto = new EditMeetingDto();
 			meetDto.setId(meet.getMeetingId());
 			meetDto.setType(MEETING);
-			employeeService.getById(meet.getCreatedBy()).ifPresent(
-					byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+			employeeService.getById(meet.getCreatedBy())
+					.ifPresent(byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
 			meetDto.setSubject(meet.getMeetingTitle());
 			meetDto.setBody(meet.getDescription());
 			meetDto.setDueDate(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
@@ -392,59 +399,60 @@ public class CommonUtil {
 		return activity;
 
 	}
-	
-	public static LinkedHashMap<Long, List<TimeLineActivityDto>> getUpnextData(List<Call> calls,List<Visit> visits,List<Email> emails,List<Meetings> meetings,EmployeeService employeeService) {
-		 List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
-				EditCallDto callDto = new EditCallDto();
-				callDto.setId(call.getCallId());
-				callDto.setSubject(call.getSubject());
-				callDto.setType(CALL);
-				callDto.setBody(call.getComment());
-				callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
-				TO_EMPLOYEE.apply(call.getCallFrom()).ifPresent(e -> {
-					callDto.setCallFrom(e.getFirstName() + " " + e.getLastName());
-					callDto.setAssignTo(e.getStaffId());
-				});
-				callDto.setStatus(call.getStatus());
-				return callDto;
-			}).collect(toList());
 
-			upNext.addAll(visits.stream().filter(UPNEXT_VISIT).map(visit -> {
-				EditVisitDto editVisitDto = new EditVisitDto();
-				editVisitDto.setId(visit.getVisitId());
-				editVisitDto.setLocation(visit.getLocation());
-				editVisitDto.setSubject(visit.getSubject());
-				editVisitDto.setType(VISIT);
-				editVisitDto.setBody(visit.getContent());
-				employeeService.getById(visit.getCreatedBy()).ifPresent(
-						byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				editVisitDto.setCreatedOn(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
-				editVisitDto.setStatus(visit.getStatus());
-				editVisitDto.setAssignTo(visit.getVisitBy().getStaffId());
-				return editVisitDto;
-			}).collect(toList()));
-			upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
-				EditMeetingDto meetDto = new EditMeetingDto();
-				meetDto.setId(meet.getMeetingId());
-				meetDto.setType(MEETING);
-				employeeService.getById(meet.getCreatedBy()).ifPresent(
-						byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
-				meetDto.setSubject(meet.getMeetingTitle());
-				meetDto.setBody(meet.getDescription());
-				meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
-				meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
-				meetDto.setStatus(meet.getMeetingStatus());
-				meetDto.setAssignTo(meet.getAssignTo().getStaffId());
-				return meetDto;
-			}).collect(toList()));
-			
-			upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
-					.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
-			return upNext.stream()
-					.collect(groupingBy(e -> DAYS.between(
-							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime(),
-							parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
-					.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
-							(oldValue, newValue) -> oldValue, LinkedHashMap::new));
+	public static LinkedHashMap<Long, List<TimeLineActivityDto>> getUpnextData(List<Call> calls, List<Visit> visits,
+			List<Email> emails, List<Meetings> meetings, EmployeeService employeeService) {
+		List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
+			EditCallDto callDto = new EditCallDto();
+			callDto.setId(call.getCallId());
+			callDto.setSubject(call.getSubject());
+			callDto.setType(CALL);
+			callDto.setBody(call.getComment());
+			callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
+			TO_EMPLOYEE.apply(call.getCallFrom()).ifPresent(e -> {
+				callDto.setCallFrom(e.getFirstName() + " " + e.getLastName());
+				callDto.setAssignTo(e.getStaffId());
+			});
+			callDto.setStatus(call.getStatus());
+			return callDto;
+		}).collect(toList());
+
+		upNext.addAll(visits.stream().filter(UPNEXT_VISIT).map(visit -> {
+			EditVisitDto editVisitDto = new EditVisitDto();
+			editVisitDto.setId(visit.getVisitId());
+			editVisitDto.setLocation(visit.getLocation());
+			editVisitDto.setSubject(visit.getSubject());
+			editVisitDto.setType(VISIT);
+			editVisitDto.setBody(visit.getContent());
+			employeeService.getById(visit.getCreatedBy()).ifPresent(
+					byId -> editVisitDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+			editVisitDto.setCreatedOn(convertDateDateWithTime(visit.getStartDate(), visit.getStartTime12Hours()));
+			editVisitDto.setStatus(visit.getStatus());
+			editVisitDto.setAssignTo(visit.getVisitBy().getStaffId());
+			return editVisitDto;
+		}).collect(toList()));
+		upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
+			EditMeetingDto meetDto = new EditMeetingDto();
+			meetDto.setId(meet.getMeetingId());
+			meetDto.setType(MEETING);
+			employeeService.getById(meet.getCreatedBy())
+					.ifPresent(byId -> meetDto.setShortName(shortName(byId.getFirstName() + " " + byId.getLastName())));
+			meetDto.setSubject(meet.getMeetingTitle());
+			meetDto.setBody(meet.getDescription());
+			meetDto.setAttachments(TO_METTING_ATTACHMENT_DTOS.apply(meet.getMeetingAttachments()));
+			meetDto.setCreatedOn(convertDateDateWithTime(meet.getStartDate(), meet.getStartTime12Hours()));
+			meetDto.setStatus(meet.getMeetingStatus());
+			meetDto.setAssignTo(meet.getAssignTo().getStaffId());
+			return meetDto;
+		}).collect(toList()));
+
+		upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
+				.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
+		return upNext.stream()
+				.collect(groupingBy(e -> DAYS.between(
+						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime(),
+						parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
+				.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
+						(oldValue, newValue) -> oldValue, LinkedHashMap::new));
 	}
 }

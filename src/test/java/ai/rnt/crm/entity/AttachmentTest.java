@@ -1,5 +1,8 @@
 package ai.rnt.crm.entity;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 
 class AttachmentTest {
@@ -13,6 +16,7 @@ class AttachmentTest {
 		attachment.getAttachType();
 		attachment.getAttachName();
 		attachment.getMail();
+		assertNull(attachment.getEmailAttchId());
 	}
 
 	Email email = new Email();
@@ -24,5 +28,6 @@ class AttachmentTest {
 		attachment.setAttachType("pdf");
 		attachment.setAttachName("test");
 		attachment.setMail(email);
+		assertEquals(1, attachment.getEmailAttchId());
 	}
 }

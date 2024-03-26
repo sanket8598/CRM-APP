@@ -39,7 +39,7 @@ class LeadsDtoMapperTest {
 	}
 
 	@Test
-	public void testToLeadDto() {
+	void testToLeadDto() {
 		Leads leads = new Leads();
 		Optional<LeadDto> leadDtoOptional = LeadsDtoMapper.TO_LEAD_DTO.apply(leads);
 		assertNotNull(leadDtoOptional);

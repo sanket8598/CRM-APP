@@ -1,6 +1,7 @@
 package ai.rnt.crm.entity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,6 +30,7 @@ class EmployeeMasterTest {
 		employeeMaster.getLeads();
 		employeeMaster.getOpportunity();
 		employeeMaster.getImpLead();
+		assertNull(employeeMaster.getFirstName());
 	}
 
 	List<RoleMaster> employeeRole = new ArrayList<>();
@@ -53,6 +55,7 @@ class EmployeeMasterTest {
 		employeeMaster.setLeads(leads);
 		employeeMaster.setOpportunity(opportunity);
 		employeeMaster.setImpLead(impLead);
+		assertEquals(1477, employeeMaster.getStaffId());
 	}
 
 	@Test
