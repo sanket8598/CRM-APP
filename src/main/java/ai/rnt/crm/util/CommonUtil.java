@@ -151,6 +151,7 @@ public class CommonUtil {
 	public static List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
 		log.info("inside the getCallRelatedTasks method...");
 		return calls.stream().flatMap(call -> call.getCallTasks().stream())
+				.filter(e->isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId(), e.isRemainderOn(),
@@ -163,6 +164,7 @@ public class CommonUtil {
 	public static List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		log.info("inside the getVistRelatedTasks method...");
 		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
+				.filter(e->isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId(), e.isRemainderOn(),
@@ -175,6 +177,7 @@ public class CommonUtil {
 	public static List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
 		log.info("inside the getMeetingRelatedTasks method...");
 		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
+				.filter(e->isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getMeetings().getMeetingId(),
@@ -187,6 +190,7 @@ public class CommonUtil {
 	public static List<MainTaskDto> getLeadRelatedTasks(Leads lead) {
 		log.info("inside the getLeadRelatedTasks method...");
 		return lead.getLeadTasks().stream()
+				.filter(e->isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(), LEAD,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId(), e.isRemainderOn(),
@@ -199,6 +203,7 @@ public class CommonUtil {
 	public static List<MainTaskDto> getOpportunityRelatedTasks(Opportunity oppt) {
 		log.info("inside the getOpportunityRelatedTasks method...");
 		return oppt.getOpportunityTasks().stream()
+				.filter(e->isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getOptyTaskId(), e.getSubject(), e.getStatus(), OPPORTUNITY,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getOpportunity().getOpportunityId(), e.isRemainderOn(),

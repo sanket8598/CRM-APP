@@ -2,6 +2,7 @@ package ai.rnt.crm.exception.handler;
 
 import static ai.rnt.crm.constants.MessageConstants.ACCESS_DENIED;
 import static ai.rnt.crm.constants.MessageConstants.BAD_CREDENTIALS;
+import static ai.rnt.crm.constants.MessageConstants.ERROR_MSG;
 import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
 import static ai.rnt.crm.util.HttpUtils.getURL;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
@@ -170,6 +171,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			return new ResponseEntity<>(new ApiError(false, BAD_CREDENTIALS), BAD_REQUEST);
 		else if (exc.getException() instanceof InvalidKeyException)
 			return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), UNAUTHORIZED);
+		else if (exc.getException() instanceof NullPointerException)
+			return new ResponseEntity<>(new ApiError(false, ERROR_MSG), INTERNAL_SERVER_ERROR);
 		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), INTERNAL_SERVER_ERROR);
 	}
 
