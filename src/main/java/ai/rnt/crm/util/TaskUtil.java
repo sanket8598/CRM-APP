@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor(access = PRIVATE)
 public class TaskUtil {
 
-	public static boolean checkDuplicateTask(List<PhoneCallTask> allTask, PhoneCallTask phoneCallTask) {
+	public boolean checkDuplicateTask(List<PhoneCallTask> allTask, PhoneCallTask phoneCallTask) {
 		log.info("inside the call checkDuplicateTask method...{}");
 		try {
 			return nonNull(phoneCallTask) && allTask.stream().filter(Objects::nonNull).anyMatch(
