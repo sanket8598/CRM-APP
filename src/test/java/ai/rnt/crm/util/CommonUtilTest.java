@@ -42,6 +42,8 @@ import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
 import ai.rnt.crm.entity.Meetings;
+import ai.rnt.crm.entity.Opportunity;
+import ai.rnt.crm.entity.OpportunityTask;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.entity.Visit;
@@ -80,6 +82,7 @@ class CommonUtilTest {
 	@InjectMocks
 	private CommonUtil commonUtil;
 
+	@SuppressWarnings("deprecation")
 	@BeforeEach
 	void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -119,7 +122,8 @@ class CommonUtilTest {
 		List<Visit> visits = new ArrayList<>();
 		List<Meetings> meetings = new ArrayList<>();
 		Leads lead = new Leads();
-		Map<String, Object> taskData = CommonUtil.getTaskDataMap(calls, visits, meetings, lead);
+		Opportunity oppt = new Opportunity();
+		Map<String, Object> taskData = CommonUtil.getTaskDataMap(calls, visits, meetings, lead,oppt);
 		assertEquals(expectedTaskData, taskData);
 	}
 
@@ -223,6 +227,30 @@ class CommonUtilTest {
 	void testGetLeadRelatedTasksWithEmptyList() {
 		Leads leads = mock(Leads.class);
 		List<MainTaskDto> result = CommonUtil.getLeadRelatedTasks(leads);
+		assertTrue(result.isEmpty());
+	}
+	@Test
+	void testGetOpportunityRelatedTasksWithValidData() {
+		OpportunityTask leadTask1 = new OpportunityTask();
+		OpportunityTask leadTask2 = new OpportunityTask();
+		EmployeeMaster master = new EmployeeMaster();
+		master.setStaffId(1477);
+		leadTask1.setAssignTo(master);
+		leadTask2.setAssignTo(master);
+		Opportunity oppt = mock(Opportunity.class);
+		oppt.setEmployee(master);
+		oppt.setOpportunityId(1);
+		leadTask1.setOpportunity(oppt);
+		leadTask2.setOpportunity(oppt);
+		when(oppt.getOpportunityTasks()).thenReturn(Arrays.asList(leadTask1, leadTask2));
+		List<MainTaskDto> result = CommonUtil.getOpportunityRelatedTasks(oppt);
+		assertEquals(2, result.size());
+	}
+	
+	@Test
+	void testGetOpportunityRelatedTasksWithEmptyList() {
+		Opportunity oppt = mock(Opportunity.class);
+		List<MainTaskDto> result = CommonUtil.getOpportunityRelatedTasks(oppt);
 		assertTrue(result.isEmpty());
 	}
 

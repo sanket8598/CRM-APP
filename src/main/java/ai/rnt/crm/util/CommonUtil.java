@@ -27,6 +27,7 @@ import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
 import static ai.rnt.crm.constants.StatusConstants.EMAIL;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
+import static ai.rnt.crm.constants.StatusConstants.OPPORTUNITY;
 import static ai.rnt.crm.constants.StatusConstants.MEETING;
 import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
@@ -93,6 +94,7 @@ import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadSourceMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Meetings;
+import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.exception.ResourceNotFoundException;
@@ -105,7 +107,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CommonUtil {
 
 	public static Map<String, Object> getTaskDataMap(List<Call> calls, List<Visit> visits, List<Meetings> meetings,
-			Leads lead) {
+			Leads lead,Opportunity opportunity) {
 		log.info("inside the getTaskDataMap method...");
 		Map<String, Object> taskData = new HashMap<>();
 		Map<String, Object> taskCount = new HashMap<>();
@@ -113,6 +115,8 @@ public class CommonUtil {
 		allTask.addAll(getVistRelatedTasks(visits));
 		allTask.addAll(getMeetingRelatedTasks(meetings));
 		allTask.addAll(getLeadRelatedTasks(lead));
+		if(nonNull(opportunity))
+			allTask.addAll(getOpportunityRelatedTasks(opportunity));
 		List<MainTaskDto> notStartedTask = allTask.stream().filter(NOT_STARTED_TASK)
 				.sorted((t1, t2) -> parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
 						.compareTo(parse(t2.getDueDate(), DATE_TIME_WITH_AM_OR_PM)))
@@ -187,6 +191,18 @@ public class CommonUtil {
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId(), e.isRemainderOn(),
 						e.getLead().getStatus(),
+						e.isRemainderOn() ? convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())
+								: null))
+				.collect(toList());
+	}
+	
+	public static List<MainTaskDto> getOpportunityRelatedTasks(Opportunity oppt) {
+		log.info("inside the getOpportunityRelatedTasks method...");
+		return oppt.getOpportunityTasks().stream()
+				.map(e -> new MainTaskDto(e.getOptyTaskId(), e.getSubject(), e.getStatus(), OPPORTUNITY,
+						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getOpportunity().getOpportunityId(), e.isRemainderOn(),
+						e.getOpportunity().getStatus(),
 						e.isRemainderOn() ? convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())
 								: null))
 				.collect(toList());

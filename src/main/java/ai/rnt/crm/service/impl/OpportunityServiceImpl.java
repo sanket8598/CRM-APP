@@ -326,7 +326,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			dataMap.put(TIMELINE, getTimelineData(calls,visits,emails,meetings,employeeService));
 			dataMap.put(ACTIVITY, getActivityData(calls,visits,emails,meetings,employeeService));
 			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls,visits,emails,meetings,employeeService)));
-			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, opportunity.getLeads()));
+			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, opportunity.getLeads(),opportunity));
 			opptDataMap.put(SUCCESS, true);
 			opptDataMap.put(DATA, dataMap);
 			return new ResponseEntity<>(opptDataMap, OK);
