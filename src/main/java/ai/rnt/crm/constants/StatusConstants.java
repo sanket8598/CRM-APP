@@ -38,6 +38,7 @@ public final class StatusConstants {
 	public static final String VISIT = "Visit";
 	public static final String MEETING = "Meeting";
 	public static final String LEAD = "Lead";
+	public static final String OPPORTUNITY = "Opportunity";
 	
 	public static final String LOW = "Low";
 	public static final String MEDIUM = "Medium";

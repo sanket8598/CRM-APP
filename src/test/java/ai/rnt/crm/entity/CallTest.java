@@ -34,6 +34,7 @@ class CallTest {
 		call.getLead();
 		call.getIsOpportunity();
 		call.getCallTasks();
+		assertNull(call.getCallId());
 	}
 
 	EmployeeMaster employeeMaster = new EmployeeMaster();
@@ -61,6 +62,7 @@ class CallTest {
 		call.setIsOpportunity(false);
 		List<PhoneCallTask> callTasks = new ArrayList<>();
 		call.setCallTasks(callTasks);
+		assertEquals(1, call.getCallId());
 	}
 
 	@Test

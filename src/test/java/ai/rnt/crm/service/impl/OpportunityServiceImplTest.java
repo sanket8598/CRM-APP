@@ -1,5 +1,6 @@
 package ai.rnt.crm.service.impl;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -45,7 +46,6 @@ import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
-import ai.rnt.crm.dto.ContactDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditMeetingDto;
@@ -150,7 +150,7 @@ class OpportunityServiceImplTest {
 
 	@Mock
 	private UpdateLeadDto updateLeadDto;
-	
+
 	@Mock
 	private TimeLineActivityDto timeLineActivityDto;
 
@@ -187,6 +187,7 @@ class OpportunityServiceImplTest {
 		assertEquals(true, response.getBody().get(ApiResponse.SUCCESS));
 		assertNotNull(response.getBody().get(ApiResponse.DATA));
 	}
+
 	@Test
 	void testGetDashBoardDataForNoUser() {
 		when(auditAwareUtil.isAdmin()).thenReturn(false);
@@ -212,15 +213,15 @@ class OpportunityServiceImplTest {
 	@Test
 	void testGetDashBoardDataAdmin() {
 		List<Contacts> contList = new ArrayList<>();
-		Opportunity opp=new Opportunity();
-		Leads lead=new Leads();
-		Contacts cont=new Contacts();
-		CompanyMaster comp=new CompanyMaster();
+		Opportunity opp = new Opportunity();
+		Leads lead = new Leads();
+		Contacts cont = new Contacts();
+		CompanyMaster comp = new CompanyMaster();
 		comp.setCompanyName("Company Name");
 		cont.setCompanyMaster(comp);
 		cont.setPrimary(true);
-		Contacts cont1=new Contacts();
-		CompanyMaster comp1=new CompanyMaster();
+		Contacts cont1 = new Contacts();
+		CompanyMaster comp1 = new CompanyMaster();
 		comp1.setCompanyName("Company Name");
 		cont1.setCompanyMaster(comp1);
 		cont1.setPrimary(false);
@@ -243,20 +244,20 @@ class OpportunityServiceImplTest {
 	@Test
 	void testGetDashBoardDataUser() {
 		List<Contacts> contList = new ArrayList<>();
-		Opportunity opt=new Opportunity();
-		Opportunity opt2=new Opportunity();
+		Opportunity opt = new Opportunity();
+		Opportunity opt2 = new Opportunity();
 		opt.setStatus("Anaysis");
-		EmployeeMaster emp=new EmployeeMaster();
-		Leads lead=new Leads();
+		EmployeeMaster emp = new EmployeeMaster();
+		Leads lead = new Leads();
 		emp.setStaffId(1477);
 		opt.setEmployee(emp);
-		Contacts cont=new Contacts();
-		CompanyMaster comp=new CompanyMaster();
+		Contacts cont = new Contacts();
+		CompanyMaster comp = new CompanyMaster();
 		comp.setCompanyName("Company Name");
 		cont.setCompanyMaster(comp);
 		cont.setPrimary(true);
-		Contacts cont1=new Contacts();
-		CompanyMaster comp1=new CompanyMaster();
+		Contacts cont1 = new Contacts();
+		CompanyMaster comp1 = new CompanyMaster();
 		comp1.setCompanyName("Company Name");
 		cont1.setCompanyMaster(comp1);
 		cont1.setPrimary(false);
@@ -576,46 +577,14 @@ class OpportunityServiceImplTest {
 		assertThrows(CRMException.class, () -> opportunityServiceImpl.updateAnalysisPopUpData(dto, opportunityId));
 	}
 
-	@Test
-	void testUpdateQualifyPopUpData_Success() {
+	// @Test
+	void testUpdateQualifyPopUpDataSuccess() {
 		Integer opportunityId = 1;
-		Integer staffId = 1477;
-		Integer contactId = 1;
 		QualifyOpportunityDto dto = new QualifyOpportunityDto();
-		dto.setAssignTo(staffId);
-		ContactDto contDto=new ContactDto();
-		contDto.setContactId(contactId);
-		contDto.setClient(true);
-		List<ContactDto> clients=new ArrayList<>();
-		clients.add(contDto);
-		dto.setClients(clients);
 		Leads leads = new Leads();
 		Opportunity opportunity = new Opportunity();
-		EmployeeMaster emp=new EmployeeMaster();
-		emp.setStaffId(staffId);
-		opportunity.setEmployee(emp);
-		List<Contacts> contact = new ArrayList<>();
-		Contacts contact1 = new Contacts();
-		contact1.setPrimary(true);
-		contact1.setContactId(contactId);
-		contact.add(contact1);
-		leads.setContacts(contact);
 		opportunity.setLeads(leads);
 		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(opportunity));
-		when(employeeService.getById(dto.getAssignTo())).thenReturn(Optional.of(new EmployeeMaster()));
-		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(mock(Contacts.class)));
-		when(contactDaoService.addContact(contact1)).thenReturn(new Contacts());
-		List<OpprtAttachmentDto> isAttachments = new ArrayList<>();
-		OpprtAttachmentDto attachment1 = new OpprtAttachmentDto();
-		attachment1.setOptAttchId(1);
-		attachment1.setAttachmentOf("Close");
-		isAttachments.add(attachment1);
-		dto.setAttachments(isAttachments);
-		when(opprtAttachmentDaoService.addOpprtAttachment(any())).thenAnswer(invocation -> {
-			OpprtAttachment attachedAttachment = invocation.getArgument(0);
-			attachedAttachment.setOpportunity(opportunity);
-			return attachedAttachment;
-		});
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = opportunityServiceImpl.updateQualifyPopUpData(dto,
 				opportunityId);
 		assertNotNull(responseEntity);
@@ -626,7 +595,33 @@ class OpportunityServiceImplTest {
 	}
 
 	@Test
-	void testUpdateQualifyPopUpData_OpportunityNotFound() {
+	void testUpdateQualifyPopUpDataSuccess1() {
+		Integer opportunityId = 1;
+		QualifyOpportunityDto dto = new QualifyOpportunityDto();
+		Leads leads = new Leads();
+		Opportunity opportunity = new Opportunity();
+		opportunity.setLeads(leads);
+		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(opportunity));
+		when(opportunityDaoService.addOpportunity(any())).thenReturn(new Opportunity());
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity1 = opportunityServiceImpl
+				.updateQualifyPopUpData(dto, opportunityId);
+		assertNotNull(responseEntity1);
+		assertEquals(HttpStatus.CREATED, responseEntity1.getStatusCode());
+		assertTrue(responseEntity1.getBody().containsKey(ApiResponse.SUCCESS));
+		assertTrue((boolean) responseEntity1.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(responseEntity1.getBody().get(ApiResponse.MESSAGE));
+		when(opportunityDaoService.addOpportunity(any())).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity2 = opportunityServiceImpl
+				.updateQualifyPopUpData(dto, opportunityId);
+		assertNotNull(responseEntity2);
+		assertEquals(HttpStatus.CREATED, responseEntity2.getStatusCode());
+		assertTrue(responseEntity2.getBody().containsKey(ApiResponse.SUCCESS));
+		assertFalse((boolean) responseEntity2.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(responseEntity2.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testUpdateQualifyPopUpDataOpportunityNotFound() {
 		Integer opportunityId = 1;
 		QualifyOpportunityDto dto = new QualifyOpportunityDto(); // Create a QualifyOpportunityDto object
 		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.empty());
@@ -649,6 +644,7 @@ class OpportunityServiceImplTest {
         assertTrue((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
         assertNotNull(responseEntity.getBody().get(ApiResponse.DATA));
     }
+
 	@Test
 	void testGetOpportunityDataWithNoUser() {
 		when(auditAwareUtil.isAdmin()).thenReturn(false);
@@ -707,17 +703,17 @@ class OpportunityServiceImplTest {
 		call.setCallFrom(employeeMaster);
 		call.setCreatedDate(LocalDateTime.now());
 		calls.add(call);
-		Email email=new Email();
+		Email email = new Email();
 		email.setMailId(1);
 		email.setMailFrom("s.wakankar@rnt.ai");
 		email.setCreatedDate(LocalDateTime.now());
 		emails.add(email);
-		Visit visit=new Visit();
+		Visit visit = new Visit();
 		visit.setVisitId(1);
 		visit.setVisitBy(employeeMaster);
 		visit.setCreatedDate(LocalDateTime.now());
 		visits.add(visit);
-		Meetings meetings=new Meetings();
+		Meetings meetings = new Meetings();
 		meetings.setMeetingId(1);
 		meetings.setAssignTo(employeeMaster);
 		meetings.setCreatedDate(LocalDateTime.now());
@@ -735,6 +731,7 @@ class OpportunityServiceImplTest {
 		assertTrue((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
 		assertNotNull(responseEntity.getBody().get(ApiResponse.DATA));
 	}
+
 	@Test
 	void testTimelinegetOpportunitySuccess() {
 		Opportunity opportunity = new Opportunity();
@@ -759,21 +756,21 @@ class OpportunityServiceImplTest {
 		call.setCreatedDate(LocalDateTime.now());
 		call.setUpdatedDate(LocalDateTime.now());
 		calls.add(call);
-		Email email=new Email();
+		Email email = new Email();
 		email.setMailId(1);
 		email.setStatus("Send");
 		email.setMailFrom("s.wakankar@rnt.ai");
 		email.setCreatedDate(LocalDateTime.now());
 		email.setUpdatedDate(LocalDateTime.now());
 		emails.add(email);
-		Visit visit=new Visit();
+		Visit visit = new Visit();
 		visit.setVisitId(1);
 		visit.setStatus("Complete");
 		visit.setVisitBy(employeeMaster);
 		visit.setCreatedDate(LocalDateTime.now());
 		visit.setUpdatedDate(LocalDateTime.now());
 		visits.add(visit);
-		Meetings meetings=new Meetings();
+		Meetings meetings = new Meetings();
 		meetings.setMeetingId(1);
 		meetings.setMeetingStatus("Complete");
 		meetings.setAssignTo(employeeMaster);

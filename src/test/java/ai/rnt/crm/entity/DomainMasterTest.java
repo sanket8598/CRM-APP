@@ -1,5 +1,8 @@
 package ai.rnt.crm.entity;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +17,7 @@ class DomainMasterTest {
 		domainMaster.getDomainId();
 		domainMaster.getDomainName();
 		domainMaster.getLeads();
+		assertNull(domainMaster.getDomainId());
 	}
 
 	List<Leads> leads = new ArrayList<>();
@@ -23,5 +27,6 @@ class DomainMasterTest {
 		domainMaster.setDomainId(1);
 		domainMaster.setDomainName("Java");
 		domainMaster.setLeads(leads);
+		assertEquals(1, domainMaster.getDomainId());
 	}
 }

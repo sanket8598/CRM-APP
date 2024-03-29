@@ -1,5 +1,8 @@
 package ai.rnt.crm.entity;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 
 class ContactsTest {
@@ -24,7 +27,7 @@ class ContactsTest {
 		contacts.getCompanyMaster();
 		contacts.getPrimary();
 		contacts.getClient();
-
+		assertNull(contacts.getContactId());
 	}
 
 	Leads leads = new Leads();
@@ -48,6 +51,6 @@ class ContactsTest {
 		contacts.setCompanyMaster(CompanyMaster);
 		contacts.setPrimary(true);
 		contacts.setClient(true);
-
+		assertEquals(1, contacts.getContactId());
 	}
 }

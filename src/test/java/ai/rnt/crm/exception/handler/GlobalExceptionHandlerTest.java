@@ -137,7 +137,7 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<ApiError> responseEntity = globalExceptionHandler.handleInvalidKeyException(ex);
         assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
         ApiError apiError = responseEntity.getBody();
-        assertEquals("JWT Token is Expired !!", apiError.getMessage()); // Assuming TOKEN_EXPIRED is "Token expired"
+        assertEquals("JWT Token is Expired !!", apiError.getMessage());
     }
     
     @Test
@@ -147,7 +147,16 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<ApiError> responseEntity = globalExceptionHandler.handleCRMException(ex);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         ApiError apiError = responseEntity.getBody();
-        assertEquals("Your Credentails Are Not Valid !!", apiError.getMessage()); // Assuming BAD_CREDENTIALS is "Bad credentials"
+        assertEquals("Your Credentails Are Not Valid !!", apiError.getMessage()); 
+    }
+    @Test
+    void handleCRMExceptionShouldReturnNullPointerException() throws Throwable {
+    	NullPointerException innerException = new NullPointerException("Null Pointer Exception");
+    	CRMException ex = new CRMException(innerException);
+    	ResponseEntity<ApiError> responseEntity = globalExceptionHandler.handleCRMException(ex);
+    	assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
+    	ApiError apiError = responseEntity.getBody();
+    	assertEquals("Something unexpected happened !!", apiError.getMessage()); 
     }
 
     @Test

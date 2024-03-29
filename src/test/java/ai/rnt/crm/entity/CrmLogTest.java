@@ -1,5 +1,8 @@
 package ai.rnt.crm.entity;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 
 class CrmLogTest {
@@ -23,6 +26,7 @@ class CrmLogTest {
 		crmLog.getYourMail();
 		crmLog.getNoteTitle();
 		crmLog.getYourNote();
+		assertNull(crmLog.getCrmLogId());
 	}
 
 	@Test
@@ -42,5 +46,6 @@ class CrmLogTest {
 		crmLog.setYourMail("testdata");
 		crmLog.setNoteTitle("note title");
 		crmLog.setYourNote("my note");
+		assertEquals(1, crmLog.getCrmLogId());
 	}
 }

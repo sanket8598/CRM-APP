@@ -446,7 +446,7 @@ public class LeadServiceImpl implements LeadService {
 			dataMap.put(TIMELINE, getTimelineData(calls,visits,emails,meetings,employeeService));
 			dataMap.put(ACTIVITY, getActivityData(calls,visits,emails,meetings,employeeService));
 			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls,visits,emails,meetings,employeeService)));
-			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, leadById));
+			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, leadById,null));
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);
 			return new ResponseEntity<>(lead, OK);

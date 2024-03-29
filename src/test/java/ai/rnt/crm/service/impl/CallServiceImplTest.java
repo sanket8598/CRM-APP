@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -23,11 +24,17 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,6 +60,7 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.TaskUtil;
 
 @ExtendWith(MockitoExtension.class)
 class CallServiceImplTest {
@@ -71,6 +79,9 @@ class CallServiceImplTest {
 
 	@Mock
 	private AuditAwareUtil auditAwareUtil;
+
+	@Mock
+	private TaskUtil taskUtil;
 
 	@Test
 	void addCallTest() {
@@ -242,28 +253,42 @@ class CallServiceImplTest {
 	void assignCallTest() {
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		EmployeeMaster employee = new EmployeeMaster();
-
 		map.put("staffId", 1477);
 		map.put("addCallId", 1);
-
 		Call existingCall = mock(Call.class);
 		when(callDaoService.getCallById(anyInt())).thenReturn(of(existingCall));
 		when(employeeService.getById(anyInt())).thenReturn(of(employee));
 		when(callDaoService.call(any(Call.class))).thenReturn(existingCall);
-
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = callServiceImpl.assignCall(map);
-
 		assertNotNull(responseEntity);
 		assertEquals(OK, responseEntity.getStatusCode());
-
 		EnumMap<ApiResponse, Object> result = responseEntity.getBody();
 		assertNotNull(result);
 		assertTrue((Boolean) result.get(SUCCESS));
 		assertEquals("Call Assigned SuccessFully", result.get(MESSAGE));
-
 		verify(callDaoService, times(1)).getCallById(anyInt());
 		verify(employeeService, times(1)).getById(anyInt());
 		verify(callDaoService, times(1)).call(any(Call.class));
+	}
+
+	@Test
+	void assignCallNotAssignedTest() {
+		int staffId = 1;
+		int callId = 1;
+		Map<String, Integer> map = new HashMap<>();
+		map.put("staffId", staffId);
+		map.put("addCallId", callId);
+		Call call = new Call();
+		when(callDaoService.getCallById(callId)).thenReturn(Optional.of(call));
+		EmployeeMaster employee = new EmployeeMaster();
+		when(employeeService.getById(staffId)).thenReturn(Optional.of(employee));
+		when(callDaoService.call(call)).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = callServiceImpl.assignCall(map);
+		assertNotNull(responseEntity);
+		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
+		assertNotNull(responseBody);
+		assertFalse((Boolean) responseBody.get(SUCCESS));
+		assertEquals("Call Not Assigned", responseBody.get(MESSAGE));
 	}
 
 	@Test
@@ -296,16 +321,18 @@ class CallServiceImplTest {
 		assertEquals("Call updated SuccessFully", responseEntity.getBody().get(ApiResponse.MESSAGE));
 	}
 
-	//@Test
+	@Test
 	void notMarkAsCompletedTest() {
 		int callId = 1;
-		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
-		when(callDaoService.getCallById(callId)).thenReturn(java.util.Optional.of(new Call()));
-		when(callDaoService.call(any())).thenReturn(null);
+		Call call = new Call();
+		when(callDaoService.getCallById(callId)).thenReturn(Optional.of(call));
+		when(callDaoService.call(call)).thenReturn(null);
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = callServiceImpl.markAsCompleted(callId);
-		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-		assertFalse((Boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Call Not updated", responseEntity.getBody().get(ApiResponse.MESSAGE));
+		assertNotNull(responseEntity);
+		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
+		assertNotNull(responseBody);
+		assertFalse((Boolean) responseBody.get(SUCCESS));
+		assertEquals("Call Not updated", responseBody.get(MESSAGE));
 	}
 
 	@Test
@@ -332,6 +359,26 @@ class CallServiceImplTest {
 		verify(auditAwareUtil, times(1)).getLoggedInStaffId();
 		verify(callDaoService, times(1)).getCallById(anyInt());
 		verify(callDaoService, times(1)).call(any(Call.class));
+	}
+
+	@Test
+	void deleteCallAndTaskTest() {
+		int callId = 1;
+		int loggedInStaffId = 1;
+		Call call = new Call();
+		PhoneCallTask callTask1 = mock(PhoneCallTask.class);
+		PhoneCallTask callTask2 = mock(PhoneCallTask.class);
+		List<PhoneCallTask> callTasks = Arrays.asList(callTask1, callTask2);
+		call.setCallTasks(callTasks);
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(loggedInStaffId);
+		when(callDaoService.getCallById(callId)).thenReturn(Optional.of(call));
+		callServiceImpl.deleteCall(callId);
+		verify(callTask1).setDeletedBy(loggedInStaffId);
+		verify(callTask1).setDeletedDate(any(LocalDateTime.class));
+		verify(callTask2).setDeletedBy(loggedInStaffId);
+		verify(callTask2).setDeletedDate(any(LocalDateTime.class));
+		verify(callDaoService).addCallTask(callTask1);
+		verify(callDaoService).addCallTask(callTask2);
 	}
 
 	@Test
@@ -401,6 +448,30 @@ class CallServiceImplTest {
 		Integer callId = 2;
 		when(leadDaoService.getLeadById(leadsId)).thenThrow(new RuntimeException("Test Exception"));
 		assertThrows(CRMException.class, () -> callServiceImpl.addCallTask(dto, leadsId, callId));
+	}
+
+	@Test
+	void addCallTaskCheckDuplicateTest() {
+		PhoneCallTask phoneCallTask = new PhoneCallTask();
+		CallTaskDto dto = new CallTaskDto();
+		Integer leadsId = 1;
+		Integer callId = 2;
+		phoneCallTask.setSubject("test");
+		phoneCallTask.setStatus("Open");
+		phoneCallTask.setPriority("low");
+		phoneCallTask.setDueDate(LocalDate.now());
+		phoneCallTask.setRemainderVia("Email");
+		phoneCallTask.setRemainderVia("Email");
+		phoneCallTask.setRemainderDueAt("10:10");
+		phoneCallTask.setRemainderDueOn(LocalDate.now());
+		phoneCallTask.setDescription("testData");
+		phoneCallTask.setDueTime("11:11");
+		phoneCallTask.isRemainderOn();
+		List<PhoneCallTask> list = new ArrayList<>();
+		list.add(phoneCallTask);
+		when(callDaoService.getAllTask()).thenReturn(list);
+		when(taskUtil.checkDuplicateTask(any(), any(PhoneCallTask.class))).thenReturn(true);
+		callServiceImpl.addCallTask(dto, leadsId, callId);
 	}
 
 	@Test
@@ -491,15 +562,14 @@ class CallServiceImplTest {
 		Integer taskId = 2;
 		Integer staffId = 1;
 		PhoneCallTask callTask = new PhoneCallTask();
-		Map<String,Integer> map=new HashMap<>();
+		Map<String, Integer> map = new HashMap<>();
 		map.put("taskId", taskId);
 		map.put("staffId", staffId);
 		EmployeeMaster employee = new EmployeeMaster();
 		when(callDaoService.getCallTaskById(taskId)).thenReturn(java.util.Optional.of(callTask));
 		when(employeeService.getById(staffId)).thenReturn(java.util.Optional.of(employee));
 		when(callDaoService.addCallTask(any())).thenReturn(null);
-		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = callServiceImpl
-				.assignCallTask(map);
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = callServiceImpl.assignCallTask(map);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertFalse((Boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
 		assertEquals("Task Not Assigned", responseEntity.getBody().get(ApiResponse.MESSAGE));
@@ -546,5 +616,40 @@ class CallServiceImplTest {
 		Integer taskId = 1;
 		when(callDaoService.getCallTaskById(taskId)).thenThrow(new RuntimeException("Test Exception"));
 		assertThrows(CRMException.class, () -> callServiceImpl.deleteCallTask(taskId));
+	}
+
+	@Test
+	void assignCallTest_FilterCallTasks() {
+		int staffId = 1;
+		int callId = 1;
+		Map<String, Integer> map = new HashMap<>();
+		map.put("staffId", staffId);
+		map.put("addCallId", callId);
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setStaffId(123);
+		Call call = new Call();
+		call.setCallFrom(employeeMaster);
+		List<PhoneCallTask> callTasks = Arrays.asList(createCallTask(1, staffId), createCallTask(2, 2),
+				createCallTask(3, staffId));
+
+		call.setCallTasks(callTasks);
+		when(callDaoService.getCallById(callId)).thenReturn(Optional.of(call));
+		EmployeeMaster employee = new EmployeeMaster();
+		when(employeeService.getById(staffId)).thenReturn(Optional.of(employee));
+		callServiceImpl.assignCall(map);
+		List<PhoneCallTask> updatedTasks = callTasks.stream().filter(task -> task.getAssignTo().getStaffId() == staffId)
+				.collect(Collectors.toList());
+		for (PhoneCallTask task : updatedTasks) {
+			verify(task).setAssignTo(employee);
+			verify(callDaoService).addCallTask(task);
+		}
+	}
+
+	private PhoneCallTask createCallTask(int taskId, int assigneeStaffId) {
+		PhoneCallTask task = mock(PhoneCallTask.class);
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setStaffId(123);
+		when(task.getAssignTo()).thenReturn(employeeMaster);
+		return task;
 	}
 }

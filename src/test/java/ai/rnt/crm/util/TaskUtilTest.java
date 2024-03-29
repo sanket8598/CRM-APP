@@ -57,7 +57,7 @@ class TaskUtilTest {
 		phoneCallTask.setDueTime("11:11");
 		phoneCallTask1.setDueTime("11:11");
 		allTasks.add(phoneCallTask1);
-		boolean result = TaskUtil.checkDuplicateTask(allTasks, phoneCallTask);
+		boolean result = taskUtil.checkDuplicateTask(allTasks, phoneCallTask);
 		assertTrue(result, "Expected a duplicate task but did not find one");
 	}
 

@@ -1,10 +1,13 @@
 package ai.rnt.crm.util;
 
-import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
+
+import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.MeetingTask;
@@ -22,31 +25,24 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@Component
 @NoArgsConstructor(access = PRIVATE)
 public class TaskUtil {
 
-	public static boolean checkDuplicateTask(List<PhoneCallTask> allTask, PhoneCallTask phoneCallTask) {
+	public boolean checkDuplicateTask(List<PhoneCallTask> allTask, PhoneCallTask phoneCallTask) {
 		log.info("inside the call checkDuplicateTask method...{}");
-		boolean status = false;
 		try {
-			if (isNull(allTask) || allTask.isEmpty())
-				status = false;
-			for (PhoneCallTask task : allTask) {
-				if (task.getSubject().equals(phoneCallTask.getSubject())
-						&& task.getStatus().equals(phoneCallTask.getStatus())
-						&& task.getPriority().equals(phoneCallTask.getPriority())
-						&& compareDatesIgnoringTime(task.getDueDate(), phoneCallTask.getDueDate())
-						&& task.getRemainderVia().equals(phoneCallTask.getRemainderVia())
-						&& task.getRemainderDueAt().equals(phoneCallTask.getRemainderDueAt())
-						&& compareDatesIgnoringTime(task.getRemainderDueOn(), phoneCallTask.getRemainderDueOn())
-						&& task.getDescription().equals(phoneCallTask.getDescription())
-						&& task.getDueTime().equals(phoneCallTask.getDueTime())
-						&& task.isRemainderOn() == phoneCallTask.isRemainderOn()) {
-					status = true;
-					break;
-				}
-			}
-			return status;
+			return nonNull(phoneCallTask) && allTask.stream().filter(Objects::nonNull).anyMatch(
+					(task->task.getSubject().equals(phoneCallTask.getSubject())
+							&& task.getStatus().equals(phoneCallTask.getStatus())
+							&& task.getPriority().equals(phoneCallTask.getPriority())
+							&& compareDatesIgnoringTime(task.getDueDate(), phoneCallTask.getDueDate())
+							&& task.getRemainderVia().equals(phoneCallTask.getRemainderVia())
+							&& task.getRemainderDueAt().equals(phoneCallTask.getRemainderDueAt())
+							&& compareDatesIgnoringTime(task.getRemainderDueOn(), phoneCallTask.getRemainderDueOn())
+							&& task.getDescription().equals(phoneCallTask.getDescription())
+							&& task.getDueTime().equals(phoneCallTask.getDueTime())
+							&& task.isRemainderOn() == phoneCallTask.isRemainderOn()));
 		} catch (Exception e) {
 			log.info("Got Exception while checking the DuplicateCallTask..{}", e.getMessage());
 			throw new CRMException(e);
@@ -55,12 +51,8 @@ public class TaskUtil {
 
 	public static boolean checkDuplicateVisitTask(List<VisitTask> allTask, VisitTask visitTask) {
 		log.info("inside the checkDuplicateVisitTask method...{}");
-		boolean status = false;
 		try {
-			if (isNull(allTask) || allTask.isEmpty())
-				status = false;
-			for (VisitTask task : allTask) {
-				if (task.getSubject().equals(visitTask.getSubject()) && task.getStatus().equals(visitTask.getStatus())
+			return nonNull(visitTask) && allTask.stream().filter(Objects::nonNull).anyMatch(task->task.getSubject().equals(visitTask.getSubject()) && task.getStatus().equals(visitTask.getStatus())
 						&& task.getPriority().equals(visitTask.getPriority())
 						&& compareDatesIgnoringTime(task.getDueDate(), visitTask.getDueDate())
 						&& task.getRemainderVia().equals(visitTask.getRemainderVia())
@@ -68,12 +60,7 @@ public class TaskUtil {
 						&& compareDatesIgnoringTime(task.getRemainderDueOn(), visitTask.getRemainderDueOn())
 						&& task.getDescription().equals(visitTask.getDescription())
 						&& task.getDueTime().equals(visitTask.getDueTime())
-						&& task.isRemainderOn() == visitTask.isRemainderOn()) {
-					status = true;
-					break;
-				}
-			}
-			return status;
+						&& task.isRemainderOn() == visitTask.isRemainderOn());
 		} catch (Exception e) {
 			log.info("Got Exception while checking the DuplicateVisitTask..{}", e.getMessage());
 			throw new CRMException(e);
@@ -82,12 +69,8 @@ public class TaskUtil {
 
 	public static boolean checkDuplicateLeadTask(List<LeadTask> allTask, LeadTask leadTask) {
 		log.info("inside the checkDuplicateLeadTask method...{}");
-		boolean status = false;
 		try {
-			if (isNull(allTask) || allTask.isEmpty())
-				status = false;
-			for (LeadTask task : allTask) {
-				if (task.getSubject().equals(leadTask.getSubject()) && task.getStatus().equals(leadTask.getStatus())
+			return nonNull(leadTask) && allTask.stream().filter(Objects::nonNull).anyMatch(task->task.getSubject().equals(leadTask.getSubject()) && task.getStatus().equals(leadTask.getStatus())
 						&& task.getPriority().equals(leadTask.getPriority())
 						&& compareDatesIgnoringTime(task.getDueDate(), leadTask.getDueDate())
 						&& task.getRemainderVia().equals(leadTask.getRemainderVia())
@@ -95,12 +78,7 @@ public class TaskUtil {
 						&& compareDatesIgnoringTime(task.getRemainderDueOn(), leadTask.getRemainderDueOn())
 						&& task.getDescription().equals(leadTask.getDescription())
 						&& task.getDueTime().equals(leadTask.getDueTime())
-						&& task.isRemainderOn() == leadTask.isRemainderOn()) {
-					status = true;
-					break;
-				}
-			}
-			return status;
+						&& task.isRemainderOn() == leadTask.isRemainderOn());
 		} catch (Exception e) {
 			log.info("Got Exception while checking the DuplicateLeadTask..{}", e.getMessage());
 			throw new CRMException(e);
@@ -109,12 +87,8 @@ public class TaskUtil {
 
 	public static boolean checkDuplicateMeetingTask(List<MeetingTask> allMeetingTask, MeetingTask meetingTask) {
 		log.info("inside the checkDuplicateMeetingTask method...{}");
-		boolean status = false;
 		try {
-			if (isNull(allMeetingTask) || allMeetingTask.isEmpty())
-				status = false;
-			for (MeetingTask task : allMeetingTask) {
-				if (task.getSubject().equals(meetingTask.getSubject())
+			return nonNull(meetingTask) && allMeetingTask.stream().filter(Objects::nonNull).anyMatch(task->task.getSubject().equals(meetingTask.getSubject())
 						&& task.getStatus().equals(meetingTask.getStatus())
 						&& task.getPriority().equals(meetingTask.getPriority())
 						&& compareDatesIgnoringTime(task.getDueDate(), meetingTask.getDueDate())
@@ -123,12 +97,7 @@ public class TaskUtil {
 						&& compareDatesIgnoringTime(task.getRemainderDueOn(), meetingTask.getRemainderDueOn())
 						&& task.getDescription().equals(meetingTask.getDescription())
 						&& task.getDueTime().equals(meetingTask.getDueTime())
-						&& task.isRemainderOn() == meetingTask.isRemainderOn()) {
-					status = true;
-					break;
-				}
-			}
-			return status;
+						&& task.isRemainderOn() == meetingTask.isRemainderOn());
 		} catch (Exception e) {
 			log.info("Got Exception while checking the DuplicateMeetingTask..{}", e.getMessage());
 			throw new CRMException(e);
@@ -137,12 +106,8 @@ public class TaskUtil {
 
 	public static boolean checkDuplicateOptyTask(List<OpportunityTask> allOptyTask, OpportunityTask opportunityTask) {
 		log.info("inside the checkDuplicateOptyTask method...{}");
-		boolean status = false;
 		try {
-			if (isNull(allOptyTask) || allOptyTask.isEmpty())
-				status = false;
-			for (OpportunityTask task : allOptyTask) {
-				if (task.getSubject().equals(opportunityTask.getSubject())
+			return nonNull(opportunityTask) && allOptyTask.stream().filter(Objects::nonNull).anyMatch(task->task.getSubject().equals(opportunityTask.getSubject())
 						&& task.getStatus().equals(opportunityTask.getStatus())
 						&& task.getPriority().equals(opportunityTask.getPriority())
 						&& compareDatesIgnoringTime(task.getDueDate(), opportunityTask.getDueDate())
@@ -151,12 +116,7 @@ public class TaskUtil {
 						&& compareDatesIgnoringTime(task.getRemainderDueOn(), opportunityTask.getRemainderDueOn())
 						&& task.getDescription().equals(opportunityTask.getDescription())
 						&& task.getDueTime().equals(opportunityTask.getDueTime())
-						&& task.isRemainderOn() == opportunityTask.isRemainderOn()) {
-					status = true;
-					break;
-				}
-			}
-			return status;
+						&& task.isRemainderOn() == opportunityTask.isRemainderOn());
 		} catch (Exception e) {
 			log.info("Got Exception while checking the DuplicateOpportunityTask..{}", e.getMessage());
 			throw new CRMException(e);

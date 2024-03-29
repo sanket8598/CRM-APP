@@ -1,5 +1,8 @@
 package ai.rnt.crm.entity;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +18,7 @@ class CountryMasterTest {
 		countryMaster.getCountry();
 		countryMaster.getContacts();
 		countryMaster.getStates();
+		assertNull(countryMaster.getCountryId());
 	}
 
 	List<CompanyMaster> contacts = new ArrayList<>();
@@ -26,6 +30,6 @@ class CountryMasterTest {
 		countryMaster.setCountry("India");
 		countryMaster.setContacts(contacts);
 		countryMaster.setStates(states);
+		assertEquals(1, countryMaster.getCountryId());
 	}
-
 }

@@ -14,7 +14,6 @@ import static ai.rnt.crm.dto_mapper.CallTaskDtoMapper.TO_GET_CALL_TASK_DTO;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static ai.rnt.crm.util.TaskUtil.checkDuplicateTask;
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
@@ -47,6 +46,7 @@ import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.CallService;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.TaskUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,6 +64,7 @@ public class CallServiceImpl implements CallService {
 	private final LeadDaoService leadDaoService;
 	private final EmployeeService employeeService;
 	private final AuditAwareUtil auditAwareUtil;
+	private final TaskUtil taskUtil;
 
 	private static final String ADD_CALL = "AddCall";
 	private static final String TASK_ID = "taskId";
@@ -254,7 +255,7 @@ public class CallServiceImpl implements CallService {
 			if (lead.isPresent())
 				phoneCallTask.setAssignTo(lead.get().getEmployee());
 			callDaoService.getCallById(callId).ifPresent(phoneCallTask::setCall);
-			if (checkDuplicateTask(callDaoService.getAllTask(), phoneCallTask)) {
+			if (taskUtil.checkDuplicateTask(callDaoService.getAllTask(), phoneCallTask)) {
 				addCallTaskMap.put(SUCCESS, false);
 				addCallTaskMap.put(MESSAGE, "Task Already Exists !!");
 			} else if (nonNull(callDaoService.addCallTask(phoneCallTask))) {

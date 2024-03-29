@@ -1,5 +1,6 @@
 package ai.rnt.crm.entity;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -20,10 +21,12 @@ class AuditableTest {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		UserDetail userDetail = mock(UserDetail.class);
 		when(authentication.getDetails()).thenReturn(userDetail);
-		when(userDetail.getStaffId()).thenReturn(123); // Set whatever staff ID you want for testing
+		when(userDetail.getStaffId()).thenReturn(123);
 		Auditable auditable = new Auditable() {
+			private static final long serialVersionUID = 1L;
 		};
 		auditable.beforPersist();
+		assertNotNull(auditable);
 	}
 
 	@Test
@@ -34,12 +37,14 @@ class AuditableTest {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		UserDetail userDetail = mock(UserDetail.class);
 		when(authentication.getDetails()).thenReturn(userDetail);
-		when(userDetail.getStaffId()).thenReturn(123); // Set whatever staff ID you want for testing
+		when(userDetail.getStaffId()).thenReturn(123);
 		Auditable auditable = new Auditable() {
+			private static final long serialVersionUID = 1L;
 		};
 		auditable.beforUpdate();
 		auditable.getUpdatedBy();
 		auditable.setUpdatedBy(1375);
+		assertNotNull(auditable);
 	}
 
 	@Test
@@ -50,9 +55,11 @@ class AuditableTest {
 		when(securityContext.getAuthentication()).thenReturn(authentication);
 		UserDetail userDetail = mock(UserDetail.class);
 		when(authentication.getDetails()).thenReturn(userDetail);
-		when(userDetail.getStaffId()).thenReturn(123); // Set whatever staff ID you want for testing
+		when(userDetail.getStaffId()).thenReturn(123);
 		Auditable auditable = new Auditable() {
+			private static final long serialVersionUID = 1L;
 		};
 		auditable.beforDelete();
+		assertNotNull(auditable);
 	}
 }
