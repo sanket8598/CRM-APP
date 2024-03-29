@@ -80,7 +80,7 @@ public class Opportunity extends Auditable {
 	@Column(name = "risk_minigation")
 	private String riskMinigation;
 
-	@Column(name = "initial_timeline" , columnDefinition = "date")
+	@Column(name = "initial_timeline", columnDefinition = "date")
 	private LocalDate initialTimeline;
 
 	@Column(name = "lic_pric_dets")
@@ -94,16 +94,16 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "prop_exp_date", columnDefinition = "date")
 	private LocalDate propExpDate;
-	
+
 	@Column(name = "terms_and_conditions")
 	private String termsAndConditions;
-	
+
 	@Column(name = "presentation")
 	private String presentation;
-	
+
 	@Column(name = "scope_of_work")
 	private String scopeOfWork;
-	
+
 	@Column(name = "proposition")
 	private String proposition;
 
@@ -124,7 +124,7 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "final_budget")
 	private String finalBudget;
-	
+
 	@Column(name = "progress_status")
 	private String progressStatus;
 
@@ -142,4 +142,16 @@ public class Opportunity extends Auditable {
 
 	@OneToMany(mappedBy = "opportunity", cascade = ALL, orphanRemoval = true)
 	private List<OpportunityTask> opportunityTasks = new ArrayList<>();
+
+	@Column(name = "shared_req", columnDefinition = "default false")
+	private Boolean requirementShared;
+
+	@Column(name = "dec_maker", columnDefinition = "default false")
+	private Boolean identifyDecisionMaker;
+
+	@Column(name = "first_mtg_done", columnDefinition = "default false")
+	private Boolean firstMeetingDone;
+
+	@Column(name = "cust_readiness")
+	private String customerReadiness;
 }

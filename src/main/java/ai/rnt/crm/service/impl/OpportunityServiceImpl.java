@@ -382,23 +382,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			List<Contacts> contacts = opportunityData.getLeads().getContacts();
-			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
-					.filter(e -> nonNull(e.getAttachmentOf()) && QUALIFY.equalsIgnoreCase(e.getAttachmentOf()))
-					.collect(toList());
 			Optional<QualifyOpportunityDto> dto = TO_QUALIFY_OPPORTUNITY_DTO.apply(opportunityData);
-			dto.ifPresent(e -> {
-				e.setPrimaryContact(TO_CONTACT_DTO
-						.apply(contacts.stream().filter(Contacts::getPrimary).findFirst()
-								.orElseThrow(() -> new ResourceNotFoundException("Priamry Contact")))
-						.orElseThrow(ResourceNotFoundException::new));
-				e.setAssignTo(opportunityData.getEmployee().getStaffId());
-				e.setLeadSourceId(opportunityData.getLeads().getLeadSourceMaster().getLeadSourceId());
-				e.setContacts(TO_CONTACT_DTOS.apply(contacts));
-				e.setAttachments(TO_OPTY_ATTACHMENT_DTOS.apply(attachments));
-				e.setClients(TO_CONTACT_DTOS.apply(contacts.stream()
-						.filter(cl -> nonNull(cl.getClient()) && TRUE.equals(cl.getClient())).collect(toList())));
-			});
 			qualifyData.put(DATA, dto);
 			qualifyData.put(SUCCESS, true);
 			return new ResponseEntity<>(qualifyData, OK);
@@ -414,38 +398,21 @@ public class OpportunityServiceImpl implements OpportunityService {
 		log.info("inside the Opportunity updateQualifyPopUpData method...{}", opportunityId);
 		EnumMap<ApiResponse, Object> updateQualifyData = new EnumMap<>(ApiResponse.class);
 		try {
-			boolean status = false;
-			String phase = QUALIFY;
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-
-			opportunityData.setEmployee(employeeService.getById(dto.getAssignTo())
-					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, dto.getAssignTo())));
-			opportunityData.setTopic(dto.getTopic());
-			opportunityData.setProposedSolution(dto.getProposedSolution());
-			opportunityData.setClosedOn(dto.getUpdatedClosedOn());
 			opportunityData.setBudgetAmount(dto.getBudgetAmount());
-			opportunityData.setProgressStatus(dto.getProgressStatus());
+			opportunityData.setRequirementShared(dto.getRequirementShared());
+			opportunityData.setIdentifyDecisionMaker(dto.getIdentifyDecisionMaker());
+			opportunityData.setFirstMeetingDone(dto.getFirstMeetingDone());
+			opportunityData.setCustomerReadiness(dto.getCustomerReadiness());
 			opportunityData.setCurrentPhase(dto.getCurrentPhase());
-
-			List<Integer> clientList = dto.getClients().stream().filter(ContactDto::getClient)
-					.map(ContactDto::getContactId).collect(toList());
-
-			opportunityData.getLeads().getContacts().stream().filter(con -> clientList.contains(con.getContactId()))
-					.forEach(con -> {
-						Contacts contact = contactDaoService.findById(con.getContactId()).orElseThrow(
-								() -> new ResourceNotFoundException("Contact", "contactId", con.getContactId()));
-						contact.setClient(true);
-						contactDaoService.addContact(contact);
-					});
-			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
-			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
-			if (status) {
+			opportunityData.setProgressStatus(dto.getProgressStatus());
+			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateQualifyData.put(SUCCESS, true);
-				updateQualifyData.put(MESSAGE, "Opportunity Qualify Successfully..!!");
+				updateQualifyData.put(MESSAGE, "Qualify Successfully..!!");
 			} else {
 				updateQualifyData.put(SUCCESS, false);
-				updateQualifyData.put(MESSAGE, "Opportunity Not Qualify");
+				updateQualifyData.put(MESSAGE, "Not Qualify");
 			}
 			return new ResponseEntity<>(updateQualifyData, CREATED);
 		} catch (Exception e) {

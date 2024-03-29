@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.stereotype.Component;
+
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.MeetingTask;
 import ai.rnt.crm.entity.OpportunityTask;
@@ -23,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
+@Component
 @NoArgsConstructor(access = PRIVATE)
 public class TaskUtil {
 
