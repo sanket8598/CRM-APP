@@ -28,4 +28,6 @@ public class QualifyOpportunityDto {
 	private Boolean firstMeetingDone;
 
 	private String customerReadiness;
+	
+	private String qualifyRemarks;
 }

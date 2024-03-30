@@ -29,9 +29,7 @@ import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUN
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUNITY_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_PROPOSE_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_OPPORTUNITY_DTO;
-import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
-import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_OPTY_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.ServiceFallsDtoMapper.TO_SERVICE_FALL_MASTER_DTOS;
@@ -55,7 +53,6 @@ import static ai.rnt.crm.util.ConvertDateFormatUtil.convertLocalDate;
 import static ai.rnt.crm.util.OpportunityUtil.amountInWords;
 import static ai.rnt.crm.util.OpportunityUtil.calculateBubbleSize;
 import static ai.rnt.crm.util.OpportunityUtil.checkPhase;
-import static java.lang.Boolean.TRUE;
 import static java.lang.Double.valueOf;
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
@@ -95,7 +92,6 @@ import ai.rnt.crm.dao.service.OpprtAttachmentDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
-import ai.rnt.crm.dto.ContactDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
@@ -309,7 +305,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			List<Visit> visits = visitDaoService.getVisitsByLeadId(leadId);
 			List<Email> emails = emailDaoService.getEmailByLeadId(leadId);
 			List<Meetings> meetings = meetingDaoService.getMeetingByLeadId(leadId);
-			
+
 			OpportunityDto dto = TO_DASHBOARD_OPPORTUNITY_DTO.apply(opportunity)
 					.orElseThrow(ResourceNotFoundException::new);
 			dto.setContacts(TO_CONTACT_DTOS.apply(opportunity.getLeads().getContacts()));
@@ -323,10 +319,10 @@ public class OpportunityServiceImpl implements OpportunityService {
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
-			dataMap.put(TIMELINE, getTimelineData(calls,visits,emails,meetings,employeeService));
-			dataMap.put(ACTIVITY, getActivityData(calls,visits,emails,meetings,employeeService));
-			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls,visits,emails,meetings,employeeService)));
-			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, opportunity.getLeads(),opportunity));
+			dataMap.put(TIMELINE, getTimelineData(calls, visits, emails, meetings, employeeService));
+			dataMap.put(ACTIVITY, getActivityData(calls, visits, emails, meetings, employeeService));
+			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls, visits, emails, meetings, employeeService)));
+			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, opportunity.getLeads(), opportunity));
 			opptDataMap.put(SUCCESS, true);
 			opptDataMap.put(DATA, dataMap);
 			return new ResponseEntity<>(opptDataMap, OK);
@@ -405,6 +401,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setIdentifyDecisionMaker(dto.getIdentifyDecisionMaker());
 			opportunityData.setFirstMeetingDone(dto.getFirstMeetingDone());
 			opportunityData.setCustomerReadiness(dto.getCustomerReadiness());
+			opportunityData.setQualifyRemarks(dto.getQualifyRemarks());
 			opportunityData.setCurrentPhase(dto.getCurrentPhase());
 			opportunityData.setProgressStatus(dto.getProgressStatus());
 			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
@@ -429,11 +426,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
-					.filter(e -> nonNull(e.getAttachmentOf()) && ANALYSIS.equalsIgnoreCase(e.getAttachmentOf()))
-					.collect(toList());
 			Optional<AnalysisOpportunityDto> dto = TO_ANALYSIS_OPPORTUNITY_DTO.apply(opportunityData);
-			dto.ifPresent(l -> l.setAttachments(TO_OPPORTUNITY_ATTACHMENT_DTOS.apply(attachments)));
 			analysisData.put(DATA, dto);
 			analysisData.put(SUCCESS, true);
 			return new ResponseEntity<>(analysisData, OK);
@@ -449,26 +442,20 @@ public class OpportunityServiceImpl implements OpportunityService {
 		log.info("inside the Opportunity updateAnalysisPopUpData method...{}", opportunityId);
 		EnumMap<ApiResponse, Object> updateAnalysisData = new EnumMap<>(ApiResponse.class);
 		try {
-			boolean status = false;
-			String phase = ANALYSIS;
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			opportunityData.setTechnicalNeed(dto.getTechnicalNeed());
-			opportunityData.setIntegrationPoint(dto.getIntegrationPoint());
-			opportunityData.setSecAndComp(dto.getSecAndComp());
-			opportunityData.setRiskMinigation(dto.getRiskMinigation());
-			opportunityData.setInitialTimeline(dto.getUpdatedInitialTimeline());
-			opportunityData.setProgressStatus(dto.getProgressStatus());
 			opportunityData.setCurrentPhase(dto.getCurrentPhase());
-
-			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
-			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
-			if (status) {
+			opportunityData.setProgressStatus(dto.getProgressStatus());
+			opportunityData.setCustomerNeed(dto.getCustomerNeed());
+			opportunityData.setProposedSolution(dto.getProposedSolution());
+			opportunityData.setTimeline(dto.getTimeline());
+			opportunityData.setAnalysisRemarks(dto.getAnalysisRemarks());
+			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateAnalysisData.put(SUCCESS, true);
-				updateAnalysisData.put(MESSAGE, "Opportunity Analysis Successfully..!!");
+				updateAnalysisData.put(MESSAGE, "Analysis Successfully..!!");
 			} else {
 				updateAnalysisData.put(SUCCESS, false);
-				updateAnalysisData.put(MESSAGE, "Opportunity Not Analysis");
+				updateAnalysisData.put(MESSAGE, "Not Analysis");
 			}
 			return new ResponseEntity<>(updateAnalysisData, CREATED);
 		} catch (Exception e) {
@@ -485,11 +472,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
-					.filter(e -> nonNull(e.getAttachmentOf()) && PROPOSE.equalsIgnoreCase(e.getAttachmentOf()))
-					.collect(toList());
 			Optional<ProposeOpportunityDto> dto = TO_PROPOSE_OPPORTUNITY_DTO.apply(opportunityData);
-			dto.ifPresent(l -> l.setAttachments(TO_OPPORTUNITY_ATTACHMENT_DTOS.apply(attachments)));
 			proposeData.put(DATA, dto);
 			proposeData.put(SUCCESS, true);
 			return new ResponseEntity<>(proposeData, OK);
@@ -505,28 +488,21 @@ public class OpportunityServiceImpl implements OpportunityService {
 		log.info("inside the Opportunity updateProposePopUpData method...{}", opportunityId);
 		EnumMap<ApiResponse, Object> updateProposeData = new EnumMap<>(ApiResponse.class);
 		try {
-			boolean status = false;
-			String phase = PROPOSE;
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			opportunityData.setLicAndPricDetails(dto.getLicAndPricDetails());
-			opportunityData.setDevPlan(dto.getDevPlan());
-			opportunityData.setPropAcceptCriteria(dto.getPropAcceptCriteria());
-			opportunityData.setPropExpDate(dto.getUpdatedPropExpDate());
-			opportunityData.setPresentation(dto.getPresentation());
-			opportunityData.setProposition(dto.getProposition());
-			opportunityData.setTermsAndConditions(dto.getTermsAndConditions());
-			opportunityData.setScopeOfWork(dto.getScopeOfWork());
 			opportunityData.setProgressStatus(dto.getProgressStatus());
 			opportunityData.setCurrentPhase(dto.getCurrentPhase());
-			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
-			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
-			if (status) {
+			opportunityData.setIdentifySme(dto.getIdentifySme());
+			opportunityData.setDevelopProposal(dto.getDevelopProposal());
+			opportunityData.setComplInternalReview(dto.getComplInternalReview());
+			opportunityData.setPresentProposal(dto.getPresentProposal());
+			opportunityData.setFinalCommAndTimeline(dto.getFinalCommAndTimeline());
+			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateProposeData.put(SUCCESS, true);
-				updateProposeData.put(MESSAGE, "Opportunity Propose Successfully..!!");
+				updateProposeData.put(MESSAGE, "Proposed Successfully..!!");
 			} else {
 				updateProposeData.put(SUCCESS, false);
-				updateProposeData.put(MESSAGE, "Opportunity Not Propose");
+				updateProposeData.put(MESSAGE, "Not Proposed.");
 			}
 			return new ResponseEntity<>(updateProposeData, CREATED);
 		} catch (Exception e) {

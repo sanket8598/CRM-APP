@@ -1,10 +1,5 @@
 package ai.rnt.crm.dto.opportunity;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,29 +7,19 @@ import lombok.Setter;
 @Setter
 public class ProposeOpportunityDto {
 
-	private String licAndPricDetails;
-
-	private String devPlan;
-
-	private String propAcceptCriteria;
-
-	private String presentation;
-
-	private String scopeOfWork;
-
-	private String termsAndConditions;
-
-	private String proposition;
+	private Integer opportunityId;
 
 	private String progressStatus;
 
 	private String currentPhase;
 
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private LocalDate propExpDate;
+	private Boolean identifySme;
 
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private LocalDate updatedPropExpDate;
+	private Boolean developProposal;
 
-	private List<OpprtAttachmentDto> attachments;
+	private Boolean complInternalReview;
+
+	private Boolean presentProposal;
+
+	private Boolean finalCommAndTimeline;
 }

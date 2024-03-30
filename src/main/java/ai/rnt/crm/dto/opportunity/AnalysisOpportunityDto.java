@@ -14,24 +14,15 @@ public class AnalysisOpportunityDto {
 
 	private Integer opportunityId;
 
-	private String technicalNeed;
-
-	private String integrationPoint;
-
-	private String secAndComp;
-
-	private String riskMinigation;
-
-	@JsonFormat(pattern = "dd-MM-yyyy")
-	private LocalDate initialTimeline;
-
-	@JsonFormat(pattern = "yyyy-MM-dd")
-	private LocalDate updatedInitialTimeline;
-
 	private String currentPhase;
 
 	private String progressStatus;
-
-	private List<OpprtAttachmentDto> attachments;
-
+	
+	private String customerNeed;
+	
+	private String proposedSolution;
+	
+	private String timeline;
+	
+	private String analysisRemarks;
 }
