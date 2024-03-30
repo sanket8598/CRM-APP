@@ -154,4 +154,31 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "cust_readiness")
 	private String customerReadiness;
+	
+	@Column(name = "qualify_rem")
+	private String qualifyRemarks;
+	
+	@Column(name = "analysis_rem")
+	private String analysisRemarks;
+	
+	@Column(name = "propose_rem")
+	private String proposeRemarks;
+	
+	@Column(name = "timeline")
+	private String timeline;
+	
+	@Column(name = "identify_sme", columnDefinition = "default false")
+	private Boolean identifySme;
+	
+	@Column(name = "dev_proposal", columnDefinition = "default false")
+	private Boolean developProposal;
+	
+	@Column(name = "compl_intl_rev", columnDefinition = "default false")
+	private Boolean complInternalReview;
+	
+	@Column(name = "present_proposal", columnDefinition = "default false")
+	private Boolean presentProposal;
+	
+	@Column(name = "final_comm_timeline", columnDefinition = "default false")
+	private Boolean finalCommAndTimeline;
 }
