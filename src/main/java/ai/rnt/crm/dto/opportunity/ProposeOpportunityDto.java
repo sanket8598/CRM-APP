@@ -22,4 +22,6 @@ public class ProposeOpportunityDto {
 	private Boolean presentProposal;
 
 	private Boolean finalCommAndTimeline;
+	
+	private String proposeRemarks;
 }

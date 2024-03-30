@@ -497,6 +497,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setComplInternalReview(dto.getComplInternalReview());
 			opportunityData.setPresentProposal(dto.getPresentProposal());
 			opportunityData.setFinalCommAndTimeline(dto.getFinalCommAndTimeline());
+			opportunityData.setProposeRemarks(dto.getProposeRemarks());
 			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateProposeData.put(SUCCESS, true);
 				updateProposeData.put(MESSAGE, "Proposed Successfully..!!");
