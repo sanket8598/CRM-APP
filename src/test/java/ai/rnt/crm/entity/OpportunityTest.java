@@ -33,7 +33,7 @@ class OpportunityTest {
 		opportunity.setPresentation("Sample Presentation");
 		opportunity.setScopeOfWork("Sample Scope of Work");
 		opportunity.setProposition("Sample Proposition");
-		opportunity.setWinLoseReason("Sample Win-Lose Reason");
+		opportunity.setLostReason("Sample Win-Lose Reason");
 		opportunity.setPaymentTerms("Sample Payment Terms");
 		opportunity.setCurrentPhase("Sample Current Phase");
 		opportunity.setContract("Sample Contract");
@@ -53,6 +53,11 @@ class OpportunityTest {
 		opportunity.setFirstMeetingDone(true);
 		opportunity.setIdentifyDecisionMaker(true);
 		opportunity.setRequirementShared(true);
+		opportunity.setFinalisingTeam(true);
+		opportunity.setSlaSigned(true);
+		opportunity.setSowSigned(true);
+		opportunity.setNdaSigned(true);
+		opportunity.setProjectKickoff(true);
 		opportunity.setOpportunityTasks(new ArrayList<>());
 		opportunity.getOpportunityTasks();
 		EmployeeMaster employee = new EmployeeMaster();
@@ -93,6 +98,11 @@ class OpportunityTest {
 		assertEquals(true, opportunity.getFirstMeetingDone());
 		assertEquals(true, opportunity.getIdentifyDecisionMaker());
 		assertEquals(true, opportunity.getRequirementShared());
+		assertEquals(true, opportunity.getProjectKickoff());
+		assertEquals(true, opportunity.getFinalisingTeam());
+		assertEquals(true, opportunity.getSlaSigned());
+		assertEquals(true, opportunity.getSowSigned());
+		assertEquals(true, opportunity.getNdaSigned());
 		assertEquals(LocalDate.of(2024, 3, 1), opportunity.getClosedOn());
 		assertEquals(employee, opportunity.getEmployee());
 		assertEquals(leads, opportunity.getLeads());

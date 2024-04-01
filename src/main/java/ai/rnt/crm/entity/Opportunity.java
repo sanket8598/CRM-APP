@@ -107,8 +107,8 @@ public class Opportunity extends Auditable {
 	@Column(name = "proposition")
 	private String proposition;
 
-	@Column(name = "win_lose_reason")
-	private String winLoseReason;
+	@Column(name = "opty_lost_reason")
+	private String lostReason;
 
 	@Column(name = "payment_terms")
 	private String paymentTerms;
@@ -154,31 +154,52 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "cust_readiness")
 	private String customerReadiness;
-	
+
 	@Column(name = "qualify_rem")
 	private String qualifyRemarks;
-	
+
 	@Column(name = "analysis_rem")
 	private String analysisRemarks;
-	
+
 	@Column(name = "propose_rem")
 	private String proposeRemarks;
-	
+
 	@Column(name = "timeline")
 	private String timeline;
-	
+
 	@Column(name = "identify_sme", columnDefinition = "default false")
 	private Boolean identifySme;
-	
+
 	@Column(name = "dev_proposal", columnDefinition = "default false")
 	private Boolean developProposal;
-	
+
 	@Column(name = "compl_intl_rev", columnDefinition = "default false")
 	private Boolean complInternalReview;
-	
+
 	@Column(name = "present_proposal", columnDefinition = "default false")
 	private Boolean presentProposal;
-	
+
 	@Column(name = "final_comm_timeline", columnDefinition = "default false")
 	private Boolean finalCommAndTimeline;
+
+	@Column(name = "proj_kick_off", columnDefinition = "default false")
+	private Boolean projectKickoff;
+
+	@Column(name = "final_team", columnDefinition = "default false")
+	private Boolean finalisingTeam;
+
+	@Column(name = "sla_signed", columnDefinition = "default false")
+	private Boolean slaSigned;
+
+	@Column(name = "sow_signed", columnDefinition = "default false")
+	private Boolean sowSigned;
+
+	@Column(name = "nda_signed", columnDefinition = "default false")
+	private Boolean ndaSigned;
+
+	@Column(name = "mail_status", columnDefinition = "default false")
+	private Boolean thankMailSent;
+
+	@Column(name = "descrp")
+	private String description;
 }

@@ -53,6 +53,7 @@ import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
+import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.OpprtAttachmentDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
@@ -363,7 +364,7 @@ class OpportunityServiceImplTest {
 	}
 
 	@Test
-	void testUpdateOpportunity_Success() {
+	void testUpdateOpportunitySuccess() {
 		UpdateLeadDto dto = new UpdateLeadDto();
 		Integer opportunityId = 123;
 		Opportunity opportunity = new Opportunity();
@@ -408,41 +409,19 @@ class OpportunityServiceImplTest {
 	}
 
 	@Test
-	void testUpdateClosePopUpDataSuccess() {
-		CloseOpportunityDto dto = new CloseOpportunityDto();
-		Integer opportunityId = 1;
-		Opportunity opportunity = new Opportunity();
-		opportunity.setOpportunityId(opportunityId);
-		OpprtAttachment attachment = new OpprtAttachment();
-		attachment.setOpportunity(opportunity);
-
-		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(mock(Opportunity.class)));
-		List<OpprtAttachmentDto> isAttachments = new ArrayList<>();
-		OpprtAttachmentDto attachment1 = new OpprtAttachmentDto();
-		attachment1.setOptAttchId(1);
-		attachment1.setAttachmentOf("Close");
-		isAttachments.add(attachment1);
-		dto.setAttachments(isAttachments);
-		when(opprtAttachmentDaoService.addOpprtAttachment(any())).thenAnswer(invocation -> {
-			OpprtAttachment attachedAttachment = invocation.getArgument(0);
-			attachedAttachment.setOpportunity(opportunity);
-			return attachedAttachment;
-		});
-		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = opportunityServiceImpl.updateClosePopUpData(dto,
-				opportunityId);
-		assertNotNull(responseEntity);
-		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-		assertTrue(responseEntity.getBody().containsKey(ApiResponse.MESSAGE));
-		assertTrue((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Opportunity Close Successfully..!!", responseEntity.getBody().get(ApiResponse.MESSAGE));
-	}
-
-	@Test
 	void testUpdateClosePopUpDataException() {
 		CloseOpportunityDto dto = new CloseOpportunityDto();
 		Integer opportunityId = 1;
 		when(opportunityDaoService.findOpportunity(opportunityId)).thenThrow(new RuntimeException("Mock exception"));
 		assertThrows(CRMException.class, () -> opportunityServiceImpl.updateClosePopUpData(dto, opportunityId));
+	}
+
+	@Test
+	void testUpdateCloseAsLOstDataException() {
+		CloseAsLostOpportunityDto dto = new CloseAsLostOpportunityDto();
+		Integer opportunityId = 1;
+		when(opportunityDaoService.findOpportunity(opportunityId)).thenThrow(new RuntimeException("Mock exception"));
+		assertThrows(CRMException.class, () -> opportunityServiceImpl.updateCloseAsLostData(dto, opportunityId));
 	}
 
 	@Test
@@ -490,6 +469,28 @@ class OpportunityServiceImplTest {
 	}
 
 	@Test
+	void testGetCloseAsLostDataSuccess() {
+		Integer opportunityId = 1;
+		Opportunity opportunityData = new Opportunity();
+		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(opportunityData));
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = opportunityServiceImpl
+				.getCloseAsLostData(opportunityId);
+		assertNotNull(responseEntity);
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertTrue(responseEntity.getBody().containsKey(ApiResponse.DATA));
+		assertTrue(responseEntity.getBody().containsKey(ApiResponse.SUCCESS));
+		assertTrue((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(responseEntity.getBody().get(ApiResponse.DATA));
+	}
+
+	@Test
+	void testGetCloseAsLostDataOpportunityNotFound() {
+		Integer opportunityId = 1;
+		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.empty());
+		assertThrows(CRMException.class, () -> opportunityServiceImpl.getCloseAsLostData(opportunityId));
+	}
+
+	@Test
 	void testGetAnalysisPopUpDataSuccess() {
 		Integer opportunityId = 1;
 		Opportunity opportunityData = new Opportunity();
@@ -509,20 +510,6 @@ class OpportunityServiceImplTest {
 		Integer opportunityId = 1;
 		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.empty());
 		assertThrows(CRMException.class, () -> opportunityServiceImpl.getAnalysisPopUpData(opportunityId));
-	}
-
-	//@Test
-	void testUpdateProposePopUpDataSuccess() {
-		Integer opportunityId = 1;
-		ProposeOpportunityDto dto = new ProposeOpportunityDto();
-		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(mock(Opportunity.class)));
-		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = opportunityServiceImpl.updateProposePopUpData(dto,
-				opportunityId);
-		assertNotNull(responseEntity);
-		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-		assertTrue(responseEntity.getBody().containsKey(ApiResponse.SUCCESS));
-		assertTrue((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
-		assertNotNull(responseEntity.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -566,7 +553,59 @@ class OpportunityServiceImplTest {
 		assertFalse((boolean) responseEntity2.getBody().get(ApiResponse.SUCCESS));
 		assertNotNull(responseEntity2.getBody().get(ApiResponse.MESSAGE));
 	}
-	
+
+	@Test
+	void testUpdateClosePopUpDataSuccess1() {
+		Integer opportunityId = 1;
+		CloseOpportunityDto dto = new CloseOpportunityDto();
+		Leads leads = new Leads();
+		Opportunity opportunity = new Opportunity();
+		opportunity.setLeads(leads);
+		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(opportunity));
+		when(opportunityDaoService.addOpportunity(any())).thenReturn(new Opportunity());
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity1 = opportunityServiceImpl.updateClosePopUpData(dto,
+				opportunityId);
+		assertNotNull(responseEntity1);
+		assertEquals(HttpStatus.CREATED, responseEntity1.getStatusCode());
+		assertTrue(responseEntity1.getBody().containsKey(ApiResponse.SUCCESS));
+		assertTrue((boolean) responseEntity1.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(responseEntity1.getBody().get(ApiResponse.MESSAGE));
+		when(opportunityDaoService.addOpportunity(any())).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity2 = opportunityServiceImpl.updateClosePopUpData(dto,
+				opportunityId);
+		assertNotNull(responseEntity2);
+		assertEquals(HttpStatus.CREATED, responseEntity2.getStatusCode());
+		assertTrue(responseEntity2.getBody().containsKey(ApiResponse.SUCCESS));
+		assertFalse((boolean) responseEntity2.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(responseEntity2.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testUpdateCloseAsLostDataSuccess1() {
+		Integer opportunityId = 1;
+		CloseAsLostOpportunityDto dto = new CloseAsLostOpportunityDto();
+		Leads leads = new Leads();
+		Opportunity opportunity = new Opportunity();
+		opportunity.setLeads(leads);
+		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(opportunity));
+		when(opportunityDaoService.addOpportunity(any())).thenReturn(new Opportunity());
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity1 = opportunityServiceImpl.updateCloseAsLostData(dto,
+				opportunityId);
+		assertNotNull(responseEntity1);
+		assertEquals(HttpStatus.CREATED, responseEntity1.getStatusCode());
+		assertTrue(responseEntity1.getBody().containsKey(ApiResponse.SUCCESS));
+		assertTrue((boolean) responseEntity1.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(responseEntity1.getBody().get(ApiResponse.MESSAGE));
+		when(opportunityDaoService.addOpportunity(any())).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity2 = opportunityServiceImpl.updateCloseAsLostData(dto,
+				opportunityId);
+		assertNotNull(responseEntity2);
+		assertEquals(HttpStatus.CREATED, responseEntity2.getStatusCode());
+		assertTrue(responseEntity2.getBody().containsKey(ApiResponse.SUCCESS));
+		assertFalse((boolean) responseEntity2.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(responseEntity2.getBody().get(ApiResponse.MESSAGE));
+	}
+
 	@Test
 	void testUpdateProposePopUpDataSuccess1() {
 		Integer opportunityId = 1;
@@ -592,7 +631,7 @@ class OpportunityServiceImplTest {
 		assertFalse((boolean) responseEntity2.getBody().get(ApiResponse.SUCCESS));
 		assertNotNull(responseEntity2.getBody().get(ApiResponse.MESSAGE));
 	}
-	
+
 	@Test
 	void testUpdateAnalysisPopUpDataSuccess1() {
 		Integer opportunityId = 1;
@@ -622,7 +661,7 @@ class OpportunityServiceImplTest {
 	@Test
 	void testUpdateQualifyPopUpDataOpportunityNotFound() {
 		Integer opportunityId = 1;
-		QualifyOpportunityDto dto = new QualifyOpportunityDto(); // Create a QualifyOpportunityDto object
+		QualifyOpportunityDto dto = new QualifyOpportunityDto();
 		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.empty());
 		assertThrows(CRMException.class, () -> opportunityServiceImpl.updateQualifyPopUpData(dto, opportunityId));
 	}
@@ -791,13 +830,13 @@ class OpportunityServiceImplTest {
 	}
 
 	@Test
-    void testGetOpportunityData_ResourceNotFoundException() {
+    void testGetOpportunityDataResourceNotFoundException() {
         when(opportunityDaoService.findOpportunity(anyInt())).thenReturn(Optional.empty());
         assertThrows(CRMException.class, () -> opportunityServiceImpl.getOpportunityData(1));
     }
 
 	@Test
-    void testGetOpportunityData_Exception() {
+    void testGetOpportunityDataException() {
         when(opportunityDaoService.findOpportunity(anyInt())).thenThrow(new RuntimeException("Simulated exception"));
         assertThrows(CRMException.class, () -> opportunityServiceImpl.getOpportunityData(1));
     }

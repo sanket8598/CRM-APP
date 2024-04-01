@@ -21,12 +21,12 @@ import static ai.rnt.crm.constants.OppurtunityStatus.WON;
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_ANALYSIS_OPPORTUNITY_DTO;
+import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_CLOSE_AS_LOST_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_CLOSE_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOARD_OPPORTUNITY_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_GRAPHICAL_DATA_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUNITY_ATTACHMENT;
-import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUNITY_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_PROPOSE_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
@@ -94,6 +94,7 @@ import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
+import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
@@ -520,11 +521,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			List<OpprtAttachment> attachments = opportunityData.getOprtAttachment().stream()
-					.filter(e -> nonNull(e.getAttachmentOf()) && CLOSE.equalsIgnoreCase(e.getAttachmentOf()))
-					.collect(toList());
 			Optional<CloseOpportunityDto> dto = TO_CLOSE_OPPORTUNITY_DTO.apply(opportunityData);
-			dto.ifPresent(l -> l.setAttachments(TO_OPPORTUNITY_ATTACHMENT_DTOS.apply(attachments)));
 			closeData.put(DATA, dto);
 			closeData.put(SUCCESS, true);
 			return new ResponseEntity<>(closeData, OK);
@@ -540,29 +537,72 @@ public class OpportunityServiceImpl implements OpportunityService {
 		log.info("inside the Opportunity updateClosePopUpData method...{}", opportunityId);
 		EnumMap<ApiResponse, Object> updateCloseData = new EnumMap<>(ApiResponse.class);
 		try {
-			boolean status = false;
-			String phase = CLOSE;
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			opportunityData.setWinLoseReason(dto.getWinLoseReason());
-			opportunityData.setContract(dto.getContract());
-			opportunityData.setPaymentTerms(dto.getPaymentTerms());
-			opportunityData.setSupportPlan(dto.getSupportPlan());
-			opportunityData.setFinalBudget(dto.getFinalBudget());
 			opportunityData.setProgressStatus(dto.getProgressStatus());
 			opportunityData.setCurrentPhase(dto.getCurrentPhase());
-			List<OpprtAttachmentDto> isAttachments = dto.getAttachments();
-			status = updateAttachmentsOfAllPhases(opportunityData, phase, isAttachments);
-			if (status) {
+			opportunityData.setProjectKickoff(dto.getProjectKickoff());
+			opportunityData.setFinalisingTeam(dto.getFinalisingTeam());
+			opportunityData.setSlaSigned(dto.getSlaSigned());
+			opportunityData.setSowSigned(dto.getSowSigned());
+			opportunityData.setNdaSigned(dto.getNdaSigned());
+			opportunityData.setStatus(dto.getStatus());
+			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateCloseData.put(SUCCESS, true);
-				updateCloseData.put(MESSAGE, "Opportunity Close Successfully..!!");
+				updateCloseData.put(MESSAGE, "Close Successfully..!!");
 			} else {
 				updateCloseData.put(SUCCESS, false);
-				updateCloseData.put(MESSAGE, "Opportunity Not Close");
+				updateCloseData.put(MESSAGE, "Not Close");
 			}
 			return new ResponseEntity<>(updateCloseData, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception in Opportunity while updating the close popup data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getCloseAsLostData(Integer opportunityId) {
+		log.info("inside the Opportunity getCloseAsLostData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> closeAsLostData = new EnumMap<>(ApiResponse.class);
+		closeAsLostData.put(SUCCESS, false);
+		try {
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			Optional<CloseAsLostOpportunityDto> dto = TO_CLOSE_AS_LOST_OPPORTUNITY_DTO.apply(opportunityData);
+			closeAsLostData.put(DATA, dto);
+			closeAsLostData.put(SUCCESS, true);
+			return new ResponseEntity<>(closeAsLostData, OK);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while getting closeAsLost opty data...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCloseAsLostData(CloseAsLostOpportunityDto dto,
+			Integer opportunityId) {
+		log.info("inside the Opportunity updateCloseAsLostData method...{}", opportunityId);
+		EnumMap<ApiResponse, Object> updateCloseAsLostData = new EnumMap<>(ApiResponse.class);
+		try {
+			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			opportunityData.setProgressStatus(dto.getProgressStatus());
+			opportunityData.setCurrentPhase(dto.getCurrentPhase());
+			opportunityData.setLostReason(dto.getLostReason());
+			opportunityData.setThankMailSent(dto.getThankMailSent());
+			opportunityData.setDescription(dto.getDescription());
+			opportunityData.setStatus(dto.getStatus());
+			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
+				updateCloseAsLostData.put(SUCCESS, true);
+				updateCloseAsLostData.put(MESSAGE, "Opportunity Lost..!!");
+			} else {
+				updateCloseAsLostData.put(SUCCESS, false);
+				updateCloseAsLostData.put(MESSAGE, "Not Lost");
+			}
+			return new ResponseEntity<>(updateCloseAsLostData, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception in Opportunity while updating the close as lost opty data...{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
