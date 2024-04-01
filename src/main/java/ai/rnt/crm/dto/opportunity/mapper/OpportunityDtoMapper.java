@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
+import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
@@ -69,4 +70,7 @@ public class OpportunityDtoMapper {
 
 	public static final Function<Opportunity, Optional<CloseOpportunityDto>> TO_CLOSE_OPPORTUNITY_DTO = e -> evalMapper(
 			e, CloseOpportunityDto.class);
+	
+	public static final Function<Opportunity, Optional<CloseAsLostOpportunityDto>> TO_CLOSE_AS_LOST_OPPORTUNITY_DTO = e -> evalMapper(
+			e, CloseAsLostOpportunityDto.class);
 }

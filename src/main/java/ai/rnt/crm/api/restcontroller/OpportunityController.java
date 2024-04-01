@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
+import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
 import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
@@ -104,6 +105,20 @@ public class OpportunityController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateClosePopUpData(@RequestBody CloseOpportunityDto dto,
 			@PathVariable(name = "opportunityId") Integer opportunityId) {
 		return opportunityService.updateClosePopUpData(dto, opportunityId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/closeAsLost/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getCloseAsLostData(
+			@PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.getCloseAsLostData(opportunityId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@PutMapping("/closeAsLost/{opportunityId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCloseAsLostData(
+			@RequestBody CloseAsLostOpportunityDto dto, @PathVariable(name = "opportunityId") Integer opportunityId) {
+		return opportunityService.updateCloseAsLostData(dto, opportunityId);
 	}
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)

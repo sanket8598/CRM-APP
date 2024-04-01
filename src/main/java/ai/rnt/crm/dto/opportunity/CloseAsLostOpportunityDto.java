@@ -5,13 +5,11 @@ import lombok.Setter;
 
 /**
  * @author Nikhil Gaikwad
- * @since 22/02/2024
- * @version 1.2
  *
  */
 @Getter
 @Setter
-public class CloseOpportunityDto {
+public class CloseAsLostOpportunityDto {
 
 	private Integer opportunityId;
 
@@ -19,16 +17,12 @@ public class CloseOpportunityDto {
 
 	private String currentPhase;
 
-	private Boolean projectKickoff;
+	private String lostReason;
 
-	private Boolean finalisingTeam;
+	private Boolean thankMailSent;
 
-	private Boolean slaSigned;
+	private String description;
 
-	private Boolean sowSigned;
-
-	private Boolean ndaSigned;
-	
 	private String status;
 
 }
