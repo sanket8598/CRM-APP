@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import java.util.ArrayList;
 import java.util.List;
 
+import ai.rnt.crm.dto.opportunity.OpportunityDto;
 import ai.rnt.crm.util.LeadsCardUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,6 +45,8 @@ public class EditLeadDto {
 	private Integer dropDownAssignTo;
 
 	private ContactDto primaryContact;
+	
+	private OpportunityDto opportunity;
 
 	public String getShortName() {
 		return nonNull(primaryContact)
