@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import ai.rnt.crm.dto.opportunity.OpportunityDto;
+
 class EditLeadDtoTest {
 
 	EditLeadDto dto = new EditLeadDto();
@@ -16,6 +18,7 @@ class EditLeadDtoTest {
 	void testEditLeadDto() {
 		EditLeadDto editLeadDto = new EditLeadDto();
 		Integer leadId = 1;
+		Integer optyId = 1;
 		String topic = "New Project";
 		String budgetAmount = "10000";
 		Integer assignTo = 2;
@@ -23,6 +26,8 @@ class EditLeadDtoTest {
 		String customerNeed = "Increase sales";
 		String proposedSolution = "Implement new marketing strategies";
 		ServiceFallsDto serviceFallsMaster = new ServiceFallsDto();
+		OpportunityDto opportunityDto = new OpportunityDto();
+		opportunityDto.setOpportunityId(1);
 		LeadSourceDto leadSourceMaster = new LeadSourceDto();
 		DomainMasterDto domainMaster = new DomainMasterDto();
 		String message = "Please follow up";
@@ -45,6 +50,7 @@ class EditLeadDtoTest {
 		editLeadDto.setCustomerNeed(customerNeed);
 		editLeadDto.setProposedSolution(proposedSolution);
 		editLeadDto.setServiceFallsMaster(serviceFallsMaster);
+		editLeadDto.setOpportunity(opportunityDto);
 		editLeadDto.setLeadSourceMaster(leadSourceMaster);
 		editLeadDto.setDomainMaster(domainMaster);
 		editLeadDto.setMessage(message);
@@ -75,6 +81,7 @@ class EditLeadDtoTest {
 		assertEquals(dropDownAssignTo, editLeadDto.getDropDownAssignTo());
 		assertEquals(primaryContact, editLeadDto.getPrimaryContact());
 		assertEquals(primaryContact, editLeadDto.getContacts().get(0));
+		assertEquals(optyId, editLeadDto.getOpportunity().getOpportunityId());
 	}
 
 	@Test
