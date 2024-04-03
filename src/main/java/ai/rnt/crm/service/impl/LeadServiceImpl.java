@@ -566,6 +566,7 @@ public class LeadServiceImpl implements LeadService {
 			setLeadSourceToLead(dto.getLeadSourceId(), lead, leadSourceDaoService);
 			setDomainToLead(dto.getDomainId(), lead, domainMasterDaoService);
 			contact.setLinkedinId(dto.getLinkedinId());
+			contact.setContactNumberPrimary(dto.getPhoneNumber());
 			if (nonNull(contactDaoService.addContact(contact)) && nonNull(leadDaoService.addLead(lead)))
 				updateMap.put(MESSAGE, "Lead Details Updated Successfully !!");
 			else
