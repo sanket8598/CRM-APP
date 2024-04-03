@@ -68,6 +68,7 @@ import static ai.rnt.crm.util.CommonUtil.upNextActivities;
 import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
+import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
@@ -458,6 +459,8 @@ public class LeadServiceImpl implements LeadService {
 		log.info("inside the qualifyLead method...{}", leadId);
 		EnumMap<ApiResponse, Object> qualifyLeadMap = new EnumMap<>(ApiResponse.class);
 		try {
+			Opportunity opportunity = null;
+			boolean status = false;
 			qualifyLeadMap.put(SUCCESS, true);
 			qualifyLeadMap.put(MESSAGE, "Lead Not Qualify");
 			Leads lead = leadDaoService.getLeadById(leadId)
@@ -472,10 +475,20 @@ public class LeadServiceImpl implements LeadService {
 			lead.setBudgetAmount(dto.getBudgetAmount());
 			lead.setDisqualifyAs(QUALIFIED);
 			lead.setStatus(CLOSE_AS_QUALIFIED);
-			if (nonNull(leadDaoService.addLead(lead)) && addToOpputunity(lead))
-				qualifyLeadMap.put(MESSAGE, "Lead Qualified SuccessFully");
-			else
-				qualifyLeadMap.put(SUCCESS, false);
+			if (nonNull(dto.getQualify()) && TRUE.equals(dto.getQualify())) {
+				opportunity = addToOpputunity(lead);
+				status = nonNull(opportunity);
+				if (nonNull(leadDaoService.addLead(lead)) && status) {
+					qualifyLeadMap.put(MESSAGE, "Lead Qualified SuccessFully");
+					qualifyLeadMap.put(DATA, opportunity.getOpportunityId());
+				} else
+					qualifyLeadMap.put(SUCCESS, false);
+			} else {
+				if (nonNull(leadDaoService.addLead(lead)))
+					qualifyLeadMap.put(MESSAGE, "Save SuccessFully");
+				else
+					qualifyLeadMap.put(SUCCESS, false);
+			}
 			return new ResponseEntity<>(qualifyLeadMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while qualifying the lead..{}", e.getMessage());
@@ -855,7 +868,7 @@ public class LeadServiceImpl implements LeadService {
 		}
 	}
 
-	public boolean addToOpputunity(Leads leads) {
+	public Opportunity addToOpputunity(Leads leads) {
 		Opportunity opportunity = new Opportunity();
 		opportunity.setStatus(OppurtunityStatus.OPEN);
 		opportunity.setBudgetAmount(leads.getBudgetAmount());
@@ -865,6 +878,6 @@ public class LeadServiceImpl implements LeadService {
 		opportunity.setPseudoName(leads.getPseudoName());
 		opportunity.setEmployee(leads.getEmployee());
 		opportunity.setLeads(leads);
-		return nonNull(opportunityDaoService.addOpportunity(opportunity));
+		return opportunityDaoService.addOpportunity(opportunity);
 	}
 }

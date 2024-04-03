@@ -24,4 +24,6 @@ public class QualifyLeadDto {
 	private String customerReadiness;
 
 	private String qualifyRemarks;
+	
+	private Boolean qualify;
 }
