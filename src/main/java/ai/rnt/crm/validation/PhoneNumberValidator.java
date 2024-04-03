@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PhoneNumberValidator implements ConstraintValidator<PhoneNumValid,String>{
 
-	private PhoneNumberValidateApi phoneNumberValidateApi;
+	private final PhoneNumberValidateApi phoneNumberValidateApi;
 
 	@Override
 	public boolean isValid(String phoneNumber, ConstraintValidatorContext context) {

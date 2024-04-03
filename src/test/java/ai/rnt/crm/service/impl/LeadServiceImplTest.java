@@ -587,8 +587,8 @@ class LeadServiceImplTest {
 		opportunity.setPseudoName("Test Pseudo Name");
 		opportunity.setEmployee(employee);
 		when(opportunityDaoService.addOpportunity(any())).thenReturn(opportunity);
-		boolean result = leadService.addToOpputunity(leads);
-		assertTrue(result);
+		opportunity = leadService.addToOpputunity(leads);
+		assertNotNull(opportunity);
 		assertEquals(OppurtunityStatus.OPEN, opportunity.getStatus());
 		assertEquals(leads.getBudgetAmount(), opportunity.getBudgetAmount());
 		assertEquals(leads.getCustomerNeed(), opportunity.getCustomerNeed());
@@ -602,8 +602,8 @@ class LeadServiceImplTest {
 	void testAddToOpportunityFailure() {
 		Leads leads = new Leads();
 		when(opportunityDaoService.addOpportunity(any())).thenReturn(null);
-		boolean result = leadService.addToOpputunity(leads);
-		assertFalse(result);
+		Opportunity opportunity = leadService.addToOpputunity(leads);
+		assertNull(opportunity);
 	}
 
 	@Test
@@ -843,15 +843,10 @@ class LeadServiceImplTest {
 	void testQualifyLeadUnSuccess() throws Exception {
 		Integer leadId = 1;
 		QualifyLeadDto dto = new QualifyLeadDto();
+		dto.setQualify(true);
 		Leads lead = new Leads();
-		ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
-		serviceFalls.setServiceName("Test");
-		ServiceFallsDto serviceFallsDto = new ServiceFallsDto();
-		serviceFallsDto.setServiceFallsId(1);
-		serviceFallsDto.setServiceName("111ert");
 		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
 		when(leadDaoService.addLead(any())).thenReturn(lead);
-		when(serviceFallsDaoSevice.save(any())).thenReturn(Optional.of(serviceFallsDto));
 		when(serviceFallsDaoSevice.findByName("Other")).thenReturn(Optional.of(new ServiceFallsMaster()));
 		when(serviceFallsDaoSevice.getServiceFallById(1)).thenReturn(Optional.of(new ServiceFallsMaster()));
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
