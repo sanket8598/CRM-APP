@@ -872,10 +872,10 @@ public class LeadServiceImpl implements LeadService {
 		Opportunity opportunity = new Opportunity();
 		opportunity.setStatus(OppurtunityStatus.OPEN);
 		opportunity.setBudgetAmount(leads.getBudgetAmount());
-		opportunity.setCustomerNeed(leads.getCustomerNeed());
-		opportunity.setProposedSolution(leads.getProposedSolution());
 		opportunity.setTopic(leads.getTopic());
 		opportunity.setPseudoName(leads.getPseudoName());
+		opportunity.setCurrentPhase(leads.getCurrentPhase());
+		opportunity.setProgressStatus(leads.getProgressStatus());
 		opportunity.setEmployee(leads.getEmployee());
 		opportunity.setLeads(leads);
 		return opportunityDaoService.addOpportunity(opportunity);
