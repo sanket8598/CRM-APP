@@ -29,7 +29,6 @@ import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_DISQUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.DISQUALIFIED_LEAD;
-import static ai.rnt.crm.constants.StatusConstants.FOLLOW_UP;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
 import static ai.rnt.crm.constants.StatusConstants.OPEN;
 import static ai.rnt.crm.constants.StatusConstants.OPEN_LEAD;
@@ -69,7 +68,6 @@ import static ai.rnt.crm.util.CommonUtil.upNextActivities;
 import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
-import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
@@ -437,16 +435,15 @@ public class LeadServiceImpl implements LeadService {
 			List<Visit> visits = visitDaoService.getVisitsByLeadIdAndIsOpportunity(leadId);
 			List<Email> emails = emailDaoService.getEmailByLeadIdAndIsOpportunity(leadId);
 			List<Meetings> meetings = meetingDaoService.getMeetingByLeadIdAndIsOpportunity(leadId);
-  
-			   
+
 			dataMap.put(LEAD_INFO, dto);
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
-			dataMap.put(TIMELINE, getTimelineData(calls,visits,emails,meetings,employeeService));
-			dataMap.put(ACTIVITY, getActivityData(calls,visits,emails,meetings,employeeService));
-			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls,visits,emails,meetings,employeeService)));
-			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, leadById,null));
+			dataMap.put(TIMELINE, getTimelineData(calls, visits, emails, meetings, employeeService));
+			dataMap.put(ACTIVITY, getActivityData(calls, visits, emails, meetings, employeeService));
+			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls, visits, emails, meetings, employeeService)));
+			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, leadById, null));
 			lead.put(SUCCESS, true);
 			lead.put(DATA, dataMap);
 			return new ResponseEntity<>(lead, OK);
@@ -465,17 +462,16 @@ public class LeadServiceImpl implements LeadService {
 			qualifyLeadMap.put(MESSAGE, "Lead Not Qualify");
 			Leads lead = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
-			lead.setCustomerNeed(dto.getCustomerNeed());
-			lead.setProposedSolution(dto.getProposedSolution());
-			lead.setDisqualifyAs(TRUE.equals(dto.getIsFollowUpRemainder()) ? FOLLOW_UP : QUALIFIED);
-			if (nonNull(dto.getIsFollowUpRemainder()) && TRUE.equals(dto.getIsFollowUpRemainder())) {
-				lead.setIsFollowUpRemainder(dto.getIsFollowUpRemainder());
-				lead.setRemainderVia(dto.getRemainderVia());
-				lead.setRemainderDueAt(dto.getRemainderDueAt());
-				lead.setRemainderDueOn(dto.getRemainderDueOn());
-			}
+			lead.setRequirementShared(dto.getRequirementShared());
+			lead.setIdentifyDecisionMaker(dto.getIdentifyDecisionMaker());
+			lead.setFirstMeetingDone(dto.getFirstMeetingDone());
+			lead.setCustomerReadiness(dto.getCustomerReadiness());
+			lead.setQualifyRemarks(dto.getQualifyRemarks());
+			lead.setCurrentPhase(dto.getCurrentPhase());
+			lead.setProgressStatus(dto.getProgressStatus());
+			lead.setBudgetAmount(dto.getBudgetAmount());
+			lead.setDisqualifyAs(QUALIFIED);
 			lead.setStatus(CLOSE_AS_QUALIFIED);
-			setServiceFallToLead(dto.getServiceFallsMaster().getServiceName(), lead, serviceFallsDaoSevice);
 			if (nonNull(leadDaoService.addLead(lead)) && addToOpputunity(lead))
 				qualifyLeadMap.put(MESSAGE, "Lead Qualified SuccessFully");
 			else
@@ -696,7 +692,8 @@ public class LeadServiceImpl implements LeadService {
 						}).sum();
 						int duplicateLead = leadDtos.size() - saveLeadCount;
 						excelMap.put(SUCCESS, saveLeadCount > 0);
-						excelMap.put(MESSAGE, saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
+						excelMap.put(MESSAGE,
+								saveLeadCount + " Leads Added And " + duplicateLead + " Duplicate Found!!");
 						if (duplicateLead == 0 && saveLeadCount == 0)
 							excelMap.put(MESSAGE, "No Lead Found To Add !!");
 						return new ResponseEntity<>(excelMap, CREATED);

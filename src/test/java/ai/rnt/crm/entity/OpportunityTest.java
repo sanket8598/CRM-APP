@@ -46,13 +46,8 @@ class OpportunityTest {
 		opportunity.setDevelopProposal(true);
 		opportunity.setIdentifySme(true);
 		opportunity.setTimeline("This Quater");
-		opportunity.setQualifyRemarks("test1");
 		opportunity.setAnalysisRemarks("test2");
 		opportunity.setProposeRemarks("test3");
-		opportunity.setCustomerReadiness("test");
-		opportunity.setFirstMeetingDone(true);
-		opportunity.setIdentifyDecisionMaker(true);
-		opportunity.setRequirementShared(true);
 		opportunity.setFinalisingTeam(true);
 		opportunity.setSlaSigned(true);
 		opportunity.setSowSigned(true);
@@ -91,13 +86,8 @@ class OpportunityTest {
 		assertEquals(true, opportunity.getDevelopProposal());
 		assertEquals(true, opportunity.getIdentifySme());
 		assertEquals("This Quater", opportunity.getTimeline());
-		assertEquals("test1", opportunity.getQualifyRemarks());
 		assertEquals("test2", opportunity.getAnalysisRemarks());
 		assertEquals("test3", opportunity.getProposeRemarks());
-		assertEquals("test", opportunity.getCustomerReadiness());
-		assertEquals(true, opportunity.getFirstMeetingDone());
-		assertEquals(true, opportunity.getIdentifyDecisionMaker());
-		assertEquals(true, opportunity.getRequirementShared());
 		assertEquals(true, opportunity.getProjectKickoff());
 		assertEquals(true, opportunity.getFinalisingTeam());
 		assertEquals(true, opportunity.getSlaSigned());

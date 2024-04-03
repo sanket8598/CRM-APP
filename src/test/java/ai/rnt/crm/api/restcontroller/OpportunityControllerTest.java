@@ -18,7 +18,6 @@ import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
-import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.OpportunityService;
 
@@ -75,24 +74,12 @@ class OpportunityControllerTest {
 	@Test
 	void getQualifyPopUpDataTest() {
 		OpportunityService opportunityService = mock(OpportunityService.class);
-		Integer opportunityId = 1;
+		Integer leadId = 1;
 		OpportunityController controller = new OpportunityController(opportunityService);
 		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
-		when(opportunityService.getQualifyPopUpData(opportunityId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.getQualifyPopUpData(opportunityId);
-		verify(opportunityService).getQualifyPopUpData(opportunityId);
-	}
-
-	@Test
-	void updateQualifyPopUpDataTest() {
-		OpportunityService opportunityService = mock(OpportunityService.class);
-		Integer opportunityId = 1;
-		QualifyOpportunityDto dto = new QualifyOpportunityDto();
-		OpportunityController controller = new OpportunityController(opportunityService);
-		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
-		when(opportunityService.updateQualifyPopUpData(dto, opportunityId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.updateQualifyPopUpData(dto, opportunityId);
-		verify(opportunityService).updateQualifyPopUpData(dto, opportunityId);
+		when(opportunityService.getQualifyPopUpData(leadId)).thenReturn(mockResponse);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.getQualifyPopUpData(leadId);
+		verify(opportunityService).getQualifyPopUpData(leadId);
 	}
 
 	@Test
