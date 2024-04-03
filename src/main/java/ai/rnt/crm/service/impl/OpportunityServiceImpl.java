@@ -4,6 +4,7 @@ import static ai.rnt.crm.constants.CRMConstants.ACTIVITY;
 import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
 import static ai.rnt.crm.constants.CRMConstants.DOMAINS;
 import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
+import static ai.rnt.crm.constants.CRMConstants.LEAD_ID;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE;
 import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALL;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
@@ -20,6 +21,7 @@ import static ai.rnt.crm.constants.OppurtunityStatus.QUALIFY;
 import static ai.rnt.crm.constants.OppurtunityStatus.WON;
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
+import static ai.rnt.crm.constants.StatusConstants.LEAD;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_ANALYSIS_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_CLOSE_AS_LOST_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_CLOSE_OPPORTUNITY_DTO;
@@ -28,7 +30,7 @@ import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_DASHBOAR
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_GRAPHICAL_DATA_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_OPPORTUNITY_ATTACHMENT;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_PROPOSE_OPPORTUNITY_DTO;
-import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_OPPORTUNITY_DTO;
+import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_QUALIFY_LEAD_DTO;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
 import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
@@ -92,6 +94,7 @@ import ai.rnt.crm.dao.service.OpprtAttachmentDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
@@ -100,7 +103,6 @@ import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
 import ai.rnt.crm.dto.opportunity.OpprtAttachmentDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
-import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Email;
@@ -372,49 +374,19 @@ public class OpportunityServiceImpl implements OpportunityService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getQualifyPopUpData(Integer opportunityId) {
-		log.info("inside the Opportunity getQualifyPopUpData method...{}", opportunityId);
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getQualifyPopUpData(Integer leadId) {
+		log.info("inside the Opportunity getQualifyPopUpData method...{}", leadId);
 		EnumMap<ApiResponse, Object> qualifyData = new EnumMap<>(ApiResponse.class);
 		qualifyData.put(SUCCESS, false);
 		try {
-			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
-					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			Optional<QualifyOpportunityDto> dto = TO_QUALIFY_OPPORTUNITY_DTO.apply(opportunityData);
+			Leads lead = leadDaoService.getLeadById(leadId)
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
+			Optional<QualifyLeadDto> dto = TO_QUALIFY_LEAD_DTO.apply(lead);
 			qualifyData.put(DATA, dto);
 			qualifyData.put(SUCCESS, true);
 			return new ResponseEntity<>(qualifyData, OK);
 		} catch (Exception e) {
 			log.error("Got Exception in Opportunity while getting qualify data...{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateQualifyPopUpData(QualifyOpportunityDto dto,
-			Integer opportunityId) {
-		log.info("inside the Opportunity updateQualifyPopUpData method...{}", opportunityId);
-		EnumMap<ApiResponse, Object> updateQualifyData = new EnumMap<>(ApiResponse.class);
-		try {
-			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
-					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			opportunityData.setBudgetAmount(dto.getBudgetAmount());
-			opportunityData.setRequirementShared(dto.getRequirementShared());
-			opportunityData.setIdentifyDecisionMaker(dto.getIdentifyDecisionMaker());
-			opportunityData.setFirstMeetingDone(dto.getFirstMeetingDone());
-			opportunityData.setCustomerReadiness(dto.getCustomerReadiness());
-			opportunityData.setQualifyRemarks(dto.getQualifyRemarks());
-			opportunityData.setCurrentPhase(dto.getCurrentPhase());
-			opportunityData.setProgressStatus(dto.getProgressStatus());
-			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
-				updateQualifyData.put(SUCCESS, true);
-				updateQualifyData.put(MESSAGE, "Qualify Successfully..!!");
-			} else {
-				updateQualifyData.put(SUCCESS, false);
-				updateQualifyData.put(MESSAGE, "Not Qualify");
-			}
-			return new ResponseEntity<>(updateQualifyData, CREATED);
-		} catch (Exception e) {
-			log.error("Got Exception in Opportunity while updating the qualify data...{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

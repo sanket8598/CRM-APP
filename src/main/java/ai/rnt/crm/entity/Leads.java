@@ -93,6 +93,27 @@ public class Leads extends Auditable {
 
 	@Column(name = "remainder_due_on")
 	private LocalDate remainderDueOn;
+	
+	@Column(name = "shared_req", columnDefinition = "default false")
+	private Boolean requirementShared;
+
+	@Column(name = "dec_maker", columnDefinition = "default false")
+	private Boolean identifyDecisionMaker;
+
+	@Column(name = "first_mtg_done", columnDefinition = "default false")
+	private Boolean firstMeetingDone;
+
+	@Column(name = "customer_readiness")
+	private String customerReadiness;
+
+	@Column(name = "qualify_rem")
+	private String qualifyRemarks;
+	
+	@Column(name = "progress_status")
+	private String progressStatus;
+	
+	@Column(name = "current_phase")
+	private String currentPhase;
 
 	@ManyToOne(cascade = { MERGE, DETACH, REFRESH })
 	@JoinColumn(name = "lead_source_id")

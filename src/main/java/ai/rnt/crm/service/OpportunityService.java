@@ -9,7 +9,6 @@ import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
-import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.enums.ApiResponse;
 
 public interface OpportunityService {
@@ -20,10 +19,7 @@ public interface OpportunityService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityData(Integer optId);
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> getQualifyPopUpData(Integer opportunityId);
-
-	ResponseEntity<EnumMap<ApiResponse, Object>> updateQualifyPopUpData(QualifyOpportunityDto dto,
-			Integer opportunityId);
+	ResponseEntity<EnumMap<ApiResponse, Object>> getQualifyPopUpData(Integer leadId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getAnalysisPopUpData(Integer opportunityId);
 

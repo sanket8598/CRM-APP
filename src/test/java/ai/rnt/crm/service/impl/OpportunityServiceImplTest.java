@@ -57,13 +57,11 @@ import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.OpprtAttachmentDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
-import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
-import ai.rnt.crm.entity.LeadSourceMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.entity.Opportunity;
@@ -290,22 +288,8 @@ class OpportunityServiceImplTest {
 
 	@Test
 	void getQualifyPopUpDataTest() {
-		Opportunity opportunity = new Opportunity();
-		Leads leads = new Leads();
-		Contacts primaryContact = new Contacts();
-		List<Contacts> contacts = new ArrayList<>();
-		primaryContact.setPrimary(true);
-		EmployeeMaster employeeMaster = new EmployeeMaster();
-		employeeMaster.setStaffId(1477);
-		opportunity.setEmployee(employeeMaster);
-		LeadSourceMaster leadSourceMaster = new LeadSourceMaster();
-		leadSourceMaster.setLeadSourceId(1);
-		contacts.add(primaryContact);
-		leads.setContacts(contacts);
-		leads.setLeadSourceMaster(leadSourceMaster);
-		opportunity.setLeads(leads);
-		when(opportunityDaoService.findOpportunity(anyInt())).thenReturn(Optional.of(opportunity));
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.getQualifyPopUpData(1);
+		when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(leads));
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.getQualifyPopUpData(anyInt());
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue((boolean) response.getBody().get(ApiResponse.SUCCESS));
@@ -529,32 +513,6 @@ class OpportunityServiceImplTest {
 	}
 
 	@Test
-	void testUpdateQualifyPopUpDataSuccess1() {
-		Integer opportunityId = 1;
-		QualifyOpportunityDto dto = new QualifyOpportunityDto();
-		Leads leads = new Leads();
-		Opportunity opportunity = new Opportunity();
-		opportunity.setLeads(leads);
-		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(opportunity));
-		when(opportunityDaoService.addOpportunity(any())).thenReturn(new Opportunity());
-		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity1 = opportunityServiceImpl
-				.updateQualifyPopUpData(dto, opportunityId);
-		assertNotNull(responseEntity1);
-		assertEquals(HttpStatus.CREATED, responseEntity1.getStatusCode());
-		assertTrue(responseEntity1.getBody().containsKey(ApiResponse.SUCCESS));
-		assertTrue((boolean) responseEntity1.getBody().get(ApiResponse.SUCCESS));
-		assertNotNull(responseEntity1.getBody().get(ApiResponse.MESSAGE));
-		when(opportunityDaoService.addOpportunity(any())).thenReturn(null);
-		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity2 = opportunityServiceImpl
-				.updateQualifyPopUpData(dto, opportunityId);
-		assertNotNull(responseEntity2);
-		assertEquals(HttpStatus.CREATED, responseEntity2.getStatusCode());
-		assertTrue(responseEntity2.getBody().containsKey(ApiResponse.SUCCESS));
-		assertFalse((boolean) responseEntity2.getBody().get(ApiResponse.SUCCESS));
-		assertNotNull(responseEntity2.getBody().get(ApiResponse.MESSAGE));
-	}
-
-	@Test
 	void testUpdateClosePopUpDataSuccess1() {
 		Integer opportunityId = 1;
 		CloseOpportunityDto dto = new CloseOpportunityDto();
@@ -656,14 +614,6 @@ class OpportunityServiceImplTest {
 		assertTrue(responseEntity2.getBody().containsKey(ApiResponse.SUCCESS));
 		assertFalse((boolean) responseEntity2.getBody().get(ApiResponse.SUCCESS));
 		assertNotNull(responseEntity2.getBody().get(ApiResponse.MESSAGE));
-	}
-
-	@Test
-	void testUpdateQualifyPopUpDataOpportunityNotFound() {
-		Integer opportunityId = 1;
-		QualifyOpportunityDto dto = new QualifyOpportunityDto();
-		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.empty());
-		assertThrows(CRMException.class, () -> opportunityServiceImpl.updateQualifyPopUpData(dto, opportunityId));
 	}
 
 	@Test

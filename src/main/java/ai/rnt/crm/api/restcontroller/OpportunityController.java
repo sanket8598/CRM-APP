@@ -19,7 +19,6 @@ import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
-import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.OpportunityService;
 import lombok.RequiredArgsConstructor;
@@ -52,17 +51,10 @@ public class OpportunityController {
 	}
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
-	@GetMapping("/qualify/{opportunityId}")
+	@GetMapping("/qualify/{leadId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getQualifyPopUpData(
-			@PathVariable(name = "opportunityId") Integer opportunityId) {
-		return opportunityService.getQualifyPopUpData(opportunityId);
-	}
-
-	@PreAuthorize(CHECK_BOTH_ACCESS)
-	@PutMapping("/qualify/{opportunityId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateQualifyPopUpData(@RequestBody QualifyOpportunityDto dto,
-			@PathVariable(name = "opportunityId") Integer opportunityId) {
-		return opportunityService.updateQualifyPopUpData(dto, opportunityId);
+			@PathVariable(name = "leadId") Integer leadId) {
+		return opportunityService.getQualifyPopUpData(leadId);
 	}
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)

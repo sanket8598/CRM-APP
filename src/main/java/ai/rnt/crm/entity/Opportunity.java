@@ -143,21 +143,6 @@ public class Opportunity extends Auditable {
 	@OneToMany(mappedBy = "opportunity", cascade = ALL, orphanRemoval = true)
 	private List<OpportunityTask> opportunityTasks = new ArrayList<>();
 
-	@Column(name = "shared_req", columnDefinition = "default false")
-	private Boolean requirementShared;
-
-	@Column(name = "dec_maker", columnDefinition = "default false")
-	private Boolean identifyDecisionMaker;
-
-	@Column(name = "first_mtg_done", columnDefinition = "default false")
-	private Boolean firstMeetingDone;
-
-	@Column(name = "cust_readiness")
-	private String customerReadiness;
-
-	@Column(name = "qualify_rem")
-	private String qualifyRemarks;
-
 	@Column(name = "analysis_rem")
 	private String analysisRemarks;
 

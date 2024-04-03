@@ -801,7 +801,7 @@ class LeadServiceImplTest {
 		visits.add(visit);
 		calls.add(call);
 		emails.add(email);
-		Meetings m =mock(Meetings.class);
+		Meetings m = mock(Meetings.class);
 		m.setMeetingStatus("asa");
 		meetings.add(m);
 		when(call.getCallTo()).thenReturn("Sanket wakankar");
@@ -832,7 +832,6 @@ class LeadServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response1 = leadService.editLead(leadId);
 	}
 
-	
 	@Test
 	void testEditLeadLeadNotFound() {
 		Integer leadId = 1;
@@ -844,16 +843,12 @@ class LeadServiceImplTest {
 	void testQualifyLeadUnSuccess() throws Exception {
 		Integer leadId = 1;
 		QualifyLeadDto dto = new QualifyLeadDto();
-		dto.setCustomerNeed("Test customer need");
-		dto.setProposedSolution("Test proposed solution");
-		dto.setIsFollowUpRemainder(true);
 		Leads lead = new Leads();
 		ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
 		serviceFalls.setServiceName("Test");
 		ServiceFallsDto serviceFallsDto = new ServiceFallsDto();
 		serviceFallsDto.setServiceFallsId(1);
 		serviceFallsDto.setServiceName("111ert");
-		dto.setServiceFallsMaster(serviceFallsDto);
 		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
 		when(leadDaoService.addLead(any())).thenReturn(lead);
 		when(serviceFallsDaoSevice.save(any())).thenReturn(Optional.of(serviceFallsDto));

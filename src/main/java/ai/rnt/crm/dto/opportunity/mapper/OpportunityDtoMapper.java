@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
@@ -18,7 +19,7 @@ import ai.rnt.crm.dto.opportunity.GraphicalDataDto;
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
 import ai.rnt.crm.dto.opportunity.OpprtAttachmentDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
-import ai.rnt.crm.dto.opportunity.QualifyOpportunityDto;
+import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.OpprtAttachment;
 import lombok.NoArgsConstructor;
@@ -47,11 +48,11 @@ public class OpportunityDtoMapper {
 	public static final Function<Opportunity, Optional<OpportunityDto>> TO_OPPORTUNITY_DTO = e -> evalMapper(e,
 			OpportunityDto.class);
 
-	public static final Function<Opportunity, Optional<QualifyOpportunityDto>> TO_QUALIFY_OPPORTUNITY_DTO = e -> evalMapper(
-			e, QualifyOpportunityDto.class);
+	public static final Function<Leads, Optional<QualifyLeadDto>> TO_QUALIFY_LEAD_DTO = e -> evalMapper(e,
+			QualifyLeadDto.class);
 
-	public static final Function<Collection<Opportunity>, List<QualifyOpportunityDto>> TO_QUALIFY_OPPORTUNITY_DTOS = e -> e
-			.stream().map(dm -> TO_QUALIFY_OPPORTUNITY_DTO.apply(dm).get()).collect(Collectors.toList());
+	public static final Function<Collection<Leads>, List<QualifyLeadDto>> TO_QUALIFY_LEAD_DTOS = e -> e.stream()
+			.map(dm -> TO_QUALIFY_LEAD_DTO.apply(dm).get()).collect(Collectors.toList());
 
 	public static final Function<Opportunity, Optional<AnalysisOpportunityDto>> TO_ANALYSIS_OPPORTUNITY_DTO = e -> evalMapper(
 			e, AnalysisOpportunityDto.class);
@@ -70,7 +71,7 @@ public class OpportunityDtoMapper {
 
 	public static final Function<Opportunity, Optional<CloseOpportunityDto>> TO_CLOSE_OPPORTUNITY_DTO = e -> evalMapper(
 			e, CloseOpportunityDto.class);
-	
+
 	public static final Function<Opportunity, Optional<CloseAsLostOpportunityDto>> TO_CLOSE_AS_LOST_OPPORTUNITY_DTO = e -> evalMapper(
 			e, CloseAsLostOpportunityDto.class);
 }
