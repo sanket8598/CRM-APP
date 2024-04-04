@@ -147,8 +147,10 @@ public class VisitServiceImpl implements VisitService {
 				if (status.equalsIgnoreCase(SAVE)) {
 					updVisitMap.put(MESSAGE, "Visit Updated Successfully");
 					updVisitMap.put(SUCCESS, true);
-				} else
+				} else {
 					updVisitMap.put(MESSAGE, "Visit Updated And Completed Successfully");
+					updVisitMap.put(SUCCESS, true);
+				}
 			} else {
 				updVisitMap.put(MESSAGE, "Visit Not Updated");
 				updVisitMap.put(SUCCESS, false);
