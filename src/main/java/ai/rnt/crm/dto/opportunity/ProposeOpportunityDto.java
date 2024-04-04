@@ -13,15 +13,15 @@ public class ProposeOpportunityDto {
 
 	private String currentPhase;
 
-	private Boolean identifySme;
+	private Boolean identifySme = false;
 
-	private Boolean developProposal;
+	private Boolean developProposal = false;
 
-	private Boolean complInternalReview;
+	private Boolean complInternalReview = false;
 
-	private Boolean presentProposal;
+	private Boolean presentProposal = false;
 
-	private Boolean finalCommAndTimeline;
-	
+	private Boolean finalCommAndTimeline = false;
+
 	private String proposeRemarks;
 }

@@ -15,15 +15,15 @@ public class QualifyLeadDto {
 
 	private String currentPhase;
 
-	private Boolean requirementShared;
+	private Boolean requirementShared = false;
 
-	private Boolean identifyDecisionMaker;
+	private Boolean identifyDecisionMaker = false;
 
-	private Boolean firstMeetingDone;
+	private Boolean firstMeetingDone = false;
 
 	private String customerReadiness;
 
 	private String qualifyRemarks;
-	
+
 	private Boolean qualify;
 }

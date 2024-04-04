@@ -19,16 +19,16 @@ public class CloseOpportunityDto {
 
 	private String currentPhase;
 
-	private Boolean projectKickoff;
+	private Boolean projectKickoff = false;
 
-	private Boolean finalisingTeam;
+	private Boolean finalisingTeam = false;
 
-	private Boolean slaSigned;
+	private Boolean slaSigned = false;
 
-	private Boolean sowSigned;
+	private Boolean sowSigned = false;
 
-	private Boolean ndaSigned;
-	
+	private Boolean ndaSigned = false;
+
 	private String status;
 
 }
