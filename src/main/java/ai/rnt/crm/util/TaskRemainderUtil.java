@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.mail.internet.AddressException;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dao.service.CallDaoService;
@@ -73,7 +74,7 @@ public class TaskRemainderUtil {
 
 	private final EmailUtil emailUtil;
 
-	// @Scheduled(cron = "0 * * * * ?") // for every minute.
+	@Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
 		log.info("inside the reminderForTask method...{}");
 		try {

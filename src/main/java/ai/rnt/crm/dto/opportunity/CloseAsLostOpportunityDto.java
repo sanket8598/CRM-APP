@@ -19,7 +19,7 @@ public class CloseAsLostOpportunityDto {
 
 	private String lostReason;
 
-	private Boolean thankMailSent;
+	private Boolean thankMailSent = false;
 
 	private String description;
 
