@@ -6,6 +6,7 @@ import static ai.rnt.crm.constants.CRMConstants.DOMAINS;
 import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_ID;
 import static ai.rnt.crm.constants.CRMConstants.LEAD_SOURCE;
+import static ai.rnt.crm.constants.CRMConstants.OPTY_ID;
 import static ai.rnt.crm.constants.CRMConstants.SERVICE_FALL;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.CRMConstants.TASK;
@@ -650,6 +651,30 @@ public class OpportunityServiceImpl implements OpportunityService {
 			return status;
 		} catch (Exception e) {
 			log.error("Got Exception while updating the attachments of opportunity phase...{}", phase);
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignOpportunity(Map<String, Integer> map) {
+		EnumMap<ApiResponse, Object> resultMap = new EnumMap<>(ApiResponse.class);
+		log.info("inside assign opportunity staffId: {} optyId:{}", map.get(OPTY_ID));
+		try {
+			Opportunity opportunity = opportunityDaoService.findOpportunity(map.get(OPTY_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPTY_ID, map.get(OPTY_ID)));
+			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
+					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
+			opportunity.setEmployee(employee);
+			if (nonNull(opportunityDaoService.addOpportunity(opportunity))) {
+				resultMap.put(MESSAGE, "Opportunity Assigned SuccessFully");
+				resultMap.put(SUCCESS, true);
+			} else {
+				resultMap.put(MESSAGE, "Opportunity Not Assigned");
+				resultMap.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(resultMap, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while assigning the Opportunity..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

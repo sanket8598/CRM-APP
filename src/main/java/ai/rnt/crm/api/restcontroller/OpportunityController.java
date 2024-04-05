@@ -3,6 +3,7 @@ package ai.rnt.crm.api.restcontroller;
 import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -118,5 +119,11 @@ public class OpportunityController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateOpportunity(@RequestBody UpdateLeadDto dto,
 			@PathVariable(name = "opportunityId") Integer opportunityId) {
 		return opportunityService.updateOpportunity(dto, opportunityId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@PutMapping("/assign")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> assignOpportunity(@RequestBody Map<String, Integer> map) {
+		return opportunityService.assignOpportunity(map);
 	}
 }

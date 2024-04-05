@@ -1,6 +1,7 @@
 package ai.rnt.crm.service;
 
 import java.util.EnumMap;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 
@@ -41,4 +42,6 @@ public interface OpportunityService {
 			Integer opportunityId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getCloseAsLostData(Integer opportunityId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> assignOpportunity(Map<String, Integer> map);
 }

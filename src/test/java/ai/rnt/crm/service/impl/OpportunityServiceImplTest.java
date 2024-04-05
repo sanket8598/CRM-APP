@@ -1,10 +1,10 @@
 package ai.rnt.crm.service.impl;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
@@ -16,7 +16,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -790,4 +792,43 @@ class OpportunityServiceImplTest {
         when(opportunityDaoService.findOpportunity(anyInt())).thenThrow(new RuntimeException("Simulated exception"));
         assertThrows(CRMException.class, () -> opportunityServiceImpl.getOpportunityData(1));
     }
+	
+	@Test
+	void assignOpportunitySuccess() {
+		Map<String, Integer> map = new HashMap<>();
+		map.put("optyId", 1);
+		map.put("staffId", 1);
+		Opportunity opportunity = new Opportunity();
+		EmployeeMaster employee = new EmployeeMaster();
+		when(opportunityDaoService.findOpportunity(1)).thenReturn(Optional.of(opportunity));
+		when(employeeService.getById(1)).thenReturn(Optional.of(employee));
+		when(opportunityDaoService.addOpportunity(any(Opportunity.class))).thenReturn(opportunity);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.assignOpportunity(map);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Opportunity Assigned SuccessFully", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void assignOpportunityUnSuccess() {
+		Map<String, Integer> map = new HashMap<>();
+		map.put("optyId", 1);
+		map.put("staffId", 1);
+		Opportunity opportunity = new Opportunity();
+		EmployeeMaster employee = new EmployeeMaster();
+		when(opportunityDaoService.findOpportunity(1)).thenReturn(Optional.of(opportunity));
+		when(employeeService.getById(1)).thenReturn(Optional.of(employee));
+		when(opportunityDaoService.addOpportunity(any(Opportunity.class))).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.assignOpportunity(map);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
+
+	@Test
+	void assignOpportunityException() {
+		Map<String, Integer> map = new HashMap<>();
+		map.put("leadId", 1);
+		map.put("staffId", 1);
+		when(opportunityDaoService.findOpportunity(1)).thenThrow(new RuntimeException("Database error"));
+		assertThrows(CRMException.class, () -> opportunityServiceImpl.assignOpportunity(map));
+	}
 }
