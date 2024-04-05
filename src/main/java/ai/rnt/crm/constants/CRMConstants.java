@@ -16,6 +16,7 @@ public final class CRMConstants {
 	public static final String EMAIL_ID = "emailId";
 	public static final String FULL_NAME = "fullName";
 	public static final String LEAD_ID = "leadId";
+	public static final String OPTY_ID = "optyId";
 	public static final String OTHER = "Other";
 	public static final String LEAD_SOURCE_MASTER = "LeadSourceMaster";
 	public static final String LEAD_SOURCE_NAME = "leadSourceName";
