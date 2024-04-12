@@ -63,6 +63,14 @@ public class Leads extends Auditable {
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private EmployeeMaster employee;
+	
+	@JoinColumn(name = "assign_by", updatable = true)
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@ManyToOne
+	private EmployeeMaster assignBy;
+	
+	@Column(name = "assign_on")
+	private LocalDate assignDate;
 
 	@Column(name = "budget_amount")
 	private String budgetAmount;

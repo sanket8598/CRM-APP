@@ -788,6 +788,7 @@ class LeadServiceImplTest {
 		lead.setCreatedBy(1375);
 		employeeMaster.setStaffId(1375);
 		lead.setEmployee(employeeMaster);
+		lead.setAssignBy(employeeMaster);
 		List<Call> calls = new ArrayList<>();
 		List<Email> emails = new ArrayList<>();
 		List<Visit> visits = new ArrayList<>();

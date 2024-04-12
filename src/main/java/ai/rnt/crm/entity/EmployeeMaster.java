@@ -83,6 +83,9 @@ public class EmployeeMaster extends Auditable {
 	@OneToMany(mappedBy = "employee")
 	private List<Leads> leads = new ArrayList<>();
 	
+	@OneToMany(mappedBy = "assignBy")
+	private List<Leads> assignLeads = new ArrayList<>();
+	
 	@OneToMany(mappedBy = "employee")
 	private List<Opportunity> opportunity = new ArrayList<>();
 	
