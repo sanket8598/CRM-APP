@@ -80,6 +80,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -201,6 +202,8 @@ public class LeadServiceImpl implements LeadService {
 			setServiceFallToLead(leadDto.getServiceFallsId(), leads, serviceFallsDaoSevice);
 			setLeadSourceToLead(leadDto.getLeadSourceId(), leads, leadSourceDaoService);
 			setDomainToLead(leadDto.getDomainId(), leads, domainMasterDaoService);
+			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leads::setAssignBy);
+			leads.setAssignDate(LocalDate.now());
 			if (nonNull(leadDto.getAssignTo()))
 				employeeService.getById(leadDto.getAssignTo()).ifPresent(leads::setEmployee);
 			else
@@ -428,6 +431,9 @@ public class LeadServiceImpl implements LeadService {
 				e.setDropDownAssignTo(leadById.getEmployee().getStaffId());
 				e.setMessage("Assigned To " + leadById.getEmployee().getFirstName() + " "
 						+ leadById.getEmployee().getLastName());
+				e.setAssignBy(leadById.getAssignBy().getFirstName() + " " + leadById.getEmployee().getLastName());
+				e.setAssignDate(leadById.getAssignDate());
+				e.setCreatedDate(leadById.getCreatedDate());
 				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy())
 						.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, leadById.getCreatedBy()));
 				e.setGeneratedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
@@ -506,6 +512,8 @@ public class LeadServiceImpl implements LeadService {
 			EmployeeMaster employee = employeeService.getById(map.get(STAFF_ID))
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			leads.setEmployee(employee);
+			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leads::setAssignBy);
+			leads.setAssignDate(LocalDate.now());
 			if (nonNull(leadDaoService.addLead(leads))) {
 				resultMap.put(MESSAGE, "Lead Assigned SuccessFully");
 				resultMap.put(SUCCESS, true);

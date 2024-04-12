@@ -2,8 +2,12 @@ package ai.rnt.crm.dto;
 
 import static java.util.Objects.nonNull;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import ai.rnt.crm.dto.opportunity.OpportunityDto;
 import ai.rnt.crm.util.LeadsCardUtil;
@@ -23,6 +27,14 @@ public class EditLeadDto {
 	private Integer assignTo;
 
 	private String status;
+
+	private String assignBy;
+
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDate assignDate;
+
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDateTime createdDate;
 
 	private String customerNeed;
 
@@ -45,7 +57,7 @@ public class EditLeadDto {
 	private Integer dropDownAssignTo;
 
 	private ContactDto primaryContact;
-	
+
 	private OpportunityDto opportunity;
 
 	public String getShortName() {

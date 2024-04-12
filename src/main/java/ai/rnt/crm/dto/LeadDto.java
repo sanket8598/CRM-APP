@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import java.time.LocalDate;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
@@ -73,4 +75,7 @@ public class LeadDto {
 
 	private String linkedinId;
 
+	private Integer assignBy;
+	
+	private LocalDate assignDate;
 }
