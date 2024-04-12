@@ -431,7 +431,7 @@ public class LeadServiceImpl implements LeadService {
 				e.setDropDownAssignTo(leadById.getEmployee().getStaffId());
 				e.setMessage("Assigned To " + leadById.getEmployee().getFirstName() + " "
 						+ leadById.getEmployee().getLastName());
-				e.setAssignBy(leadById.getAssignBy().getFirstName() + " " + leadById.getEmployee().getLastName());
+				e.setAssignBy(leadById.getAssignBy().getFirstName() + " " + leadById.getAssignBy().getLastName());
 				e.setAssignDate(leadById.getAssignDate());
 				e.setCreatedDate(leadById.getCreatedDate());
 				EmployeeMaster employeeMaster = employeeService.getById(leadById.getCreatedBy())
