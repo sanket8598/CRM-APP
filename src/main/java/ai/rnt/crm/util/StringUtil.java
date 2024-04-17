@@ -2,7 +2,7 @@ package ai.rnt.crm.util;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import java.util.Random;
+import java.security.SecureRandom;
 import java.util.regex.Pattern;
 
 import ai.rnt.crm.exception.CRMException;
@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class StringUtil {
 
-	private static final Random random = new Random();
+	private static final SecureRandom random = new SecureRandom();
 
 	public static boolean hasWhitespace(String text) {
 		log.info("inside the hasWhitespace method...{}", text);
