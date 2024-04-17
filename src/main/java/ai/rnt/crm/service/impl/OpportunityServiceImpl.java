@@ -400,7 +400,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			AnalysisOpportunityDto dto = TO_ANALYSIS_OPPORTUNITY_DTO.apply(opportunityData).get();
+			AnalysisOpportunityDto dto = TO_ANALYSIS_OPPORTUNITY_DTO.apply(opportunityData).orElse(null);
 			dto.setCustomerNeed(opportunityData.getLeads().getCustomerNeed());
 			dto.setProposedSolution(opportunityData.getLeads().getProposedSolution());
 			analysisData.put(DATA, Optional.of(dto));
