@@ -480,6 +480,11 @@ class OpportunityServiceImplTest {
 	void testGetAnalysisPopUpDataSuccess() {
 		Integer opportunityId = 1;
 		Opportunity opportunityData = new Opportunity();
+		Leads leads = new Leads();
+		leads.setLeadId(1);
+		leads.setCustomerNeed("test data");
+		leads.setProposedSolution("test");	
+		opportunityData.setLeads(leads);
 		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(opportunityData));
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = opportunityServiceImpl
 				.getAnalysisPopUpData(opportunityId);

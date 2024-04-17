@@ -51,17 +51,17 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.createLead(any(LeadDto.class))).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.saveLead(dto);
+		leadsController.saveLead(dto);
 		verify(leadService).createLead(dto);
 	}
 
 	@Test
 	void getLeadsByStatusTest() {
-		String leadsStatus = "Open"; // Provide a valid status
+		String leadsStatus = "Open"; 
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.getLeadsByStatus(anyString())).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.getLeadsByStatus(leadsStatus);
+		leadsController.getLeadsByStatus(leadsStatus);
 		verify(leadService).getLeadsByStatus(leadsStatus);
 	}
 
@@ -70,7 +70,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(serviceFallsService.getAllSerciveFalls()).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.getAllSerciveFalls();
+		leadsController.getAllSerciveFalls();
 		verify(serviceFallsService).getAllSerciveFalls();
 	}
 
@@ -79,7 +79,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.getAllLeadSource()).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.getAllLeadSource();
+		leadsController.getAllLeadSource();
 		verify(leadService).getAllLeadSource();
 	}
 
@@ -88,7 +88,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.getAllDropDownData()).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.getAllDropDownData();
+		leadsController.getAllDropDownData();
 		verify(leadService).getAllDropDownData();
 	}
 
@@ -97,7 +97,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.getLeadDashboardData()).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.getLeadDashboardData();
+		leadsController.getLeadDashboardData();
 		verify(leadService).getLeadDashboardData();
 	}
 
@@ -107,8 +107,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.getLeadDashboardDataByStatus(leadsStatus)).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController
-				.getLeadDashboardDataByStatus(leadsStatus);
+		leadsController.getLeadDashboardDataByStatus(leadsStatus);
 		verify(leadService).getLeadDashboardDataByStatus(leadsStatus);
 	}
 
@@ -118,7 +117,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.editLead(leadId)).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.editLead(leadId);
+		leadsController.editLead(leadId);
 		verify(leadService).editLead(leadId);
 	}
 
@@ -129,7 +128,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.qualifyLead(leadId, dto)).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.qualifyLead(leadId, dto);
+		leadsController.qualifyLead(leadId, dto);
 		verify(leadService).qualifyLead(leadId, dto);
 	}
 
@@ -140,7 +139,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.assignLead(map)).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.assignLead(map);
+		leadsController.assignLead(map);
 		verify(leadService).assignLead(map);
 	}
 
@@ -151,7 +150,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.disQualifyLead(anyInt(), any(LeadDto.class))).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.disQualifyLead(leadId, dto);
+		leadsController.disQualifyLead(leadId, dto);
 		verify(leadService).disQualifyLead(leadId, dto);
 	}
 
@@ -162,7 +161,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.updateLeadContact(anyInt(), any(UpdateLeadDto.class))).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.updateLeadContact(leadId, dto);
+		leadsController.updateLeadContact(leadId, dto);
 		verify(leadService).updateLeadContact(leadId, dto);
 	}
 
@@ -173,7 +172,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.importantLead(anyInt(), anyBoolean())).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.importantLead(leadId, status);
+		leadsController.importantLead(leadId, status);
 		verify(leadService).importantLead(leadId, status);
 	}
 
@@ -183,7 +182,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.reactiveLead(anyInt())).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.reactiveLead(leadId);
+		leadsController.reactiveLead(leadId);
 		verify(leadService).reactiveLead(leadId);
 	}
 
@@ -193,7 +192,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.addSortFilterForLeads(any(LeadSortFilterDto.class))).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.addSortFilterToLeads(sortFilterDto);
+		leadsController.addSortFilterToLeads(sortFilterDto);
 		verify(leadService).addSortFilterForLeads(sortFilterDto);
 	}
 
@@ -203,7 +202,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.uploadExcel(mockFile)).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.uploadExcel(mockFile);
+		leadsController.uploadExcel(mockFile);
 		verify(leadService).uploadExcel(mockFile);
 	}
 
@@ -213,7 +212,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.getForQualifyLead(leadId)).thenReturn(expectedResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadsController.editQualifyLead(leadId);
+		leadsController.editQualifyLead(leadId);
 		verify(leadService).getForQualifyLead(leadId);
 	}
 }

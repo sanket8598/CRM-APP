@@ -147,7 +147,7 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<ApiError> responseEntity = globalExceptionHandler.handleCRMException(ex);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         ApiError apiError = responseEntity.getBody();
-        assertEquals("Your Credentails Are Not Valid !!", apiError.getMessage()); 
+        assertEquals("Your Credentials Are Not Valid !!", apiError.getMessage()); 
     }
     @Test
     void handleCRMExceptionShouldReturnNullPointerException() throws Throwable {

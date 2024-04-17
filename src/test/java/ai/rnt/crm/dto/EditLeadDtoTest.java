@@ -2,6 +2,8 @@ package ai.rnt.crm.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,9 +37,15 @@ class EditLeadDtoTest {
 		String leadRequirements = "Detailed requirements";
 		String pseudoName = "JD";
 		Integer dropDownAssignTo = 3;
+		String assignBy = "Test";
+		LocalDate date = LocalDate.now();
+		LocalDateTime createdDate = LocalDateTime.now();
 		ContactDto primaryContact = new ContactDto();
 		List<ContactDto> contacts = new ArrayList<>();
 		contacts.add(primaryContact);
+		editLeadDto.setAssignBy(assignBy);
+		editLeadDto.setAssignDate(date);
+		editLeadDto.setCreatedDate(createdDate);
 		editLeadDto.setContacts(contacts);
 		primaryContact.setFirstName("John");
 		primaryContact.setLastName("Doe");
@@ -82,6 +90,9 @@ class EditLeadDtoTest {
 		assertEquals(primaryContact, editLeadDto.getPrimaryContact());
 		assertEquals(primaryContact, editLeadDto.getContacts().get(0));
 		assertEquals(optyId, editLeadDto.getOpportunity().getOpportunityId());
+		assertEquals(assignBy, editLeadDto.getAssignBy());
+		assertEquals(date, editLeadDto.getAssignDate());
+		assertEquals(createdDate, editLeadDto.getCreatedDate());
 	}
 
 	@Test

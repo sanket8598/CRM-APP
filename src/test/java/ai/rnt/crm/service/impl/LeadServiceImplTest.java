@@ -2,12 +2,12 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -95,9 +95,13 @@ import ai.rnt.crm.entity.StateMaster;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
+import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.EmailUtil;
 import ai.rnt.crm.util.ReadExcelUtil;
+import ai.rnt.crm.util.TaskNotificationsUtil;
+import ai.rnt.crm.util.TaskRemainderUtil;
 
 class LeadServiceImplTest {
 
@@ -124,6 +128,9 @@ class LeadServiceImplTest {
 
 	@Mock
 	private LeadSortFilterDaoService leadSortFilterDaoService;
+	
+	@Mock
+	private TaskNotificationsUtil taskNotificationsUtil;
 
 	@Mock
 	private LeadSourceDaoService leadSourceDaoService;
@@ -160,6 +167,9 @@ class LeadServiceImplTest {
 
 	@Mock
 	private StateDaoService stateDaoService;
+
+	@Mock
+	private EmailUtil emailUtil;
 
 	@Mock
 	private DomainMasterDaoService domainMasterDaoService;
@@ -581,18 +591,17 @@ class LeadServiceImplTest {
 		Opportunity opportunity = new Opportunity();
 		opportunity.setStatus("Open");
 		opportunity.setBudgetAmount("1000.0");
-		opportunity.setCustomerNeed("Test Customer Need");
-		opportunity.setProposedSolution("Test Proposed Solution");
+		leads.setCustomerNeed("Test Customer Need");
+		leads.setProposedSolution("Test Proposed Solution");
 		opportunity.setTopic("Test Topic");
 		opportunity.setPseudoName("Test Pseudo Name");
 		opportunity.setEmployee(employee);
+		opportunity.setLeads(leads);
 		when(opportunityDaoService.addOpportunity(any())).thenReturn(opportunity);
 		opportunity = leadService.addToOpputunity(leads);
 		assertNotNull(opportunity);
 		assertEquals(OppurtunityStatus.OPEN, opportunity.getStatus());
 		assertEquals(leads.getBudgetAmount(), opportunity.getBudgetAmount());
-		assertEquals(leads.getCustomerNeed(), opportunity.getCustomerNeed());
-		assertEquals(leads.getProposedSolution(), opportunity.getProposedSolution());
 		assertEquals(leads.getTopic(), opportunity.getTopic());
 		assertEquals(leads.getPseudoName(), opportunity.getPseudoName());
 		assertEquals(employee, opportunity.getEmployee());
@@ -990,5 +999,11 @@ class LeadServiceImplTest {
 				.thenThrow(new RuntimeException("Simulated Exception"));
 		Contacts result = leadService.buildLeadObj(leadDto);
 		assertNull(result);
+	}
+	
+	@Test
+	void testAssignLeadNotificationException() {
+		when(leadDaoService.getLeadById(1)).thenThrow(ResourceNotFoundException.class);
+		assertThrows(CRMException.class, () -> leadService.assignLeadNotification(123));
 	}
 }

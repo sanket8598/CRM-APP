@@ -57,6 +57,7 @@ public class EmailUtil extends PropertyUtil {
 	private static final String RABBIT_AND_TORTOISE_TECHNOLOGY = "Rabbit & Tortoise Technology.";
 	private static final String COMMA_BR_BR = ",<br><br>";
 	private static final String BR = "<br><br>";
+	private static final String SINGLE_BR = "<br>";
 	private static final String REGARDS = "Regards,";
 	private static final String TASK_REMINDER = "Task Reminder : ";
 	private static final String TEXT_HTML = "text/html";
@@ -328,6 +329,40 @@ public class EmailUtil extends PropertyUtil {
 			return ofPattern("dd-MMM-yyyy").format(date);
 		} catch (Exception e) {
 			log.error("Got Exception while converting task due date..{}" + e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public void sendLeadAssignMail(Leads leads) {
+		log.info("inside the sendLeadAssignMail method...}");
+		try {
+			Message msg = new MimeMessage(getSession());
+			InternetAddress[] recipientAddress = new InternetAddress[1];
+			recipientAddress[0] = new InternetAddress(leads.getEmployee().getEmailId());
+
+			String leadName = leads.getContacts().stream().filter(Contacts::getPrimary)
+					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
+			msg.setFrom(new InternetAddress(getUserName()));
+			msg.setRecipients(TO, recipientAddress);
+			msg.setSubject("New Lead Assigned : " + leadName);
+			msg.setSentDate(new Date());
+			String primaryPhoneNumber = leads.getContacts().stream().filter(Contacts::getPrimary).findFirst()
+					.map(Contacts::getContactNumberPrimary).orElse("No primary contact found.");
+			StringBuilder content = new StringBuilder().append("<br>")
+					.append(String.format("%s",
+							DEAR + leads.getEmployee().getFirstName() + " " + leads.getEmployee().getLastName()
+									+ COMMA_BR_BR)
+							+ "A new lead has been assigned to you in CRM system:" + BR + "Lead Name : " + leadName
+							+ "." + SINGLE_BR + "Contact Information : " + primaryPhoneNumber + SINGLE_BR + "Source : "
+							+ leads.getLeadSourceMaster().getSourceName() + SINGLE_BR + "Assigned By : "
+							+ leads.getAssignBy().getFirstName() + " " + leads.getAssignBy().getLastName() + "."
+							+ SINGLE_BR + "Assigned Date : " + leads.getAssignDate() + "." + BR
+							+ "Thank you for your attention to this lead.")
+					.append(BR).append(REGARDS).append("<br>").append("RNT Sales Team");
+			msg.setContent(content.toString(), TEXT_HTML);
+			send(msg);
+		} catch (Exception e) {
+			log.error("Got Exception while sending call task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

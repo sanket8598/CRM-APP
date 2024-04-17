@@ -77,28 +77,37 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 		try {
 			if (nonNull(notification)) {
 				String msg = "Task Reminder : %s : The task is scheduled for completion by %s";
-				String leadMsg = "Follow-Up Reminder : %s by %s";
+				String leadMsg = "New Lead Assigned : %s by %s Assigned date %s";
 				TaskNotificationsDto dto = new TaskNotificationsDto();
 				dto.setNotifStatus(notification.isNotifStatus());
 				dto.setNotifId(notification.getNotifId());
-				if (nonNull(notification.getCallTask()))
+				if (nonNull(notification.getCallTask())) {
 					dto.setMessage(format(msg, notification.getCallTask().getSubject(), convertDateDateWithTime(
 							notification.getCallTask().getDueDate(), notification.getCallTask().getDueTime12Hours())));
-				else if (nonNull(notification.getVisitTask()))
+					dto.setCallTaskId(notification.getCallTask().getCallTaskId());
+				} else if (nonNull(notification.getVisitTask())) {
 					dto.setMessage(format(msg, notification.getVisitTask().getSubject(),
 							convertDateDateWithTime(notification.getVisitTask().getDueDate(),
 									notification.getVisitTask().getDueTime12Hours())));
-				else if (nonNull(notification.getMeetingTask()))
+					dto.setVisitTaskId(notification.getVisitTask().getVisitTaskId());
+				} else if (nonNull(notification.getMeetingTask())) {
 					dto.setMessage(format(msg, notification.getMeetingTask().getSubject(),
 							convertDateDateWithTime(notification.getMeetingTask().getDueDate(),
 									notification.getMeetingTask().getDueTime12Hours())));
-				else if (nonNull(notification.getLeadTask()))
+					dto.setMeetingTaskId(notification.getMeetingTask().getMeetingTaskId());
+				} else if (nonNull(notification.getLeadTask())) {
 					dto.setMessage(format(msg, notification.getLeadTask().getSubject(), convertDateDateWithTime(
 							notification.getLeadTask().getDueDate(), notification.getLeadTask().getDueTime12Hours())));
-				else if (nonNull(notification.getLeads()))
-					dto.setMessage(format(leadMsg, notification.getLeads().getTopic(),
+					dto.setLeadTaskId(notification.getLeadTask().getLeadTaskId());
+				} else if (nonNull(notification.getLeads())) {
+					dto.setMessage(format(leadMsg,
 							notification.getLeads().getContacts().stream().filter(Contacts::getPrimary)
-									.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("")));
+									.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse(""),
+							notification.getLeads().getAssignBy().getFirstName() + " "
+									+ notification.getLeads().getAssignBy().getLastName(),
+							notification.getLeads().getAssignDate().toString()));
+					dto.setLeadId(notification.getLeads().getLeadId());
+				}
 				return dto;
 			}
 			return null;
