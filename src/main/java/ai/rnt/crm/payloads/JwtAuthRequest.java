@@ -10,8 +10,8 @@ import lombok.Setter;
 @Setter
 public class JwtAuthRequest {
 	
-	@NotNull(message ="UserId should not be null !!")
-	@NotEmpty(message ="UserId should not be empty !!")
+	@NotNull(message ="Username should not be null !!")
+	@NotEmpty(message ="Username should not be empty !!")
 	private String userId;
 	
 	@NotNull(message ="Password should not be null !!")

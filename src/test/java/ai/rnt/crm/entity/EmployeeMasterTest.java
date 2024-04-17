@@ -30,6 +30,7 @@ class EmployeeMasterTest {
 		employeeMaster.getLeads();
 		employeeMaster.getOpportunity();
 		employeeMaster.getImpLead();
+		employeeMaster.getAssignLeads();
 		assertNull(employeeMaster.getFirstName());
 	}
 
@@ -53,6 +54,7 @@ class EmployeeMasterTest {
 		employeeMaster.setDepartureDate(localDate);
 		employeeMaster.setEmployeeRole(employeeRole);
 		employeeMaster.setLeads(leads);
+		employeeMaster.setAssignLeads(leads);
 		employeeMaster.setOpportunity(opportunity);
 		employeeMaster.setImpLead(impLead);
 		assertEquals(1477, employeeMaster.getStaffId());

@@ -59,12 +59,6 @@ public class Opportunity extends Auditable {
 	@Column(name = "budget_amount")
 	private String budgetAmount;
 
-	@Column(name = "customer_need")
-	private String customerNeed;
-
-	@Column(name = "proposed_solution")
-	private String proposedSolution;
-
 	@Column(name = "closed_on")
 	private LocalDate closedOn;
 
@@ -187,4 +181,7 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "descrp")
 	private String description;
+
+	@OneToMany(mappedBy = "opportunity", cascade = ALL)
+	private List<Proposal> proposals = new ArrayList<>();
 }

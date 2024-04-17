@@ -400,8 +400,10 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			Optional<AnalysisOpportunityDto> dto = TO_ANALYSIS_OPPORTUNITY_DTO.apply(opportunityData);
-			analysisData.put(DATA, dto);
+			AnalysisOpportunityDto dto = TO_ANALYSIS_OPPORTUNITY_DTO.apply(opportunityData).get();
+			dto.setCustomerNeed(opportunityData.getLeads().getCustomerNeed());
+			dto.setProposedSolution(opportunityData.getLeads().getProposedSolution());
+			analysisData.put(DATA, Optional.of(dto));
 			analysisData.put(SUCCESS, true);
 			return new ResponseEntity<>(analysisData, OK);
 		} catch (Exception e) {
@@ -418,12 +420,14 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			Leads leads = opportunityData.getLeads();
+			leads.setCustomerNeed(dto.getCustomerNeed());
+			leads.setProposedSolution(dto.getProposedSolution());
 			opportunityData.setCurrentPhase(dto.getCurrentPhase());
 			opportunityData.setProgressStatus(dto.getProgressStatus());
-			opportunityData.setCustomerNeed(dto.getCustomerNeed());
-			opportunityData.setProposedSolution(dto.getProposedSolution());
 			opportunityData.setTimeline(dto.getTimeline());
 			opportunityData.setAnalysisRemarks(dto.getAnalysisRemarks());
+			opportunityData.setLeads(leads);
 			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateAnalysisData.put(SUCCESS, true);
 				updateAnalysisData.put(MESSAGE, "Analysis Successfully..!!");
@@ -588,12 +592,12 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunity = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
+			Leads lead = opportunity.getLeads();
+			lead.setCustomerNeed(dto.getCustomerNeed());
+			lead.setProposedSolution(dto.getProposedSolution());
 			opportunity.setTopic(dto.getTopic());
 			opportunity.setBudgetAmount(dto.getBudgetAmount());
-			opportunity.setCustomerNeed(dto.getCustomerNeed());
-			opportunity.setProposedSolution(dto.getProposedSolution());
 			opportunity.setPseudoName(dto.getPseudoName());
-			Leads lead = opportunity.getLeads();
 			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
 			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService, dto,

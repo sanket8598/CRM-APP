@@ -20,10 +20,10 @@ public class EntityTaskDto implements Serializable{
 
 	private String subject;
 
-	@ValidTaskStatus(message = "Please Enter Valid Task Status!!")
+	@ValidTaskStatus(message = "Please Select Valid Task Status!!")
 	private String status;
 
-	@ValidTaskPriority(message = "Please Enter Valid Task Priority!!")
+	@ValidTaskPriority(message = "Please Select Valid Task Priority!!")
 	private String priority;
 
 	@NotNull(message = "Due date should not be null!!")

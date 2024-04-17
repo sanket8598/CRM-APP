@@ -12,14 +12,17 @@ class OpportunityTest {
 	@Test
 	void testOpportunityObject() {
 		Opportunity opportunity = new Opportunity();
+		Leads leads = new Leads();
+		leads.setLeadId(1);
 		opportunity.setOpportunityId(1);
 		opportunity.setStatus("Open");
 		opportunity.setTopic("Sample Topic");
 		opportunity.setPseudoName("Sample Pseudo Name");
 		opportunity.setBudgetAmount("10000");
-		opportunity.setCustomerNeed("Sample Customer Need");
-		opportunity.setProposedSolution("Sample Proposed Solution");
+		leads.setCustomerNeed("Sample Customer Need");
+		leads.setProposedSolution("Sample Proposed Solution");
 		opportunity.setClosedOn(LocalDate.of(2024, 3, 1));
+		opportunity.setLeads(leads);
 		opportunity.setTechnicalNeed("Sample Technical Need");
 		opportunity.setIntegrationPoint("Sample Integration Point");
 		opportunity.setSecAndComp("Sample Security and Compliance");
@@ -58,8 +61,6 @@ class OpportunityTest {
 		EmployeeMaster employee = new EmployeeMaster();
 		employee.setStaffId(1);
 		opportunity.setEmployee(employee);
-		Leads leads = new Leads();
-		leads.setLeadId(1);
 		opportunity.setLeads(leads);
 		OpprtAttachment attachment1 = new OpprtAttachment();
 		attachment1.setOptAttchId(1);
@@ -78,8 +79,8 @@ class OpportunityTest {
 		assertEquals("Sample Topic", opportunity.getTopic());
 		assertEquals("Sample Pseudo Name", opportunity.getPseudoName());
 		assertEquals("10000", opportunity.getBudgetAmount());
-		assertEquals("Sample Customer Need", opportunity.getCustomerNeed());
-		assertEquals("Sample Proposed Solution", opportunity.getProposedSolution());
+		assertEquals("Sample Customer Need", leads.getCustomerNeed());
+		assertEquals("Sample Proposed Solution", leads.getProposedSolution());
 		assertEquals(true, opportunity.getFinalCommAndTimeline());
 		assertEquals(true, opportunity.getPresentProposal());
 		assertEquals(true, opportunity.getComplInternalReview());

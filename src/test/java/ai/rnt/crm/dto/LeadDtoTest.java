@@ -2,6 +2,8 @@ package ai.rnt.crm.dto;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 
 class LeadDtoTest {
@@ -34,8 +36,12 @@ class LeadDtoTest {
 		String businessCard = "rdtfyghjklfghb";
 		String businessCardName = "myData";
 		String businessCardType = "pdf";
+		Integer assignBy = 1;
+		LocalDate date = LocalDate.now();
 
 		leadDto.setLeadId(leadId);
+		leadDto.setAssignBy(assignBy);
+		leadDto.setAssignDate(date);
 		leadDto.setFirstName(firstName);
 		leadDto.setLastName(lastName);
 		leadDto.setPhoneNumber(phoneNumber);

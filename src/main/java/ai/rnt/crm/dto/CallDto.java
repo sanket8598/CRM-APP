@@ -33,7 +33,7 @@ public class CallDto {
 	@NotBlank(message = "Subject should not be null or empty!!")
 	private String subject;
 
-	@ValidCallDirection(message = "Please Enter Valid Call Direction!!")
+	@ValidCallDirection(message = "Please Select Valid Call Direction!!")
 	private String direction;
 
 	@NotBlank(message = "Phone Number should not be null or empty!!")

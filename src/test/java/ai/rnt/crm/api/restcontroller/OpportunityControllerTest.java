@@ -5,6 +5,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.dto.opportunity.AnalysisOpportunityDto;
+import ai.rnt.crm.dto.opportunity.CloseAsLostOpportunityDto;
 import ai.rnt.crm.dto.opportunity.CloseOpportunityDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
 import ai.rnt.crm.enums.ApiResponse;
@@ -42,8 +45,7 @@ class OpportunityControllerTest {
 		OpportunityService opportunityService = Mockito.mock(OpportunityService.class);
 		when(opportunityService.getOpportunityDataByStatus(status)).thenReturn(expectedResponse);
 		OpportunityController opportunityController = new OpportunityController(opportunityService);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityController
-				.getOpportunityDataByStatus(status);
+		opportunityController.getOpportunityDataByStatus(status);
 		verify(opportunityService).getOpportunityDataByStatus(status);
 	}
 
@@ -55,7 +57,7 @@ class OpportunityControllerTest {
 		OpportunityService opportunityService = Mockito.mock(OpportunityService.class);
 		when(opportunityService.getDashBoardData(staffId)).thenReturn(expectedResponse);
 		OpportunityController opportunityController = new OpportunityController(opportunityService);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityController.getDashboardData(staffId);
+		opportunityController.getDashboardData(staffId);
 		verify(opportunityService).getDashBoardData(staffId);
 	}
 
@@ -67,7 +69,7 @@ class OpportunityControllerTest {
 		OpportunityService opportunityService = Mockito.mock(OpportunityService.class);
 		when(opportunityService.getOpportunityData(optId)).thenReturn(expectedResponse);
 		OpportunityController opportunityController = new OpportunityController(opportunityService);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityController.editOpportunity(optId);
+		opportunityController.editOpportunity(optId);
 		verify(opportunityService).getOpportunityData(optId);
 	}
 
@@ -78,7 +80,7 @@ class OpportunityControllerTest {
 		OpportunityController controller = new OpportunityController(opportunityService);
 		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
 		when(opportunityService.getQualifyPopUpData(leadId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.getQualifyPopUpData(leadId);
+		controller.getQualifyPopUpData(leadId);
 		verify(opportunityService).getQualifyPopUpData(leadId);
 	}
 
@@ -89,7 +91,7 @@ class OpportunityControllerTest {
 		OpportunityController controller = new OpportunityController(opportunityService);
 		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
 		when(opportunityService.getAnalysisPopUpData(opportunityId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.getAnalysisPopUpData(opportunityId);
+		controller.getAnalysisPopUpData(opportunityId);
 		verify(opportunityService).getAnalysisPopUpData(opportunityId);
 	}
 
@@ -101,7 +103,7 @@ class OpportunityControllerTest {
 		OpportunityController controller = new OpportunityController(opportunityService);
 		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
 		when(opportunityService.updateAnalysisPopUpData(dto, opportunityId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.updateAnalysisPopUpData(dto, opportunityId);
+		controller.updateAnalysisPopUpData(dto, opportunityId);
 		verify(opportunityService).updateAnalysisPopUpData(dto, opportunityId);
 	}
 
@@ -112,7 +114,7 @@ class OpportunityControllerTest {
 		OpportunityController controller = new OpportunityController(opportunityService);
 		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
 		when(opportunityService.getProposePopUpData(opportunityId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.getProposePopUpData(opportunityId);
+		controller.getProposePopUpData(opportunityId);
 		verify(opportunityService).getProposePopUpData(opportunityId);
 	}
 
@@ -124,7 +126,7 @@ class OpportunityControllerTest {
 		OpportunityController controller = new OpportunityController(opportunityService);
 		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
 		when(opportunityService.updateProposePopUpData(dto, opportunityId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.updateProposePopUpData(dto, opportunityId);
+		controller.updateProposePopUpData(dto, opportunityId);
 		verify(opportunityService).updateProposePopUpData(dto, opportunityId);
 	}
 
@@ -135,8 +137,19 @@ class OpportunityControllerTest {
 		OpportunityController controller = new OpportunityController(opportunityService);
 		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
 		when(opportunityService.getClosePopUpData(opportunityId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.getClosePopUpData(opportunityId);
+		controller.getClosePopUpData(opportunityId);
 		verify(opportunityService).getClosePopUpData(opportunityId);
+	}
+
+	@Test
+	void getCloseAsLostPopUpDataTest() {
+		OpportunityService opportunityService = mock(OpportunityService.class);
+		Integer opportunityId = 1;
+		OpportunityController controller = new OpportunityController(opportunityService);
+		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
+		when(opportunityService.getCloseAsLostData(opportunityId)).thenReturn(mockResponse);
+		controller.getCloseAsLostData(opportunityId);
+		verify(opportunityService).getCloseAsLostData(opportunityId);
 	}
 
 	@Test
@@ -147,8 +160,20 @@ class OpportunityControllerTest {
 		OpportunityController controller = new OpportunityController(opportunityService);
 		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
 		when(opportunityService.updateClosePopUpData(dto, opportunityId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.updateClosePopUpData(dto, opportunityId);
+		controller.updateClosePopUpData(dto, opportunityId);
 		verify(opportunityService).updateClosePopUpData(dto, opportunityId);
+	}
+
+	@Test
+	void updateCloseAsLostDataTest() {
+		OpportunityService opportunityService = mock(OpportunityService.class);
+		Integer opportunityId = 1;
+		CloseAsLostOpportunityDto dto = new CloseAsLostOpportunityDto();
+		OpportunityController controller = new OpportunityController(opportunityService);
+		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
+		when(opportunityService.updateCloseAsLostData(dto, opportunityId)).thenReturn(mockResponse);
+		controller.updateCloseAsLostData(dto, opportunityId);
+		verify(opportunityService).updateCloseAsLostData(dto, opportunityId);
 	}
 
 	@Test
@@ -159,7 +184,18 @@ class OpportunityControllerTest {
 		OpportunityController controller = new OpportunityController(opportunityService);
 		ResponseEntity<EnumMap<ApiResponse, Object>> mockResponse = ResponseEntity.ok().build();
 		when(opportunityService.updateOpportunity(dto, opportunityId)).thenReturn(mockResponse);
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = controller.updateOpportunity(dto, opportunityId);
+		controller.updateOpportunity(dto, opportunityId);
 		verify(opportunityService).updateOpportunity(dto, opportunityId);
+	}
+
+	@Test
+	void assignOpportunityTest() {
+		Map<String, Integer> map = new HashMap<>();
+		map.put("OptyId", 1);
+		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
+		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
+		when(opportunityService.assignOpportunity(map)).thenReturn(expectedResponse);
+		opportunityController.assignOpportunity(map);
+		verify(opportunityService).assignOpportunity(map);
 	}
 }

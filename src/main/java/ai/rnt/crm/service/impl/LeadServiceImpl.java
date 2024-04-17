@@ -138,6 +138,7 @@ import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.ServiceFallsMaster;
+import ai.rnt.crm.entity.TaskNotifications;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
@@ -146,7 +147,9 @@ import ai.rnt.crm.functional.custominterface.impl.LeadsCardMapperImpl;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.EmailUtil;
 import ai.rnt.crm.util.ReadExcelUtil;
+import ai.rnt.crm.util.TaskNotificationsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -184,6 +187,8 @@ public class LeadServiceImpl implements LeadService {
 	private final ContactDaoService contactDaoService;
 	private final DomainMasterDaoService domainMasterDaoService;
 	private final OpportunityDaoService opportunityDaoService;
+	private final EmailUtil emailUtil;
+	private final TaskNotificationsUtil taskNotificationsUtil;
 
 	private static final String PRIMFIELD = "PrimaryField";
 	private static final String SECNDFIELD = "SecondaryField";
@@ -515,6 +520,8 @@ public class LeadServiceImpl implements LeadService {
 			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leads::setAssignBy);
 			leads.setAssignDate(LocalDate.now());
 			if (nonNull(leadDaoService.addLead(leads))) {
+				emailUtil.sendLeadAssignMail(leads);
+				assignLeadNotification(map.get(LEAD_ID));
 				resultMap.put(MESSAGE, "Lead Assigned SuccessFully");
 				resultMap.put(SUCCESS, true);
 			} else {
@@ -888,5 +895,21 @@ public class LeadServiceImpl implements LeadService {
 		opportunity.setEmployee(leads.getEmployee());
 		opportunity.setLeads(leads);
 		return opportunityDaoService.addOpportunity(opportunity);
+	}
+
+	public void assignLeadNotification(Integer leadId) {
+		log.info("inside assignLeadNotification method...{}", leadId);
+		try {
+			TaskNotifications taskNotifications = new TaskNotifications();
+			taskNotifications.setLeads(leadDaoService.getLeadById(leadId)
+					.orElseThrow(() -> new ResourceNotFoundException("Leads", "leadId", leadId)));
+			taskNotifications.setCreatedBy(1375);
+			taskNotifications.setNotifTo(taskNotifications.getLeads().getEmployee());
+			taskNotifications.setNotifStatus(true);
+			taskNotificationsUtil.sendFollowUpLeadNotification(taskNotifications);
+		} catch (Exception e) {
+			log.error("Got Exception while sending assign lead notification..{}", e);
+			throw new CRMException(e);
+		}
 	}
 }

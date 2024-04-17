@@ -24,10 +24,10 @@ public class TaskDto implements Serializable {
 	@NotBlank(message = "Subject should not be null or empty!!")
 	private String subject;
 
-	@ValidTaskStatus(message = "Please Enter Valid Task Status!!")
+	@ValidTaskStatus(message = "Please Select Valid Task Status!!")
 	private String status;
 
-	@ValidTaskPriority(message = "Please Enter Valid Task Priority!!")
+	@ValidTaskPriority(message = "Please Select Valid Task Priority!!")
 	private String priority;
 
 	// @JsonFormat(pattern = "yyyy-MM-dd") we have configered it as global in config

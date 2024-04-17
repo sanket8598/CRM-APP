@@ -30,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import ai.rnt.crm.dao.service.TaskNotificationDaoService;
 import ai.rnt.crm.dto.TaskNotificationsDto;
 import ai.rnt.crm.entity.Contacts;
+import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
@@ -180,7 +181,10 @@ class TaskNotificationServiceImplTest {
 	void getMessageLeadsNotNull() {
 		TaskNotifications notification = new TaskNotifications();
 		Leads leads = new Leads();
-		leads.setTopic("test");
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setStaffId(1);
+		leads.setAssignBy(employeeMaster);
+		leads.setAssignDate(LocalDate.now());
 		List<Contacts> contacts = new ArrayList<>();
 		leads.setContacts(contacts);
 		notification.setLeads(leads);
