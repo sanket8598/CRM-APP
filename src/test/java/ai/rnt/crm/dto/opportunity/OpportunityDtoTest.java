@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,6 +41,9 @@ class OpportunityDtoTest {
 		opportunityDto.setEmployee(employeeDto);
 		opportunityDto.setContacts(contacts);
 		opportunityDto.setCreatedOn("2024-03-13");
+		opportunityDto.setCreatedDate(LocalDateTime.now());
+		opportunityDto.setAssignBy("Me");
+		opportunityDto.setAssignDate(LocalDate.now());
 		opportunityDto1.setOpportunityId(1);
 		opportunityDto1.setStatus("Open");
 		opportunityDto1.setTopic("Test Topic");
@@ -80,6 +84,9 @@ class OpportunityDtoTest {
 		assertEquals(employeeDto, opportunityDto.getEmployee());
 		assertEquals(contacts, opportunityDto.getContacts());
 		assertEquals("2024-03-13", opportunityDto.getCreatedOn());
+		assertEquals("Me", opportunityDto.getAssignBy());
+		opportunityDto.getCreatedDate();
+		opportunityDto.getAssignDate();
 	}
 
 	@Test
