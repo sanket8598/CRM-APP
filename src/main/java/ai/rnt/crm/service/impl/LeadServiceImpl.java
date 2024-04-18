@@ -894,6 +894,8 @@ public class LeadServiceImpl implements LeadService {
 		opportunity.setProgressStatus(leads.getProgressStatus());
 		opportunity.setEmployee(leads.getEmployee());
 		opportunity.setLeads(leads);
+		employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(opportunity::setAssignBy);
+		opportunity.setAssignDate(LocalDate.now());
 		return opportunityDaoService.addOpportunity(opportunity);
 	}
 
