@@ -37,6 +37,7 @@ import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
+import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.exception.CRMException;
@@ -362,7 +363,42 @@ public class EmailUtil extends PropertyUtil {
 			msg.setContent(content.toString(), TEXT_HTML);
 			send(msg);
 		} catch (Exception e) {
-			log.error("Got Exception while sending call task reminder mail..{}", e.getMessage());
+			log.error("Got Exception while sending lead assigned reminder mail..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public void sendOptyAssignMail(Opportunity opportunity) {
+		log.info("inside the sendOptyAssignMail method...}");
+		try {
+			Message msg = new MimeMessage(getSession());
+			InternetAddress[] recipientAddress = new InternetAddress[1];
+			recipientAddress[0] = new InternetAddress(opportunity.getEmployee().getEmailId());
+
+			String optyName = opportunity.getLeads().getContacts().stream().filter(Contacts::getPrimary)
+					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
+			msg.setFrom(new InternetAddress(getUserName()));
+			msg.setRecipients(TO, recipientAddress);
+			msg.setSubject("New Opportunity Assigned : " + optyName);
+			msg.setSentDate(new Date());
+			String primaryPhoneNumber = opportunity.getLeads().getContacts().stream().filter(Contacts::getPrimary)
+					.findFirst().map(Contacts::getContactNumberPrimary).orElse("No primary contact found.");
+			StringBuilder content = new StringBuilder().append("<br>")
+					.append(String.format("%s",
+							DEAR + opportunity.getEmployee().getFirstName() + " "
+									+ opportunity.getEmployee().getLastName() + COMMA_BR_BR)
+							+ "A new opportunity has been assigned to you in CRM system:" + BR + "Opportunity Name : "
+							+ optyName + "." + SINGLE_BR + "Contact Information : " + primaryPhoneNumber + SINGLE_BR
+							+ "Source : " + opportunity.getLeads().getLeadSourceMaster().getSourceName() + SINGLE_BR
+							+ "Assigned By : " + opportunity.getAssignBy().getFirstName() + " "
+							+ opportunity.getAssignBy().getLastName() + "." + SINGLE_BR + "Assigned Date : "
+							+ opportunity.getAssignDate() + "." + BR
+							+ "Thank you for your attention to this opportunity.")
+					.append(BR).append(REGARDS).append("<br>").append("RNT Sales Team");
+			msg.setContent(content.toString(), TEXT_HTML);
+			send(msg);
+		} catch (Exception e) {
+			log.error("Got Exception while sending opportunity assigned reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

@@ -75,6 +75,7 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.EmailUtil;
 import ai.rnt.crm.util.TaskNotificationsUtil;
 
 class OpportunityServiceImplTest {
@@ -138,6 +139,9 @@ class OpportunityServiceImplTest {
 
 	@Mock
 	private EmployeeMaster employeeMaster;
+	
+	@Mock
+	private EmailUtil emailUtil ;
 
 	@Mock
 	private ServiceFallsMaster serviceFallsMaster;
