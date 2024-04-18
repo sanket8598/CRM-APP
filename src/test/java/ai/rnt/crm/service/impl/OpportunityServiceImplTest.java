@@ -685,6 +685,7 @@ class OpportunityServiceImplTest {
 		employeeMaster.setLastName("data");
 		employeeMaster.setStaffId(1477);
 		leads.setLeadId(1);
+		opportunity.setAssignBy(employeeMaster);
 		opportunity.setLeads(leads);
 		opportunity.setCreatedBy(1477);
 		opportunity.setEmployee(employeeMaster);
@@ -738,6 +739,7 @@ class OpportunityServiceImplTest {
 		leads.setLeadId(1);
 		opportunity.setLeads(leads);
 		opportunity.setCreatedBy(1477);
+		opportunity.setAssignBy(employeeMaster);
 		opportunity.setEmployee(employeeMaster);
 		List<Call> calls = new ArrayList<>();
 		List<Email> emails = new ArrayList<>();

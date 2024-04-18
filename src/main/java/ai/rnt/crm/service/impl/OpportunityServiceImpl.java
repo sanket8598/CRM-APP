@@ -255,7 +255,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 					countMap.put("inPipelineAmount",
 							amountInWords(opportunityDashboardData.stream()
 									.filter(opt -> asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE).contains(opt.getStatus())
-											&& nonNull(opt.getBudgetAmount()))
+											&& (nonNull(opt.getBudgetAmount())&&  !opt.getBudgetAmount().isEmpty()))
 									.mapToDouble(e -> valueOf(e.getBudgetAmount().replace(",", ""))).sum()));
 					countMap.put("inPipeline",
 							opportunityDashboardData.stream()
@@ -266,14 +266,14 @@ public class OpportunityServiceImpl implements OpportunityService {
 					countMap.put("lost", opportunityDashboardData.stream()
 							.filter(opt -> opt.getStatus().equalsIgnoreCase(LOST)).count());
 					double totalBudgetAmount = opportunityDashboardData.stream()
-							.filter(e -> nonNull(e.getBudgetAmount()))
+							.filter(e -> nonNull(e.getBudgetAmount())&& !e.getBudgetAmount().isEmpty())
 							.mapToDouble(e -> valueOf(e.getBudgetAmount().replace(",", ""))).sum();
 					List<GraphicalDataDto> graph = opportunityDashboardData.stream().map(opt -> {
 						GraphicalDataDto graphicalData = TO_GRAPHICAL_DATA_DTO.apply(opt).get();
 						opt.getLeads().getContacts().stream().filter(Contacts::getPrimary).findFirst()
 								.ifPresent(e -> graphicalData.setCompanyName(e.getCompanyMaster().getCompanyName()));
 						graphicalData.setBubbleSize(calculateBubbleSize(
-								nonNull(opt.getBudgetAmount()) ? valueOf(opt.getBudgetAmount().replace(",", "")) : 0.0,
+								(nonNull(opt.getBudgetAmount())&& !opt.getBudgetAmount().isEmpty()) ? valueOf(opt.getBudgetAmount().replace(",", "")) : 0.0,
 								totalBudgetAmount));
 						graphicalData.setPhase(checkPhase(opt.getStatus()));
 						graphicalData.setClosedDate(convertLocalDate(opt.getClosedOn()));
@@ -319,6 +319,9 @@ public class OpportunityServiceImpl implements OpportunityService {
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, opportunity.getCreatedBy()));
 			dto.setGeneratedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
 			dto.setDropDownAssignTo(employeeMaster.getStaffId());
+			dto.setAssignBy(opportunity.getAssignBy().getFirstName() + " " + opportunity.getAssignBy().getLastName());
+			dto.setAssignDate(opportunity.getAssignDate());
+			dto.setCreatedDate(opportunity.getCreatedDate());
 			dataMap.put(OPPORTUNITY_INFO, dto);
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));

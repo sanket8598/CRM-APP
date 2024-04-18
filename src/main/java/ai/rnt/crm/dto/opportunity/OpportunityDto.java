@@ -4,6 +4,7 @@ import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static java.util.Objects.nonNull;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -36,6 +37,14 @@ public class OpportunityDto {
 	private String message;
 
 	private String generatedBy;
+
+	private String assignBy;
+
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDate assignDate;
+
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDateTime createdDate;
 
 	private Integer dropDownAssignTo;
 

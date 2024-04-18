@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import javax.validation.constraints.NotBlank;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,6 +11,7 @@ public class QualifyLeadDto {
 
 	private Integer leadId;
 
+	@NotBlank(message = "Budget amount should not be null or empty!!")
 	private String budgetAmount;
 
 	private String progressStatus;
