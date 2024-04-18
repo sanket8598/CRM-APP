@@ -1,9 +1,9 @@
 package ai.rnt.crm.service.impl;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -72,8 +72,10 @@ import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
+import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.TaskNotificationsUtil;
 
 class OpportunityServiceImplTest {
 
@@ -130,6 +132,9 @@ class OpportunityServiceImplTest {
 
 	@Mock
 	private Opportunity opportunity;
+	
+	@Mock
+	private TaskNotificationsUtil taskNotificationsUtil;
 
 	@Mock
 	private EmployeeMaster employeeMaster;
@@ -837,5 +842,11 @@ class OpportunityServiceImplTest {
 		map.put("staffId", 1);
 		when(opportunityDaoService.findOpportunity(1)).thenThrow(new RuntimeException("Database error"));
 		assertThrows(CRMException.class, () -> opportunityServiceImpl.assignOpportunity(map));
+	}
+	
+	@Test
+	void testAssignOpportunityNotificationException() {
+		when(opportunityDaoService.findOpportunity(1)).thenThrow(ResourceNotFoundException.class);
+		assertThrows(CRMException.class, () -> opportunityServiceImpl.assignOptyNotification(123));
 	}
 }
