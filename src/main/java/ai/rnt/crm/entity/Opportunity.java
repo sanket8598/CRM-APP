@@ -129,6 +129,14 @@ public class Opportunity extends Auditable {
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private EmployeeMaster employee;
+	
+	@JoinColumn(name = "assign_by", updatable = true)
+	@LazyCollection(LazyCollectionOption.TRUE)
+	@ManyToOne
+	private EmployeeMaster assignBy;
+	
+	@Column(name = "assign_on")
+	private LocalDate assignDate;
 
 	@OneToOne(cascade = ALL)
 	@JoinColumn(name = "lead_id", unique = true)
