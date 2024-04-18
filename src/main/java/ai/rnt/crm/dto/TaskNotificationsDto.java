@@ -15,4 +15,5 @@ public class TaskNotificationsDto {
 	private Integer visitTaskId;
 	private Integer leadTaskId;
 	private Integer leadId;
+	private Integer optyId;
 }

@@ -112,6 +112,7 @@ import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.OpprtAttachment;
+import ai.rnt.crm.entity.TaskNotifications;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
@@ -119,6 +120,8 @@ import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.OpportunityService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.EmailUtil;
+import ai.rnt.crm.util.TaskNotificationsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -157,6 +160,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 	private final ContactDaoService contactDaoService;
 	private final LeadDaoService leadDaoService;
 	private final OpprtAttachmentDaoService opprtAttachmentDaoService;
+	private final TaskNotificationsUtil taskNotificationsUtil;
+	private final EmailUtil emailUtil;
 
 	private static final String OPPORTUNITY_ID = "opportunityId";
 
@@ -255,7 +260,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 					countMap.put("inPipelineAmount",
 							amountInWords(opportunityDashboardData.stream()
 									.filter(opt -> asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE).contains(opt.getStatus())
-											&& (nonNull(opt.getBudgetAmount())&&  !opt.getBudgetAmount().isEmpty()))
+											&& (nonNull(opt.getBudgetAmount()) && !opt.getBudgetAmount().isEmpty()))
 									.mapToDouble(e -> valueOf(e.getBudgetAmount().replace(",", ""))).sum()));
 					countMap.put("inPipeline",
 							opportunityDashboardData.stream()
@@ -266,15 +271,16 @@ public class OpportunityServiceImpl implements OpportunityService {
 					countMap.put("lost", opportunityDashboardData.stream()
 							.filter(opt -> opt.getStatus().equalsIgnoreCase(LOST)).count());
 					double totalBudgetAmount = opportunityDashboardData.stream()
-							.filter(e -> nonNull(e.getBudgetAmount())&& !e.getBudgetAmount().isEmpty())
+							.filter(e -> nonNull(e.getBudgetAmount()) && !e.getBudgetAmount().isEmpty())
 							.mapToDouble(e -> valueOf(e.getBudgetAmount().replace(",", ""))).sum();
 					List<GraphicalDataDto> graph = opportunityDashboardData.stream().map(opt -> {
 						GraphicalDataDto graphicalData = TO_GRAPHICAL_DATA_DTO.apply(opt).get();
 						opt.getLeads().getContacts().stream().filter(Contacts::getPrimary).findFirst()
 								.ifPresent(e -> graphicalData.setCompanyName(e.getCompanyMaster().getCompanyName()));
-						graphicalData.setBubbleSize(calculateBubbleSize(
-								(nonNull(opt.getBudgetAmount())&& !opt.getBudgetAmount().isEmpty()) ? valueOf(opt.getBudgetAmount().replace(",", "")) : 0.0,
-								totalBudgetAmount));
+						graphicalData.setBubbleSize(
+								calculateBubbleSize((nonNull(opt.getBudgetAmount()) && !opt.getBudgetAmount().isEmpty())
+										? valueOf(opt.getBudgetAmount().replace(",", ""))
+										: 0.0, totalBudgetAmount));
 						graphicalData.setPhase(checkPhase(opt.getStatus()));
 						graphicalData.setClosedDate(convertLocalDate(opt.getClosedOn()));
 						return graphicalData;
@@ -322,6 +328,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 			dto.setAssignBy(opportunity.getAssignBy().getFirstName() + " " + opportunity.getAssignBy().getLastName());
 			dto.setAssignDate(opportunity.getAssignDate());
 			dto.setCreatedDate(opportunity.getCreatedDate());
+			dto.setCustomerNeed(opportunity.getLeads().getCustomerNeed());
+			dto.setProposedSolution(opportunity.getLeads().getProposedSolution());
 			dataMap.put(OPPORTUNITY_INFO, dto);
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
@@ -403,7 +411,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 		try {
 			Opportunity opportunityData = opportunityDaoService.findOpportunity(opportunityId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPPORTUNITY_ID, opportunityId));
-			AnalysisOpportunityDto dto = TO_ANALYSIS_OPPORTUNITY_DTO.apply(opportunityData).orElse(new AnalysisOpportunityDto());
+			AnalysisOpportunityDto dto = TO_ANALYSIS_OPPORTUNITY_DTO.apply(opportunityData)
+					.orElse(new AnalysisOpportunityDto());
 			dto.setCustomerNeed(opportunityData.getLeads().getCustomerNeed());
 			dto.setProposedSolution(opportunityData.getLeads().getProposedSolution());
 			analysisData.put(DATA, Optional.of(dto));
@@ -673,6 +682,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			opportunity.setEmployee(employee);
 			if (nonNull(opportunityDaoService.addOpportunity(opportunity))) {
+				emailUtil.sendOptyAssignMail(opportunity);
+				assignOptyNotification(map.get(OPTY_ID));
 				resultMap.put(MESSAGE, "Opportunity Assigned SuccessFully");
 				resultMap.put(SUCCESS, true);
 			} else {
@@ -682,6 +693,22 @@ public class OpportunityServiceImpl implements OpportunityService {
 			return new ResponseEntity<>(resultMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while assigning the Opportunity..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public void assignOptyNotification(Integer optyId) {
+		log.info("inside assignOptyNotification method...{}", optyId);
+		try {
+			TaskNotifications taskNotifications = new TaskNotifications();
+			taskNotifications.setOpportunity(opportunityDaoService.findOpportunity(optyId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPTY_ID, optyId)));
+			taskNotifications.setCreatedBy(1375);
+			taskNotifications.setNotifTo(taskNotifications.getOpportunity().getEmployee());
+			taskNotifications.setNotifStatus(true);
+			taskNotificationsUtil.sendAssignOptyNotification(taskNotifications);
+		} catch (Exception e) {
+			log.error("Got Exception while sending assign opportunity notification..{}", e);
 			throw new CRMException(e);
 		}
 	}

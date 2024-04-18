@@ -50,6 +50,10 @@ public class TaskNotifications extends Auditable {
 	@JoinColumn(name = "lead_id", updatable = true)
 	@ManyToOne
 	private Leads leads;
+	
+	@JoinColumn(name = "opty_id", updatable = true)
+	@ManyToOne
+	private Opportunity opportunity;
 
 	@JoinColumn(name = "notif_to", updatable = true)
 	@ManyToOne

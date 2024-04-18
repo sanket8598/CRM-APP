@@ -34,6 +34,7 @@ import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
+import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.TaskNotifications;
 import ai.rnt.crm.entity.VisitTask;
@@ -188,6 +189,25 @@ class TaskNotificationServiceImplTest {
 		List<Contacts> contacts = new ArrayList<>();
 		leads.setContacts(contacts);
 		notification.setLeads(leads);
+		TaskNotificationsDto result = taskNotificationService.getMessage(notification);
+		assertNotNull(result);
+		assertFalse(result.isNotifStatus());
+		assertNotNull(result.getMessage());
+	}
+
+	@Test
+	void getMessageOpportunityNotNull() {
+		TaskNotifications notification = new TaskNotifications();
+		Opportunity opportunity = new Opportunity();
+		Leads leads = new Leads();
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setStaffId(1);
+		opportunity.setAssignBy(employeeMaster);
+		opportunity.setAssignDate(LocalDate.now());
+		List<Contacts> contacts = new ArrayList<>();
+		leads.setContacts(contacts);
+		opportunity.setLeads(leads);
+		notification.setOpportunity(opportunity);
 		TaskNotificationsDto result = taskNotificationService.getMessage(notification);
 		assertNotNull(result);
 		assertFalse(result.isNotifStatus());

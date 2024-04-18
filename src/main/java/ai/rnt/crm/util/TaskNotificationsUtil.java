@@ -31,4 +31,8 @@ public class TaskNotificationsUtil {
 	public void sendLeadTaskNotification(TaskNotifications taskNotifications) {
 		taskNotificationsRepository.save(taskNotifications);
 	}
+
+	public void sendAssignOptyNotification(TaskNotifications taskNotifications) {
+		taskNotificationsRepository.save(taskNotifications);
+	}
 }

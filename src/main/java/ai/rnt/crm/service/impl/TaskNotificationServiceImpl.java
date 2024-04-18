@@ -28,6 +28,10 @@ import ai.rnt.crm.service.TaskNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * @author Nikhil Gaikwad
+ *
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -78,6 +82,7 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 			if (nonNull(notification)) {
 				String msg = "Task Reminder : %s : The task is scheduled for completion by %s";
 				String leadMsg = "New Lead Assigned : %s by %s Assigned date %s";
+				String optyMsg = "New Opportunity Assigned : %s by %s Assigned date %s";
 				TaskNotificationsDto dto = new TaskNotificationsDto();
 				dto.setNotifStatus(notification.isNotifStatus());
 				dto.setNotifId(notification.getNotifId());
@@ -107,6 +112,14 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 									+ notification.getLeads().getAssignBy().getLastName(),
 							notification.getLeads().getAssignDate().toString()));
 					dto.setLeadId(notification.getLeads().getLeadId());
+				} else if (nonNull(notification.getOpportunity())) {
+					dto.setMessage(format(optyMsg,
+							notification.getOpportunity().getLeads().getContacts().stream().filter(Contacts::getPrimary)
+									.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse(""),
+							notification.getOpportunity().getAssignBy().getFirstName() + " "
+									+ notification.getOpportunity().getAssignBy().getLastName(),
+							notification.getOpportunity().getAssignDate().toString()));
+					dto.setOptyId(notification.getOpportunity().getOpportunityId());
 				}
 				return dto;
 			}
