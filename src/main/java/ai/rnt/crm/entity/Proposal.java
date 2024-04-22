@@ -1,7 +1,11 @@
 package ai.rnt.crm.entity;
 
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.GenerationType.IDENTITY;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Where;
@@ -27,7 +32,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "opty_proposal")
+@Table(name = "crm_opty_proposal")
 @Where(clause = "deleted_by is null")
 public class Proposal extends Auditable {
 
@@ -46,8 +51,14 @@ public class Proposal extends Auditable {
 
 	@Column(name = "currency")
 	private String currency;
-	
+
+	@Column(name = "prop_description")
+	private String propDescription;
+
 	@ManyToOne(cascade = MERGE)
 	@JoinColumn(name = "opty_id")
 	private Opportunity opportunity;
+
+	@OneToMany(mappedBy = "proposal", cascade = ALL, orphanRemoval = true)
+	private List<ProposalServices> proposalServices = new ArrayList<>();
 }

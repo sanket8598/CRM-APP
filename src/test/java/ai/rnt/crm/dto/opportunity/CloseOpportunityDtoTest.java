@@ -16,8 +16,11 @@ class CloseOpportunityDtoTest {
 		closeOpportunityDto.setSlaSigned(true);
 		closeOpportunityDto.setNdaSigned(true);
 		closeOpportunityDto.setSowSigned(true);
+		closeOpportunityDto.setOpportunityId(1);
+		closeOpportunityDto.setStatus("Close");
 
 		assertEquals("Won", closeOpportunityDto.getProgressStatus());
 		assertEquals("Phase 3", closeOpportunityDto.getCurrentPhase());
+		assertEquals(1, closeOpportunityDto.getOpportunityId());
 	}
 }

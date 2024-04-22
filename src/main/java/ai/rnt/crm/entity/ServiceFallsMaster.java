@@ -1,5 +1,6 @@
 package ai.rnt.crm.entity;
 
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.util.ArrayList;
@@ -41,8 +42,11 @@ public class ServiceFallsMaster extends Auditable {
 
 	@Column(name = "service_name")
 	private String serviceName;
-	
+
 	@OneToMany(mappedBy = "serviceFallsMaster")
-	private List<Leads> leads=new ArrayList<>();
+	private List<Leads> leads = new ArrayList<>();
+
+	@OneToMany(mappedBy = "serviceFallsMaster", cascade = ALL)
+	private List<ProposalServices> proposalServices = new ArrayList<>();
 
 }

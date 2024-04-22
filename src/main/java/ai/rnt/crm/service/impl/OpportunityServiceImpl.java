@@ -536,6 +536,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setSowSigned(dto.getSowSigned());
 			opportunityData.setNdaSigned(dto.getNdaSigned());
 			opportunityData.setStatus(dto.getStatus());
+			opportunityData.setFeedback(dto.getFeedback());
 			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateCloseData.put(SUCCESS, true);
 				updateCloseData.put(MESSAGE, "Close Successfully..!!");
@@ -582,6 +583,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setThankMailSent(dto.getThankMailSent());
 			opportunityData.setDescription(dto.getDescription());
 			opportunityData.setStatus(dto.getStatus());
+			opportunityData.setFeedback(dto.getFeedback());
 			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateCloseAsLostData.put(SUCCESS, true);
 				updateCloseAsLostData.put(MESSAGE, "Opportunity Lost..!!");

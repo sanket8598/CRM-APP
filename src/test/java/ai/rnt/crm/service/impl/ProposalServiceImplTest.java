@@ -1,8 +1,9 @@
 package ai.rnt.crm.service.impl;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -11,7 +12,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -22,11 +28,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.ProposalDaoService;
+import ai.rnt.crm.dao.service.ProposalServicesDaoService;
+import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
+import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.Proposal;
+import ai.rnt.crm.entity.ProposalServices;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
@@ -45,13 +56,25 @@ class ProposalServiceImplTest {
 	private ProposalDto dto;
 
 	@Mock
+	private ProposalServicesDto proposalServiceDto;
+
+	@Mock
+	private GetProposalsDto getProposalsDto;
+
+	@Mock
 	private Proposal proposal;
 
 	@Mock
 	private Opportunity opportunity;
 
 	@Mock
+	private EmployeeDaoService employeeDaoService;
+
+	@Mock
 	private ProposalDaoService proposalDaoService;
+
+	@Mock
+	private ProposalServicesDaoService proposalServicesDaoService;
 
 	@Mock
 	private OpportunityDaoService opportunityDaoService;
@@ -102,4 +125,48 @@ class ProposalServiceImplTest {
 		assertThrows(CRMException.class, () -> proposalServiceImpl.addProposal(callDto, optyId));
 		verify(opportunityDaoService, times(1)).findOpportunity(anyInt());
 	}
+
+	@Test
+	void getProposalsByOptyIdSuccess() {
+		int optyId = 1;
+		Proposal proposalDto = new Proposal();
+		proposalDto.setCreatedBy(1);
+		List<Proposal> proposals = Arrays.asList(proposalDto);
+		Map<Integer, String> employeeMap = new HashMap<>();
+		employeeMap.put(1, "John Doe");
+		when(employeeDaoService.getEmployeeNameMap()).thenReturn(employeeMap);
+		when(proposalDaoService.getProposalsByOptyId(optyId)).thenReturn(proposals);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = proposalServiceImpl.getProposalsByOptyId(optyId);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(response.getBody().get(ApiResponse.DATA));
+	}
+
+	@Test
+	void getProposalsByOptyIdException() {
+		int optyId = 1;
+		when(proposalDaoService.getProposalsByOptyId(anyInt())).thenThrow();
+		assertThrows(CRMException.class, () -> proposalServiceImpl.getProposalsByOptyId(optyId));
+	}
+
+	@Test
+	void testAddServicesToProposalSuccess() throws Exception {
+		int proposalId = 1;
+		when(proposalDaoService.findProposalById(proposalId)).thenReturn(Optional.of(proposal));
+		when(proposalServicesDaoService.save(any(ProposalServices.class)))
+				.thenReturn(Optional.of(new ProposalServicesDto()));
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = proposalServiceImpl
+				.addServicesToProposal(Collections.singletonList(proposalServiceDto), proposalId);
+		assertTrue(response.getBody().containsKey(ApiResponse.SUCCESS));
+		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Proposal Service Added Successfully !!", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
+
+	@Test
+    void testAddServicesToProposalException() {
+        int proposalId = 1;
+        when(proposalDaoService.findProposalById(anyInt())).thenThrow(ResourceNotFoundException.class);
+        assertThrows(CRMException.class, () -> proposalServiceImpl.addServicesToProposal(Collections.singletonList(proposalServiceDto), proposalId));
+    }
 }

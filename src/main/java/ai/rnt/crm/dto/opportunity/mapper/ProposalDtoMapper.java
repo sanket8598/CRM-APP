@@ -9,8 +9,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
+import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
 import ai.rnt.crm.entity.Proposal;
+import ai.rnt.crm.entity.ProposalServices;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = PRIVATE)
@@ -33,4 +36,22 @@ public class ProposalDtoMapper {
 	 */
 	public static final Function<Collection<ProposalDto>, List<Proposal>> TO_PROPOSALS = e -> e.stream()
 			.map(dm -> TO_PROPOSAL.apply(dm).get()).collect(Collectors.toList());
+
+	public static final Function<Proposal, Optional<GetProposalsDto>> TO_PROPOSAL_DTO = e -> evalMapper(e,
+			GetProposalsDto.class);
+
+	public static final Function<Collection<Proposal>, List<GetProposalsDto>> TO_PROPOSAL_DTOS = e -> e.stream()
+			.map(dm -> TO_PROPOSAL_DTO.apply(dm).get()).collect(Collectors.toList());
+
+	public static final Function<ProposalServicesDto, Optional<ProposalServices>> TO_PROPOSAL_SERVICE = e -> evalMapper(
+			e, ProposalServices.class);
+	public static final Function<ProposalServices, Optional<ProposalServicesDto>> TO_PROPOSAL_SERVICE_DTO = e -> evalMapper(
+			e, ProposalServicesDto.class);
+	/**
+	 * @since 22-04-2024
+	 * @version 1.0
+	 *
+	 */
+	public static final Function<Collection<ProposalServicesDto>, List<ProposalServices>> TO_PROPOSAL_SERVICES = e -> e
+			.stream().map(dm -> TO_PROPOSAL_SERVICE.apply(dm).get()).collect(Collectors.toList());
 }
