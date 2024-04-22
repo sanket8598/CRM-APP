@@ -7,10 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import ai.rnt.crm.entity.ServiceFallsMaster;
 
-public interface ServiceFallRepository extends JpaRepository<ServiceFallsMaster, Integer>{
+public interface ServiceFallRepository extends JpaRepository<ServiceFallsMaster, Integer> {
 
 	Optional<ServiceFallsMaster> findByServiceName(String serviceFalls);
 
 	List<ServiceFallsMaster> findByDeletedDateIsNullOrderByServiceNameAsc();
+
+	boolean existsByServiceName(String serviceName);
 
 }

@@ -44,4 +44,6 @@ public interface OpportunityService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> getCloseAsLostData(Integer opportunityId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> assignOpportunity(Map<String, Integer> map);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> reactiveOpty(Integer optyId);
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.dto.opportunity.ProposalDto;
@@ -50,5 +51,10 @@ public class ProposalController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addServicesToProposal(
 			@RequestBody @Valid List<ProposalServicesDto> dto, @Min(1) @PathVariable(name = "propId") Integer propId) {
 		return proposalService.addServicesToProposal(dto, propId);
+	}
+
+	@PostMapping("/add/newService")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addNewService(@RequestParam String serviceName) {
+		return proposalService.addNewService(serviceName.trim());
 	}
 }

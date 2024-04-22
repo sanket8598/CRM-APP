@@ -126,4 +126,10 @@ public class OpportunityController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> assignOpportunity(@RequestBody Map<String, Integer> map) {
 		return opportunityService.assignOpportunity(map);
 	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@PutMapping("/reactive/{optyId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveOpty(@PathVariable Integer optyId) {
+		return opportunityService.reactiveOpty(optyId);
+	}
 }

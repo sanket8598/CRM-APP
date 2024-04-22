@@ -14,4 +14,6 @@ public interface ServiceFallsDaoSevice extends CrudService<ServiceFallsMaster, S
 
 	Optional <ServiceFallsMaster> findByName(String serviceFalls);
 
+	boolean findByServiceName(String serviceName);
+
 }

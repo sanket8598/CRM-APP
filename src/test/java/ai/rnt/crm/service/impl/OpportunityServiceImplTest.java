@@ -1,8 +1,8 @@
 package ai.rnt.crm.service.impl;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -133,15 +133,15 @@ class OpportunityServiceImplTest {
 
 	@Mock
 	private Opportunity opportunity;
-	
+
 	@Mock
 	private TaskNotificationsUtil taskNotificationsUtil;
 
 	@Mock
 	private EmployeeMaster employeeMaster;
-	
+
 	@Mock
-	private EmailUtil emailUtil ;
+	private EmailUtil emailUtil;
 
 	@Mock
 	private ServiceFallsMaster serviceFallsMaster;
@@ -492,7 +492,7 @@ class OpportunityServiceImplTest {
 		Leads leads = new Leads();
 		leads.setLeadId(1);
 		leads.setCustomerNeed("test data");
-		leads.setProposedSolution("test");	
+		leads.setProposedSolution("test");
 		opportunityData.setLeads(leads);
 		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(opportunityData));
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = opportunityServiceImpl
@@ -808,7 +808,7 @@ class OpportunityServiceImplTest {
         when(opportunityDaoService.findOpportunity(anyInt())).thenThrow(new RuntimeException("Simulated exception"));
         assertThrows(CRMException.class, () -> opportunityServiceImpl.getOpportunityData(1));
     }
-	
+
 	@Test
 	void assignOpportunitySuccess() {
 		Map<String, Integer> map = new HashMap<>();
@@ -847,10 +847,50 @@ class OpportunityServiceImplTest {
 		when(opportunityDaoService.findOpportunity(1)).thenThrow(new RuntimeException("Database error"));
 		assertThrows(CRMException.class, () -> opportunityServiceImpl.assignOpportunity(map));
 	}
-	
+
 	@Test
 	void testAssignOpportunityNotificationException() {
 		when(opportunityDaoService.findOpportunity(1)).thenThrow(ResourceNotFoundException.class);
 		assertThrows(CRMException.class, () -> opportunityServiceImpl.assignOptyNotification(123));
+	}
+
+	@Test
+	void testReactiveOptySuccessfulReactivation() {
+		Integer optyId = 1;
+		when(opportunityDaoService.findOpportunity(optyId)).thenReturn(Optional.of(new Opportunity()));
+		when(opportunityDaoService.addOpportunity(any(Opportunity.class))).thenReturn(new Opportunity());
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.reactiveOpty(optyId);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue(response.getBody().containsKey(ApiResponse.SUCCESS));
+		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertTrue(response.getBody().containsKey(ApiResponse.MESSAGE));
+		assertEquals("Opportunity Reactivate Successfully", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testReactiveLeadUnsuccessful() {
+		Integer optyId = 1;
+		when(opportunityDaoService.findOpportunity(optyId)).thenReturn(Optional.of(new Opportunity()));
+		when(opportunityDaoService.addOpportunity(any())).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.reactiveOpty(optyId);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue(response.getBody().containsKey(ApiResponse.SUCCESS));
+		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertTrue(response.getBody().containsKey(ApiResponse.MESSAGE));
+		assertEquals("Opportunity Not Reactivate", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testReactiveOptyNotFound() {
+		Integer optyId = 1;
+		when(opportunityDaoService.findOpportunity(optyId)).thenReturn(Optional.empty());
+		assertThrows(CRMException.class, () -> opportunityServiceImpl.reactiveOpty(optyId));
+	}
+
+	@Test
+	void testReactiveLeadException() {
+		Integer optyId = 1;
+		when(opportunityDaoService.findOpportunity(optyId)).thenThrow(new RuntimeException("Some error occurred"));
+		assertThrows(CRMException.class, () -> opportunityServiceImpl.reactiveOpty(optyId));
 	}
 }
