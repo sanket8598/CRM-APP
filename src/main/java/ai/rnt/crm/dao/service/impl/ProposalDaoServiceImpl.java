@@ -1,5 +1,8 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,5 +26,15 @@ public class ProposalDaoServiceImpl implements ProposalDaoService {
 	@Override
 	public Proposal saveProposal(Proposal proposal) {
 		return proposalRepository.save(proposal);
+	}
+
+	@Override
+	public List<Proposal> getProposalsByOptyId(Integer optyId) {
+		return proposalRepository.findProposalByOpportunityOpportunityId(optyId);
+	}
+
+	@Override
+	public Optional<Proposal> findProposalById(Integer propId) {
+		return proposalRepository.findById(propId);
 	}
 }

@@ -16,6 +16,8 @@ class ProposeOpportunityDtoTest {
 		proposeOpportunityDto.setFinalCommAndTimeline(true);
 		proposeOpportunityDto.setProgressStatus("In Progress");
 		proposeOpportunityDto.setCurrentPhase("Phase 1");
+		proposeOpportunityDto.setOpportunityId(1);
+		proposeOpportunityDto.setProposeRemarks("Test");
 		assertEquals(true, proposeOpportunityDto.getIdentifySme());
 		assertEquals(true, proposeOpportunityDto.getDevelopProposal());
 		assertEquals(true, proposeOpportunityDto.getComplInternalReview());
@@ -23,5 +25,6 @@ class ProposeOpportunityDtoTest {
 		assertEquals(true, proposeOpportunityDto.getFinalCommAndTimeline());
 		assertEquals("In Progress", proposeOpportunityDto.getProgressStatus());
 		assertEquals("Phase 1", proposeOpportunityDto.getCurrentPhase());
+		assertEquals(1, proposeOpportunityDto.getOpportunityId());
 	}
 }

@@ -28,6 +28,8 @@ public class CloseOpportunityDto {
 	private Boolean sowSigned = false;
 
 	private Boolean ndaSigned = false;
+	
+	private String feedback;
 
 	private String status;
 

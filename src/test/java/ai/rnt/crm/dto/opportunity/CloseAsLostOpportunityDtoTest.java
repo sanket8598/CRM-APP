@@ -14,8 +14,11 @@ class CloseAsLostOpportunityDtoTest {
 		closeOpportunityAsLostDto.setLostReason("test");
 		closeOpportunityAsLostDto.setThankMailSent(true);
 		closeOpportunityAsLostDto.setDescription("testdate");
+		closeOpportunityAsLostDto.setOpportunityId(1);
+		closeOpportunityAsLostDto.setStatus("close");
 
 		assertEquals("Lost", closeOpportunityAsLostDto.getProgressStatus());
 		assertEquals("Phase 4", closeOpportunityAsLostDto.getCurrentPhase());
+		assertEquals(1, closeOpportunityAsLostDto.getOpportunityId());
 	}
 }

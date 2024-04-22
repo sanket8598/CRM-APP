@@ -22,6 +22,8 @@ public class CloseAsLostOpportunityDto {
 	private Boolean thankMailSent = false;
 
 	private String description;
+	
+	private String feedback;
 
 	private String status;
 

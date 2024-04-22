@@ -8,6 +8,7 @@ import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,18 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 	}
 
 	@Override
+	public List<EmployeeMaster> getAllEmployee() {
+		return employeeMasterRepository.findAll();
+	}
+
+	@Override
+	public Map<Integer, String> getEmployeeNameMap() {
+		List<EmployeeMaster> allEmployee = getAllEmployee();
+		return allEmployee.stream()
+				.collect(Collectors.toMap(EmployeeMaster::getStaffId, e -> e.getFirstName() + " " + e.getLastName()));
+	}
+
+	@Override
 	public Optional<EmployeeDto> getById(Integer assignTo) {
 		return TO_EMPLOYEE.apply(employeeMasterRepository.findById(assignTo)
 				.orElseThrow(() -> new ResourceNotFoundException("Employee", "staffId", assignTo)));
@@ -47,10 +60,10 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 
 	@Override
 	public List<String> activeEmployeeEmailIds() {
-		return employeeMasterRepository.findEmailIdByDepartureDateIsNullOrDepartureDateBefore(now().atZone(systemDefault())
-	            .withZoneSameInstant(of(INDIA_ZONE))
-	            .toLocalDate()).stream()
-				.filter(e -> nonNull(e) && nonNull(e.getEmailId())).map(EmailIdProjection::getEmailId)
+		return employeeMasterRepository
+				.findEmailIdByDepartureDateIsNullOrDepartureDateBefore(
+						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDate())
+				.stream().filter(e -> nonNull(e) && nonNull(e.getEmailId())).map(EmailIdProjection::getEmailId)
 				.collect(Collectors.toList());
 	}
 
@@ -63,4 +76,5 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 	public Integer findTopStaffIdByEmailId(String email) {
 		return employeeMasterRepository.findTopStaffIdByEmailId(email).getStaffId();
 	}
+
 }

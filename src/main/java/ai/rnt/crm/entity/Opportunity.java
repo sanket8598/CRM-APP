@@ -189,6 +189,9 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "descrp")
 	private String description;
+	
+	@Column(name = "feedback")
+	private String feedback;
 
 	@OneToMany(mappedBy = "opportunity", cascade = ALL)
 	private List<Proposal> proposals = new ArrayList<>();
