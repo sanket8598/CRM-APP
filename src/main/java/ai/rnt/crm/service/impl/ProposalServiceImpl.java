@@ -2,6 +2,7 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_EDIT_PROPOSAL_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_PROPOSAL;
 import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_PROPOSAL_DTOS;
@@ -11,6 +12,9 @@ import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.StringUtil.randomNumberGenerator;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
+import static java.time.LocalDateTime.now;
+import static java.time.ZoneId.of;
+import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -22,7 +26,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -46,6 +52,7 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.ProposalService;
+import ai.rnt.crm.util.AuditAwareUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -65,6 +72,7 @@ public class ProposalServiceImpl implements ProposalService {
 	private final EmployeeDaoService employeeDaoService;
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
 	private final EmployeeService employeeService;
+	private final AuditAwareUtil auditAwareUtil;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> generateProposalId() {
@@ -232,6 +240,41 @@ public class ProposalServiceImpl implements ProposalService {
 			return new ResponseEntity<>(updateProposal, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while updating the proposal data..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	@Transactional
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteProposal(@Min(1) Integer propId) {
+		log.info("inside the delete proposal method...{}", propId);
+		EnumMap<ApiResponse, Object> delPropMap = new EnumMap<>(ApiResponse.class);
+		try {
+			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
+			Proposal proposal = proposalDaoService.findProposalById(propId)
+					.orElseThrow(() -> new ResourceNotFoundException("Proposal", "propId", propId));
+			proposal.getProposalServices().stream().forEach(e -> {
+				e.setDeletedBy(loggedInStaffId);
+				e.setDeletedDate(now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+				try {
+					proposalServicesDaoService.save(e);
+				} catch (Exception e1) {
+					log.error("Got Exception while deleting the proposal services..{}", e1.getMessage());
+				}
+			});
+			proposal.setDeletedBy(loggedInStaffId);
+			proposal.setDeletedDate(
+					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+			if (nonNull(proposalDaoService.saveProposal(proposal))) {
+				delPropMap.put(MESSAGE, "Proposal Deleted Successfully.");
+				delPropMap.put(SUCCESS, true);
+			} else {
+				delPropMap.put(MESSAGE, "Proposal Not Delete.");
+				delPropMap.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(delPropMap, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while deleting the proposal..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
