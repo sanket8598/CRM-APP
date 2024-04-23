@@ -1,5 +1,7 @@
 package ai.rnt.crm.api.restcontroller;
 
+import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
+
 import java.util.EnumMap;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,31 +33,42 @@ public class ProposalController {
 
 	private final ProposalService proposalService;
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping("/generateId")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> generateProposalId() {
 		return proposalService.generateProposalId();
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping("/add/{optyId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addProposal(@RequestBody @Valid ProposalDto dto,
 			@Min(1) @PathVariable(name = "optyId") Integer optyId) {
 		return proposalService.addProposal(dto, optyId);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping("/get/{optyId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getProposals(
 			@Min(1) @PathVariable(name = "optyId") Integer optyId) {
 		return proposalService.getProposalsByOptyId(optyId);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping("/addServices/{propId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addServicesToProposal(
 			@RequestBody @Valid List<ProposalServicesDto> dto, @Min(1) @PathVariable(name = "propId") Integer propId) {
 		return proposalService.addServicesToProposal(dto, propId);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping("/add/newService")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addNewService(@RequestParam String serviceName) {
 		return proposalService.addNewService(serviceName.trim());
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/edit/{propId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editProposal(@Valid @Min(1) @PathVariable Integer propId) {
+		return proposalService.editProposal(propId);
 	}
 }
