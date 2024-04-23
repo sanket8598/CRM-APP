@@ -16,13 +16,13 @@ import static ai.rnt.crm.constants.OppurtunityStatus.ANALYSIS;
 import static ai.rnt.crm.constants.OppurtunityStatus.CLOSE;
 import static ai.rnt.crm.constants.OppurtunityStatus.IN_PIPELINE;
 import static ai.rnt.crm.constants.OppurtunityStatus.LOST;
-import static ai.rnt.crm.constants.OppurtunityStatus.OPEN;
 import static ai.rnt.crm.constants.OppurtunityStatus.PROPOSE;
 import static ai.rnt.crm.constants.OppurtunityStatus.QUALIFY;
 import static ai.rnt.crm.constants.OppurtunityStatus.WON;
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
+import static ai.rnt.crm.constants.StatusConstants.OPEN;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_ANALYSIS_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_CLOSE_AS_LOST_OPPORTUNITY_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.OpportunityDtoMapper.TO_CLOSE_OPPORTUNITY_DTO;
@@ -711,6 +711,28 @@ public class OpportunityServiceImpl implements OpportunityService {
 			taskNotificationsUtil.sendAssignOptyNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending assign opportunity notification..{}", e);
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> reactiveOpty(Integer optyId) {
+		log.info("inside the reactiveOpty method...{}", optyId);
+		EnumMap<ApiResponse, Object> reactiveOptyMap = new EnumMap<>(ApiResponse.class);
+		try {
+			Opportunity opportunity = opportunityDaoService.findOpportunity(optyId)
+					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPTY_ID, optyId));
+			opportunity.setStatus(OPEN);
+			if (nonNull(opportunityDaoService.addOpportunity(opportunity))) {
+				reactiveOptyMap.put(MESSAGE, "Opportunity Reactivate Successfully");
+				reactiveOptyMap.put(SUCCESS, true);
+			} else {
+				reactiveOptyMap.put(MESSAGE, "Opportunity Not Reactivate");
+				reactiveOptyMap.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(reactiveOptyMap, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while reactivating the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

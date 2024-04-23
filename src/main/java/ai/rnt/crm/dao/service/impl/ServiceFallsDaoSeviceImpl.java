@@ -16,9 +16,11 @@ import ai.rnt.crm.dto.ServiceFallsDto;
 import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.repository.ServiceFallRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice {
 
 	private final ServiceFallRepository serviceFallRepository;
@@ -42,9 +44,14 @@ public class ServiceFallsDaoSeviceImpl implements ServiceFallsDaoSevice {
 	}
 
 	@Override
-	@CacheEvict(value =SERVICE_FALLS,allEntries = true)
+	@CacheEvict(value = SERVICE_FALLS, allEntries = true)
 	public Optional<ServiceFallsDto> save(ServiceFallsMaster serviceFalls) throws Exception {
 		return TO_SERVICE_FALL_MASTER_DTO.apply(serviceFallRepository.save(serviceFalls));
 	}
 
+	@Override
+	public boolean findByServiceName(String serviceName) {
+		log.info("inside the findByServiceName method...{}", serviceName);
+		return serviceFallRepository.existsByServiceName(serviceName);
+	}
 }

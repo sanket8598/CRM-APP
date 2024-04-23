@@ -7,7 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,6 +34,7 @@ import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.ProposalDaoService;
 import ai.rnt.crm.dao.service.ProposalServicesDaoService;
+import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
@@ -72,6 +75,9 @@ class ProposalServiceImplTest {
 
 	@Mock
 	private ProposalDaoService proposalDaoService;
+
+	@Mock
+	private ServiceFallsDaoSevice serviceFallsDaoSevice;
 
 	@Mock
 	private ProposalServicesDaoService proposalServicesDaoService;
@@ -164,9 +170,38 @@ class ProposalServiceImplTest {
 	}
 
 	@Test
-    void testAddServicesToProposalException() {
-        int proposalId = 1;
-        when(proposalDaoService.findProposalById(anyInt())).thenThrow(ResourceNotFoundException.class);
-        assertThrows(CRMException.class, () -> proposalServiceImpl.addServicesToProposal(Collections.singletonList(proposalServiceDto), proposalId));
+	void testAddServicesToProposalException() {
+		int proposalId = 1;
+		when(proposalDaoService.findProposalById(anyInt())).thenThrow(ResourceNotFoundException.class);
+		assertThrows(CRMException.class, () -> proposalServiceImpl
+				.addServicesToProposal(Collections.singletonList(proposalServiceDto), proposalId));
+	}
+
+	@Test
+	void testAddNewServiceSuccess() throws Exception {
+		when(serviceFallsDaoSevice.findByServiceName(anyString())).thenReturn(false);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = proposalServiceImpl.addNewService("NewService");
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue((boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("New Service Added Successfully !!", response.getBody().get(ApiResponse.MESSAGE));
+		verify(serviceFallsDaoSevice, times(1)).findByServiceName("NewService");
+		verify(serviceFallsDaoSevice, times(1)).save(any());
+	}
+
+	@Test
+    void testAddNewServiceServiceExists() throws Exception {
+        when(serviceFallsDaoSevice.findByServiceName(anyString())).thenReturn(true);
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = proposalServiceImpl.addNewService("ExistingService");
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
+        assertEquals("Service Is Present !!", response.getBody().get(ApiResponse.MESSAGE));
+        verify(serviceFallsDaoSevice, times(1)).findByServiceName("ExistingService");
+        verify(serviceFallsDaoSevice, never()).save(any());
+    }
+
+	@Test
+    void testAddNewServiceException() {
+        when(serviceFallsDaoSevice.findByServiceName(anyString())).thenThrow(new RuntimeException("Database connection failed"));
+        assertThrows(CRMException.class, () -> proposalServiceImpl.addNewService("NewService"));
     }
 }

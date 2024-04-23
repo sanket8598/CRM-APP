@@ -7,6 +7,7 @@ import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.util.StringUtil.randomNumberGenerator;
+import static ai.rnt.crm.util.XSSUtil.sanitize;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -25,11 +26,13 @@ import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.ProposalDaoService;
 import ai.rnt.crm.dao.service.ProposalServicesDaoService;
+import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.Proposal;
+import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
@@ -51,6 +54,7 @@ public class ProposalServiceImpl implements ProposalService {
 	private final ProposalServicesDaoService proposalServicesDaoService;
 	private final OpportunityDaoService opportunityDaoService;
 	private final EmployeeDaoService employeeDaoService;
+	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> generateProposalId() {
@@ -134,6 +138,32 @@ public class ProposalServiceImpl implements ProposalService {
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
 			log.error("Got exception while adding services to the proposals by propId..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addNewService(String serviceName) {
+		log.info("inside the addNewService method...{}", serviceName);
+		EnumMap<ApiResponse, Object> resultData = new EnumMap<>(ApiResponse.class);
+		resultData.put(SUCCESS, false);
+		resultData.put(MESSAGE, "New Service Not Added !!");
+		try {
+			if (serviceFallsDaoSevice.findByServiceName(serviceName)) {
+				resultData.put(SUCCESS, false);
+				resultData.put(MESSAGE, "Service Is Present !!");
+				return new ResponseEntity<>(resultData, OK);
+			} else {
+				ServiceFallsMaster serviceFalls = new ServiceFallsMaster();
+				serviceFalls.setServiceName(sanitize(serviceName));
+				if (nonNull(serviceFallsDaoSevice.save(serviceFalls))) {
+					resultData.put(SUCCESS, true);
+					resultData.put(MESSAGE, "New Service Added Successfully !!");
+				}
+			}
+			return new ResponseEntity<>(resultData, OK);
+		} catch (Exception e) {
+			log.error("Got exception while adding new service in the proposal...", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
