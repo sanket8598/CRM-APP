@@ -36,6 +36,7 @@ import ai.rnt.crm.dto.opportunity.EditProposalDto;
 import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
+import ai.rnt.crm.dto.opportunity.UpdateProposalDto;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.Proposal;
@@ -198,6 +199,39 @@ public class ProposalServiceImpl implements ProposalService {
 			return new ResponseEntity<>(proposal, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting data for edit the proposal data..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateProposal(Integer propId, UpdateProposalDto dto) {
+		log.info("inside the updateProposal method...{}", propId);
+		EnumMap<ApiResponse, Object> updateProposal = new EnumMap<>(ApiResponse.class);
+		updateProposal.put(SUCCESS, false);
+		updateProposal.put(MESSAGE, "Proposal Not Update !!");
+		try {
+			Proposal proposalById = proposalDaoService.findProposalById(propId)
+					.orElseThrow(() -> new ResourceNotFoundException("Proposal", "propId", propId));
+			proposalById.setOwnerName(dto.getOwnerName());
+			proposalById.setCurrency(dto.getCurrency());
+			proposalById.setPropDescription(dto.getPropDescription());
+			dto.getProposalServices().stream().forEach(e -> {
+				proposalServicesDaoService.findById(e.getPropServiceId()).ifPresent(ps -> {
+					ps.setServicePrice(e.getServicePrice());
+					ps.setProposal(proposalById);
+					try {
+						proposalServicesDaoService.save(ps).ifPresent(save -> {
+							updateProposal.put(SUCCESS, true);
+							updateProposal.put(MESSAGE, "Proposal Updated Successfully!!");
+						});
+					} catch (Exception e1) {
+						log.error("Got Exception while updating the proposal service data..{}", e1.getMessage());
+					}
+				});
+			});
+			return new ResponseEntity<>(updateProposal, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while updating the proposal data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

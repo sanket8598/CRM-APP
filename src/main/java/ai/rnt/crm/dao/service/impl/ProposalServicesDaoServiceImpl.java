@@ -25,4 +25,9 @@ public class ProposalServicesDaoServiceImpl implements ProposalServicesDaoServic
 		return TO_PROPOSAL_SERVICE_DTO.apply(proposalServicesRepository.save(entity));
 	}
 
+	@Override
+	public Optional<ProposalServices> findById(Integer propServiceId) {
+		return proposalServicesRepository.findById(propServiceId);
+	}
+
 }

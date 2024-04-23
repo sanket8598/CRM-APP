@@ -11,4 +11,6 @@ public class ProposalServicesDto {
 	private ServiceFallsDto serviceFallsMaster;
 
 	private String servicePrice;
+
+	private Integer propServiceId;
 }

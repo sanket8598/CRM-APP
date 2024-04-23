@@ -38,6 +38,7 @@ import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
+import ai.rnt.crm.dto.opportunity.UpdateProposalDto;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.Proposal;
@@ -70,7 +71,13 @@ class ProposalServiceImplTest {
 	private Proposal proposal;
 
 	@Mock
+	private ProposalServices proposalServices;
+
+	@Mock
 	private Opportunity opportunity;
+
+	@Mock
+	private UpdateProposalDto updateProposalDto;
 
 	@Mock
 	private EmployeeDaoService employeeDaoService;
@@ -236,5 +243,38 @@ class ProposalServiceImplTest {
 	    void testEditProposalException() {
 	        when(proposalDaoService.findProposalById(anyInt())).thenThrow(new RuntimeException("Database connection failed"));
 	        assertThrows(CRMException.class, () -> proposalServiceImpl.editProposal(1));
+	    }
+
+	@Test
+	void testUpdateProposalSuccess() throws Exception {
+		Proposal proposal = new Proposal();
+		proposal.setPropId(1);
+		proposal.setOwnerName("Old Owner");
+		proposal.setCurrency("Old Currency");
+		proposal.setPropDescription("Old Description");
+		ProposalServices proposalServices = new ProposalServices();
+		proposalServices.setPropServiceId(1);
+		proposalServices.setServicePrice("Old Price");
+		ProposalServicesDto proposalServicesDto = new ProposalServicesDto();
+		when(proposalDaoService.findProposalById(anyInt())).thenReturn(Optional.of(proposal));
+		when(proposalServicesDaoService.findById(any())).thenReturn(Optional.of(proposalServices));
+		when(proposalServicesDaoService.save(any())).thenReturn(Optional.of(proposalServicesDto));
+		UpdateProposalDto updateProposalDto = new UpdateProposalDto();
+		proposalServicesDto.setPropServiceId(1);
+		proposalServicesDto.setServicePrice("New Price");
+		updateProposalDto.getProposalServices().add(proposalServicesDto);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = proposalServiceImpl.updateProposal(1,
+				updateProposalDto);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue((boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Proposal Updated Successfully!!", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("New Price", proposalServices.getServicePrice());
+		verify(proposalServicesDaoService, times(1)).findById(1);
+	}
+
+	@Test
+	    void testUpdateProposalException() {
+	        when(proposalDaoService.findProposalById(anyInt())).thenThrow(new RuntimeException("Database connection failed"));
+	        assertThrows(CRMException.class, () -> proposalServiceImpl.updateProposal(1,updateProposalDto));
 	    }
 }

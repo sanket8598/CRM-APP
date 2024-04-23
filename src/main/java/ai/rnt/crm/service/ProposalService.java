@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
+import ai.rnt.crm.dto.opportunity.UpdateProposalDto;
 import ai.rnt.crm.enums.ApiResponse;
 
 public interface ProposalService {
@@ -24,5 +25,7 @@ public interface ProposalService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> addNewService(String serviceName);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> editProposal(Integer propId);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> updateProposal(Integer propId, UpdateProposalDto dto);
 
 }
