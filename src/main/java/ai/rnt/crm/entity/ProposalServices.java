@@ -22,7 +22,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "crm_proposal_services")
 @Where(clause = "deleted_by is null")
-public class ProposalServices {
+public class ProposalServices extends Auditable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)

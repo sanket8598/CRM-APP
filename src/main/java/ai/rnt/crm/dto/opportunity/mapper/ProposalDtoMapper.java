@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.opportunity.EditProposalDto;
 import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
@@ -54,4 +55,10 @@ public class ProposalDtoMapper {
 	 */
 	public static final Function<Collection<ProposalServicesDto>, List<ProposalServices>> TO_PROPOSAL_SERVICES = e -> e
 			.stream().map(dm -> TO_PROPOSAL_SERVICE.apply(dm).get()).collect(Collectors.toList());
+
+	public static final Function<Proposal, Optional<EditProposalDto>> TO_EDIT_PROPOSAL_DTO = e -> evalMapper(e,
+			EditProposalDto.class);
+	public static final Function<Collection<Proposal>, List<EditProposalDto>> TO_EDIT_PROPOSAL_DTOS = e -> e.stream()
+			.map(dm -> TO_EDIT_PROPOSAL_DTO.apply(dm).get()).collect(Collectors.toList());
+
 }

@@ -23,4 +23,6 @@ public interface ProposalService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> addNewService(String serviceName);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> editProposal(Integer propId);
+
 }

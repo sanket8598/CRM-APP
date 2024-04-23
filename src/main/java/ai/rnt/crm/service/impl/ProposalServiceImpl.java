@@ -1,5 +1,8 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
+import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
+import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_EDIT_PROPOSAL_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_PROPOSAL;
 import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_PROPOSAL_DTOS;
 import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_PROPOSAL_SERVICES;
@@ -13,8 +16,10 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -27,15 +32,18 @@ import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.ProposalDaoService;
 import ai.rnt.crm.dao.service.ProposalServicesDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dto.opportunity.EditProposalDto;
 import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
+import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.Proposal;
 import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.ProposalService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +63,7 @@ public class ProposalServiceImpl implements ProposalService {
 	private final OpportunityDaoService opportunityDaoService;
 	private final EmployeeDaoService employeeDaoService;
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
+	private final EmployeeService employeeService;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> generateProposalId() {
@@ -164,6 +173,31 @@ public class ProposalServiceImpl implements ProposalService {
 			return new ResponseEntity<>(resultData, OK);
 		} catch (Exception e) {
 			log.error("Got exception while adding new service in the proposal...", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editProposal(Integer propId) {
+		log.info("inside the editProposal method...{}", propId);
+		EnumMap<ApiResponse, Object> proposal = new EnumMap<>(ApiResponse.class);
+		try {
+			Map<String, Object> dataMap = new LinkedHashMap<>();
+
+			Proposal proposalById = proposalDaoService.findProposalById(propId)
+					.orElseThrow(() -> new ResourceNotFoundException("Proposal", "propId", propId));
+			Optional<EditProposalDto> dto = TO_EDIT_PROPOSAL_DTO.apply(proposalById);
+			dto.ifPresent(e -> {
+				EmployeeMaster employeeMaster = employeeService.getById(proposalById.getCreatedBy()).orElseThrow(
+						() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, proposalById.getCreatedBy()));
+				e.setCreatedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
+			});
+			dataMap.put("ProposalInfo", dto);
+			proposal.put(SUCCESS, true);
+			proposal.put(DATA, dataMap);
+			return new ResponseEntity<>(proposal, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while getting data for edit the proposal data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

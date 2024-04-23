@@ -38,12 +38,14 @@ import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
+import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.Proposal;
 import ai.rnt.crm.entity.ProposalServices;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
+import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.StringUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,6 +86,9 @@ class ProposalServiceImplTest {
 
 	@Mock
 	private OpportunityDaoService opportunityDaoService;
+
+	@Mock
+	private EmployeeService employeeService;
 
 	@Test
 	void testGenerateProposalId_Success() {
@@ -204,4 +209,32 @@ class ProposalServiceImplTest {
         when(serviceFallsDaoSevice.findByServiceName(anyString())).thenThrow(new RuntimeException("Database connection failed"));
         assertThrows(CRMException.class, () -> proposalServiceImpl.addNewService("NewService"));
     }
+
+	@Test
+	void testEditProposalSuccess() {
+		Proposal proposal = new Proposal();
+		EmployeeMaster employeeMaster = mock(EmployeeMaster.class);
+		Opportunity opportunity = new Opportunity();
+		employeeMaster.setFirstName("test");
+		employeeMaster.setLastName("data");
+		proposal.setCreatedBy(1375);
+		employeeMaster.setStaffId(1375);
+		opportunity.setEmployee(employeeMaster);
+		proposal.setOpportunity(opportunity);
+		proposal.setPropId(1);
+		proposal.setCreatedBy(1);
+		when(employeeService.getById(proposal.getCreatedBy())).thenReturn(Optional.of(employeeMaster));
+		when(proposalDaoService.findProposalById(anyInt())).thenReturn(Optional.of(proposal));
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = proposalServiceImpl.editProposal(1);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue((boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertNotNull(response.getBody().get(ApiResponse.DATA));
+		verify(proposalDaoService, times(1)).findProposalById(1);
+	}
+
+	@Test
+	    void testEditProposalException() {
+	        when(proposalDaoService.findProposalById(anyInt())).thenThrow(new RuntimeException("Database connection failed"));
+	        assertThrows(CRMException.class, () -> proposalServiceImpl.editProposal(1));
+	    }
 }
