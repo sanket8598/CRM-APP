@@ -1,9 +1,11 @@
 package ai.rnt.crm.service.impl;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThrows;
+import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
+import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -13,7 +15,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.OK;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -26,10 +30,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.ProposalDaoService;
@@ -47,6 +53,7 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
+import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.StringUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -93,6 +100,12 @@ class ProposalServiceImplTest {
 
 	@Mock
 	private OpportunityDaoService opportunityDaoService;
+
+	@Mock
+	private AuditAwareUtil auditAwareUtil;
+
+	@Mock
+	private CallDaoService callDaoService;
 
 	@Mock
 	private EmployeeService employeeService;
@@ -277,4 +290,53 @@ class ProposalServiceImplTest {
 	        when(proposalDaoService.findProposalById(anyInt())).thenThrow(new RuntimeException("Database connection failed"));
 	        assertThrows(CRMException.class, () -> proposalServiceImpl.updateProposal(1,updateProposalDto));
 	    }
+
+	@Test
+	void deleteProposalTest() {
+		Integer propId = 1;
+		Proposal existingProposal = Mockito.mock(Proposal.class);
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1477);
+		when(proposalDaoService.findProposalById(Mockito.anyInt())).thenReturn(Optional.of(existingProposal));
+		when(proposalDaoService.saveProposal(Mockito.any(Proposal.class))).thenReturn(existingProposal);
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = proposalServiceImpl.deleteProposal(propId);
+		assertNotNull(responseEntity);
+		assertEquals(OK, responseEntity.getStatusCode());
+		EnumMap<ApiResponse, Object> result = responseEntity.getBody();
+		assertNotNull(result);
+		assertTrue((Boolean) result.get(SUCCESS));
+		assertEquals("Proposal Deleted Successfully.", result.get(MESSAGE));
+		verify(auditAwareUtil, times(1)).getLoggedInStaffId();
+		verify(proposalDaoService, times(1)).findProposalById(propId);
+	}
+
+	@Test
+	void deleteProposalAndServicesTest() throws Exception {
+		int propId = 1;
+		int loggedInStaffId = 1;
+		Proposal proposal = new Proposal();
+		ProposalServices proposalServices1 = mock(ProposalServices.class);
+		ProposalServices proposalServices2 = mock(ProposalServices.class);
+		List<ProposalServices> services = Arrays.asList(proposalServices1, proposalServices2);
+		proposal.setProposalServices(services);
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(loggedInStaffId);
+		when(proposalDaoService.findProposalById(propId)).thenReturn(Optional.of(proposal));
+		proposalServiceImpl.deleteProposal(propId);
+		verify(proposalServices1).setDeletedBy(loggedInStaffId);
+		verify(proposalServices1).setDeletedDate(any(LocalDateTime.class));
+		verify(proposalServices1).setDeletedBy(loggedInStaffId);
+		verify(proposalServices1).setDeletedDate(any(LocalDateTime.class));
+		verify(proposalServicesDaoService).save(proposalServices1);
+		verify(proposalServicesDaoService).save(proposalServices2);
+	}
+
+	@Test
+	void deleteProposalTestException() {
+		Integer propId = 1;
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(123);
+		when(proposalDaoService.findProposalById(anyInt())).thenThrow(new RuntimeException("Simulated exception"));
+		assertThrows(CRMException.class, () -> proposalServiceImpl.deleteProposal(propId));
+		verify(auditAwareUtil, times(1)).getLoggedInStaffId();
+		verify(proposalDaoService, times(1)).findProposalById(propId);
+		verify(proposalDaoService, never()).saveProposal(any(Proposal.class));
+	}
 }

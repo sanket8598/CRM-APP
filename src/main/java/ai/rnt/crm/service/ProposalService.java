@@ -4,6 +4,7 @@ import java.util.EnumMap;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 import org.springframework.http.ResponseEntity;
 
@@ -27,5 +28,7 @@ public interface ProposalService {
 	ResponseEntity<EnumMap<ApiResponse, Object>> editProposal(Integer propId);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> updateProposal(Integer propId, UpdateProposalDto dto);
+
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteProposal(@Min(1) Integer propId);
 
 }
