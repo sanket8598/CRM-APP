@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
+import ai.rnt.crm.dto.opportunity.UpdateProposalDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.ProposalService;
 import lombok.RequiredArgsConstructor;
@@ -70,5 +72,12 @@ public class ProposalController {
 	@GetMapping("/edit/{propId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editProposal(@Valid @Min(1) @PathVariable Integer propId) {
 		return proposalService.editProposal(propId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@PutMapping("/{propId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateProposal(@PathVariable Integer propId,
+			@RequestBody UpdateProposalDto dto) {
+		return proposalService.updateProposal(propId, dto);
 	}
 }
