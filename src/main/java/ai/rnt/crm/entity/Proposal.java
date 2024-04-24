@@ -4,6 +4,7 @@ import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.GenerationType.IDENTITY;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,11 +47,11 @@ public class Proposal extends Auditable {
 	@Column(name = "gen_prop_id")
 	private String genPropId;
 
-	@Column(name = "owner_name")
-	private String ownerName;
+	@Column(name = "effective_from")
+	private LocalDate effectiveFrom;
 
-	@Column(name = "currency")
-	private String currency;
+	@Column(name = "effective_to")
+	private LocalDate effectiveTo;
 
 	@Column(name = "prop_description")
 	private String propDescription;

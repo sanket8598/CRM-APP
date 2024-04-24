@@ -1,5 +1,9 @@
 package ai.rnt.crm.dto.opportunity;
 
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +15,11 @@ public class GetProposalsDto {
 
 	private String genPropId;
 
-	private String ownerName;
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDate effectiveFrom;
 
-	private String currency;
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDate effectiveTo;
 
-	private String createdBy;
+	private String optyName;
 }

@@ -1,7 +1,11 @@
 package ai.rnt.crm.dto.opportunity;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,11 +18,14 @@ public class EditProposalDto {
 
 	private String genPropId;
 
-	private String ownerName;
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDate effectiveFrom;
 
-	private String createdBy;
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDate effectiveTo;
 
-	private String currency;
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDateTime createdOn;
 
 	private String propDescription;
 

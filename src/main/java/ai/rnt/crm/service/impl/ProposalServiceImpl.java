@@ -1,7 +1,5 @@
 package ai.rnt.crm.service.impl;
 
-import static ai.rnt.crm.constants.CRMConstants.EMPLOYEE;
-import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_EDIT_PROPOSAL_DTO;
 import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_PROPOSAL;
@@ -27,13 +25,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
 import ai.rnt.crm.dao.service.ProposalDaoService;
 import ai.rnt.crm.dao.service.ProposalServicesDaoService;
@@ -43,14 +38,12 @@ import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
 import ai.rnt.crm.dto.opportunity.UpdateProposalDto;
-import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.Proposal;
 import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
-import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.ProposalService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import lombok.RequiredArgsConstructor;
@@ -69,9 +62,7 @@ public class ProposalServiceImpl implements ProposalService {
 	private final ProposalDaoService proposalDaoService;
 	private final ProposalServicesDaoService proposalServicesDaoService;
 	private final OpportunityDaoService opportunityDaoService;
-	private final EmployeeDaoService employeeDaoService;
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
-	private final EmployeeService employeeService;
 	private final AuditAwareUtil auditAwareUtil;
 
 	@Override
@@ -89,7 +80,7 @@ public class ProposalServiceImpl implements ProposalService {
 	}
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addProposal(@Valid ProposalDto dto, Integer optyId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addProposal(ProposalDto dto, Integer optyId) {
 		log.info("inside the addProposal method...{}", optyId);
 		EnumMap<ApiResponse, Object> proposalData = new EnumMap<>(ApiResponse.class);
 		try {
@@ -118,11 +109,10 @@ public class ProposalServiceImpl implements ProposalService {
 		log.info("inside the getProposalsByOptyId method...");
 		EnumMap<ApiResponse, Object> proposalData = new EnumMap<>(ApiResponse.class);
 		try {
-			Map<Integer, String> employeeMap = employeeDaoService.getEmployeeNameMap();
+			// Map<Integer, String> employeeMap = employeeDaoService.getEmployeeNameMap();
 			List<Proposal> proposals = proposalDaoService.getProposalsByOptyId(optyId);
 			List<GetProposalsDto> dto = TO_PROPOSAL_DTOS.apply(proposals.stream()
 					.sorted((b, a) -> a.getCreatedDate().compareTo(b.getCreatedDate())).collect(Collectors.toList()));
-			dto.forEach(e -> e.setCreatedBy(employeeMap.get(Integer.parseInt(e.getCreatedBy()))));
 			proposalData.put(DATA, dto);
 			proposalData.put(SUCCESS, true);
 			return new ResponseEntity<>(proposalData, OK);
@@ -191,19 +181,15 @@ public class ProposalServiceImpl implements ProposalService {
 		log.info("inside the editProposal method...{}", propId);
 		EnumMap<ApiResponse, Object> proposal = new EnumMap<>(ApiResponse.class);
 		try {
-			Map<String, Object> dataMap = new LinkedHashMap<>();
+			Map<String, Object> editProposalMap = new LinkedHashMap<>();
 
 			Proposal proposalById = proposalDaoService.findProposalById(propId)
 					.orElseThrow(() -> new ResourceNotFoundException("Proposal", "propId", propId));
 			Optional<EditProposalDto> dto = TO_EDIT_PROPOSAL_DTO.apply(proposalById);
-			dto.ifPresent(e -> {
-				EmployeeMaster employeeMaster = employeeService.getById(proposalById.getCreatedBy()).orElseThrow(
-						() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, proposalById.getCreatedBy()));
-				e.setCreatedBy(employeeMaster.getFirstName() + " " + employeeMaster.getLastName());
-			});
-			dataMap.put("ProposalInfo", dto);
+			dto.ifPresent(propsl -> propsl.setCreatedOn(proposalById.getCreatedDate()));
+			editProposalMap.put("ProposalInfo", dto);
 			proposal.put(SUCCESS, true);
-			proposal.put(DATA, dataMap);
+			proposal.put(DATA, editProposalMap);
 			return new ResponseEntity<>(proposal, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while getting data for edit the proposal data..{}", e.getMessage());
@@ -220,8 +206,8 @@ public class ProposalServiceImpl implements ProposalService {
 		try {
 			Proposal proposalById = proposalDaoService.findProposalById(propId)
 					.orElseThrow(() -> new ResourceNotFoundException("Proposal", "propId", propId));
-			proposalById.setOwnerName(dto.getOwnerName());
-			proposalById.setCurrency(dto.getCurrency());
+			proposalById.setEffectiveFrom(dto.getEffectiveFrom());
+			proposalById.setEffectiveTo(dto.getEffectiveTo());
 			proposalById.setPropDescription(dto.getPropDescription());
 			dto.getProposalServices().stream().forEach(e -> {
 				proposalServicesDaoService.findById(e.getPropServiceId()).ifPresent(ps -> {
@@ -246,7 +232,7 @@ public class ProposalServiceImpl implements ProposalService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteProposal(@Min(1) Integer propId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteProposal(Integer propId) {
 		log.info("inside the delete proposal method...{}", propId);
 		EnumMap<ApiResponse, Object> delPropMap = new EnumMap<>(ApiResponse.class);
 		try {
