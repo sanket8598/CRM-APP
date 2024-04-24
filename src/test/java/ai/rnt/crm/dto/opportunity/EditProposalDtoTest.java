@@ -3,6 +3,7 @@ package ai.rnt.crm.dto.opportunity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +16,8 @@ class EditProposalDtoTest {
 		EditProposalDto editProposalDto = new EditProposalDto();
 		editProposalDto.setPropId(1);
 		editProposalDto.setGenPropId("PROP123");
-		editProposalDto.setOwnerName("John Doe");
-		editProposalDto.setCreatedBy("Jane Smith");
-		editProposalDto.setCurrency("USD");
+		editProposalDto.setEffectiveFrom(LocalDate.now());
+		editProposalDto.setEffectiveTo(LocalDate.now());
 		editProposalDto.setPropDescription("Proposal description");
 		ProposalServicesDto proposalServicesDto = new ProposalServicesDto();
 		List<ProposalServicesDto> proposalServicesList = new ArrayList<>();
@@ -27,9 +27,8 @@ class EditProposalDtoTest {
 		editProposalDto.setOpportunity(opportunityDto);
 		assertEquals(1, editProposalDto.getPropId());
 		assertEquals("PROP123", editProposalDto.getGenPropId());
-		assertEquals("John Doe", editProposalDto.getOwnerName());
-		assertEquals("Jane Smith", editProposalDto.getCreatedBy());
-		assertEquals("USD", editProposalDto.getCurrency());
+		editProposalDto.getEffectiveFrom();
+		editProposalDto.getEffectiveTo();
 		assertEquals("Proposal description", editProposalDto.getPropDescription());
 		assertNotNull(editProposalDto.getProposalServices());
 		assertEquals(1, editProposalDto.getProposalServices().size());

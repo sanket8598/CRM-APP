@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto.opportunity;
 
+import java.time.LocalDate;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +13,7 @@ public class ProposalDto {
 
 	private String genPropId;
 
-	private String ownerName;
+	private LocalDate effectiveFrom;
 
-	private String currency;
+	private LocalDate effectiveTo;
 }

@@ -1,5 +1,6 @@
 package ai.rnt.crm.dto.opportunity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,11 +13,11 @@ public class UpdateProposalDto {
 
 	private Integer propId;
 
-	private String ownerName;
-
-	private String currency;
+	private LocalDate effectiveFrom;
 
 	private String propDescription;
+
+	private LocalDate effectiveTo;
 
 	private List<ProposalServicesDto> proposalServices = new ArrayList<>();
 }
