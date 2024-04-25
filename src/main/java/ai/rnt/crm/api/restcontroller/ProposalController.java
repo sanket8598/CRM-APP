@@ -81,11 +81,13 @@ public class ProposalController {
 		return proposalService.updateProposal(propId, dto);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@DeleteMapping("/{propId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteProposal(@Min(1) @PathVariable Integer propId) {
 		return proposalService.deleteProposal(propId);
 	}
 
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@DeleteMapping("/service/{propServiceId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteService(@Min(1) @PathVariable Integer propServiceId) {
 		return proposalService.deleteService(propServiceId);

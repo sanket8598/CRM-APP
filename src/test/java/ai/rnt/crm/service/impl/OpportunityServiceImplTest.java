@@ -822,7 +822,7 @@ class OpportunityServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityServiceImpl.assignOpportunity(map);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Opportunity Assigned SuccessFully", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Opportunity Assigned Successfully", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test

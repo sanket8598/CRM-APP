@@ -264,7 +264,7 @@ class CallServiceImplTest {
 		EnumMap<ApiResponse, Object> result = responseEntity.getBody();
 		assertNotNull(result);
 		assertTrue((Boolean) result.get(SUCCESS));
-		assertEquals("Call Assigned SuccessFully", result.get(MESSAGE));
+		assertEquals("Call Assigned Successfully", result.get(MESSAGE));
 		verify(callDaoService, times(1)).getCallById(anyInt());
 		verify(employeeService, times(1)).getById(anyInt());
 		verify(callDaoService, times(1)).call(any(Call.class));
@@ -317,7 +317,7 @@ class CallServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = callServiceImpl.markAsCompleted(callId);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertTrue((Boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Call updated SuccessFully", responseEntity.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Call updated Successfully", responseEntity.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -354,7 +354,7 @@ class CallServiceImplTest {
 		EnumMap<ApiResponse, Object> result = responseEntity.getBody();
 		assertNotNull(result);
 		assertTrue((Boolean) result.get(SUCCESS));
-		assertEquals("Call deleted SuccessFully.", result.get(MESSAGE));
+		assertEquals("Call deleted Successfully.", result.get(MESSAGE));
 		verify(auditAwareUtil, times(1)).getLoggedInStaffId();
 		verify(callDaoService, times(1)).getCallById(anyInt());
 		verify(callDaoService, times(1)).call(any(Call.class));
@@ -550,7 +550,7 @@ class CallServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = callServiceImpl.assignCallTask(map);
 		assertEquals(OK, responseEntity.getStatusCode());
 		assertTrue((Boolean) responseEntity.getBody().get(SUCCESS));
-		assertEquals("Task Assigned SuccessFully", responseEntity.getBody().get(MESSAGE));
+		assertEquals("Task Assigned Successfully", responseEntity.getBody().get(MESSAGE));
 		verify(callDaoService, times(1)).getCallTaskById(2);
 		verify(employeeService, times(1)).getById(1);
 		verify(callDaoService, times(1)).addCallTask(callTask);

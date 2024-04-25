@@ -146,7 +146,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 			leadTask.setAssignTo(employee);
 			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
 				asgnTaskMap.put(SUCCESS, true);
-				asgnTaskMap.put(MESSAGE, "Task Assigned SuccessFully");
+				asgnTaskMap.put(MESSAGE, "Task Assigned Successfully");
 			} else {
 				asgnTaskMap.put(SUCCESS, false);
 				asgnTaskMap.put(MESSAGE, "Task Not Assigned");
@@ -171,7 +171,7 @@ public class LeadTaskServiceImpl implements LeadTaskService {
 		            .toLocalDateTime());
 			if (nonNull(leadTaskDaoService.addTask(leadTask))) {
 				delTaskMap.put(SUCCESS, true);
-				delTaskMap.put(MESSAGE, "Task deleted SuccessFully");
+				delTaskMap.put(MESSAGE, "Task deleted Successfully");
 			} else {
 				delTaskMap.put(SUCCESS, false);
 				delTaskMap.put(MESSAGE, "Task Not delete.");

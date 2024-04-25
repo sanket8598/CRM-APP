@@ -126,7 +126,7 @@ class LeadTaskServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadTaskServiceImpl.assignLeadTask(map);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(true, response.getBody().get(SUCCESS));
-		assertEquals("Task Assigned SuccessFully", response.getBody().get(MESSAGE));
+		assertEquals("Task Assigned Successfully", response.getBody().get(MESSAGE));
 	}
 
 	@Test
@@ -163,7 +163,7 @@ class LeadTaskServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadTaskServiceImpl.deleteLeadTask(taskId);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(true, response.getBody().get(SUCCESS));
-		assertEquals("Task deleted SuccessFully", response.getBody().get(MESSAGE));
+		assertEquals("Task deleted Successfully", response.getBody().get(MESSAGE));
 	}
 
 	@Test

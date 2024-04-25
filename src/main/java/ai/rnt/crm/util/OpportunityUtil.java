@@ -60,8 +60,4 @@ public class OpportunityUtil {
 			return null;
 		}
 	}
-	
-	public static void main(String[] args) {
-	 System.out.println(amountInWords(100));
-	}
 }

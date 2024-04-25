@@ -686,7 +686,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			if (nonNull(opportunityDaoService.addOpportunity(opportunity))) {
 				emailUtil.sendOptyAssignMail(opportunity);
 				assignOptyNotification(map.get(OPTY_ID));
-				resultMap.put(MESSAGE, "Opportunity Assigned SuccessFully");
+				resultMap.put(MESSAGE, "Opportunity Assigned Successfully");
 				resultMap.put(SUCCESS, true);
 			} else {
 				resultMap.put(MESSAGE, "Opportunity Not Assigned");

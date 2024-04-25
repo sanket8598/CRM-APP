@@ -238,7 +238,7 @@ public class MeetingServiceImpl implements MeetingService {
 		            .withZoneSameInstant(of(INDIA_ZONE))
 		            .toLocalDateTime());
 			if (nonNull(meetingDaoService.addMeeting(meetings))) {
-				delMeetMap.put(MESSAGE, "Meeting deleted SuccessFully.");
+				delMeetMap.put(MESSAGE, "Meeting deleted Successfully.");
 				delMeetMap.put(SUCCESS, true);
 			} else {
 				delMeetMap.put(MESSAGE, "Meeting Not delete.");
@@ -337,7 +337,7 @@ public class MeetingServiceImpl implements MeetingService {
 			meetingTask.setAssignTo(employee);
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
 				asgnMeetTaskMap.put(SUCCESS, true);
-				asgnMeetTaskMap.put(MESSAGE, "Task Assigned SuccessFully");
+				asgnMeetTaskMap.put(MESSAGE, "Task Assigned Successfully");
 			} else {
 				asgnMeetTaskMap.put(SUCCESS, false);
 				asgnMeetTaskMap.put(MESSAGE, "Task Not Assigned");
@@ -361,7 +361,7 @@ public class MeetingServiceImpl implements MeetingService {
 		            .withZoneSameInstant(of(INDIA_ZONE))
 		            .toLocalDateTime());
 			if (nonNull(meetingDaoService.addMeetingTask(meetingTask))) {
-				delMeetTaskMap.put(MESSAGE, "Meeting Task Deleted SuccessFully.");
+				delMeetTaskMap.put(MESSAGE, "Meeting Task Deleted Successfully.");
 				delMeetTaskMap.put(SUCCESS, true);
 			} else {
 				delMeetTaskMap.put(MESSAGE, "Meeting Task Not delete.");
@@ -393,7 +393,7 @@ public class MeetingServiceImpl implements MeetingService {
 			meetings.setAssignTo(employee);
 			if (nonNull(meetingDaoService.addMeeting(meetings))) {
 				resultMap.put(SUCCESS, true);
-				resultMap.put(MESSAGE, "Meeting Assigned SuccessFully");
+				resultMap.put(MESSAGE, "Meeting Assigned Successfully");
 			} else {
 				resultMap.put(SUCCESS, false);
 				resultMap.put(MESSAGE, "Meeting Not Assigned");

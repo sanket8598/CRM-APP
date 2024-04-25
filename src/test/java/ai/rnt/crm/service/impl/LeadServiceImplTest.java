@@ -355,7 +355,7 @@ class LeadServiceImplTest {
 		assertTrue(response.getBody().containsKey(ApiResponse.SUCCESS));
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
 		assertTrue(response.getBody().containsKey(ApiResponse.MESSAGE));
-		assertEquals("Lead Disqualified SuccessFully", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Lead Disqualified Successfully", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -436,7 +436,7 @@ class LeadServiceImplTest {
 		assertTrue(response.getBody().containsKey(ApiResponse.SUCCESS));
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
 		assertTrue(response.getBody().containsKey(ApiResponse.MESSAGE));
-		assertEquals("Lead Reactivate SuccessFully", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Lead Reactivate Successfully", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -651,7 +651,7 @@ class LeadServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.assignLead(map);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Lead Assigned SuccessFully", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Lead Assigned Successfully", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test

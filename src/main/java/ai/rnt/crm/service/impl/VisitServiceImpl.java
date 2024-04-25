@@ -179,7 +179,7 @@ public class VisitServiceImpl implements VisitService {
 					});
 			visit.setVisitBy(employee);
 			if (nonNull(visitDaoService.saveVisit(visit))) {
-				asgnVisitMap.put(MESSAGE, "Visit Assigned SuccessFully");
+				asgnVisitMap.put(MESSAGE, "Visit Assigned Successfully");
 				asgnVisitMap.put(SUCCESS, true);
 			} else {
 				asgnVisitMap.put(MESSAGE, "Visit Not Assigned");
@@ -201,7 +201,7 @@ public class VisitServiceImpl implements VisitService {
 					.orElseThrow(() -> new ResourceNotFoundException(VISIT, VISIT_ID, visitId));
 			visit.setStatus(COMPLETE);
 			if (nonNull(visitDaoService.saveVisit(visit))) {
-				mrkAsComplVisitMap.put(MESSAGE, "Visit updated SuccessFully");
+				mrkAsComplVisitMap.put(MESSAGE, "Visit updated Successfully");
 				mrkAsComplVisitMap.put(SUCCESS, true);
 			} else {
 				mrkAsComplVisitMap.put(MESSAGE, "Visit Not updated");
@@ -231,7 +231,7 @@ public class VisitServiceImpl implements VisitService {
 			visit.setDeletedBy(loggedInStaffId);
 			visit.setDeletedDate(now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 			if (nonNull(visitDaoService.saveVisit(visit))) {
-				delVisitMap.put(MESSAGE, "Visit deleted SuccessFully.");
+				delVisitMap.put(MESSAGE, "Visit deleted Successfully.");
 				delVisitMap.put(SUCCESS, true);
 			} else {
 				delVisitMap.put(MESSAGE, "Visit Not delete.");
@@ -330,7 +330,7 @@ public class VisitServiceImpl implements VisitService {
 			visitTask.setAssignTo(employee);
 			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
 				asgnVisitTaskMap.put(SUCCESS, true);
-				asgnVisitTaskMap.put(MESSAGE, "Task Assigned SuccessFully");
+				asgnVisitTaskMap.put(MESSAGE, "Task Assigned Successfully");
 			} else {
 				asgnVisitTaskMap.put(SUCCESS, false);
 				asgnVisitTaskMap.put(MESSAGE, "Task Not Assigned");
@@ -353,7 +353,7 @@ public class VisitServiceImpl implements VisitService {
 			visitTask.setDeletedDate(
 					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 			if (nonNull(visitDaoService.addVisitTask(visitTask))) {
-				delVisitTaskMap.put(MESSAGE, "Visit Task Deleted SuccessFully.");
+				delVisitTaskMap.put(MESSAGE, "Visit Task Deleted Successfully.");
 				delVisitTaskMap.put(SUCCESS, true);
 			} else {
 				delVisitTaskMap.put(MESSAGE, "Visit Task Not delete.");

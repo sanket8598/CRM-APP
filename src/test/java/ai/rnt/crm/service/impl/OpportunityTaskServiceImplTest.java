@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -127,7 +128,7 @@ class OpportunityTaskServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityTaskServiceImpl.assignOpportunityTask(map);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(true, response.getBody().get(SUCCESS));
-		assertEquals("Task Assigned SuccessFully", response.getBody().get(MESSAGE));
+		assertEquals("Task Assigned Successfully", response.getBody().get(MESSAGE));
 	}
 
 	@Test
@@ -198,7 +199,7 @@ class OpportunityTaskServiceImplTest {
 				.deleteOpportunityTask(taskId);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(true, response.getBody().get(SUCCESS));
-		assertEquals("Task deleted SuccessFully", response.getBody().get(MESSAGE));
+		assertEquals("Task deleted Successfully", response.getBody().get(MESSAGE));
 	}
 
 	@Test
@@ -218,4 +219,23 @@ class OpportunityTaskServiceImplTest {
 		when(opportunityTaskDaoService.getOptyTaskById(taskId)).thenThrow(RuntimeException.class);
 		assertThrows(CRMException.class, () -> opportunityTaskServiceImpl.deleteOpportunityTask(taskId));
 	}
+	
+	//@Test
+	void addOpportunityTaskNotAddedDueToDuplicateTest() {
+	    OpportunityTaskDto dto = new OpportunityTaskDto();
+	    OpportunityTask existingTask = new OpportunityTask(); // Create an existing task
+	    // Set properties of existingTask to match with the task being added in your implementation
+	    existingTask.setSubject("test");
+	    when(opportunityDaoService.findOpportunity(leadsId)).thenReturn(Optional.of(new Opportunity()));
+	    when(employeeService.getById(any())).thenReturn(Optional.of(new EmployeeMaster()));
+	    when(opportunityTaskDaoService.getAllTask()).thenReturn(Collections.singletonList(existingTask)); // Return a list containing the existing task
+	    when(opportunityTaskDaoService.addOptyTask(any())).thenReturn(null);
+
+	    ResponseEntity<EnumMap<ApiResponse, Object>> response = opportunityTaskServiceImpl.addOpportunityTask(dto, leadsId);
+
+	    assertEquals(HttpStatus.CREATED, response.getStatusCode());
+	    assertEquals(false, response.getBody().get(SUCCESS));
+	    assertEquals("Task Already Exists !!", response.getBody().get(MESSAGE));
+	}
+
 }

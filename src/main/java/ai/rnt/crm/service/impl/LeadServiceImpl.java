@@ -522,7 +522,7 @@ public class LeadServiceImpl implements LeadService {
 			if (nonNull(leadDaoService.addLead(leads))) {
 				emailUtil.sendLeadAssignMail(leads);
 				assignLeadNotification(map.get(LEAD_ID));
-				resultMap.put(MESSAGE, "Lead Assigned SuccessFully");
+				resultMap.put(MESSAGE, "Lead Assigned Successfully");
 				resultMap.put(SUCCESS, true);
 			} else {
 				resultMap.put(MESSAGE, "Lead Not Assigned");
@@ -546,7 +546,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.setDisqualifyReason(dto.getDisqualifyReason());
 			lead.setStatus(CLOSE_AS_DISQUALIFIED);
 			if (nonNull(leadDaoService.addLead(lead))) {
-				disQualifiedMap.put(MESSAGE, "Lead Disqualified SuccessFully");
+				disQualifiedMap.put(MESSAGE, "Lead Disqualified Successfully");
 				disQualifiedMap.put(SUCCESS, true);
 			} else {
 				disQualifiedMap.put(MESSAGE, "Lead Not Disqualify");
@@ -636,7 +636,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.setDisqualifyReason(null);
 			lead.setStatus(OPEN);
 			if (nonNull(leadDaoService.addLead(lead))) {
-				reactiveLeadMap.put(MESSAGE, "Lead Reactivate SuccessFully");
+				reactiveLeadMap.put(MESSAGE, "Lead Reactivate Successfully");
 				reactiveLeadMap.put(SUCCESS, true);
 			} else {
 				reactiveLeadMap.put(MESSAGE, "Lead Not Reactivate");

@@ -102,7 +102,7 @@ class EmailServiceImplTest {
 		when(emailDaoService.email(email)).thenReturn(email);
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = emailServiceImpl.assignEmail(map);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-		assertEquals("Email Assigned SuccessFully", responseEntity.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Email Assigned Successfully", responseEntity.getBody().get(ApiResponse.MESSAGE));
 		assertEquals(true, responseEntity.getBody().get(ApiResponse.SUCCESS));
 	}
 
@@ -238,7 +238,7 @@ class EmailServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = emailServiceImpl.deleteEmail(mailId);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Email deleted SuccessFully.", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Email deleted Successfully.", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test

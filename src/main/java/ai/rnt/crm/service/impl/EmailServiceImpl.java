@@ -174,7 +174,7 @@ public class EmailServiceImpl implements EmailService {
 					updatedEmail = emailDaoService.email(mail);
 				}
 			if (nonNull(updatedEmail)) {
-				delEmailMap.put(MESSAGE, "Email deleted SuccessFully.");
+				delEmailMap.put(MESSAGE, "Email deleted Successfully.");
 				delEmailMap.put(SUCCESS, true);
 			} else {
 				delEmailMap.put(MESSAGE, "Email Not deleted.");
@@ -197,7 +197,7 @@ public class EmailServiceImpl implements EmailService {
 					.orElseThrow(() -> new ResourceNotFoundException("Employee", STAFF_ID, map.get(STAFF_ID)));
 			email.setMailFrom(employee.getEmailId());
 			if (nonNull(emailDaoService.email(email))) {
-				asgmMailMap.put(MESSAGE, "Email Assigned SuccessFully");
+				asgmMailMap.put(MESSAGE, "Email Assigned Successfully");
 				asgmMailMap.put(SUCCESS, true);
 			} else {
 				asgmMailMap.put(MESSAGE, "Email Not Assigned");

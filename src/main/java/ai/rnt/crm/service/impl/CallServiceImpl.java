@@ -174,7 +174,7 @@ public class CallServiceImpl implements CallService {
 					});
 			call.setCallFrom(employee);
 			if (nonNull(callDaoService.call(call))) {
-				asgnCallMap.put(MESSAGE, "Call Assigned SuccessFully");
+				asgnCallMap.put(MESSAGE, "Call Assigned Successfully");
 				asgnCallMap.put(SUCCESS, true);
 			} else {
 				asgnCallMap.put(MESSAGE, "Call Not Assigned");
@@ -197,7 +197,7 @@ public class CallServiceImpl implements CallService {
 			call.setUpdatedDate(now());
 			call.setStatus(COMPLETE);
 			if (nonNull(callDaoService.call(call))) {
-				markCompllMap.put(MESSAGE, "Call updated SuccessFully");
+				markCompllMap.put(MESSAGE, "Call updated Successfully");
 				markCompllMap.put(SUCCESS, true);
 			} else {
 				markCompllMap.put(MESSAGE, "Call Not updated");
@@ -231,7 +231,7 @@ public class CallServiceImpl implements CallService {
 		            .withZoneSameInstant(of(INDIA_ZONE))
 		            .toLocalDateTime());
 			if (nonNull(callDaoService.call(call))) {
-				delCallMap.put(MESSAGE, "Call deleted SuccessFully.");
+				delCallMap.put(MESSAGE, "Call deleted Successfully.");
 				delCallMap.put(SUCCESS, true);
 			} else {
 				delCallMap.put(MESSAGE, "Call Not delete.");
@@ -330,7 +330,7 @@ public class CallServiceImpl implements CallService {
 			callTask.setAssignTo(employee);
 			if (nonNull(callDaoService.addCallTask(callTask))) {
 				asgnCallTaskMap.put(SUCCESS, true);
-				asgnCallTaskMap.put(MESSAGE, "Task Assigned SuccessFully");
+				asgnCallTaskMap.put(MESSAGE, "Task Assigned Successfully");
 			} else {
 				asgnCallTaskMap.put(SUCCESS, false);
 				asgnCallTaskMap.put(MESSAGE, "Task Not Assigned");

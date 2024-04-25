@@ -180,7 +180,7 @@ class VisitServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = visitServiceImpl.assignVisit(map);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertEquals(true, response.getBody().get(SUCCESS));
-		assertEquals("Visit Assigned SuccessFully", response.getBody().get(MESSAGE));
+		assertEquals("Visit Assigned Successfully", response.getBody().get(MESSAGE));
 	}
 
 	@Test
@@ -218,7 +218,7 @@ class VisitServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = visitServiceImpl.visitMarkAsCompleted(visitId);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(true, responseEntity.getBody().get(SUCCESS));
-		assertEquals("Visit updated SuccessFully", responseEntity.getBody().get(MESSAGE));
+		assertEquals("Visit updated Successfully", responseEntity.getBody().get(MESSAGE));
 	}
 
 	@Test
@@ -254,7 +254,7 @@ class VisitServiceImplTest {
 	    EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
 	    assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 	    assertEquals(true, responseBody.get(ApiResponse.SUCCESS));
-	    assertEquals("Visit deleted SuccessFully.", responseBody.get(ApiResponse.MESSAGE));
+	    assertEquals("Visit deleted Successfully.", responseBody.get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -383,7 +383,7 @@ class VisitServiceImplTest {
 		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(true, responseBody.get(ApiResponse.SUCCESS));
-		assertEquals("Task Assigned SuccessFully", responseBody.get(ApiResponse.MESSAGE));
+		assertEquals("Task Assigned Successfully", responseBody.get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -423,7 +423,7 @@ class VisitServiceImplTest {
 		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(true, responseBody.get(ApiResponse.SUCCESS));
-		assertEquals("Visit Task Deleted SuccessFully.", responseBody.get(ApiResponse.MESSAGE));
+		assertEquals("Visit Task Deleted Successfully.", responseBody.get(ApiResponse.MESSAGE));
 	}
 
 	@Test

@@ -151,7 +151,7 @@ class MeetingServiceImplTest {
 		when(meetingDaoService.addMeeting(meeting)).thenReturn(meeting);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = meetingServiceImpl.deleteMeeting(meetingId);
 		assertTrue((boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Meeting deleted SuccessFully.", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Meeting deleted Successfully.", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -285,7 +285,7 @@ class MeetingServiceImplTest {
 		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 		assertEquals(true, responseBody.get(ApiResponse.SUCCESS));
-		assertEquals("Task Assigned SuccessFully", responseBody.get(ApiResponse.MESSAGE));
+		assertEquals("Task Assigned Successfully", responseBody.get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -326,7 +326,7 @@ class MeetingServiceImplTest {
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Meeting Task Deleted SuccessFully.", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Meeting Task Deleted Successfully.", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -365,7 +365,7 @@ class MeetingServiceImplTest {
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Meeting Assigned SuccessFully", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Meeting Assigned Successfully", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test

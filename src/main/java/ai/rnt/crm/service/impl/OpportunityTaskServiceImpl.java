@@ -148,7 +148,7 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 			opportunityTask.setAssignTo(employee);
 			if (nonNull(opportunityTaskDaoService.addOptyTask(opportunityTask))) {
 				asgnOpptTaskMap.put(SUCCESS, true);
-				asgnOpptTaskMap.put(MESSAGE, "Task Assigned SuccessFully");
+				asgnOpptTaskMap.put(MESSAGE, "Task Assigned Successfully");
 			} else {
 				asgnOpptTaskMap.put(SUCCESS, false);
 				asgnOpptTaskMap.put(MESSAGE, "Task Not Assigned");
@@ -172,7 +172,7 @@ public class OpportunityTaskServiceImpl implements OpportunityTaskService {
 					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
 			if (nonNull(opportunityTaskDaoService.addOptyTask(opportunityTask))) {
 				delOpptTaskMap.put(SUCCESS, true);
-				delOpptTaskMap.put(MESSAGE, "Task deleted SuccessFully");
+				delOpptTaskMap.put(MESSAGE, "Task deleted Successfully");
 			} else {
 				delOpptTaskMap.put(SUCCESS, false);
 				delOpptTaskMap.put(MESSAGE, "Task Not delete.");
