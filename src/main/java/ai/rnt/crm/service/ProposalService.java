@@ -28,4 +28,6 @@ public interface ProposalService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> deleteProposal(Integer propId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteService(Integer propServiceId);
+
 }

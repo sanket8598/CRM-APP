@@ -40,6 +40,7 @@ import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
 import ai.rnt.crm.dto.opportunity.UpdateProposalDto;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.Proposal;
+import ai.rnt.crm.entity.ProposalServices;
 import ai.rnt.crm.entity.ServiceFallsMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
@@ -261,6 +262,30 @@ public class ProposalServiceImpl implements ProposalService {
 			return new ResponseEntity<>(delPropMap, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while deleting the proposal..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteService(Integer propServiceId) {
+		log.info("inside the deleteService method...{}", propServiceId);
+		EnumMap<ApiResponse, Object> deleteSerive = new EnumMap<>(ApiResponse.class);
+		try {
+			ProposalServices proposalServices = proposalServicesDaoService.findById(propServiceId).orElseThrow(
+					() -> new ResourceNotFoundException("ProposalServices", "propServiceId", propServiceId));
+			proposalServices.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+			proposalServices.setDeletedDate(
+					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+			if (nonNull(proposalServicesDaoService.save(proposalServices))) {
+				deleteSerive.put(MESSAGE, "Service Deleted Successfully.");
+				deleteSerive.put(SUCCESS, true);
+			} else {
+				deleteSerive.put(MESSAGE, "Service Not Delete.");
+				deleteSerive.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(deleteSerive, OK);
+		} catch (Exception e) {
+			log.error("error occured while deleting the proposal service by id..{}", +propServiceId, e.getMessage());
 			throw new CRMException(e);
 		}
 	}
