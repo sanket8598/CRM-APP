@@ -161,7 +161,7 @@ class ProposalServiceImplTest {
 		verify(opportunityDaoService, times(1)).findOpportunity(anyInt());
 	}
 
-	//@Test
+	 @Test
 	void getProposalsByOptyIdSuccess() {
 		int optyId = 1;
 		Proposal proposalDto = new Proposal();
@@ -169,6 +169,9 @@ class ProposalServiceImplTest {
 		Contacts contact = new Contacts();
 		List<Contacts> contacts = new ArrayList<>();
 		Opportunity opty = new Opportunity();
+		contact.setFirstName("test");
+		contact.setLastName("testdata");
+		contact.setPrimary(true);
 		contact.setContactId(1);
 		contacts.add(contact);
 		leads.setContacts(contacts);
@@ -176,10 +179,10 @@ class ProposalServiceImplTest {
 		opty.setLeads(leads);
 		proposalDto.setOpportunity(opty);
 		proposalDto.setCreatedBy(1);
+		proposalDto.setCreatedDate(LocalDateTime.now());
 		List<Proposal> proposals = Arrays.asList(proposalDto);
 		Map<Integer, String> employeeMap = new HashMap<>();
 		employeeMap.put(1, "John Doe");
-		when(employeeDaoService.getEmployeeNameMap()).thenReturn(employeeMap);
 		when(proposalDaoService.getProposalsByOptyId(optyId)).thenReturn(proposals);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = proposalServiceImpl.getProposalsByOptyId(optyId);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -351,5 +354,38 @@ class ProposalServiceImplTest {
 		verify(auditAwareUtil, times(1)).getLoggedInStaffId();
 		verify(proposalDaoService, times(1)).findProposalById(propId);
 		verify(proposalDaoService, never()).saveProposal(any(Proposal.class));
+	}
+
+	@Test
+	void deleteServiceTest() throws Exception {
+		Integer propServiceId = 1;
+		ProposalServices proposalServices = new ProposalServices();
+		ProposalServicesDto dto = new ProposalServicesDto();
+		when(proposalServicesDaoService.findById(propServiceId)).thenReturn(java.util.Optional.of(proposalServices));
+		when(proposalServicesDaoService.save(any())).thenReturn(java.util.Optional.of(dto));
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = proposalServiceImpl.deleteService(propServiceId);
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		assertTrue((Boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
+	}
+
+	@Test
+	void deleteServiceTestElse() throws Exception {
+		Integer propServiceId = 1;
+		when(proposalServicesDaoService.findById(propServiceId)).thenReturn(Optional.of(new ProposalServices()));
+		when(proposalServicesDaoService.save(any())).thenReturn(null); 
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = proposalServiceImpl.deleteService(propServiceId);
+		assertNotNull(responseEntity);
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+		EnumMap<ApiResponse, Object> responseMap = responseEntity.getBody();
+		assertNotNull(responseMap);
+		verify(proposalServicesDaoService, times(1)).findById(propServiceId);
+		verify(proposalServicesDaoService, times(1)).save(any());
+	}
+
+	@Test
+	void deleteServiceTestException() {
+		Integer propServiceId = 1;
+		when(proposalServicesDaoService.findById(propServiceId)).thenThrow(new RuntimeException("Test Exception"));
+		assertThrows(CRMException.class, () -> proposalServiceImpl.deleteService(propServiceId));
 	}
 }
