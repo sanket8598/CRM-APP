@@ -13,7 +13,6 @@ import ai.rnt.crm.dto.opportunity.EditProposalDto;
 import ai.rnt.crm.dto.opportunity.GetProposalsDto;
 import ai.rnt.crm.dto.opportunity.ProposalDto;
 import ai.rnt.crm.dto.opportunity.ProposalServicesDto;
-import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Proposal;
 import ai.rnt.crm.entity.ProposalServices;
 import lombok.NoArgsConstructor;
@@ -41,9 +40,7 @@ public class ProposalDtoMapper {
 
 	public static final Function<Proposal, Optional<GetProposalsDto>> TO_PROPOSAL_DTO = e -> {
 		Optional<GetProposalsDto> evalMapper2 = evalMapper(e, GetProposalsDto.class);
-		evalMapper2.ifPresent(prop -> prop
-				.setOptyName(e.getOpportunity().getLeads().getContacts().stream().filter(Contacts::getPrimary)
-						.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("")));
+		evalMapper2.ifPresent(prop -> prop.setOptyName(e.getOpportunity().getTopic()));
 		return evalMapper2;
 	};
 
