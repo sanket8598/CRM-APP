@@ -161,7 +161,7 @@ class ProposalServiceImplTest {
 		verify(opportunityDaoService, times(1)).findOpportunity(anyInt());
 	}
 
-	 @Test
+	@Test
 	void getProposalsByOptyIdSuccess() {
 		int optyId = 1;
 		Proposal proposalDto = new Proposal();
@@ -372,7 +372,7 @@ class ProposalServiceImplTest {
 	void deleteServiceTestElse() throws Exception {
 		Integer propServiceId = 1;
 		when(proposalServicesDaoService.findById(propServiceId)).thenReturn(Optional.of(new ProposalServices()));
-		when(proposalServicesDaoService.save(any())).thenReturn(null); 
+		when(proposalServicesDaoService.save(any())).thenReturn(null);
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = proposalServiceImpl.deleteService(propServiceId);
 		assertNotNull(responseEntity);
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());

@@ -210,20 +210,27 @@ public class ProposalServiceImpl implements ProposalService {
 			proposalById.setEffectiveFrom(dto.getEffectiveFrom());
 			proposalById.setEffectiveTo(dto.getEffectiveTo());
 			proposalById.setPropDescription(dto.getPropDescription());
-			dto.getProposalServices().stream().forEach(e -> {
-				proposalServicesDaoService.findById(e.getPropServiceId()).ifPresent(ps -> {
-					ps.setServicePrice(e.getServicePrice());
-					ps.setProposal(proposalById);
-					try {
-						proposalServicesDaoService.save(ps).ifPresent(save -> {
-							updateProposal.put(SUCCESS, true);
-							updateProposal.put(MESSAGE, "Proposal Updated Successfully!!");
-						});
-					} catch (Exception e1) {
-						log.error("Got Exception while updating the proposal service data..{}", e1.getMessage());
-					}
+			List<ProposalServicesDto> proposalServices = dto.getProposalServices();
+			if (!proposalServices.isEmpty()) {
+				dto.getProposalServices().stream().forEach(e -> {
+					proposalServicesDaoService.findById(e.getPropServiceId()).ifPresent(ps -> {
+						ps.setServicePrice(e.getServicePrice());
+						ps.setProposal(proposalById);
+						try {
+							proposalServicesDaoService.save(ps).ifPresent(save -> {
+								updateProposal.put(SUCCESS, true);
+								updateProposal.put(MESSAGE, "Proposal Updated Successfully!!");
+							});
+						} catch (Exception e1) {
+							log.error("Got Exception while updating the proposal service data..{}", e1.getMessage());
+						}
+					});
 				});
-			});
+			} else {
+				proposalDaoService.saveProposal(proposalById);
+				updateProposal.put(SUCCESS, true);
+				updateProposal.put(MESSAGE, "Proposal Updated Successfully!!");
+			}
 			return new ResponseEntity<>(updateProposal, OK);
 		} catch (Exception e) {
 			log.error("Got Exception while updating the proposal data..{}", e.getMessage());
