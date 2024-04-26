@@ -31,6 +31,7 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.springframework.stereotype.Component;
 
+import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.entity.Attachment;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Email;
@@ -41,6 +42,7 @@ import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.exception.CRMException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -51,7 +53,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class EmailUtil extends PropertyUtil {
+
+	private final EmailDaoService emailDaoService;
 
 	private static final String THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY = " The task is scheduled for completion by ";
 	private static final String I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE = "I hope this email finds you well. This is a friendly reminder about the Task for the ";
@@ -116,11 +121,17 @@ public class EmailUtil extends PropertyUtil {
 		}
 	}
 
+	public String getMailPassword(String userName) {
+		String findPasswordByMailId = emailDaoService.findPasswordByMailId(userName);
+		System.out.println("pss  " + findPasswordByMailId);
+		return findPasswordByMailId;
+	}
+
 	public Session getSession() {
 		return Session.getInstance(PROPERTIES, new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(getUserName(), getPassword());
+				return new PasswordAuthentication(getUserName(), getMailPassword(getUserName()));
 			}
 		});
 	}
@@ -334,7 +345,7 @@ public class EmailUtil extends PropertyUtil {
 		}
 	}
 
-	public void sendLeadAssignMail(Leads leads) {
+	public boolean sendLeadAssignMail(Leads leads) {
 		log.info("inside the sendLeadAssignMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
@@ -362,13 +373,14 @@ public class EmailUtil extends PropertyUtil {
 					.append(BR).append(REGARDS).append("<br>").append("RNT Sales Team");
 			msg.setContent(content.toString(), TEXT_HTML);
 			send(msg);
-		} catch (Exception e) {
-			log.error("Got Exception while sending lead assigned reminder mail..{}", e.getMessage());
-			throw new CRMException(e);
+			return true;
+		} catch (MessagingException ex) {
+			log.error("Got Exception while sending lead assigned reminder mail..{}", ex.getMessage());
+			return false;
 		}
 	}
 
-	public void sendOptyAssignMail(Opportunity opportunity) {
+	public boolean sendOptyAssignMail(Opportunity opportunity) {
 		log.info("inside the sendOptyAssignMail method...}");
 		try {
 			Message msg = new MimeMessage(getSession());
@@ -397,9 +409,10 @@ public class EmailUtil extends PropertyUtil {
 					.append(BR).append(REGARDS).append("<br>").append("RNT Sales Team");
 			msg.setContent(content.toString(), TEXT_HTML);
 			send(msg);
-		} catch (Exception e) {
-			log.error("Got Exception while sending opportunity assigned reminder mail..{}", e.getMessage());
-			throw new CRMException(e);
+			return true;
+		} catch (MessagingException ex) {
+			log.error("Got Exception while sending opportunity assigned reminder mail..{}", ex.getMessage());
+			return false;
 		}
 	}
 }

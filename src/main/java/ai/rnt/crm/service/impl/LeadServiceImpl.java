@@ -520,12 +520,15 @@ public class LeadServiceImpl implements LeadService {
 			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leads::setAssignBy);
 			leads.setAssignDate(LocalDate.now());
 			if (nonNull(leadDaoService.addLead(leads))) {
-				emailUtil.sendLeadAssignMail(leads);
+				boolean sendLeadAssignMail = emailUtil.sendLeadAssignMail(leads);
 				assignLeadNotification(map.get(LEAD_ID));
-				resultMap.put(MESSAGE, "Lead Assigned Successfully");
+				if (sendLeadAssignMail)
+					resultMap.put(MESSAGE, "Lead Assigned Successfully !!");
+				else
+					resultMap.put(MESSAGE, "Lead Assigned but problem while sending email !!");
 				resultMap.put(SUCCESS, true);
 			} else {
-				resultMap.put(MESSAGE, "Lead Not Assigned");
+				resultMap.put(MESSAGE, "Lead Not Assign !!");
 				resultMap.put(SUCCESS, false);
 			}
 			return new ResponseEntity<>(resultMap, OK);

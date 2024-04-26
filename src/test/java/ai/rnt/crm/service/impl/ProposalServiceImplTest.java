@@ -236,7 +236,7 @@ class ProposalServiceImplTest {
         ResponseEntity<EnumMap<ApiResponse, Object>> response = proposalServiceImpl.addNewService("ExistingService");
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
-        assertEquals("Service Is Present !!", response.getBody().get(ApiResponse.MESSAGE));
+        assertEquals("Service Is Already Present !!", response.getBody().get(ApiResponse.MESSAGE));
         verify(serviceFallsDaoSevice, times(1)).findByServiceName("ExistingService");
         verify(serviceFallsDaoSevice, never()).save(any());
     }

@@ -651,7 +651,7 @@ class LeadServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.assignLead(map);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Lead Assigned Successfully", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Lead Assigned but problem while sending email !!", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test

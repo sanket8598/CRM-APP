@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import ai.rnt.crm.entity.Email;
 
@@ -23,5 +24,8 @@ public interface EmailRepository extends JpaRepository<Email, Integer> {
 	List<Email> findByScheduledOnAndScheduledAtAndScheduled(LocalDate todayAsDate, String time, boolean scheduled);
 
 	List<Email> findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(Integer leadId, boolean flag);
+
+	@Query(value = "select mail_password from corp_mail where mail_id = ?1", nativeQuery = true)
+	String findPasswordByMailId(String userName);
 
 }

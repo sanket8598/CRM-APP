@@ -41,6 +41,7 @@ import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dto.MeetingAttachmentsDto;
 import ai.rnt.crm.dto.MeetingDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -51,8 +52,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Component
 @Slf4j
+@RequiredArgsConstructor
 @PropertySource("classpath:confidential.properties")
 public class MeetingUtil extends PropertyUtil {
+
+	private final EmailUtil emailUtil;
 
 	public void scheduleMeetingInOutlook(MeetingDto dto) throws Exception {
 		log.info("inside the scheduleMeetingInOutlook method...{}");
@@ -126,7 +130,7 @@ public class MeetingUtil extends PropertyUtil {
 		return Session.getInstance(PROPERTIES, new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(userName, password);
+				return new PasswordAuthentication(userName, emailUtil.getMailPassword(userName));
 			}
 		});
 	}

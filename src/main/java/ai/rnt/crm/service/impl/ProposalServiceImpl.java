@@ -160,7 +160,7 @@ public class ProposalServiceImpl implements ProposalService {
 		try {
 			if (serviceFallsDaoSevice.findByServiceName(serviceName)) {
 				resultData.put(SUCCESS, false);
-				resultData.put(MESSAGE, "Service Is Present !!");
+				resultData.put(MESSAGE, "Service Is Already Present !!");
 				return new ResponseEntity<>(resultData, OK);
 			} else {
 				ServiceFallsMaster serviceFalls = new ServiceFallsMaster();

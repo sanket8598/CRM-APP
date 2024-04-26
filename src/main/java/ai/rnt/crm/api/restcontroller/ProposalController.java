@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,7 +52,7 @@ public class ProposalController {
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping("/get/{optyId}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getProposals(
-			@Min(1) @PathVariable(name = "optyId") Integer optyId) {
+			@Valid @Min(1) @PathVariable(name = "optyId") Integer optyId) {
 		return proposalService.getProposalsByOptyId(optyId);
 	}
 
@@ -64,7 +65,8 @@ public class ProposalController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping("/add/newService")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addNewService(@RequestBody String serviceName) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addNewService(
+			@Valid @NotBlank(message = "Service name should not be empty") @RequestBody String serviceName) {
 		return proposalService.addNewService(serviceName.trim());
 	}
 
@@ -76,20 +78,21 @@ public class ProposalController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/{propId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateProposal(@PathVariable Integer propId,
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateProposal(@Valid @Min(1) @PathVariable Integer propId,
 			@RequestBody UpdateProposalDto dto) {
 		return proposalService.updateProposal(propId, dto);
 	}
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@DeleteMapping("/{propId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteProposal(@Min(1) @PathVariable Integer propId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteProposal(@Valid @Min(1) @PathVariable Integer propId) {
 		return proposalService.deleteProposal(propId);
 	}
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@DeleteMapping("/service/{propServiceId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteService(@Min(1) @PathVariable Integer propServiceId) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteService(
+			@Valid @Min(1) @PathVariable Integer propServiceId) {
 		return proposalService.deleteService(propServiceId);
 	}
 }

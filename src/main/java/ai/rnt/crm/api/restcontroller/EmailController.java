@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dto.EmailDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.EmailService;
+import ai.rnt.crm.util.EmailUtil;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 public class EmailController {
 
 	private final EmailService emailService;
+	private final EmailDaoService emailDaoService;
+	private final EmailUtil mailId;
 
 	/**
 	 * This method is used to save and send the email.

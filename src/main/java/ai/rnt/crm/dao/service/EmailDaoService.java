@@ -26,4 +26,6 @@ public interface EmailDaoService extends CrudService<Email, EmailDto> {
 
 	List<Email> getEmailByLeadIdAndIsOpportunity(Integer leadId);
 
+	String findPasswordByMailId(String userName);
+
 }

@@ -684,12 +684,15 @@ public class OpportunityServiceImpl implements OpportunityService {
 					.orElseThrow(() -> new ResourceNotFoundException(EMPLOYEE, STAFF_ID, map.get(STAFF_ID)));
 			opportunity.setEmployee(employee);
 			if (nonNull(opportunityDaoService.addOpportunity(opportunity))) {
-				emailUtil.sendOptyAssignMail(opportunity);
+				boolean sendOptyAssignMail = emailUtil.sendOptyAssignMail(opportunity);
 				assignOptyNotification(map.get(OPTY_ID));
-				resultMap.put(MESSAGE, "Opportunity Assigned Successfully");
+				if (sendOptyAssignMail)
+					resultMap.put(MESSAGE, "Opportunity Assigned Successfully !!");
+				else
+					resultMap.put(MESSAGE, "Opportunity assigned but problem while sending email !!");
 				resultMap.put(SUCCESS, true);
 			} else {
-				resultMap.put(MESSAGE, "Opportunity Not Assigned");
+				resultMap.put(MESSAGE, "Opportunity Not Assign");
 				resultMap.put(SUCCESS, false);
 			}
 			return new ResponseEntity<>(resultMap, OK);
