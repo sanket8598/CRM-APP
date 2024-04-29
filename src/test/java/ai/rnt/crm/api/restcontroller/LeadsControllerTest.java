@@ -57,7 +57,7 @@ class LeadsControllerTest {
 
 	@Test
 	void getLeadsByStatusTest() {
-		String leadsStatus = "Open"; 
+		String leadsStatus = "Open";
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.getLeadsByStatus(anyString())).thenReturn(expectedResponse);
@@ -161,7 +161,7 @@ class LeadsControllerTest {
 		EnumMap<ApiResponse, Object> expectedResponseMap = new EnumMap<>(ApiResponse.class);
 		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponse = ResponseEntity.ok(expectedResponseMap);
 		when(leadService.updateLeadContact(anyInt(), any(UpdateLeadDto.class))).thenReturn(expectedResponse);
-		leadsController.updateLeadContact(leadId, dto);
+		leadsController.updateLeadContact(dto, leadId);
 		verify(leadService).updateLeadContact(leadId, dto);
 	}
 

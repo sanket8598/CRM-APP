@@ -122,9 +122,7 @@ public class EmailUtil extends PropertyUtil {
 	}
 
 	public String getMailPassword(String userName) {
-		String findPasswordByMailId = emailDaoService.findPasswordByMailId(userName);
-		System.out.println("pss  " + findPasswordByMailId);
-		return findPasswordByMailId;
+		return emailDaoService.findPasswordByMailId(userName);
 	}
 
 	public Session getSession() {

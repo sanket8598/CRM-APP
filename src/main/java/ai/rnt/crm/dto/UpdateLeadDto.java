@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import ai.rnt.crm.validation.UpdateLead;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,7 +26,7 @@ public class UpdateLeadDto {
 	// @PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
 	private String phoneNumber;
 
-	@Size(max = 1000, message = "Requirement field limit exceeded! Please shorten your input.")
+	@Size(max = 1000, message = "Requirement field limit exceeded! Please shorten your input.", groups = UpdateLead.class)
 	private String topic;
 
 	@NotBlank(message = "Email Address should not be null or empty!!")
@@ -51,10 +52,10 @@ public class UpdateLeadDto {
 	private String addressLineOne;
 	private String fullName;
 
-	@Size(max = 2000, message = "Customer Need field limit exceeded! Please shorten your input.")
+	@Size(max = 2000, message = "Customer Need field limit exceeded! Please shorten your input.", groups = UpdateLead.class)
 	private String customerNeed;
 
-	@Size(max = 2000, message = "Proposed Solution field limit exceeded! Please shorten your input.")
+	@Size(max = 2000, message = "Proposed Solution field limit exceeded! Please shorten your input.", groups = UpdateLead.class)
 	private String proposedSolution;
 	private String pseudoName;
 	private String linkedinId;
