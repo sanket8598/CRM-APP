@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import ai.rnt.crm.validation.DisqualifiedLead;
 import ai.rnt.crm.validation.LeadAdvanceInfo;
@@ -29,6 +30,7 @@ public class LeadDto {
 	// @PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
 	private String phoneNumber;
 
+	@Size(max = 1000, message = "Topic field limit exceeded! Please shorten your input.")
 	private String topic;
 
 	@NotBlank(message = "Email Address should not be null or empty!!", groups = LeadAdvanceInfo.class)
