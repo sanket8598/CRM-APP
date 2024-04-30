@@ -215,6 +215,9 @@ public class ProposalServiceImpl implements ProposalService {
 				dto.getProposalServices().stream().forEach(e -> {
 					proposalServicesDaoService.findById(e.getPropServiceId()).ifPresent(ps -> {
 						ps.setServicePrice(e.getServicePrice());
+						proposalById.setSubTotal(dto.getSubTotal());
+						proposalById.setFinalAmount(dto.getFinalAmount());
+						proposalById.setDiscount(dto.getDiscount());
 						ps.setProposal(proposalById);
 						try {
 							proposalServicesDaoService.save(ps).ifPresent(save -> {

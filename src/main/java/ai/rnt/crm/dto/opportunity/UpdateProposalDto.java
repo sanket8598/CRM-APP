@@ -20,6 +20,12 @@ public class UpdateProposalDto {
 
 	private String propDescription;
 
+	private String subTotal;
+
+	private String finalAmount;
+
+	private Integer discount;
+
 	@NotNull(message = "Effective To date should not be null!!")
 	private LocalDate effectiveTo;
 

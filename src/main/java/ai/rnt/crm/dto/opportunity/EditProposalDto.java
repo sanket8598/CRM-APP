@@ -29,6 +29,12 @@ public class EditProposalDto {
 
 	private String propDescription;
 
+	private String subTotal;
+
+	private String finalAmount;
+
+	private Integer discount;
+
 	private List<ProposalServicesDto> proposalServices = new ArrayList<>();
 
 	private OpportunityDto opportunity;

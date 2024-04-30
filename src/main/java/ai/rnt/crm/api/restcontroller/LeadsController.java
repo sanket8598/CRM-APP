@@ -77,6 +77,7 @@ public class LeadsController {
 	}
 
 	// for open view data
+	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping(value = { GET_LEADS_BY_STATUS, GET_ALL_LEADS })
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getLeadsByStatus(
 			@PathVariable(name = "leadsStatus", required = false) String leadsStatus) {

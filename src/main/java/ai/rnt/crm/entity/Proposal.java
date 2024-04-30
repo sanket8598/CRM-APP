@@ -53,6 +53,15 @@ public class Proposal extends Auditable {
 	@Column(name = "effective_to")
 	private LocalDate effectiveTo;
 
+	@Column(name = "sub_total")
+	private String subTotal;
+
+	@Column(name = "final_amount")
+	private String finalAmount;
+
+	@Column(name = "discount")
+	private Integer discount;
+
 	@Column(name = "prop_description")
 	private String propDescription;
 
