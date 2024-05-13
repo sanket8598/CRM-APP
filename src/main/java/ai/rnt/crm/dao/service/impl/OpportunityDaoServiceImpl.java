@@ -55,4 +55,10 @@ public class OpportunityDaoServiceImpl implements OpportunityDaoService {
 		log.info("inside the findOpportunityById method...{}", optId);
 		return opportunityRespoitory.findById(optId);
 	}
+
+	@Override
+	public List<Opportunity> findAllOpty() {
+		log.info("inside the findAllOpty method...");
+		return opportunityRespoitory.findByDeletedDateIsNull();
+	}
 }

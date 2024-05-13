@@ -2,6 +2,7 @@ package ai.rnt.crm.dao.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import ai.rnt.crm.dto.LeadDto;
@@ -19,13 +20,17 @@ public interface LeadDaoService extends CrudService<Leads, LeadDto> {
 	List<Leads> getLeadDashboardData();
 
 	Optional<Leads> getLeadById(Integer leadId);
-	
+
 	Optional<LeadImportant> addImportantLead(LeadImportant leadImportant);
-	
-	boolean deleteImportantLead(Integer leadId,Integer staffId);
+
+	boolean deleteImportantLead(Integer leadId, Integer staffId);
 
 	List<LeadImportant> findLeadByEmployeeStaffId(Integer loggedInStaffId);
 
 	List<Leads> getFollowUpLeads(LocalDate todayAsDate, String time);
+
+	List<Map<String, Integer>> getLeadSourceCount();
+
+	List<Map<String, Integer>> getLeadSourceCount(Integer loggedInStaffId);
 
 }

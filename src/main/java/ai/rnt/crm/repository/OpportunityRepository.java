@@ -14,4 +14,6 @@ public interface OpportunityRepository extends CrudRepository<Opportunity, Integ
 
 	List<Opportunity> findByStatusInOrderByCreatedDateDesc(List<String> status);
 
+	List<Opportunity> findByDeletedDateIsNull();
+
 }

@@ -17,4 +17,6 @@ public interface OpportunityDaoService extends CrudService<Opportunity, Opportun
 	List<Opportunity> getOpportunityByStatusIn(List<String> asList);
 
 	Optional<Opportunity> findOpportunity(Integer optId);
+
+	List<Opportunity> findAllOpty();
 }
