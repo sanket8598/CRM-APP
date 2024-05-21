@@ -5,8 +5,10 @@ import static javax.persistence.TemporalType.DATE;
 import java.util.Date;
 
 import javax.persistence.Temporal;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import ai.rnt.crm.validation.PhoneNumValid;
@@ -41,6 +43,7 @@ public class CallDto {
 	// @Pattern(regexp =
 	// "^(\\+\\d{1,2}\\s?)?(\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4})$", message =
 	// "Please Enter a valid Phone Number!!")
+	@Pattern(regexp = "\\+?\\d+", message = "Invalid Phone Number!!")
 	@PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
 	private String phoneNo;
 
@@ -50,9 +53,12 @@ public class CallDto {
 
 	@NotNull(message = "Start Date should not be null!!")
 	@Temporal(DATE)
+	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private Date startDate;
 
 	@Temporal(DATE)
+	@NotNull(message = "End Date should not be null!!")
+	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private Date endDate;
 
 	private String startTime;
