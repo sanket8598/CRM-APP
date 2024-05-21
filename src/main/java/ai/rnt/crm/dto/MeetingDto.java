@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Temporal;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -33,9 +34,13 @@ public class MeetingDto {
 	private List<String> participates;
 
 	@Temporal(DATE)
+	@NotNull(message = "Start Date should not be null!!")
+	@FutureOrPresent(message = "Start date must not be smaller than today's date!!")
 	private Date startDate;
 
 	@Temporal(DATE)
+	@NotNull(message = "End Date should not be null!!")
+	@FutureOrPresent(message = "End date must not be smaller than today's date!!")
 	private Date endDate;
 
 	private String startTime;

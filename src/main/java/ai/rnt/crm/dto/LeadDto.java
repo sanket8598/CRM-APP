@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import ai.rnt.crm.validation.DisqualifiedLead;
@@ -28,6 +29,7 @@ public class LeadDto {
 	// @Pattern(regexp ="^(\+\d{1,2}\s?)?(\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4})$",
 	// message = "Please Enter a valid Phone Number!!")
 	// @PhoneNumValid(message = "Please Enter a Valid Phone Number!!")
+	@Pattern(regexp = "\\+?\\d+", message = "Please Enter a Valid Phone Number!!")
 	private String phoneNumber;
 
 	@Size(max = 1000, message = "Topic field limit exceeded! Please shorten your input.")
@@ -78,6 +80,6 @@ public class LeadDto {
 	private String linkedinId;
 
 	private Integer assignBy;
-	
+
 	private LocalDate assignDate;
 }

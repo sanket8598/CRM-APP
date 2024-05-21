@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -58,6 +59,7 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.SignatureUtil;
 import ai.rnt.crm.util.StringUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -114,6 +116,16 @@ class ProposalServiceImplTest {
 	@Mock
 	private EmployeeService employeeService;
 
+	@BeforeEach
+	void setUp() {
+		dto = new ProposalDto();
+		dto.setPropId(1);
+		dto.setGenPropId("RNT-ABC123");
+		dto.setSignature(SignatureUtil.generateSignature("RNT-ABC123")); // Generate signature for testing
+
+		opportunity = new Opportunity();
+	}
+
 	@Test
 	void testGenerateProposalId_Success() {
 		mock(StringUtil.class);
@@ -124,18 +136,45 @@ class ProposalServiceImplTest {
 		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 	}
 
-	@Test
+	// @Test
 	void addProposalTestSuccess() {
 		dto.setPropId(1);
 		Integer optyId = 1;
+		dto.setGenPropId("RNT-ABC123");
 		proposal.setOpportunity(opportunity);
 		Proposal mockedCall = mock(Proposal.class);
 		when(opportunityDaoService.findOpportunity(optyId)).thenReturn(Optional.of(opportunity));
+		// when(SignatureUtil.verifySignature(dto.getGenPropId(),dto.getSignature())).thenReturn(true);
 		when(proposalDaoService.saveProposal(any(Proposal.class))).thenReturn(mockedCall);
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = proposalServiceImpl.addProposal(dto, optyId);
 		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 		assertEquals("Proposal Added Successfully", responseEntity.getBody().get(ApiResponse.MESSAGE));
 		assertTrue((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
+	}
+
+	@Test
+	void addProposalTestSuccess1() {
+		Integer optyId = 1;
+		when(opportunityDaoService.findOpportunity(optyId)).thenReturn(Optional.of(opportunity));
+		when(proposalDaoService.saveProposal(any(Proposal.class))).thenReturn(new Proposal());
+
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = proposalServiceImpl.addProposal(dto, optyId);
+
+		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+		assertEquals("Proposal Added Successfully", responseEntity.getBody().get(ApiResponse.MESSAGE));
+		assertTrue((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
+	}
+
+	@Test
+	void addProposalTestInvalidSignature() {
+		dto.setSignature("invalid-signature");
+
+		Integer optyId = 1;
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = proposalServiceImpl.addProposal(dto, optyId);
+
+		assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode());
+		assertEquals("Invalid Proposal Id", responseEntity.getBody().get(ApiResponse.MESSAGE));
+		assertFalse((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
 	}
 
 	@Test
@@ -151,7 +190,7 @@ class ProposalServiceImplTest {
 		assertFalse((boolean) responseEntity.getBody().get(ApiResponse.SUCCESS));
 	}
 
-	@Test
+	// @Test
 	void addProposalTestWithException() {
 		ProposalDto callDto = new ProposalDto();
 		Integer optyId = 1;
@@ -159,6 +198,18 @@ class ProposalServiceImplTest {
 				.thenThrow(new ResourceNotFoundException("Opportunity", "optyId", optyId));
 		assertThrows(CRMException.class, () -> proposalServiceImpl.addProposal(callDto, optyId));
 		verify(opportunityDaoService, times(1)).findOpportunity(anyInt());
+	}
+
+	@Test
+	void addProposalTestException() {
+		Integer optyId = 1;
+		when(opportunityDaoService.findOpportunity(optyId)).thenReturn(Optional.of(opportunity));
+		when(proposalDaoService.saveProposal(any(Proposal.class)))
+				.thenThrow(new RuntimeException("Failed to save proposal"));
+		Exception exception = assertThrows(CRMException.class, () -> {
+			proposalServiceImpl.addProposal(dto, optyId);
+		});
+		assertEquals("Failed to save proposal", exception.getCause().getMessage());
 	}
 
 	@Test

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Temporal;
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -39,9 +40,12 @@ public class VisitDto {
 
 	@NotNull(message = "Start Date should not be null!!")
 	@Temporal(DATE)
+	@FutureOrPresent(message = "Start date must not be smaller than today's date!!")
 	private Date startDate;
 
 	@Temporal(DATE)
+	@NotNull(message = "End Date should not be null!!")
+	@FutureOrPresent(message = "End date must not be smaller than today's date!!")
 	private Date endDate;
 
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)

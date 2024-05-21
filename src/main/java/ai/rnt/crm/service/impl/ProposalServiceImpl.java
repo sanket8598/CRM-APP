@@ -8,6 +8,8 @@ import static ai.rnt.crm.dto.opportunity.mapper.ProposalDtoMapper.TO_PROPOSAL_SE
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static ai.rnt.crm.util.SignatureUtil.generateSignature;
+import static ai.rnt.crm.util.SignatureUtil.verifySignature;
 import static ai.rnt.crm.util.StringUtil.randomNumberGenerator;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
 import static java.time.LocalDateTime.now;
@@ -16,6 +18,7 @@ import static java.time.ZoneId.systemDefault;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -71,7 +74,9 @@ public class ProposalServiceImpl implements ProposalService {
 		log.info("inside the generateProposalId method...");
 		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
 		try {
-			result.put(DATA, randomNumberGenerator());
+			String proposalId = randomNumberGenerator();
+			String signature = generateSignature(proposalId);
+			result.put(DATA, proposalId + ":" + signature);
 			result.put(SUCCESS, true);
 			return new ResponseEntity<>(result, OK);
 		} catch (Exception e) {
@@ -85,6 +90,11 @@ public class ProposalServiceImpl implements ProposalService {
 		log.info("inside the addProposal method...{}", optyId);
 		EnumMap<ApiResponse, Object> proposalData = new EnumMap<>(ApiResponse.class);
 		try {
+			if (!verifySignature(dto.getGenPropId(), dto.getSignature())) {
+				proposalData.put(MESSAGE, "Invalid Proposal Id");
+				proposalData.put(SUCCESS, false);
+				return new ResponseEntity<>(proposalData, UNAUTHORIZED);
+			}
 			Proposal proposal = TO_PROPOSAL.apply(dto)
 					.orElseThrow(() -> new ResourceNotFoundException("Proposal", "propId", dto.getPropId()));
 			Opportunity opportunity = opportunityDaoService.findOpportunity(optyId)
