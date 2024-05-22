@@ -92,7 +92,6 @@ public class DashboardServiceImpl implements DashboardService {
 			dashboardData.put(SUCCESS, true);
 			return new ResponseEntity<>(dashboardData, OK);
 		} catch (Exception e) {
-			e.printStackTrace();
 			dashboardData.put(SUCCESS, true);
 			log.error("Got exception while fetching the main dashboard data...");
 			throw new CRMException(e);
