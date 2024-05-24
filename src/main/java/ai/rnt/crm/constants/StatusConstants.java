@@ -1,10 +1,11 @@
 package ai.rnt.crm.constants;
 
+import static lombok.AccessLevel.PRIVATE;
+
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = PRIVATE)
 public final class StatusConstants {
-
-	private StatusConstants() {
-
-	}
 
 	public static final String SAVE = "Save";
 	public static final String SEND = "Send";
@@ -34,17 +35,20 @@ public final class StatusConstants {
 	public static final String NO_LONGER_INTERESTED = "No Longer Interested";
 
 	public static final String CALL = "Call";
-	public static final String EMAIL = "Email";
 	public static final String VISIT = "Visit";
 	public static final String MEETING = "Meeting";
 	public static final String LEAD = "Lead";
 	public static final String OPPORTUNITY = "Opportunity";
-	
+
 	public static final String LOW = "Low";
 	public static final String MEDIUM = "Medium";
 	public static final String HIGH = "High";
-	
+
 	public static final String INCOMING = "Incoming";
 	public static final String OUTGOING = "Outgoing";
-	
+
+	public static final String EMAIL = "Email";
+	public static final String NOTIFICATION = "Notification";
+	public static final String BOTH = "Both";
+
 }

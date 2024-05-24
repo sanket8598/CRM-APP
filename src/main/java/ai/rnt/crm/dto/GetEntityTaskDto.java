@@ -6,9 +6,14 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 import javax.persistence.Temporal;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import ai.rnt.crm.validation.ValidReminderVia;
+import ai.rnt.crm.validation.ValidTaskPriority;
+import ai.rnt.crm.validation.ValidTaskStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,11 +25,15 @@ public class GetEntityTaskDto implements Serializable {
 
 	private String subject;
 
+	@ValidTaskStatus(message = "Please Select Valid Task Status!!")
 	private String status;
 
+	@ValidTaskPriority(message = "Please Select Valid Task Priority!!")
 	private String priority;
 
 	@Temporal(DATE)
+	@NotNull(message = "Due date should not be null!!")
+	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate updateDueDate;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
@@ -38,6 +47,7 @@ public class GetEntityTaskDto implements Serializable {
 
 	private boolean remainderOn;
 
+	@ValidReminderVia(message = "Please Select Valid RemainderVia!!")
 	private String remainderVia;
 
 	private String remainderDueAt;
@@ -46,5 +56,6 @@ public class GetEntityTaskDto implements Serializable {
 	private LocalDate remainderDueOn;
 
 	@Temporal(DATE)
+	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate updatedRemainderDueOn;
 }

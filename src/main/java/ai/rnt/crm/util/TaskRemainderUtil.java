@@ -1,6 +1,9 @@
 package ai.rnt.crm.util;
 
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
+import static ai.rnt.crm.constants.StatusConstants.BOTH;
+import static ai.rnt.crm.constants.StatusConstants.EMAIL;
+import static ai.rnt.crm.constants.StatusConstants.NOTIFICATION;
 import static ai.rnt.crm.constants.StatusConstants.SEND;
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
@@ -47,12 +50,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class TaskRemainderUtil {
-
-	private static final String EMAIL = "Email";
-
-	private static final String NOTIFICATION = "Notification";
-
-	private static final String BOTH = "Both";
 
 	private final CallDaoService callDaoService;
 

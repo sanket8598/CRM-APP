@@ -7,6 +7,7 @@ import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 
 import ai.rnt.crm.entity.EmployeeMaster;
+import ai.rnt.crm.validation.ValidReminderVia;
 import ai.rnt.crm.validation.ValidTaskPriority;
 import ai.rnt.crm.validation.ValidTaskStatus;
 import lombok.Getter;
@@ -36,6 +37,7 @@ public class EntityTaskDto implements Serializable{
 
 	private boolean remainderOn;
 
+	@ValidReminderVia(message = "Please Select Valid RemainderVia!!")
 	private String remainderVia;
 
 	private String remainderDueAt;
