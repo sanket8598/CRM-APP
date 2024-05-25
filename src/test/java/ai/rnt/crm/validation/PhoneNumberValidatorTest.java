@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import ai.rnt.crm.util.PhoneNumberValidateApi;
+import ai.rnt.crm.validation.impl.PhoneNumberValidator;
 
 class PhoneNumberValidatorTest {
 

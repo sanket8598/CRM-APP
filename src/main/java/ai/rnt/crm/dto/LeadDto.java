@@ -7,8 +7,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import ai.rnt.crm.validation.DisqualifiedLead;
-import ai.rnt.crm.validation.LeadAdvanceInfo;
+import ai.rnt.crm.marker.DisqualifiedLead;
+import ai.rnt.crm.marker.LeadAdvanceInfo;
 import ai.rnt.crm.validation.ValidDisqualifiedStatus;
 import lombok.Getter;
 import lombok.Setter;

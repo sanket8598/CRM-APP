@@ -1,4 +1,4 @@
-package ai.rnt.crm.validation;
+package ai.rnt.crm.validation.impl;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -8,6 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import ai.rnt.crm.validation.ValidFile;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

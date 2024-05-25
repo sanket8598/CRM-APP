@@ -10,6 +10,7 @@ import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import ai.rnt.crm.validation.ValidDueAndRemainderDateTime;
 import ai.rnt.crm.validation.ValidReminderVia;
 import ai.rnt.crm.validation.ValidTaskPriority;
 import ai.rnt.crm.validation.ValidTaskStatus;
@@ -18,7 +19,15 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TaskDto implements Serializable {
+@ValidDueAndRemainderDateTime(
+	    timefieldOne = "dueTime", 
+	      timefieldSec = "remainderDueAt",
+	      dateFieldOne = "dueDate",
+	      dateFieldSec = "remainderDueOn",
+	      remainderField="remainderOn",
+	      message = "Date/time is not valid!!"
+	    )
+public abstract class TaskDto implements Serializable {
 
 	private static final long serialVersionUID = -6108424214030836688L;
 

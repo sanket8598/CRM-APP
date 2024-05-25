@@ -5,7 +5,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-import ai.rnt.crm.validation.UpdateLead;
+import ai.rnt.crm.marker.UpdateLead;
 import lombok.Getter;
 import lombok.Setter;
 

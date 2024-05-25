@@ -1,10 +1,12 @@
-package ai.rnt.crm.validation;
+package ai.rnt.crm.validation.impl;
 
 import static ai.rnt.crm.enums.CallDirection.values;
 import static java.util.Arrays.stream;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+
+import ai.rnt.crm.validation.ValidCallDirection;
 
 public class CallDirectionValidator implements ConstraintValidator<ValidCallDirection, String> {
 

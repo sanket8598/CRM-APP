@@ -9,6 +9,8 @@ import javax.validation.ConstraintValidatorContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import ai.rnt.crm.validation.impl.CallDirectionValidator;
+
 class CallDirectionValidatorTest {
 
 	private CallDirectionValidator validator;

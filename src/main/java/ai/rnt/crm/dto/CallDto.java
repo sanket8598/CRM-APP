@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import ai.rnt.crm.validation.FutureOrPresentTime;
 import ai.rnt.crm.validation.PhoneNumValid;
 import ai.rnt.crm.validation.ValidCallDirection;
 import lombok.Getter;
@@ -23,6 +24,13 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@FutureOrPresentTime(
+		    timefieldOne = "startTime", 
+    	      timefieldSec = "endTime",
+    	      dateFieldOne = "startDate",
+    	      dateFieldSec = "endDate",
+    	      message = "Date/time is not valid!!"
+    	    )
 public class CallDto {
 
 	private Integer callId;

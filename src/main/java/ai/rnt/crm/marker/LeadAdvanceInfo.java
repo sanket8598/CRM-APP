@@ -1,4 +1,4 @@
-package ai.rnt.crm.validation;
+package ai.rnt.crm.marker;
 
 public interface LeadAdvanceInfo {
 

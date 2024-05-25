@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.mock.web.MockMultipartFile;
 
+import ai.rnt.crm.validation.impl.ExcelFileValidator;
+
 class ExcelFileValidatorTest {
 
 	private ExcelFileValidator validator;

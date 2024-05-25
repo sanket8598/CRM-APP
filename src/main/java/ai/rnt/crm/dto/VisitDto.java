@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import ai.rnt.crm.validation.FutureOrPresentTime;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,13 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@FutureOrPresentTime(
+	    timefieldOne = "startTime", 
+	      timefieldSec = "endTime",
+	      dateFieldOne = "startDate",
+	      dateFieldSec = "endDate",
+	      message = "Date/time is not valid!!"
+	    )
 public class VisitDto {
 
 	private Integer visitId;

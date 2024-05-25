@@ -1,4 +1,4 @@
-package ai.rnt.crm.validation;
+package ai.rnt.crm.validation.impl;
 
 import static ai.rnt.crm.enums.DisqualifiedAs.values;
 import static java.util.Arrays.stream;
@@ -7,6 +7,7 @@ import static java.util.Objects.isNull;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import ai.rnt.crm.validation.ValidDisqualifiedStatus;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
