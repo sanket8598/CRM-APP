@@ -20,10 +20,10 @@ import ai.rnt.crm.validation.FutureOrPresentTime;
 
 public class FutureOrPresentTimeValidator implements ConstraintValidator<FutureOrPresentTime, Object> {
 
-	private String timefieldOne;
-	private String timefieldSec;
-	private String dateFieldOne;
-	private String dateFieldSec;
+	public String timefieldOne;
+	public String timefieldSec;
+	public String dateFieldOne;
+	public String dateFieldSec;
 
 	@Override
 	public void initialize(FutureOrPresentTime constraintAnnotation) {
@@ -48,25 +48,28 @@ public class FutureOrPresentTimeValidator implements ConstraintValidator<FutureO
 					.toLocalDateTime();
 			LocalDateTime inputStartDate = convertDateDateWithTimeToLocalDate(startDate, startTime);
 			LocalDateTime inputEndDate = convertDateDateWithTimeToLocalDate(endDate, endTime);
-			if(inputStartDate.isBefore(currentdateTime)) {
-			   customMessageForValidation(context,dateFieldOne,"Start Date & Time must not be smaller than today's date!!");
-			   return false;
-			}
-			if(inputEndDate.isBefore(currentdateTime)) {
-				customMessageForValidation(context,dateFieldSec, "End Date & Time must not be smaller than today's Date & Time!!");
+			if (inputStartDate.isBefore(currentdateTime)) {
+				customMessageForValidation(context, dateFieldOne,
+						"Start Date & Time must not be smaller than today's date!!");
 				return false;
 			}
-			if(inputEndDate.isBefore(inputStartDate)) {
-				customMessageForValidation(context,dateFieldSec, "End Date and Time must not be smaller than Start Date and Time!!");
+			if (inputEndDate.isBefore(currentdateTime)) {
+				customMessageForValidation(context, dateFieldSec,
+						"End Date & Time must not be smaller than today's Date & Time!!");
+				return false;
+			}
+			if (inputEndDate.isBefore(inputStartDate)) {
+				customMessageForValidation(context, dateFieldSec,
+						"End Date and Time must not be smaller than Start Date and Time!!");
 				return false;
 			}
 		}
 		return true;
 	}
-	
-	 private void customMessageForValidation(ConstraintValidatorContext constraintContext,String fieldName, String message) {
-			constraintContext.buildConstraintViolationWithTemplate(message).addPropertyNode(fieldName)
-					.addConstraintViolation();
-	    }
 
+	private void customMessageForValidation(ConstraintValidatorContext constraintContext, String fieldName,
+			String message) {
+		constraintContext.buildConstraintViolationWithTemplate(message).addPropertyNode(fieldName)
+				.addConstraintViolation();
+	}
 }

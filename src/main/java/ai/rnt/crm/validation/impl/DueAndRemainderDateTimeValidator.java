@@ -20,11 +20,11 @@ import ai.rnt.crm.validation.ValidDueAndRemainderDateTime;
 
 public class DueAndRemainderDateTimeValidator implements ConstraintValidator<ValidDueAndRemainderDateTime, Object> {
 
-	private String timefieldOne;
-	private String timefieldSec;
-	private String dateFieldOne;
-	private String dateFieldSec;
-	private String remainderField;
+	public String timefieldOne;
+	public String timefieldSec;
+	public String dateFieldOne;
+	public String dateFieldSec;
+	public String remainderField;
 
 	@Override
 	public void initialize(ValidDueAndRemainderDateTime constraintAnnotation) {
