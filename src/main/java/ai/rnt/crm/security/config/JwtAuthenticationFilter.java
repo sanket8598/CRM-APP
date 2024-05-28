@@ -6,7 +6,7 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.io.IOException;
@@ -71,15 +71,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				return;
 			} else {
 				String requestTokenHeader = request.getHeader(AUTHORIZATION);
-				JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(requestTokenHeader));
-				if (!request.getRemoteAddr().equalsIgnoreCase(json.get("ipAddress").toString().replace("\"", "")))
-					throw new ResponseStatusException(BAD_REQUEST, "Unknown User!!");
-
+				
 				if (isNull(requestTokenHeader))
 					throw new MissingServletRequestPartException("AUTHORIZATION Header is missing");
 				String userName;
 				if (nonNull(requestTokenHeader) && requestTokenHeader.startsWith(TOKEN_PREFIX_BEARER)) {
 					requestTokenHeader = requestTokenHeader.substring(7);
+					JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(requestTokenHeader));
+					if (!request.getRemoteAddr().equalsIgnoreCase(json.get("ipAddress").toString().replace("\"", "")))
+						throw new ResponseStatusException(UNAUTHORIZED, "Access Denied!!");
 					userName = this.helper.extractUsername(requestTokenHeader);
 					UserDetail loadUserByUsername = this.detailsService.loadUserByUsername(userName);
 					if (TRUE.equals(this.helper.validateToken(requestTokenHeader, loadUserByUsername))) {
