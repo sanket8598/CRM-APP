@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -14,6 +16,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,14 +26,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import ai.rnt.crm.dao.service.CallDaoService;
+import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
+import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
+import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.Contacts;
+import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
+import ai.rnt.crm.entity.Meetings;
 import ai.rnt.crm.entity.Opportunity;
+import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
+import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
 
@@ -51,6 +63,17 @@ class DashboardServiceImplTest {
 
 	@Mock
 	private OpportunityDaoService opportunityDaoService;
+	
+	@Mock
+	private  CallDaoService callDaoService;
+	
+	@Mock
+	private  EmailDaoService emailDaoService;
+	
+	@Mock
+	private  VisitDaoService visitDaoService;
+	@Mock
+	private  MeetingDaoService meetingDaoService;
 
 	@Test
     void testGetDashboardDataForAdmin() {
@@ -136,4 +159,106 @@ class DashboardServiceImplTest {
 		leadSource.put("Source2", 5);
 		return Collections.singletonList(leadSource);
 	}
+	
+	@Test
+	void testGetUpComingSectionData() {
+		String field = "LEAD";
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
+		when(auditAwareUtil.isAdmin()).thenReturn(true);
+		List<Call> calls = new ArrayList<>();
+		List<Email> emails = new ArrayList<>();
+		List<Visit> visits = new ArrayList<>();
+		List<Meetings> mettings = new ArrayList<>();
+		when(callDaoService.getAllLeadCalls(anyBoolean())).thenReturn(calls);
+		when(visitDaoService.getAllLeadVisits(anyBoolean())).thenReturn(visits);
+		when(emailDaoService.getAllLeadEmails(anyBoolean())).thenReturn(emails);
+		when(meetingDaoService.getAllLeasMeetings(anyBoolean())).thenReturn(mettings);
+
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
+				.getUpComingSectionData(field);
+		assertEquals(200, responseEntity.getStatusCodeValue()); // Check if status code is OK
+		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
+		assertEquals(true, responseBody.get(ApiResponse.SUCCESS)); // Check if success flag is true
+	}
+	@Test
+	void testGetUpComingSectionDataForUser() {
+		String field = "Opportunity";
+		String emailId="abc@email.com";
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
+		when(auditAwareUtil.isUser()).thenReturn(true);
+		Call call=new Call();
+		Visit visit=new Visit();
+		EmployeeMaster emp=new EmployeeMaster();
+		emp.setStaffId(1);
+		emp.setEmailId(emailId);
+		call.setCallFrom(emp);
+		visit.setVisitBy(emp);
+		List<Call> calls = new ArrayList<>();
+		calls.add(call);
+		Email email=new Email();
+		email.setMailFrom(emailId);
+		List<Email> emails = new ArrayList<>();
+		emails.add(email);
+		List<Visit> visits = new ArrayList<>();
+		visits.add(visit);
+		Meetings meet=new Meetings();
+		meet.setAssignTo(emp);
+		List<Meetings> mettings = new ArrayList<>();
+		mettings.add(meet);
+		when(callDaoService.getAllLeadCalls(anyBoolean())).thenReturn(calls);
+		when(visitDaoService.getAllLeadVisits(anyBoolean())).thenReturn(visits);
+		when(emailDaoService.getAllLeadEmails(anyBoolean())).thenReturn(emails);
+		when(meetingDaoService.getAllLeasMeetings(anyBoolean())).thenReturn(mettings);
+		when(employeeService.getById(anyInt())).thenReturn(Optional.of(emp));
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
+				.getUpComingSectionData(field);
+		assertEquals(200, responseEntity.getStatusCodeValue()); // Check if status code is OK
+		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
+		assertEquals(true, responseBody.get(ApiResponse.SUCCESS)); // Check if success flag is true
+	}
+	@Test
+	void testGetUpComingSectionDataForNullField() {
+		String field =null;
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
+		
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
+				.getUpComingSectionData(field);
+		assertEquals(200, responseEntity.getStatusCodeValue()); 
+		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
+		assertEquals(false, responseBody.get(ApiResponse.SUCCESS)); 
+	}
+	@Test
+	void testGetUpComingSectionDataForEmptyField() {
+		String field ="";
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
+		
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
+				.getUpComingSectionData(field);
+		assertEquals(200, responseEntity.getStatusCodeValue()); 
+		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
+		assertEquals(false, responseBody.get(ApiResponse.SUCCESS)); 
+	}
+	@Test
+	void testGetUpComingSectionDataForInvalidField() {
+		String field ="abc";
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(null);
+		when(auditAwareUtil.isUser()).thenReturn(true);
+		when(auditAwareUtil.isAdmin()).thenReturn(false);
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
+				.getUpComingSectionData(field);
+		assertEquals(200, responseEntity.getStatusCodeValue()); 
+		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
+		assertEquals(true, responseBody.get(ApiResponse.SUCCESS)); 
+	}
+	@Test
+	void testGetUpComingSectionDataForException() {
+		String field ="notEmpty";
+		when(auditAwareUtil.isUser()).thenReturn(true);
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
+		when(employeeService.getById(anyInt())).thenThrow(new ResourceNotFoundException("Employee", "staffId", 1));
+		assertThrows(CRMException.class,()->dashboardServiceImpl.getUpComingSectionData(field));
+	}
+	
+	
+	
 }
