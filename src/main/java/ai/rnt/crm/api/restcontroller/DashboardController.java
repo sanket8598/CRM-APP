@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,8 +25,14 @@ public class DashboardController {
 	private final DashboardService dashboardService;
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
-	@GetMapping("/data")
+	@GetMapping
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData() {
 		return dashboardService.getDashboardData();
+	}
+	
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/upcoming/{field}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getUpComingSectionData(@PathVariable(name="field",required = true) String field) {
+		return dashboardService.getUpComingSectionData(field);
 	}
 }

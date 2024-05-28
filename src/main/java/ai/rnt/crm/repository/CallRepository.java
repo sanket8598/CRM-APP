@@ -18,4 +18,6 @@ public interface CallRepository extends JpaRepository<Call, Integer> {
 
 	List<Call> findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(Integer leadId, boolean flag);
 
+	List<Call> findByIsOpportunityOrderByCreatedDateDesc(boolean isOpportunity);
+
 }

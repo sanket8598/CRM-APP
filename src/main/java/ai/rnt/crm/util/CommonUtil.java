@@ -423,6 +423,16 @@ public class CommonUtil {
 
 	public static LinkedHashMap<Long, List<TimeLineActivityDto>> getUpnextData(List<Call> calls, List<Visit> visits,
 			List<Email> emails, List<Meetings> meetings, EmployeeService employeeService) {
+		return getUpnextActivities(calls, visits, emails, meetings, employeeService).stream()
+				.collect(groupingBy(e -> DAYS.between(
+						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime(),
+						parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
+				.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
+						(oldValue, newValue) -> oldValue, LinkedHashMap::new));
+	}
+	
+	public static List<TimeLineActivityDto> getUpnextActivities(List<Call> calls, List<Visit> visits,
+			List<Email> emails, List<Meetings> meetings, EmployeeService employeeService) {
 		List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
 			EditCallDto callDto = new EditCallDto();
 			callDto.setId(call.getCallId());
@@ -469,11 +479,6 @@ public class CommonUtil {
 
 		upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 				.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
-		return upNext.stream()
-				.collect(groupingBy(e -> DAYS.between(
-						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime(),
-						parse(e.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM))))
-				.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
-						(oldValue, newValue) -> oldValue, LinkedHashMap::new));
+		return upNext;
 	}
 }

@@ -12,4 +12,6 @@ public interface VisitRepository extends JpaRepository<Visit, Integer>{
 
 	List<Visit> findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(Integer leadId, boolean flag);
 
+	List<Visit> findByIsOpportunityOrderByCreatedDateDesc(boolean isOpportunity);
+
 }

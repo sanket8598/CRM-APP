@@ -10,4 +10,6 @@ public interface DashboardService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData();
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> getUpComingSectionData(String field);
+
 }

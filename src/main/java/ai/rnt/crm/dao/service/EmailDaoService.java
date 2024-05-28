@@ -28,4 +28,6 @@ public interface EmailDaoService extends CrudService<Email, EmailDto> {
 
 	String findPasswordByMailId(String userName);
 
+	List<Email> getAllLeadEmails(boolean isOpportunity);
+
 }

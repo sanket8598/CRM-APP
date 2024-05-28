@@ -67,4 +67,9 @@ public class CallDaoServiceImpl implements CallDaoService {
 	public List<Call> getCallsByLeadIdAndIsOpportunity(Integer leadId) {
 		return callRepository.findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(leadId,false);
 	}
+
+	@Override
+	public List<Call> getAllLeadCalls(boolean isOpprtunity) {
+		return callRepository.findByIsOpportunityOrderByCreatedDateDesc(isOpprtunity);
+	}
 }

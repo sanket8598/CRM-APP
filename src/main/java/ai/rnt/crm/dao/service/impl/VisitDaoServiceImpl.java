@@ -67,4 +67,9 @@ public class VisitDaoServiceImpl implements VisitDaoService {
 	public List<Visit> getVisitsByLeadIdAndIsOpportunity(Integer leadId) {
 		return visitRepository.findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(leadId,false);
 	}
+
+	@Override
+	public List<Visit> getAllLeadVisits(boolean isOpportunity) {
+		return visitRepository.findByIsOpportunityOrderByCreatedDateDesc(isOpportunity);
+	}
 }

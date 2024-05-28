@@ -28,4 +28,6 @@ public interface EmailRepository extends JpaRepository<Email, Integer> {
 	@Query(value = "select mail_password from corp_mail where mail_id = ?1", nativeQuery = true)
 	String findPasswordByMailId(String userName);
 
+	List<Email> findByIsOpportunityOrderByCreatedDateDesc(boolean isOpportunity);
+
 }

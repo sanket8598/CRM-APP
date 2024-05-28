@@ -67,4 +67,9 @@ public class MeetingDaoServiceImpl implements MeetingDaoService {
 	public List<Meetings> getMeetingByLeadIdAndIsOpportunity(Integer leadId) {
 		return meetingRepository.findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(leadId,false);
 	}
+
+	@Override
+	public List<Meetings> getAllLeasMeetings(boolean isOpportunity) {
+		return meetingRepository.findByIsOpportunityOrderByCreatedDateDesc(isOpportunity);
+	}
 }

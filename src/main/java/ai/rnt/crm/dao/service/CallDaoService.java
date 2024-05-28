@@ -31,4 +31,6 @@ public interface CallDaoService extends CrudService<Call, CallDto> {
 	List<PhoneCallTask> getTodaysCallTask(LocalDate todayAsDate, String time);
 
 	List<Call> getCallsByLeadIdAndIsOpportunity(Integer leadId);
+
+	List<Call> getAllLeadCalls(boolean isOpprtunity);
 }

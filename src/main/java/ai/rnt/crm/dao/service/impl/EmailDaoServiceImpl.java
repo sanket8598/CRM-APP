@@ -60,4 +60,9 @@ public class EmailDaoServiceImpl implements EmailDaoService {
 	public String findPasswordByMailId(String userName) {
 		return emailRepository.findPasswordByMailId(userName);
 	}
+
+	@Override
+	public List<Email> getAllLeadEmails(boolean isOpportunity) {
+		return emailRepository.findByIsOpportunityOrderByCreatedDateDesc(isOpportunity);
+	}
 }
