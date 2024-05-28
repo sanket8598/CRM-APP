@@ -6,6 +6,7 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 import java.io.IOException;
@@ -19,10 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ai.rnt.crm.security.JWTTokenHelper;
 import ai.rnt.crm.security.UserDetail;
+import ai.rnt.crm.util.JwtTokenDecoder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,15 +44,15 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private HandlerExceptionResolver exceptionResolver;
-	
+
 	@Autowired
-	private  CustomUserDetails detailsService;
+	private CustomUserDetails detailsService;
 
 	@Autowired
 	private JWTTokenHelper helper;
-	
-	public JwtAuthenticationFilter(HandlerExceptionResolver exceptionResolver){
-		this.exceptionResolver=exceptionResolver;
+
+	public JwtAuthenticationFilter(HandlerExceptionResolver exceptionResolver) {
+		this.exceptionResolver = exceptionResolver;
 	}
 
 	/**
@@ -59,12 +65,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		try {
-			log.info("entered inside the security entryPoint with...{}",request.getServletPath());
+			log.info("entered inside the security entryPoint with...{}", request.getServletPath());
 			if (ALLOW_URL.test(request.getServletPath())) {
 				filterChain.doFilter(request, response);
 				return;
 			} else {
 				String requestTokenHeader = request.getHeader(AUTHORIZATION);
+				JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(requestTokenHeader));
+				if (!request.getRemoteAddr().equalsIgnoreCase(json.get("ipAddress").toString().replace("\"", "")))
+					throw new ResponseStatusException(BAD_REQUEST, "Unknown User!!");
+
 				if (isNull(requestTokenHeader))
 					throw new MissingServletRequestPartException("AUTHORIZATION Header is missing");
 				String userName;
@@ -83,9 +93,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			filterChain.doFilter(request, response);
 		} catch (Exception e) {
 			log.error("Got Excetion while checking request authorizations. Request: {} {} {}",
-					request.getHeader(AUTHORIZATION),e.getClass(), e.getMessage());
+					request.getHeader(AUTHORIZATION), e.getClass(), e.getMessage());
 			exceptionResolver.resolveException(request, response, null, e);
 		}
 	}
-
 }

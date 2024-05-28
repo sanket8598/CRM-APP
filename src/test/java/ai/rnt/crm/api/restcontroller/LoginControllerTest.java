@@ -73,11 +73,11 @@ class LoginControllerTest {
 		jwtAuthRequest.setPassword("NG@@1477");
 		jwtAuthRequest.setFromCorp(false);
 		String token = "testToken";
-		when(helper.generateToken(any())).thenReturn(token);
+		when(helper.generateToken(any(),any())).thenReturn(token);
 		when(authenticationManager.authenticate(any())).thenReturn(null);
 		ResponseEntity<JwtAuthResponse> response = loginController.createAuthenticationToken(req,jwtAuthRequest);
 		verify(authenticationManager).authenticate(any());
-		verify(helper).generateToken(any());
+		verify(helper).generateToken(any(),any());
 		assertAll(() -> assertEquals(HttpStatus.OK, response.getStatusCode()),
 				() -> assertTrue(response.getBody().isStatus()),
 				() -> assertEquals(token, response.getBody().getToken()));
@@ -88,12 +88,12 @@ class LoginControllerTest {
 		jwtAuthRequest.setUserId("Ng1477");
 		jwtAuthRequest.setPassword("NG@@1477");
 		jwtAuthRequest.setFromCorp(true);
-		when(helper.generateToken(any())).thenReturn(null);
+		when(helper.generateToken(any(),any())).thenReturn(null);
 		when(authenticationManager.authenticate(any())).thenReturn(null);
 		HttpServletRequest req=mock(HttpServletRequest.class);
 		ResponseEntity<JwtAuthResponse> response = loginController.createAuthenticationToken(req,jwtAuthRequest);
 		verify(authenticationManager).authenticate(any());
-		verify(helper).generateToken(any());
+		verify(helper).generateToken(any(),any());
 		assertAll(() -> assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode()),
 				() -> assertFalse(response.getBody().isStatus()),
 				() -> assertEquals(null, response.getBody().getToken()));

@@ -71,12 +71,13 @@ public class JWTTokenHelper {
 		return extractExpiration(token).before(new Date());
 	}
 
-	public String generateToken(UserDetails userDetails) {
+	public String generateToken(UserDetails userDetails,String ipAddress) {
 		Map<String, Object> claims = new HashMap<>();
 		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
 			claims.put(FULL_NAME, emp.getFirstName() + " " + emp.getLastName());
 			claims.put(STAFF_ID, emp.getStaffId());
 			claims.put(EMAIL_ID, emp.getEmailID());
+			claims.put("ipAddress", ipAddress);
 			claims.put(ROLE, RoleUtil
 					.getSingleRole(emp.getEmployeeRole().stream().map(Role::getRoleName).collect(Collectors.toList())));
 		});
@@ -119,5 +120,4 @@ public class JWTTokenHelper {
             throw new RuntimeException("Error generating key pair", e);
         }
     }
-	
 }

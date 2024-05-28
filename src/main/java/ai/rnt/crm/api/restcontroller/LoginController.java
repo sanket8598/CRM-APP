@@ -85,7 +85,7 @@ public class LoginController {
 				jwtAuthRequest.setPassword(new Sha1Encryptor(algo).encryptThisString(jwtAuthRequest.getPassword()));
 			authenticationManager.authenticate(
 					new UsernamePasswordAuthenticationToken(jwtAuthRequest.getUserId(), jwtAuthRequest.getPassword()));
-			String token = helper.generateToken(customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()));
+			String token = helper.generateToken(customUserDetails.loadUserByUsername(jwtAuthRequest.getUserId()),request.getRemoteAddr());
 			if (nonNull(token))
 				return new ResponseEntity<>(JwtAuthResponse.builder().status(true).token(token).build(), OK);
 			return new ResponseEntity<>(JwtAuthResponse.builder().status(false).token(null).build(), NO_CONTENT);

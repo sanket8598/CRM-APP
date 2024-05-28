@@ -51,7 +51,7 @@ class JWTTokenHelperTest {
 
 		Mockito.when(employeeService.getEmployeeByUserId(username))
 				.thenReturn(Optional.of(Mockito.mock(EmployeeDto.class)));
-		String token = jwtTokenHelper.generateToken(userDetails);
+		String token = jwtTokenHelper.generateToken(userDetails,"ipAddress");
 		Claims claims = Jwts.parser().setSigningKey(JWTTokenHelper.keyPair.getPublic()).parseClaimsJws(token).getBody();
 		assertNotNull(claims);
 	}
