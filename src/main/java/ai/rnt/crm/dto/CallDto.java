@@ -5,7 +5,6 @@ import static javax.persistence.TemporalType.DATE;
 import java.util.Date;
 
 import javax.persistence.Temporal;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -24,13 +23,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@FutureOrPresentTime(
-		    timefieldOne = "startTime", 
-    	      timefieldSec = "endTime",
-    	      dateFieldOne = "startDate",
-    	      dateFieldSec = "endDate",
-    	      message = "Date/time is not valid!!"
-    	    )
+@FutureOrPresentTime(timefieldOne = "startTime", timefieldSec = "endTime", dateFieldOne = "startDate", dateFieldSec = "endDate", message = "Date/time is not valid!!")
 public class CallDto {
 
 	private Integer callId;
@@ -61,12 +54,10 @@ public class CallDto {
 
 	@NotNull(message = "Start Date should not be null!!")
 	@Temporal(DATE)
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private Date startDate;
 
 	@Temporal(DATE)
 	@NotNull(message = "End Date should not be null!!")
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private Date endDate;
 
 	private String startTime;
@@ -76,5 +67,4 @@ public class CallDto {
 	private boolean allDay;
 
 	private Boolean isOpportunity = false;
-
 }

@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import ai.rnt.crm.validation.ValidDueAndRemainderDateTime;
 import ai.rnt.crm.validation.ValidReminderVia;
 import ai.rnt.crm.validation.ValidTaskPriority;
 import ai.rnt.crm.validation.ValidTaskStatus;
@@ -19,6 +20,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@ValidDueAndRemainderDateTime(timefieldOne = "dueTime", timefieldSec = "remainderDueAt", dateFieldOne = "updateDueDate", dateFieldSec = "updatedRemainderDueOn", remainderField = "remainderOn", message = "Date/time is not valid!!")
 public class GetTaskDto implements Serializable {
 
 	private static final long serialVersionUID = 3121574599672156106L;
@@ -36,13 +38,12 @@ public class GetTaskDto implements Serializable {
 	private String priority;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate dueDate;
 
 	private String dueTime;
 
 	@Temporal(DATE)
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
+	@FutureOrPresent(message = "Due date must not be smaller than today's date!!")
 	private LocalDate updateDueDate;
 
 	private String dueTime12Hours;
@@ -55,10 +56,9 @@ public class GetTaskDto implements Serializable {
 	private String remainderDueAt;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate remainderDueOn;
 
 	@Temporal(DATE)
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
+	@FutureOrPresent(message = "Remainder due on must not be smaller than today's date!!")
 	private LocalDate updatedRemainderDueOn;
 }

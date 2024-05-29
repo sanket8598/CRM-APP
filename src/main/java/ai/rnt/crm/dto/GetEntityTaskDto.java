@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import ai.rnt.crm.validation.ValidDueAndRemainderDateTime;
 import ai.rnt.crm.validation.ValidReminderVia;
 import ai.rnt.crm.validation.ValidTaskPriority;
 import ai.rnt.crm.validation.ValidTaskStatus;
@@ -19,6 +20,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@ValidDueAndRemainderDateTime(timefieldOne = "dueTime", timefieldSec = "remainderDueAt", dateFieldOne = "updateDueDate", dateFieldSec = "updatedRemainderDueOn", remainderField = "remainderOn", message = "Date/time is not valid!!")
 public class GetEntityTaskDto implements Serializable {
 
 	private static final long serialVersionUID = -533746260646381108L;
@@ -33,7 +35,7 @@ public class GetEntityTaskDto implements Serializable {
 
 	@Temporal(DATE)
 	@NotNull(message = "Due date should not be null!!")
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
+	@FutureOrPresent(message = "Due Date must not be smaller than today's date!!")
 	private LocalDate updateDueDate;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
@@ -56,6 +58,6 @@ public class GetEntityTaskDto implements Serializable {
 	private LocalDate remainderDueOn;
 
 	@Temporal(DATE)
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
+	@FutureOrPresent(message = "Remainder due on must not be smaller than today's date!!")
 	private LocalDate updatedRemainderDueOn;
 }

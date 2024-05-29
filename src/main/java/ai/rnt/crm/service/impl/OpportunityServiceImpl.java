@@ -726,6 +726,17 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Opportunity opportunity = opportunityDaoService.findOpportunity(optyId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPTY_ID, optyId));
 			opportunity.setStatus(OPEN);
+			opportunity.setCurrentPhase("Propose");
+			opportunity.setProgressStatus("Active");
+			opportunity.setProjectKickoff(false);
+			opportunity.setFinalisingTeam(false);
+			opportunity.setSlaSigned(false);
+			opportunity.setSowSigned(false);
+			opportunity.setNdaSigned(false);
+			opportunity.setFeedback(null);
+			opportunity.setThankMailSent(false);
+			opportunity.setDescription(null);
+			opportunity.setLostReason(null);
 			if (nonNull(opportunityDaoService.addOpportunity(opportunity))) {
 				reactiveOptyMap.put(MESSAGE, "Opportunity Reactivate Successfully");
 				reactiveOptyMap.put(SUCCESS, true);

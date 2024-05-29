@@ -19,14 +19,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@ValidDueAndRemainderDateTime(
-	    timefieldOne = "dueTime", 
-	      timefieldSec = "remainderDueAt",
-	      dateFieldOne = "dueDate",
-	      dateFieldSec = "remainderDueOn",
-	      remainderField="remainderOn",
-	      message = "Date/time is not valid!!"
-	    )
+@ValidDueAndRemainderDateTime(timefieldOne = "dueTime", timefieldSec = "remainderDueAt", dateFieldOne = "dueDate", dateFieldSec = "remainderDueOn", remainderField = "remainderOn", message = "Date/time is not valid!!")
 public abstract class TaskDto implements Serializable {
 
 	private static final long serialVersionUID = -6108424214030836688L;
@@ -44,7 +37,7 @@ public abstract class TaskDto implements Serializable {
 	// for our application so no need.
 	@Temporal(DATE)
 	@NotNull(message = "Due Date should not be null!!")
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
+	@FutureOrPresent(message = "Due date must not be smaller than today's date!!")
 	private LocalDate dueDate;
 
 	@NotBlank(message = "Due time should not be null or empty!!")
@@ -60,7 +53,6 @@ public abstract class TaskDto implements Serializable {
 	private String remainderDueAt;
 
 	@Temporal(DATE)
-	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
+	@FutureOrPresent(message = "Remainder due on must not be smaller than today's date!!")
 	private LocalDate remainderDueOn;
-
 }

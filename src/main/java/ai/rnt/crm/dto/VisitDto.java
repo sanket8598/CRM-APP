@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Temporal;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -24,13 +23,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@FutureOrPresentTime(
-	    timefieldOne = "startTime", 
-	      timefieldSec = "endTime",
-	      dateFieldOne = "startDate",
-	      dateFieldSec = "endDate",
-	      message = "Date/time is not valid!!"
-	    )
+@FutureOrPresentTime(timefieldOne = "startTime", timefieldSec = "endTime", dateFieldOne = "startDate", dateFieldSec = "endDate", message = "Date/time is not valid!!")
 public class VisitDto {
 
 	private Integer visitId;
@@ -48,12 +41,10 @@ public class VisitDto {
 
 	@NotNull(message = "Start Date should not be null!!")
 	@Temporal(DATE)
-	@FutureOrPresent(message = "Start date must not be smaller than today's date!!")
 	private Date startDate;
 
 	@Temporal(DATE)
 	@NotNull(message = "End Date should not be null!!")
-	@FutureOrPresent(message = "End date must not be smaller than today's date!!")
 	private Date endDate;
 
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
@@ -71,5 +62,4 @@ public class VisitDto {
 	private Integer visitBy;
 
 	private Boolean isOpportunity = false;
-
 }
