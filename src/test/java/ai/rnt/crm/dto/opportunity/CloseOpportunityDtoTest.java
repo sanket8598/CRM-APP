@@ -18,7 +18,8 @@ class CloseOpportunityDtoTest {
 		closeOpportunityDto.setSowSigned(true);
 		closeOpportunityDto.setOpportunityId(1);
 		closeOpportunityDto.setStatus("Close");
-
+		closeOpportunityDto.setFeedback("Good");
+		closeOpportunityDto.getFeedback();
 		assertEquals("Won", closeOpportunityDto.getProgressStatus());
 		assertEquals("Phase 3", closeOpportunityDto.getCurrentPhase());
 		assertEquals(1, closeOpportunityDto.getOpportunityId());

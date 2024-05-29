@@ -17,6 +17,9 @@ class UpdateProposalDtoTest {
 		updateProposalDto.setPropId(1);
 		updateProposalDto.setEffectiveFrom(LocalDate.now());
 		updateProposalDto.setEffectiveTo(LocalDate.now());
+		updateProposalDto.setDiscount(5);
+		updateProposalDto.setFinalAmount("5000");
+		updateProposalDto.setSubTotal("4500");
 		updateProposalDto.setPropDescription("Proposal description");
 		ProposalServicesDto proposalServicesDto = new ProposalServicesDto();
 		List<ProposalServicesDto> proposalServicesList = new ArrayList<>();
@@ -25,6 +28,9 @@ class UpdateProposalDtoTest {
 		assertEquals(1, updateProposalDto.getPropId());
 		updateProposalDto.getEffectiveFrom();
 		updateProposalDto.getEffectiveTo();
+		updateProposalDto.getDiscount();
+		updateProposalDto.getFinalAmount();
+		updateProposalDto.getSubTotal();
 		assertEquals("Proposal description", updateProposalDto.getPropDescription());
 		assertNotNull(updateProposalDto.getProposalServices());
 		assertEquals(1, updateProposalDto.getProposalServices().size());

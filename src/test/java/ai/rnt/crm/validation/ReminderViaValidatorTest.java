@@ -5,19 +5,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-class TaskStatusValidatorTest {
+class ReminderViaValidatorTest {
 
-	private final TaskStatusValidator validator = new TaskStatusValidator();
+	private final ReminderViaValidator validator = new ReminderViaValidator();
 
 	@Test
-	void isValidWithValidStatusReturnsTrue() {
-		String validStatus = "Not Started";
+	void isValidWithValidSReminderViaReturnsTrue() {
+		String validStatus = "Email";
 		boolean isValid = validator.isValid(validStatus, null);
 		assertTrue(isValid);
 	}
 
 	@Test
-	void isValidWithInvalidStatusReturnsFalse() {
+	void isValidWithInvalidReminderViaReturnsFalse() {
 		String invalidStatus = "INVALID";
 		boolean isValid = validator.isValid(invalidStatus, null);
 		assertFalse(isValid);

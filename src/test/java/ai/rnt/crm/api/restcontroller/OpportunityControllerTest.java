@@ -1,5 +1,6 @@
 package ai.rnt.crm.api.restcontroller;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -197,5 +198,16 @@ class OpportunityControllerTest {
 		when(opportunityService.assignOpportunity(map)).thenReturn(expectedResponse);
 		opportunityController.assignOpportunity(map);
 		verify(opportunityService).assignOpportunity(map);
+	}
+
+	@Test
+	void reactiveOptyTest() {
+		Integer optyId = 123;
+		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+		ResponseEntity<EnumMap<ApiResponse, Object>> expectedResponseEntity = ResponseEntity.ok(expectedResponse);
+		when(opportunityService.reactiveOpty(optyId)).thenReturn(expectedResponseEntity);
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = opportunityController.reactiveOpty(optyId);
+		verify(opportunityService).reactiveOpty(optyId);
+		assertEquals(expectedResponseEntity, responseEntity);
 	}
 }
