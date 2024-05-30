@@ -113,15 +113,27 @@ class DashboardServiceImplTest {
 
 	private List<Opportunity> mockOpportunityList() {
 		Opportunity opty1 = new Opportunity();
+		opty1.setCreatedDate(LocalDateTime.now());
+		Leads leads = new Leads();
 		opty1.setStatus("WON");
 		EmployeeMaster employeeMaster = new EmployeeMaster();
 		employeeMaster.setStaffId(1);
 		opty1.setEmployee(employeeMaster);
+		List<Contacts> contacts = new ArrayList<>();
+		Contacts con = new Contacts();
+		con.setFirstName("test");
+		con.setLastName("data");
+		con.setPrimary(true);
+		contacts.add(con);
+		leads.setContacts(contacts);
+		opty1.setLeads(leads);
 		Opportunity opty2 = new Opportunity();
 		EmployeeMaster employeeMaster1 = new EmployeeMaster();
 		employeeMaster1.setStaffId(1);
 		opty2.setEmployee(employeeMaster1);
 		opty2.setStatus("LOSS");
+		opty2.setCreatedDate(LocalDateTime.now());
+		opty2.setLeads(leads);
 		return Arrays.asList(opty1, opty2);
 	}
 

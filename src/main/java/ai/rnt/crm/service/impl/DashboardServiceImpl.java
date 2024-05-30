@@ -5,11 +5,13 @@ import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
 import static ai.rnt.crm.constants.StatusConstants.OPPORTUNITY;
 import static ai.rnt.crm.dto_mapper.DashboardDtoMapper.TO_DASHBOARD_DTOS;
+import static ai.rnt.crm.dto_mapper.DashboardDtoMapper.TO_OPTY_MAIN_DASHBOARD_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.ASSIGNED_TO_FILTER;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.ASSIGNED_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORTUNITIES;
+import static ai.rnt.crm.functional.predicates.OpportunityPredicates.OPEN_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.WON_OPPORTUNITIES;
 import static ai.rnt.crm.util.CommonUtil.getUpnextActivities;
 import static java.util.Collections.emptyList;
@@ -78,8 +80,11 @@ public class DashboardServiceImpl implements DashboardService {
 				countMap.put("totalOpty", findAllOpty.stream().count());
 				countMap.put("wonOpty", findAllOpty.stream().filter(WON_OPPORTUNITIES).count());
 				countMap.put("lossOpty", findAllOpty.stream().filter(LOSS_OPPORTUNITIES).count());
+				countMap.put("openOpty", findAllOpty.stream().filter(OPEN_OPPORTUNITIES).count());
 				dataMap.put(COUNTDATA, countMap);
 				dataMap.put("workItem", TO_DASHBOARD_DTOS.apply(leads.stream()
+						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())).collect(toList())));
+				dataMap.put("OptyWorkItem", TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream()
 						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())).collect(toList())));
 				List<Map<String, Integer>> leadSourceData = leadDaoService.getLeadSourceCount();
 				dataMap.put("leadsBySource", leadSourceData);
@@ -95,10 +100,17 @@ public class DashboardServiceImpl implements DashboardService {
 						findAllOpty.stream().filter(
 								l -> LOSS_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 								.count());
+				countMap.put("openOpty",
+						findAllOpty.stream().filter(
+								l -> OPEN_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
+								.count());
 				dataMap.put("workItem",
 						TO_DASHBOARD_DTOS.apply(leads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
 								.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate()))
 								.collect(toList())));
+				dataMap.put("optyWorkItem", TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream()
+						.filter(l -> ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
+						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())).collect(toList())));
 				List<Map<String, Integer>> leadSourceData = leadDaoService.getLeadSourceCount(loggedInStaffId);
 				dataMap.put("leadsBySource", leadSourceData);
 				dataMap.put(COUNTDATA, countMap);
