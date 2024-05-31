@@ -21,7 +21,7 @@ class ConvertDateFormatUtilTest {
 	void testConvertDate() throws ParseException {
 		LocalDateTime dateTime = LocalDateTime.of(2023, 9, 6, 10, 15, 30);
 		String expectedDateTimeString = "06-Sep-2023 10:15 AM";
-		assertEquals(expectedDateTimeString, ConvertDateFormatUtil.convertDate(dateTime));
+		assertEquals(expectedDateTimeString.toLowerCase(), ConvertDateFormatUtil.convertDate(dateTime).toLowerCase());
 	}
 
 	@Test

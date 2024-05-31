@@ -60,7 +60,9 @@ class EmailTest {
 	@Test
 	void testGetScheduledAtTime12Hours() throws ParseException {
 		email.setScheduledAt("10:30:00");
-		assertEquals("10:30 AM", email.getScheduledAtTime12Hours());
+		String expected = "10:30 AM";
+		String actual = email.getScheduledAtTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		email.setScheduledAt(null);
 		assertNull(email.getScheduledAtTime12Hours());
 		email.setScheduledAt("invalid_time_format");

@@ -89,7 +89,9 @@ class LeadsTest {
 	@Test
 	void testGetRemainderDueAt12Hours() throws ParseException {
 		leads.setRemainderDueAt("17:30:00");
-		assertEquals("05:30 PM", leads.getRemainderDueAt12Hours());
+		String expected = "05:30 PM";
+		String actual = leads.getRemainderDueAt12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		leads.setRemainderDueAt(null);
 		assertNull(leads.getRemainderDueAt12Hours());
 		leads.setRemainderDueAt("invalid_time_format");

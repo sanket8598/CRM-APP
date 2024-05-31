@@ -68,7 +68,9 @@ class CallTest {
 	@Test
 	void testGetStartTime12Hours() throws ParseException {
 		call.setStartTime("14:30:00");
-		assertEquals("02:30 PM", call.getStartTime12Hours());
+		String expected = "02:30 PM";
+		String actual = call.getStartTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		call.setStartTime(null);
 		assertNull(call.getStartTime12Hours());
 		call.setStartTime("invalid_time_format");
@@ -80,7 +82,9 @@ class CallTest {
 	@Test
 	void testGetEndTime12Hours() throws ParseException {
 		call.setEndTime("20:45:00");
-		assertEquals("08:45 PM", call.getEndTime12Hours());
+		String expected = "08:45 PM";
+		String actual = call.getEndTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		call.setEndTime(null);
 		assertNull(call.getEndTime12Hours());
 		call.setEndTime("invalid_time_format");

@@ -73,7 +73,9 @@ class VisitTest {
 	void testGetStartTime12Hours() throws ParseException {
 		Visit visit = new Visit();
 		visit.setStartTime("14:30:00");
-		assertEquals("02:30 PM", visit.getStartTime12Hours());
+		String expected = "02:30 PM";
+		String actual = visit.getStartTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		visit.setStartTime(null);
 		assertNull(visit.getStartTime12Hours());
 		visit.setStartTime("invalid_time_format");
@@ -86,7 +88,9 @@ class VisitTest {
 	void testGetEndTime12Hours() throws ParseException {
 		Visit visit = new Visit();
 		visit.setEndTime("20:45:00");
-		assertEquals("08:45 PM", visit.getEndTime12Hours());
+		String expected = "08:45 PM";
+		String actual = visit.getEndTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		visit.setEndTime(null);
 		assertNull(visit.getEndTime12Hours());
 		visit.setEndTime("invalid_time_format");

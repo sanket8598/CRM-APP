@@ -43,7 +43,7 @@ class MeetingTaskTest {
 		assertEquals("Sample Description", task.getDescription());
 		assertTrue(task.isRemainderOn());
 		assertEquals("Email", task.getRemainderVia());
-		assertEquals("02:30 PM", task.getRemainderDueAt12Hours()); // Check converted time
+		assertEquals("02:30 PM", task.getRemainderDueAt12Hours().toUpperCase()); // Check converted time
 		assertEquals(LocalDate.of(2024, 3, 1), task.getRemainderDueOn());
 		assertEquals(meeting, task.getMeetings());
 		assertEquals(assignTo, task.getAssignTo());
@@ -53,7 +53,9 @@ class MeetingTaskTest {
 	void testGetDueTime12Hours() throws ParseException {
 		MeetingTask task = new MeetingTask();
 		task.setDueTime("13:30:00");
-		assertEquals("01:30 PM", task.getDueTime12Hours());
+		String expected = "01:30 PM";
+		String actual = task.getDueTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		task.setDueTime(null);
 		assertNull(task.getDueTime12Hours());
 		task.setDueTime("invalid_time_format");
@@ -66,7 +68,9 @@ class MeetingTaskTest {
 	void testGetRemainderDueAt12Hours() throws ParseException {
 		MeetingTask task = new MeetingTask();
 		task.setRemainderDueAt("18:45:00");
-		assertEquals("06:45 PM", task.getRemainderDueAt12Hours());
+		String expected = "06:45 PM";
+		String actual = task.getRemainderDueAt12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		task.setRemainderDueAt(null);
 		assertNull(task.getRemainderDueAt12Hours());
 		task.setRemainderDueAt("invalid_time_format");

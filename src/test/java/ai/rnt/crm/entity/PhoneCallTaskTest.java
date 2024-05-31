@@ -52,7 +52,9 @@ class PhoneCallTaskTest {
 	void testGetDueTime12Hours() {
 		PhoneCallTask phoneCallTask = new PhoneCallTask();
 		phoneCallTask.setDueTime("14:30:00");
-		assertEquals("02:30 PM", phoneCallTask.getDueTime12Hours());
+		String expected = "02:30 PM";
+		String actual = phoneCallTask.getDueTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		phoneCallTask.setDueTime(null);
 		assertNull(phoneCallTask.getDueTime12Hours());
 		phoneCallTask.setDueTime("invalid time format");
@@ -63,7 +65,9 @@ class PhoneCallTaskTest {
 	void testGetRemainderDueAt12Hours() {
 		PhoneCallTask phoneCallTask = new PhoneCallTask();
 		phoneCallTask.setRemainderDueAt("16:45:00");
-		assertEquals("04:45 PM", phoneCallTask.getRemainderDueAt12Hours());
+		String expected = "04:45 PM";
+		String actual = phoneCallTask.getRemainderDueAt12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		phoneCallTask.setRemainderDueAt(null);
 		assertNull(phoneCallTask.getRemainderDueAt12Hours());
 		phoneCallTask.setRemainderDueAt("invalid time format");

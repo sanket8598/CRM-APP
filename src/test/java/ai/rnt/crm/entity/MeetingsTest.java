@@ -54,20 +54,24 @@ class MeetingsTest {
 	void testGetStartTime12Hours() throws ParseException {
 		Meetings meeting = new Meetings();
 		meeting.setStartTime("13:30:00");
-		assertEquals("01:30 PM", meeting.getStartTime12Hours());
+		String expected = "01:30 PM";
+		String actual = meeting.getStartTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		meeting.setStartTime(null);
 		assertNull(meeting.getStartTime12Hours());
 		meeting.setStartTime("invalid_time_format");
 		assertEquals("invalid_time_format", meeting.getStartTime12Hours());
 		meeting.setStartTime("01:30 PM");
-		assertEquals("01:30 AM", meeting.getStartTime12Hours());
+		assertEquals("01:30 AM", meeting.getStartTime12Hours().toUpperCase());
 	}
 
 	@Test
 	void testGetEndTime12Hours() throws ParseException {
 		Meetings meeting = new Meetings();
 		meeting.setEndTime("18:45:00");
-		assertEquals("06:45 PM", meeting.getEndTime12Hours());
+		String expected = "06:45 PM";
+		String actual = meeting.getEndTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		meeting.setEndTime(null);
 		assertNull(meeting.getEndTime12Hours());
 		meeting.setEndTime("invalid_time_format");

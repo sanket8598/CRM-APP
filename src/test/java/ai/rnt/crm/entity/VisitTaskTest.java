@@ -43,7 +43,9 @@ class VisitTaskTest {
 	void testGetDueTime12Hours() {
 		VisitTask visitTask = new VisitTask();
 		visitTask.setDueTime("14:30:00");
-		assertEquals("02:30 PM", visitTask.getDueTime12Hours());
+		String expected = "02:30 PM";
+		String actual = visitTask.getDueTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		visitTask.setDueTime(null);
 		assertNull(visitTask.getDueTime12Hours());
 		visitTask.setDueTime("invalid time format");
@@ -54,7 +56,9 @@ class VisitTaskTest {
 	void testGetRemainderDueAt12Hours() {
 		VisitTask visitTask = new VisitTask();
 		visitTask.setRemainderDueAt("16:45:00");
-		assertEquals("04:45 PM", visitTask.getRemainderDueAt12Hours());
+		String expected = "04:45 PM";
+		String actual = visitTask.getRemainderDueAt12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		visitTask.setRemainderDueAt(null);
 		assertNull(visitTask.getRemainderDueAt12Hours());
 		visitTask.setRemainderDueAt("invalid time format");

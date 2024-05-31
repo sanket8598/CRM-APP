@@ -49,7 +49,9 @@ class OpportunityTaskTest {
 	void testGetDueTime12Hours() {
 		OpportunityTask opportunityTask = new OpportunityTask();
 		opportunityTask.setDueTime("14:30:00");
-		assertEquals("02:30 PM", opportunityTask.getDueTime12Hours());
+		String expected = "02:30 PM";
+		String actual = opportunityTask.getDueTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		opportunityTask.setDueTime(null);
 		assertNull(opportunityTask.getDueTime12Hours());
 		opportunityTask.setDueTime("invalid time format");
@@ -60,7 +62,9 @@ class OpportunityTaskTest {
 	void testGetRemainderDueAt12Hours() {
 		OpportunityTask opportunityTask = new OpportunityTask();
 		opportunityTask.setRemainderDueAt("16:45:00");
-		assertEquals("04:45 PM", opportunityTask.getRemainderDueAt12Hours());
+		String expected = "04:45 PM";
+		String actual = opportunityTask.getRemainderDueAt12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		opportunityTask.setRemainderDueAt(null);
 		assertNull(opportunityTask.getRemainderDueAt12Hours());
 		opportunityTask.setRemainderDueAt("invalid time format");

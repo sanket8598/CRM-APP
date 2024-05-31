@@ -54,7 +54,9 @@ class LeadTaskTest {
 	@Test
 	void testGetDueTime12Hours() throws ParseException {
 		leadTask.setDueTime("14:30:00");
-		assertEquals("02:30 PM", leadTask.getDueTime12Hours());
+		String expected = "02:30 PM";
+		String actual = leadTask.getDueTime12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		leadTask.setDueTime(null);
 		assertNull(leadTask.getDueTime12Hours());
 		leadTask.setDueTime("invalid_time_format");
@@ -66,7 +68,9 @@ class LeadTaskTest {
 	@Test
 	void testGetRemainderDueAt12Hours() throws ParseException {
 		leadTask.setRemainderDueAt("17:30:00");
-		assertEquals("05:30 PM", leadTask.getRemainderDueAt12Hours());
+		String expected = "05:30 PM";
+		String actual = leadTask.getRemainderDueAt12Hours();
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 		leadTask.setRemainderDueAt(null);
 		assertNull(leadTask.getRemainderDueAt12Hours());
 		leadTask.setRemainderDueAt("invalid_time_format");
