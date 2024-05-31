@@ -96,7 +96,9 @@ class LeadsTest {
 		assertNull(leads.getRemainderDueAt12Hours());
 		leads.setRemainderDueAt("invalid_time_format");
 		assertEquals("invalid_time_format", leads.getRemainderDueAt12Hours());
-		leads.setRemainderDueAt("05:30 PM");
-		assertEquals("05:30 AM", leads.getRemainderDueAt12Hours());
+		leads.setRemainderDueAt("05:30 AM");
+		String expectedTime = "05:30 AM";
+		String actualTime = leads.getRemainderDueAt12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 }

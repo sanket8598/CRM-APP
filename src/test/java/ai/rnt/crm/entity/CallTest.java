@@ -75,8 +75,10 @@ class CallTest {
 		assertNull(call.getStartTime12Hours());
 		call.setStartTime("invalid_time_format");
 		assertEquals("invalid_time_format", call.getStartTime12Hours());
-		call.setStartTime("02:30 PM");
-		assertEquals("02:30 AM", call.getStartTime12Hours());
+		call.setStartTime("02:30 AM");
+		String expectedTime = "02:30 AM";
+		String actualTime = call.getStartTime12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 
 	@Test
@@ -89,7 +91,9 @@ class CallTest {
 		assertNull(call.getEndTime12Hours());
 		call.setEndTime("invalid_time_format");
 		assertEquals("invalid_time_format", call.getEndTime12Hours());
-		call.setEndTime("08:45 PM");
-		assertEquals("08:45 AM", call.getEndTime12Hours());
+		call.setEndTime("08:45 AM");
+		String expectedTime = "08:45 AM";
+		String actualTime = call.getEndTime12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 }

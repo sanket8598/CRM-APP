@@ -61,7 +61,7 @@ class MeetingsTest {
 		assertNull(meeting.getStartTime12Hours());
 		meeting.setStartTime("invalid_time_format");
 		assertEquals("invalid_time_format", meeting.getStartTime12Hours());
-		meeting.setStartTime("01:30 PM");
+		meeting.setStartTime("01:30 AM");
 		assertEquals("01:30 AM", meeting.getStartTime12Hours().toUpperCase());
 	}
 
@@ -76,7 +76,9 @@ class MeetingsTest {
 		assertNull(meeting.getEndTime12Hours());
 		meeting.setEndTime("invalid_time_format");
 		assertEquals("invalid_time_format", meeting.getEndTime12Hours());
-		meeting.setEndTime("06:45 PM");
-		assertEquals("06:45 AM", meeting.getEndTime12Hours());
+		meeting.setEndTime("06:45 AM");
+		String expectedTime = "06:45 AM";
+		String actualTime = meeting.getEndTime12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 }

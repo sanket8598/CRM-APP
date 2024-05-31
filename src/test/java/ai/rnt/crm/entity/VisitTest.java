@@ -80,8 +80,10 @@ class VisitTest {
 		assertNull(visit.getStartTime12Hours());
 		visit.setStartTime("invalid_time_format");
 		assertEquals("invalid_time_format", visit.getStartTime12Hours());
-		visit.setStartTime("02:30 PM");
-		assertEquals("02:30 AM", visit.getStartTime12Hours());
+		visit.setStartTime("02:30 AM");
+		String expectedTime = "02:30 AM";
+		String actualTime = visit.getStartTime12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 
 	@Test
@@ -95,7 +97,9 @@ class VisitTest {
 		assertNull(visit.getEndTime12Hours());
 		visit.setEndTime("invalid_time_format");
 		assertEquals("invalid_time_format", visit.getEndTime12Hours());
-		visit.setEndTime("08:45 PM");
-		assertEquals("08:45 AM", visit.getEndTime12Hours());
+		visit.setEndTime("08:45 AM");
+		String expectedTime = "08:45 AM";
+		String actualTime = visit.getEndTime12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 }

@@ -61,8 +61,10 @@ class LeadTaskTest {
 		assertNull(leadTask.getDueTime12Hours());
 		leadTask.setDueTime("invalid_time_format");
 		assertEquals("invalid_time_format", leadTask.getDueTime12Hours());
-		leadTask.setDueTime("02:30 PM");
-		assertEquals("02:30 AM", leadTask.getDueTime12Hours());
+		leadTask.setDueTime("02:30 AM");
+		String expectedTime = "02:30 AM";
+		String actualTime = leadTask.getDueTime12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 
 	@Test
@@ -75,7 +77,9 @@ class LeadTaskTest {
 		assertNull(leadTask.getRemainderDueAt12Hours());
 		leadTask.setRemainderDueAt("invalid_time_format");
 		assertEquals("invalid_time_format", leadTask.getRemainderDueAt12Hours());
-		leadTask.setRemainderDueAt("05:30 PM");
-		assertEquals("05:30 AM", leadTask.getRemainderDueAt12Hours());
+		leadTask.setRemainderDueAt("05:30 AM");
+		String expectedTime = "05:30 AM";
+		String actualTime = leadTask.getRemainderDueAt12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 }

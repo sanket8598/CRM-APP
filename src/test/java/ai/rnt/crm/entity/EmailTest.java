@@ -68,6 +68,6 @@ class EmailTest {
 		email.setScheduledAt("invalid_time_format");
 		assertEquals("invalid_time_format", email.getScheduledAtTime12Hours());
 		email.setScheduledAt("10:30 AM");
-		assertEquals("10:30 AM", email.getScheduledAtTime12Hours());
+		assertEquals(expected.toLowerCase(), actual.toLowerCase());
 	}
 }

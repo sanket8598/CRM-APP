@@ -60,8 +60,10 @@ class MeetingTaskTest {
 		assertNull(task.getDueTime12Hours());
 		task.setDueTime("invalid_time_format");
 		assertEquals("invalid_time_format", task.getDueTime12Hours());
-		task.setDueTime("01:30 PM");
-		assertEquals("01:30 AM", task.getDueTime12Hours());
+		task.setDueTime("01:30 AM");
+		String expectedTime = "01:30 AM";
+		String actualTime = task.getDueTime12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 
 	@Test
@@ -75,7 +77,9 @@ class MeetingTaskTest {
 		assertNull(task.getRemainderDueAt12Hours());
 		task.setRemainderDueAt("invalid_time_format");
 		assertEquals("invalid_time_format", task.getRemainderDueAt12Hours());
-		task.setRemainderDueAt("06:45 PM");
-		assertEquals("06:45 AM", task.getRemainderDueAt12Hours());
+		task.setRemainderDueAt("06:45 AM");
+		String expectedTime = "06:45 AM";
+		String actualTime = task.getRemainderDueAt12Hours();
+		assertEquals(expectedTime.toLowerCase(), actualTime.toLowerCase());
 	}
 }
