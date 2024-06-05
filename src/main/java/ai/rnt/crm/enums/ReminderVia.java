@@ -4,7 +4,8 @@ import ai.rnt.crm.constants.StatusConstants;
 
 public enum ReminderVia {
 
-	EMAIL(StatusConstants.EMAIL), NOTIFICATION(StatusConstants.NOTIFICATION), BOTH(StatusConstants.BOTH);
+	EMAIL(StatusConstants.EMAIL), NOTIFICATION(StatusConstants.NOTIFICATION), BOTH(StatusConstants.BOTH),
+	NULL(StatusConstants.NULL);
 
 	private final String reminderVia;
 

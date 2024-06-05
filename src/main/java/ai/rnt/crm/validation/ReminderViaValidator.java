@@ -11,7 +11,10 @@ public class ReminderViaValidator implements ConstraintValidator<ValidReminderVi
 
 	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
-		return stream(ReminderVia.values())
-				.anyMatch(reminderVia -> reminderVia.getReminderVia().equalsIgnoreCase(value));
+		if (value == null)
+			return true;
+		else
+			return stream(ReminderVia.values())
+					.anyMatch(reminderVia -> reminderVia.getReminderVia().equalsIgnoreCase(value));
 	}
 }

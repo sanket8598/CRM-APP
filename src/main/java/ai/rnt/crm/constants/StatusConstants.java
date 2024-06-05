@@ -50,5 +50,6 @@ public final class StatusConstants {
 	public static final String EMAIL = "Email";
 	public static final String NOTIFICATION = "Notification";
 	public static final String BOTH = "Both";
+	public static final String NULL = null;
 
 }
