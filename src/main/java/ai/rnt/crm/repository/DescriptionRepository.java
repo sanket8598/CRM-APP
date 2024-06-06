@@ -10,4 +10,6 @@ public interface DescriptionRepository extends JpaRepository<Description, Intege
 
 	List<Description> findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(Integer leadId, boolean b);
 
+	List<Description> findByLeadLeadIdOrderByCreatedDateDesc(Integer leadId);
+
 }

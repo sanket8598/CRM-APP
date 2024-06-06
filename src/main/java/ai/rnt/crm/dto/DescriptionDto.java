@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import javax.validation.constraints.FutureOrPresent;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,11 +20,14 @@ public class DescriptionDto {
 	private String desc;
 
 	private String action;
-	
+
 	private String type;
 
 	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate date;
+
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDate getDate;
 
 	private String status;
 

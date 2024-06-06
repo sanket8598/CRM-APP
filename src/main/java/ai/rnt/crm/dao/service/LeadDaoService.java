@@ -38,4 +38,6 @@ public interface LeadDaoService extends CrudService<Leads, LeadDto> {
 
 	List<Description> getDescriptionByLeadIdAndIsOpportunity(Integer leadId);
 
+	List<Description> getDescriptionByLeadId(Integer leadId);
+
 }

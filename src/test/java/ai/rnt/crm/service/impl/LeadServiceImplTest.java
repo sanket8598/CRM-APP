@@ -16,6 +16,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.CREATED;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,6 +66,7 @@ import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.ContactDto;
+import ai.rnt.crm.dto.DescriptionDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditLeadDto;
@@ -81,6 +83,7 @@ import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
+import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
@@ -101,7 +104,6 @@ import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.EmailUtil;
 import ai.rnt.crm.util.ReadExcelUtil;
 import ai.rnt.crm.util.TaskNotificationsUtil;
-import ai.rnt.crm.util.TaskRemainderUtil;
 
 class LeadServiceImplTest {
 
@@ -128,7 +130,7 @@ class LeadServiceImplTest {
 
 	@Mock
 	private LeadSortFilterDaoService leadSortFilterDaoService;
-	
+
 	@Mock
 	private TaskNotificationsUtil taskNotificationsUtil;
 
@@ -178,6 +180,9 @@ class LeadServiceImplTest {
 	private LeadDto leadDto;
 
 	@Mock
+	private DescriptionDto descriptionDto;
+
+	@Mock
 	private QualifyLeadDto qualifyLeadDto;
 
 	@Mock
@@ -200,6 +205,9 @@ class LeadServiceImplTest {
 
 	@Mock
 	private Leads leads;
+
+	@Mock
+	Description description;
 
 	@Mock
 	private Call call;
@@ -1000,10 +1008,36 @@ class LeadServiceImplTest {
 		Contacts result = leadService.buildLeadObj(leadDto);
 		assertNull(result);
 	}
-	
+
 	@Test
 	void testAssignLeadNotificationException() {
 		when(leadDaoService.getLeadById(1)).thenThrow(ResourceNotFoundException.class);
 		assertThrows(CRMException.class, () -> leadService.assignLeadNotification(123));
+	}
+
+	@Test
+    void testAddDescriptionSuccess() {
+        when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(leads));
+        when(leadDaoService.addDesc(any(Description.class))).thenReturn(description);
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.addDescription(descriptionDto, 1);
+        assertEquals(CREATED, response.getStatusCode());
+        assertTrue((Boolean) response.getBody().get(SUCCESS));
+        assertEquals("Description Added Successfully", response.getBody().get(MESSAGE));
+    }
+
+	@Test
+    void testAddDescriptionFails() {
+        when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(leads));
+        when(leadDaoService.addDesc(any(Description.class))).thenReturn(null);
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.addDescription(descriptionDto, 1);
+        assertEquals(CREATED, response.getStatusCode());
+        assertFalse((Boolean) response.getBody().get(SUCCESS));
+        assertEquals("Description Not Added", response.getBody().get(MESSAGE));
+    }
+
+	@Test
+	void testAddDescriptionException() {
+		when(leadDaoService.getLeadById(1)).thenThrow(ResourceNotFoundException.class);
+		assertThrows(CRMException.class, () -> leadService.addDescription(descriptionDto,1));
 	}
 }

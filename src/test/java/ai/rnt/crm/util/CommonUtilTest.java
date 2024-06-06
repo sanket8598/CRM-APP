@@ -12,6 +12,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,11 +31,13 @@ import org.mockito.MockitoAnnotations;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dto.DescriptionDto;
 import ai.rnt.crm.dto.LeadSourceDto;
 import ai.rnt.crm.dto.MainTaskDto;
 import ai.rnt.crm.dto.ServiceFallsDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.entity.Call;
+import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.LeadSourceMaster;
@@ -123,7 +126,7 @@ class CommonUtilTest {
 		List<Meetings> meetings = new ArrayList<>();
 		Leads lead = new Leads();
 		Opportunity oppt = new Opportunity();
-		Map<String, Object> taskData = CommonUtil.getTaskDataMap(calls, visits, meetings, lead,oppt);
+		Map<String, Object> taskData = CommonUtil.getTaskDataMap(calls, visits, meetings, lead, oppt);
 		assertEquals(expectedTaskData, taskData);
 	}
 
@@ -229,6 +232,7 @@ class CommonUtilTest {
 		List<MainTaskDto> result = CommonUtil.getLeadRelatedTasks(leads);
 		assertTrue(result.isEmpty());
 	}
+
 	@Test
 	void testGetOpportunityRelatedTasksWithValidData() {
 		OpportunityTask leadTask1 = new OpportunityTask();
@@ -246,7 +250,7 @@ class CommonUtilTest {
 		List<MainTaskDto> result = CommonUtil.getOpportunityRelatedTasks(oppt);
 		assertEquals(2, result.size());
 	}
-	
+
 	@Test
 	void testGetOpportunityRelatedTasksWithEmptyList() {
 		Opportunity oppt = mock(Opportunity.class);
@@ -390,5 +394,58 @@ class CommonUtilTest {
 		Map<String, Object> result = CommonUtil.upNextActivities(input);
 		assertEquals(null, result.get("MSG"));
 		assertFalse(result.containsKey("UPNEXT_DATA_KEY"));
+	}
+
+	@Test
+	void testGetDescData() {
+		Description desc1 = new Description();
+		desc1.setDescId(1);
+		desc1.setSubject("Subject 1");
+		desc1.setDesc("Description 1");
+		desc1.setStatus("Status 1");
+		desc1.setDate(LocalDate.now());
+		desc1.setAction("Action 1");
+
+		Description desc2 = new Description();
+		desc2.setDescId(2);
+		desc2.setSubject("Subject 2");
+		desc2.setDesc("Description 2");
+		desc2.setStatus("Status 2");
+		desc2.setDate(LocalDate.now());
+		desc2.setAction("Action 2");
+
+		List<Description> descriptions = Arrays.asList(desc1, desc2);
+
+		DescriptionDto dto1 = new DescriptionDto();
+		dto1.setDescId(1);
+		dto1.setSubject("Subject 1");
+		dto1.setType("Description");
+		dto1.setDesc("Description 1");
+		dto1.setStatus("Status 1");
+		dto1.setGetDate(LocalDate.now());
+		dto1.setAction("Action 1");
+
+		DescriptionDto dto2 = new DescriptionDto();
+		dto2.setDescId(2);
+		dto2.setSubject("Subject 2");
+		dto2.setType("Description");
+		dto2.setDesc("Description 2");
+		dto2.setStatus("Status 2");
+		dto2.setGetDate(LocalDate.now());
+		dto2.setAction("Action 2");
+
+		List<DescriptionDto> expected = Arrays.asList(dto1, dto2);
+		List<DescriptionDto> actual = commonUtil.getDescData(descriptions);
+
+		assertEquals(expected.size(), actual.size());
+		for (int i = 0; i < expected.size(); i++) {
+			assertEquals(expected.get(i).getDescId(), actual.get(i).getDescId());
+			assertEquals(expected.get(i).getSubject(), actual.get(i).getSubject());
+			assertEquals(expected.get(i).getType(), actual.get(i).getType());
+			assertEquals(expected.get(i).getDesc(), actual.get(i).getDesc());
+			assertEquals(expected.get(i).getStatus(), actual.get(i).getStatus());
+			assertEquals(expected.get(i).getGetDate(), actual.get(i).getGetDate());
+			assertEquals(expected.get(i).getAction(), actual.get(i).getAction());
+		}
 	}
 }

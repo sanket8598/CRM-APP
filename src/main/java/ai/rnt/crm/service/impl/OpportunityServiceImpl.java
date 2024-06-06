@@ -44,6 +44,7 @@ import static ai.rnt.crm.functional.predicates.OpportunityPredicates.IN_PIPELINE
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.WON_OPPORTUNITIES;
 import static ai.rnt.crm.util.CommonUtil.getActivityData;
+import static ai.rnt.crm.util.CommonUtil.getDescData;
 import static ai.rnt.crm.util.CommonUtil.getTaskDataMap;
 import static ai.rnt.crm.util.CommonUtil.getTimelineData;
 import static ai.rnt.crm.util.CommonUtil.getUpnextData;
@@ -106,6 +107,7 @@ import ai.rnt.crm.dto.opportunity.OpprtAttachmentDto;
 import ai.rnt.crm.dto.opportunity.ProposeOpportunityDto;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.Contacts;
+import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.entity.Leads;
@@ -315,7 +317,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			List<Visit> visits = visitDaoService.getVisitsByLeadId(leadId);
 			List<Email> emails = emailDaoService.getEmailByLeadId(leadId);
 			List<Meetings> meetings = meetingDaoService.getMeetingByLeadId(leadId);
-
+			List<Description> descriptions = leadDaoService.getDescriptionByLeadId(leadId);
 			OpportunityDto dto = TO_DASHBOARD_OPPORTUNITY_DTO.apply(opportunity)
 					.orElseThrow(ResourceNotFoundException::new);
 			dto.setContacts(TO_CONTACT_DTOS.apply(opportunity.getLeads().getContacts()));
@@ -335,6 +337,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
 			dataMap.put(TIMELINE, getTimelineData(calls, visits, emails, meetings, employeeService));
+			dataMap.put("descriptionData", getDescData(descriptions));
 			dataMap.put(ACTIVITY, getActivityData(calls, visits, emails, meetings, employeeService));
 			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls, visits, emails, meetings, employeeService)));
 			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, opportunity.getLeads(), opportunity));

@@ -27,8 +27,8 @@ import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
 import static ai.rnt.crm.constants.StatusConstants.EMAIL;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
-import static ai.rnt.crm.constants.StatusConstants.OPPORTUNITY;
 import static ai.rnt.crm.constants.StatusConstants.MEETING;
+import static ai.rnt.crm.constants.StatusConstants.OPPORTUNITY;
 import static ai.rnt.crm.constants.StatusConstants.VISIT;
 import static ai.rnt.crm.dto_mapper.AttachmentDtoMapper.TO_ATTACHMENT_DTOS;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
@@ -82,6 +82,7 @@ import java.util.Map;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
+import ai.rnt.crm.dto.DescriptionDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditMeetingDto;
@@ -89,6 +90,7 @@ import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.MainTaskDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.entity.Call;
+import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadSourceMaster;
@@ -107,7 +109,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CommonUtil {
 
 	public static Map<String, Object> getTaskDataMap(List<Call> calls, List<Visit> visits, List<Meetings> meetings,
-			Leads lead,Opportunity opportunity) {
+			Leads lead, Opportunity opportunity) {
 		log.info("inside the getTaskDataMap method...");
 		Map<String, Object> taskData = new HashMap<>();
 		Map<String, Object> taskCount = new HashMap<>();
@@ -115,7 +117,7 @@ public class CommonUtil {
 		allTask.addAll(getVistRelatedTasks(visits));
 		allTask.addAll(getMeetingRelatedTasks(meetings));
 		allTask.addAll(getLeadRelatedTasks(lead));
-		if(nonNull(opportunity))
+		if (nonNull(opportunity))
 			allTask.addAll(getOpportunityRelatedTasks(opportunity));
 		List<MainTaskDto> notStartedTask = allTask.stream().filter(NOT_STARTED_TASK)
 				.sorted((t1, t2) -> parse(t1.getDueDate(), DATE_TIME_WITH_AM_OR_PM)
@@ -150,8 +152,7 @@ public class CommonUtil {
 
 	public static List<MainTaskDto> getCallRelatedTasks(List<Call> calls) {
 		log.info("inside the getCallRelatedTasks method...");
-		return calls.stream().flatMap(call -> call.getCallTasks().stream())
-				.filter(e->isNull(e.getDeletedBy()))
+		return calls.stream().flatMap(call -> call.getCallTasks().stream()).filter(e -> isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getCallTaskId(), e.getSubject(), e.getStatus(), CALL,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getCall().getCallId(), e.isRemainderOn(),
@@ -163,8 +164,7 @@ public class CommonUtil {
 
 	public static List<MainTaskDto> getVistRelatedTasks(List<Visit> visits) {
 		log.info("inside the getVistRelatedTasks method...");
-		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream())
-				.filter(e->isNull(e.getDeletedBy()))
+		return visits.stream().flatMap(visit -> visit.getVisitTasks().stream()).filter(e -> isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getVisitTaskId(), e.getSubject(), e.getStatus(), VISIT,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getVisit().getVisitId(), e.isRemainderOn(),
@@ -176,8 +176,7 @@ public class CommonUtil {
 
 	public static List<MainTaskDto> getMeetingRelatedTasks(List<Meetings> meetings) {
 		log.info("inside the getMeetingRelatedTasks method...");
-		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream())
-				.filter(e->isNull(e.getDeletedBy()))
+		return meetings.stream().flatMap(meet -> meet.getMeetingTasks().stream()).filter(e -> isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getMeetingTaskId(), e.getSubject(), e.getStatus(), MEETING,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getMeetings().getMeetingId(),
@@ -189,8 +188,7 @@ public class CommonUtil {
 
 	public static List<MainTaskDto> getLeadRelatedTasks(Leads lead) {
 		log.info("inside the getLeadRelatedTasks method...");
-		return lead.getLeadTasks().stream()
-				.filter(e->isNull(e.getDeletedBy()))
+		return lead.getLeadTasks().stream().filter(e -> isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getLeadTaskId(), e.getSubject(), e.getStatus(), LEAD,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
 						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getLead().getLeadId(), e.isRemainderOn(),
@@ -199,15 +197,14 @@ public class CommonUtil {
 								: null))
 				.collect(toList());
 	}
-	
+
 	public static List<MainTaskDto> getOpportunityRelatedTasks(Opportunity oppt) {
 		log.info("inside the getOpportunityRelatedTasks method...");
-		return oppt.getOpportunityTasks().stream()
-				.filter(e->isNull(e.getDeletedBy()))
+		return oppt.getOpportunityTasks().stream().filter(e -> isNull(e.getDeletedBy()))
 				.map(e -> new MainTaskDto(e.getOptyTaskId(), e.getSubject(), e.getStatus(), OPPORTUNITY,
 						convertDateDateWithTime(e.getDueDate(), e.getDueTime12Hours()),
-						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getOpportunity().getOpportunityId(), e.isRemainderOn(),
-						e.getOpportunity().getStatus(),
+						TO_EMPLOYEE.apply(e.getAssignTo()).orElse(null), e.getOpportunity().getOpportunityId(),
+						e.isRemainderOn(), e.getOpportunity().getStatus(),
 						e.isRemainderOn() ? convertDateDateWithTime(e.getRemainderDueOn(), e.getRemainderDueAt12Hours())
 								: null))
 				.collect(toList());
@@ -430,7 +427,7 @@ public class CommonUtil {
 				.entrySet().stream().sorted(comparingByKey()).collect(toMap(Map.Entry::getKey, Map.Entry::getValue,
 						(oldValue, newValue) -> oldValue, LinkedHashMap::new));
 	}
-	
+
 	public static List<TimeLineActivityDto> getUpnextActivities(List<Call> calls, List<Visit> visits,
 			List<Email> emails, List<Meetings> meetings, EmployeeService employeeService) {
 		List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
@@ -480,5 +477,19 @@ public class CommonUtil {
 		upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 				.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 		return upNext;
+	}
+
+	public static List<DescriptionDto> getDescData(List<Description> descriptions) {
+		return descriptions.stream().map(description -> {
+			DescriptionDto descriptionDto = new DescriptionDto();
+			descriptionDto.setDescId(description.getDescId());
+			descriptionDto.setSubject(description.getSubject());
+			descriptionDto.setType("Description");
+			descriptionDto.setDesc(description.getDesc());
+			descriptionDto.setStatus(description.getStatus());
+			descriptionDto.setGetDate(description.getDate());
+			descriptionDto.setAction(description.getAction());
+			return descriptionDto;
+		}).collect(toList());
 	}
 }
