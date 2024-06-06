@@ -24,6 +24,7 @@ import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import ai.rnt.crm.dto.DescriptionDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
@@ -180,5 +182,12 @@ public class LeadsController {
 	@GetMapping(EDIT_QUALIFY_LEAD)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> editQualifyLead(@PathVariable Integer leadId) {
 		return leadService.getForQualifyLead(leadId);
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@PostMapping("/description/{leadId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addDescription(@Validated @RequestBody DescriptionDto dto,
+			@Min(1) @PathVariable(name = "leadId") Integer leadId) {
+		return leadService.addDescription(dto, leadId);
 	}
 }

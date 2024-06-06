@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import ai.rnt.crm.dto.LeadDto;
+import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.LeadImportant;
 import ai.rnt.crm.entity.Leads;
 
@@ -32,5 +33,7 @@ public interface LeadDaoService extends CrudService<Leads, LeadDto> {
 	List<Map<String, Integer>> getLeadSourceCount();
 
 	List<Map<String, Integer>> getLeadSourceCount(Integer loggedInStaffId);
+
+	Description addDesc(Description description);
 
 }

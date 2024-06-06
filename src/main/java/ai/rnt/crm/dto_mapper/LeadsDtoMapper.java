@@ -10,12 +10,14 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import ai.rnt.crm.dto.DescriptionDto;
 import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.LeadDashboardDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadsCardDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.entity.Contacts;
+import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.Leads;
 
 public class LeadsDtoMapper {
@@ -75,7 +77,8 @@ public class LeadsDtoMapper {
 	public static final Function<Collection<Leads>, List<LeadDashboardDto>> TO_DASHBOARD_LEADDTOS = e -> e.stream()
 			.map(dm -> TO_DASHBOARD_LEADDTO.apply(dm).get()).collect(Collectors.toList());
 
-	public static final Function<Leads, Optional<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTO = e -> evalMapper(e, LeadsCardDto.class);
+	public static final Function<Leads, Optional<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTO = e -> evalMapper(e,
+			LeadsCardDto.class);
 
 	public static final Function<Collection<Leads>, List<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTOS = e -> e.stream()
 			.map(dm -> TO_DASHBOARD_CARDS_LEADDTO.apply(dm).get()).collect(Collectors.toList());
@@ -86,4 +89,14 @@ public class LeadsDtoMapper {
 
 	public static final Function<Leads, Optional<QualifyLeadDto>> TO_QUALIFY_LEAD = e -> evalMapper(e,
 			QualifyLeadDto.class);
+
+	public static final Function<DescriptionDto, Optional<Description>> TO_DESCRIPTION = e -> evalMapper(e,
+			Description.class);
+	/**
+	 * @since 06-06-2024
+	 * @version 1.0
+	 *
+	 */
+	public static final Function<Collection<DescriptionDto>, List<Description>> TO_DESCRIPTIONS = e -> e.stream()
+			.map(dm -> TO_DESCRIPTION.apply(dm).get()).collect(Collectors.toList());
 }

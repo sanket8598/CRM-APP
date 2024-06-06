@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import ai.rnt.crm.dto.DescriptionDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
@@ -47,5 +48,7 @@ public interface LeadService {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getForQualifyLead(Integer leadId);
 
 	public void updateLeadsStatus(Integer leadId);
+
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addDescription(DescriptionDto dto, Integer leadId);
 
 }

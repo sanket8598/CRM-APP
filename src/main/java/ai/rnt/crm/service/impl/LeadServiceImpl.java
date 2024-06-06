@@ -43,6 +43,7 @@ import static ai.rnt.crm.dto_mapper.LeadSortFilterDtoMapper.TO_LEAD_SORT_FILTER;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE;
 import static ai.rnt.crm.dto_mapper.LeadSourceDtoMapper.TO_LEAD_SOURCE_DTOS;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTOS;
+import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DESCRIPTION;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_EDITLEAD_DTO;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_LEAD_DTOS;
@@ -119,6 +120,7 @@ import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
+import ai.rnt.crm.dto.DescriptionDto;
 import ai.rnt.crm.dto.EditLeadDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
@@ -128,6 +130,7 @@ import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
+import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.EmployeeMaster;
@@ -914,6 +917,30 @@ public class LeadServiceImpl implements LeadService {
 			taskNotificationsUtil.sendFollowUpLeadNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending assign lead notification..{}", e);
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addDescription(DescriptionDto dto, Integer leadId) {
+		log.info("inside the addDescription method...{}", leadId);
+		EnumMap<ApiResponse, Object> dataMap = new EnumMap<>(ApiResponse.class);
+		try {
+			Description description = TO_DESCRIPTION.apply(dto)
+					.orElseThrow(() -> new ResourceNotFoundException("Description", "desc_id", dto.getDescId()));
+			Leads lead = leadDaoService.getLeadById(leadId)
+					.orElseThrow(() -> new ResourceNotFoundException("Lead", "leadId", leadId));
+			description.setLead(lead);
+			if (nonNull(leadDaoService.addDesc(description))) {
+				dataMap.put(MESSAGE, "Description Added Successfully");
+				dataMap.put(SUCCESS, true);
+			} else {
+				dataMap.put(MESSAGE, "Description Not Added");
+				dataMap.put(SUCCESS, false);
+			}
+			return new ResponseEntity<>(dataMap, CREATED);
+		} catch (Exception e) {
+			log.error("Got Exception while adding the description..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

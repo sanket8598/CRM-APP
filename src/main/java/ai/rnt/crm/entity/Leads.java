@@ -63,12 +63,12 @@ public class Leads extends Auditable {
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private EmployeeMaster employee;
-	
+
 	@JoinColumn(name = "assign_by", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private EmployeeMaster assignBy;
-	
+
 	@Column(name = "assign_on")
 	private LocalDate assignDate;
 
@@ -101,7 +101,7 @@ public class Leads extends Auditable {
 
 	@Column(name = "remainder_due_on")
 	private LocalDate remainderDueOn;
-	
+
 	@Column(name = "shared_req", columnDefinition = "default false")
 	private Boolean requirementShared;
 
@@ -116,10 +116,10 @@ public class Leads extends Auditable {
 
 	@Column(name = "qualify_rem")
 	private String qualifyRemarks;
-	
+
 	@Column(name = "progress_status")
 	private String progressStatus;
-	
+
 	@Column(name = "current_phase")
 	private String currentPhase;
 
@@ -147,6 +147,9 @@ public class Leads extends Auditable {
 
 	@OneToMany(mappedBy = "lead", cascade = ALL)
 	private List<Visit> visit = new ArrayList<>();
+
+	@OneToMany(mappedBy = "lead", cascade = ALL)
+	private List<Description> descriptions = new ArrayList<>();
 
 	@OneToMany(mappedBy = "lead")
 	private Set<LeadImportant> impLead;

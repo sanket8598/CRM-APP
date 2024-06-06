@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ai.rnt.crm.dao.service.LeadDaoService;
+import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.LeadImportant;
 import ai.rnt.crm.entity.Leads;
+import ai.rnt.crm.repository.DescriptionRepository;
 import ai.rnt.crm.repository.ImpLeadRepository;
 import ai.rnt.crm.repository.LeadsRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LeadDaoServiceImpl implements LeadDaoService {
 	private final LeadsRepository leadsRepository;
 	private final ImpLeadRepository impLeadRepositroy;
+	private final DescriptionRepository descriptionRepository;
 
 	@Override
 	@CacheEvict(value = LEADS, allEntries = true)
@@ -96,5 +99,11 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 	public List<Map<String, Integer>> getLeadSourceCount(Integer loggedInStaffId) {
 		log.info("inside the getLeadSourceCount method...{}", loggedInStaffId);
 		return leadsRepository.getLeadSourceCount(loggedInStaffId);
+	}
+
+	@Override
+	public Description addDesc(Description description) {
+		log.info("inside the addDesc method...{}");
+		return descriptionRepository.save(description);
 	}
 }
