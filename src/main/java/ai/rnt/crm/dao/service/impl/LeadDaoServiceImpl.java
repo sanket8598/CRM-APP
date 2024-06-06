@@ -106,4 +106,10 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 		log.info("inside the addDesc method...{}");
 		return descriptionRepository.save(description);
 	}
+
+	@Override
+	public List<Description> getDescriptionByLeadIdAndIsOpportunity(Integer leadId) {
+		log.info("inside the getDescriptionByLeadIdAndIsOpportunity method...{}");
+		return descriptionRepository.findByLeadLeadIdAndIsOpportunityOrderByCreatedDateDesc(leadId, false);
+	}
 }

@@ -450,12 +450,24 @@ public class LeadServiceImpl implements LeadService {
 			List<Visit> visits = visitDaoService.getVisitsByLeadIdAndIsOpportunity(leadId);
 			List<Email> emails = emailDaoService.getEmailByLeadIdAndIsOpportunity(leadId);
 			List<Meetings> meetings = meetingDaoService.getMeetingByLeadIdAndIsOpportunity(leadId);
-
+			List<Description> descriptions = leadDaoService.getDescriptionByLeadIdAndIsOpportunity(leadId);
+			List<DescriptionDto> descData = descriptions.stream().map(description -> {
+				DescriptionDto descriptionDto = new DescriptionDto();
+				descriptionDto.setDescId(description.getDescId());
+				descriptionDto.setSubject(description.getSubject());
+				descriptionDto.setType("Description");
+				descriptionDto.setDesc(description.getDesc());
+				descriptionDto.setStatus(description.getStatus());
+				descriptionDto.setDate(description.getDate());
+				descriptionDto.setAction(description.getAction());
+				return descriptionDto;
+			}).collect(toList());
 			dataMap.put(LEAD_INFO, dto);
 			dataMap.put(SERVICE_FALL, TO_SERVICE_FALL_MASTER_DTOS.apply(serviceFallsDaoSevice.getAllSerciveFalls()));
 			dataMap.put(LEAD_SOURCE, TO_LEAD_SOURCE_DTOS.apply(leadSourceDaoService.getAllLeadSource()));
 			dataMap.put(DOMAINS, TO_DOMAIN_DTOS.apply(domainMasterDaoService.getAllDomains()));
 			dataMap.put(TIMELINE, getTimelineData(calls, visits, emails, meetings, employeeService));
+			dataMap.put("descData", descData);
 			dataMap.put(ACTIVITY, getActivityData(calls, visits, emails, meetings, employeeService));
 			dataMap.put(UPNEXT_DATA, upNextActivities(getUpnextData(calls, visits, emails, meetings, employeeService)));
 			dataMap.put(TASK, getTaskDataMap(calls, visits, meetings, leadById, null));

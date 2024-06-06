@@ -36,4 +36,6 @@ public interface LeadDaoService extends CrudService<Leads, LeadDto> {
 
 	Description addDesc(Description description);
 
+	List<Description> getDescriptionByLeadIdAndIsOpportunity(Integer leadId);
+
 }

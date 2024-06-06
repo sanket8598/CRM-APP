@@ -18,6 +18,8 @@ public class DescriptionDto {
 	private String desc;
 
 	private String action;
+	
+	private String type;
 
 	@FutureOrPresent(message = "Date must not be smaller than today's date!!")
 	private LocalDate date;
