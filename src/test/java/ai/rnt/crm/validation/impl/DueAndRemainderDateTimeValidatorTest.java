@@ -152,7 +152,7 @@ class DueAndRemainderDateTimeValidatorTest {
 
 	@Test
 	void testIsValid_WhenRemainderDateTimeIsAfterDueDateTime_ShouldReturnTrue() {
-		TestObject testObject = new TestObject("12:00", LocalDate.now().plusDays(1), true, "14:00",
+		TestObject testObject = new TestObject("12:00", LocalDate.now().plusDays(1), true, "11:00",
 				LocalDate.now().plusDays(1));
 		boolean result = validator.isValid(testObject, context);
 		assertTrue(result);

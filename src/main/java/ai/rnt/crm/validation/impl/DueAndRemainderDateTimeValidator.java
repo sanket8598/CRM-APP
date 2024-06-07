@@ -64,7 +64,7 @@ public class DueAndRemainderDateTimeValidator implements ConstraintValidator<Val
 							"Remainder Date & Time must not be smaller than current Date & Time!!");
 					return false;
 				}
-				if (inputRemainderDate.isBefore(inputDueDate)) {
+				if (inputRemainderDate.isAfter(inputDueDate)) {
 					customMessageForValidation(context, dateFieldSec,
 							"Remainder Date & Time must not be smaller than Due Date & Time!!");
 					return false;
