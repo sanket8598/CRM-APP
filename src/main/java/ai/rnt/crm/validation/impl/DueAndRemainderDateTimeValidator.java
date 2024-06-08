@@ -39,6 +39,7 @@ public class DueAndRemainderDateTimeValidator implements ConstraintValidator<Val
 
 	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
+		log.info("inside the validation of the leadTask...{}",value);
 		if (isNull(value))
 			return true;
 		BeanWrapperImpl beanWrapperImpl = new BeanWrapperImpl(value);
@@ -53,10 +54,10 @@ public class DueAndRemainderDateTimeValidator implements ConstraintValidator<Val
 			log.info("current time in isValid method...{}", currentDateTime);
 			log.info("inputDueDate in isValid method...{}", inputDueDate);
 
+			log.info("check condition of isBefore isValid method...{}", inputDueDate.isBefore(currentDateTime));
 			if (inputDueDate.isBefore(currentDateTime)) {
 				customMessageForValidation(context, dateFieldOne,
 						"Due Date & Time must not be smaller than current date & time!!");
-				log.info("check condition of isBefore isValid method...{}", inputDueDate.isBefore(currentDateTime));
 				return false;
 			}
 			if (remainderOn) {
