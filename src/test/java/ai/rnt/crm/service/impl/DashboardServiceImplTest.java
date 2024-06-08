@@ -63,17 +63,17 @@ class DashboardServiceImplTest {
 
 	@Mock
 	private OpportunityDaoService opportunityDaoService;
-	
+
 	@Mock
-	private  CallDaoService callDaoService;
-	
+	private CallDaoService callDaoService;
+
 	@Mock
-	private  EmailDaoService emailDaoService;
-	
+	private EmailDaoService emailDaoService;
+
 	@Mock
-	private  VisitDaoService visitDaoService;
+	private VisitDaoService visitDaoService;
 	@Mock
-	private  MeetingDaoService meetingDaoService;
+	private MeetingDaoService meetingDaoService;
 
 	@Test
     void testGetDashboardDataForAdmin() {
@@ -81,7 +81,7 @@ class DashboardServiceImplTest {
         when(opportunityDaoService.findAllOpty()).thenReturn(mockOpportunityList());
         when(leadDaoService.getAllLeads()).thenReturn(mockLeadList());
         when(leadDaoService.getLeadSourceCount()).thenReturn(mockLeadSourceCount());
-        ResponseEntity<EnumMap<ApiResponse, Object>> response = dashboardServiceImpl.getDashboardData();
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = dashboardServiceImpl.getDashboardData("Lead");
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
@@ -96,7 +96,7 @@ class DashboardServiceImplTest {
 		when(opportunityDaoService.findAllOpty()).thenReturn(mockOpportunityList());
 		when(leadDaoService.getAllLeads()).thenReturn(mockLeadList());
 		when(leadDaoService.getLeadSourceCount(mockStaffId)).thenReturn(mockLeadSourceCount());
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = dashboardServiceImpl.getDashboardData();
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = dashboardServiceImpl.getDashboardData("Lead");
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
@@ -107,7 +107,7 @@ class DashboardServiceImplTest {
     void testGetDashboardDataException() {
         when(auditAwareUtil.isAdmin()).thenThrow(new RuntimeException("Exception occurred"));
         assertThrows(CRMException.class, () -> {
-        	dashboardServiceImpl.getDashboardData();
+        	dashboardServiceImpl.getDashboardData("Lead");
         });
     }
 
@@ -171,7 +171,7 @@ class DashboardServiceImplTest {
 		leadSource.put("Source2", 5);
 		return Collections.singletonList(leadSource);
 	}
-	
+
 	@Test
 	void testGetUpComingSectionData() {
 		String field = "LEAD";
@@ -192,28 +192,29 @@ class DashboardServiceImplTest {
 		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
 		assertEquals(true, responseBody.get(ApiResponse.SUCCESS)); // Check if success flag is true
 	}
+
 	@Test
 	void testGetUpComingSectionDataForUser() {
 		String field = "Opportunity";
-		String emailId="abc@email.com";
+		String emailId = "abc@email.com";
 		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
 		when(auditAwareUtil.isUser()).thenReturn(true);
-		Call call=new Call();
-		Visit visit=new Visit();
-		EmployeeMaster emp=new EmployeeMaster();
+		Call call = new Call();
+		Visit visit = new Visit();
+		EmployeeMaster emp = new EmployeeMaster();
 		emp.setStaffId(1);
 		emp.setEmailId(emailId);
 		call.setCallFrom(emp);
 		visit.setVisitBy(emp);
 		List<Call> calls = new ArrayList<>();
 		calls.add(call);
-		Email email=new Email();
+		Email email = new Email();
 		email.setMailFrom(emailId);
 		List<Email> emails = new ArrayList<>();
 		emails.add(email);
 		List<Visit> visits = new ArrayList<>();
 		visits.add(visit);
-		Meetings meet=new Meetings();
+		Meetings meet = new Meetings();
 		meet.setAssignTo(emp);
 		List<Meetings> mettings = new ArrayList<>();
 		mettings.add(meet);
@@ -228,49 +229,51 @@ class DashboardServiceImplTest {
 		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
 		assertEquals(true, responseBody.get(ApiResponse.SUCCESS)); // Check if success flag is true
 	}
+
 	@Test
 	void testGetUpComingSectionDataForNullField() {
-		String field =null;
+		String field = null;
 		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
-		
+
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
 				.getUpComingSectionData(field);
-		assertEquals(200, responseEntity.getStatusCodeValue()); 
+		assertEquals(200, responseEntity.getStatusCodeValue());
 		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
-		assertEquals(false, responseBody.get(ApiResponse.SUCCESS)); 
+		assertEquals(false, responseBody.get(ApiResponse.SUCCESS));
 	}
+
 	@Test
 	void testGetUpComingSectionDataForEmptyField() {
-		String field ="";
+		String field = "";
 		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
-		
+
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
 				.getUpComingSectionData(field);
-		assertEquals(200, responseEntity.getStatusCodeValue()); 
+		assertEquals(200, responseEntity.getStatusCodeValue());
 		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
-		assertEquals(false, responseBody.get(ApiResponse.SUCCESS)); 
+		assertEquals(false, responseBody.get(ApiResponse.SUCCESS));
 	}
+
 	@Test
 	void testGetUpComingSectionDataForInvalidField() {
-		String field ="abc";
+		String field = "abc";
 		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(null);
 		when(auditAwareUtil.isUser()).thenReturn(true);
 		when(auditAwareUtil.isAdmin()).thenReturn(false);
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
 				.getUpComingSectionData(field);
-		assertEquals(200, responseEntity.getStatusCodeValue()); 
+		assertEquals(200, responseEntity.getStatusCodeValue());
 		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
-		assertEquals(true, responseBody.get(ApiResponse.SUCCESS)); 
+		assertEquals(true, responseBody.get(ApiResponse.SUCCESS));
 	}
+
 	@Test
 	void testGetUpComingSectionDataForException() {
-		String field ="notEmpty";
+		String field = "notEmpty";
 		when(auditAwareUtil.isUser()).thenReturn(true);
 		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
 		when(employeeService.getById(anyInt())).thenThrow(new ResourceNotFoundException("Employee", "staffId", 1));
-		assertThrows(CRMException.class,()->dashboardServiceImpl.getUpComingSectionData(field));
+		assertThrows(CRMException.class, () -> dashboardServiceImpl.getUpComingSectionData(field));
 	}
-	
-	
-	
+
 }

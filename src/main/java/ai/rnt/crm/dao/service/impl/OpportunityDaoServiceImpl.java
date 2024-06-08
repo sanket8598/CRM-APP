@@ -67,6 +67,6 @@ public class OpportunityDaoServiceImpl implements OpportunityDaoService {
 	@Cacheable(value = OPPORTUNITIES)
 	public List<Opportunity> findAllOpty() {
 		log.info("inside the findAllOpty method...");
-		return opportunityRespoitory.findByDeletedDateIsNull();
+		return opportunityRespoitory.findByOrderByCreatedDateDesc();
 	}
 }

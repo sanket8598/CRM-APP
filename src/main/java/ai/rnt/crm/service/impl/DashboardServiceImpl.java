@@ -67,52 +67,52 @@ public class DashboardServiceImpl implements DashboardService {
 	private final EmployeeService employeeService;
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData() {
-		log.info("inside the getDashboardData method...");
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData(String field) {
+		log.info("inside the getDashboardData method...{}", field);
 		EnumMap<ApiResponse, Object> dashboardData = new EnumMap<>(ApiResponse.class);
 		try {
+			if (isNull(field) || field.isEmpty())
+				return new ResponseEntity<>(dashboardData, OK);
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			Map<String, Object> countMap = new HashMap<>();
 			Map<String, Object> dataMap = new HashMap<>();
 			List<Leads> leads = leadDaoService.getAllLeads();
 			List<Opportunity> findAllOpty = opportunityDaoService.findAllOpty();
 			if (auditAwareUtil.isAdmin()) {
-				countMap.put("totalOpty", findAllOpty.stream().count());
-				countMap.put("wonOpty", findAllOpty.stream().filter(WON_OPPORTUNITIES).count());
-				countMap.put("lossOpty", findAllOpty.stream().filter(LOSS_OPPORTUNITIES).count());
-				countMap.put("openOpty", findAllOpty.stream().filter(OPEN_OPPORTUNITIES).count());
+				countMap.put("Total", findAllOpty.stream().count());
+				countMap.put("Won", findAllOpty.stream().filter(WON_OPPORTUNITIES).count());
+				countMap.put("Lost", findAllOpty.stream().filter(LOSS_OPPORTUNITIES).count());
+				countMap.put("Open", findAllOpty.stream().filter(OPEN_OPPORTUNITIES).count());
 				dataMap.put(COUNTDATA, countMap);
-				dataMap.put("workItem", TO_DASHBOARD_DTOS.apply(leads.stream()
-						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())).collect(toList())));
-				dataMap.put("OptyWorkItem", TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream()
-						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())).collect(toList())));
-				List<Map<String, Integer>> leadSourceData = leadDaoService.getLeadSourceCount();
-				dataMap.put("leadsBySource", leadSourceData);
+				if (LEAD.equalsIgnoreCase(field))
+					dataMap.put("workItem", TO_DASHBOARD_DTOS.apply(leads.stream().collect(toList())));
+				else if (OPPORTUNITY.equalsIgnoreCase(field))
+					dataMap.put("optyWorkItem",
+							TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream().collect(toList())));
+				dataMap.put("leadsBySource", leadDaoService.getLeadSourceCount());
 				dashboardData.put(DATA, dataMap);
 			} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
-				countMap.put("totalOpty",
+				countMap.put("Total",
 						findAllOpty.stream().filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId)).count());
-				countMap.put("wonOpty",
+				countMap.put("Won",
 						findAllOpty.stream().filter(
 								l -> WON_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 								.count());
-				countMap.put("lossOpty",
+				countMap.put("Lost",
 						findAllOpty.stream().filter(
 								l -> LOSS_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 								.count());
-				countMap.put("openOpty",
+				countMap.put("Open",
 						findAllOpty.stream().filter(
 								l -> OPEN_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 								.count());
-				dataMap.put("workItem",
-						TO_DASHBOARD_DTOS.apply(leads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
-								.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate()))
-								.collect(toList())));
-				dataMap.put("optyWorkItem", TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream()
-						.filter(l -> ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
-						.sorted((l1, l2) -> l2.getCreatedDate().compareTo(l1.getCreatedDate())).collect(toList())));
-				List<Map<String, Integer>> leadSourceData = leadDaoService.getLeadSourceCount(loggedInStaffId);
-				dataMap.put("leadsBySource", leadSourceData);
+				if (LEAD.equalsIgnoreCase(field))
+					dataMap.put("workItem", TO_DASHBOARD_DTOS.apply(
+							leads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId)).collect(toList())));
+				else if (OPPORTUNITY.equalsIgnoreCase(field))
+					dataMap.put("optyWorkItem", TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream()
+							.filter(l -> ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId)).collect(toList())));
+				dataMap.put("leadsBySource", leadDaoService.getLeadSourceCount(loggedInStaffId));
 				dataMap.put(COUNTDATA, countMap);
 				dashboardData.put(DATA, dataMap);
 			} else

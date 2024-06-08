@@ -25,14 +25,16 @@ public class DashboardController {
 	private final DashboardService dashboardService;
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
-	@GetMapping
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData() {
-		return dashboardService.getDashboardData();
+	@GetMapping("{field}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData(
+			@PathVariable(name = "field", required = true) String field) {
+		return dashboardService.getDashboardData(field);
 	}
-	
+
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@GetMapping("/upcoming/{field}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getUpComingSectionData(@PathVariable(name="field",required = true) String field) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getUpComingSectionData(
+			@PathVariable(name = "field", required = true) String field) {
 		return dashboardService.getUpComingSectionData(field);
 	}
 }

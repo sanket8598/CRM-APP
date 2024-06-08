@@ -90,12 +90,14 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 	}
 
 	@Override
+	// @Cacheable(value = "leadSourceOfAdmin")
 	public List<Map<String, Integer>> getLeadSourceCount() {
 		log.info("inside the getLeadSourceCount method...{}");
 		return leadsRepository.getLeadSourceCount();
 	}
 
 	@Override
+	// @Cacheable(value = "leadSourceOfUser")
 	public List<Map<String, Integer>> getLeadSourceCount(Integer loggedInStaffId) {
 		log.info("inside the getLeadSourceCount method...{}", loggedInStaffId);
 		return leadsRepository.getLeadSourceCount(loggedInStaffId);
