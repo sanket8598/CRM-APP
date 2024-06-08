@@ -17,7 +17,9 @@ import javax.validation.ConstraintValidatorContext;
 import org.springframework.beans.BeanWrapperImpl;
 
 import ai.rnt.crm.validation.ValidDueAndRemainderDateTime;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DueAndRemainderDateTimeValidator implements ConstraintValidator<ValidDueAndRemainderDateTime, Object> {
 
 	public String timefieldOne;
@@ -48,10 +50,13 @@ public class DueAndRemainderDateTimeValidator implements ConstraintValidator<Val
 			LocalDateTime currentDateTime = now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE))
 					.toLocalDateTime();
 			LocalDateTime inputDueDate = convertLocalDateDateWithTimeToLocalDate(dueDate, dueTime);
+			log.info("current time in isValid method...{}", currentDateTime);
+			log.info("inputDueDate in isValid method...{}", inputDueDate);
 
 			if (inputDueDate.isBefore(currentDateTime)) {
 				customMessageForValidation(context, dateFieldOne,
 						"Due Date & Time must not be smaller than current date & time!!");
+				log.info("check condition of isBefore isValid method...{}", inputDueDate.isBefore(currentDateTime));
 				return false;
 			}
 			if (remainderOn) {

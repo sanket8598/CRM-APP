@@ -354,7 +354,7 @@ public class CallServiceImpl implements CallService {
 		            .withZoneSameInstant(of(INDIA_ZONE))
 		            .toLocalDateTime());
 			if (nonNull(callDaoService.addCallTask(callTask))) {
-				deleteTask.put(MESSAGE, "Call Task Deleted SuccessFully.");
+				deleteTask.put(MESSAGE, "Call Task Deleted Successfully.");
 				deleteTask.put(SUCCESS, true);
 			} else {
 				deleteTask.put(MESSAGE, "Call Task Not deleted.");
