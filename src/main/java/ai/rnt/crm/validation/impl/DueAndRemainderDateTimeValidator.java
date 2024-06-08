@@ -5,6 +5,7 @@ import static ai.rnt.crm.util.ConvertDateFormatUtil.convertLocalDateDateWithTime
 import static java.time.LocalDateTime.now;
 import static java.time.ZoneId.of;
 import static java.time.ZoneId.systemDefault;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
@@ -48,10 +49,12 @@ public class DueAndRemainderDateTimeValidator implements ConstraintValidator<Val
 		boolean remainderOn = (boolean) beanWrapperImpl.getPropertyValue(remainderField);
 		context.disableDefaultConstraintViolation();
 		if (nonNull(dueTime) && nonNull(dueDate)) {
-			LocalDateTime currentDateTime = now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE))
-					.toLocalDateTime();
+			LocalDate currentDate = LocalDate.now().atStartOfDay(of(INDIA_ZONE)).toLocalDate();
+			String currentTime = now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE))
+					.toLocalDateTime().format(ofPattern("HH:mm"));
+			LocalDateTime currentDateTime=convertLocalDateDateWithTimeToLocalDate(currentDate, currentTime);
 			LocalDateTime inputDueDate = convertLocalDateDateWithTimeToLocalDate(dueDate, dueTime);
-			log.info("current time in isValid method...{}", currentDateTime);
+			log.info("current time in isValid method...{}  {}", currentDateTime,currentTime);
 			log.info("inputDueDate in isValid method...{}", inputDueDate);
 
 			log.info("check condition of isBefore isValid method...{}", inputDueDate.isBefore(currentDateTime));
