@@ -30,11 +30,11 @@ public class GetTaskDto implements Serializable {
 	private String description;
 
 	@NotBlank(message = "Status should not be null or empty!!")
-	@ValidTaskStatus(message = "Please Select Valid Task Status!!")
+	@ValidTaskStatus(message = "Invalid !!")
 	private String status;
 
 	@NotBlank(message = "Priority should not be null or empty!!")
-	@ValidTaskPriority(message = "Please Select Valid Task Priority!!")
+	@ValidTaskPriority(message = "Invalid !!")
 	private String priority;
 
 	@JsonFormat(pattern = "dd-MM-yyyy")
@@ -50,7 +50,7 @@ public class GetTaskDto implements Serializable {
 
 	private boolean remainderOn;
 
-	@ValidReminderVia(message = "Please Select Valid RemainderVia!!")
+	@ValidReminderVia(message = "Invalid !!")
 	private String remainderVia;
 
 	private String remainderDueAt;

@@ -27,10 +27,10 @@ public abstract class TaskDto implements Serializable {
 	@NotBlank(message = "Subject should not be null or empty!!")
 	private String subject;
 
-	@ValidTaskStatus(message = "Please Select Valid Task Status!!")
+	@ValidTaskStatus(message = "Invalid !!")
 	private String status;
 
-	@ValidTaskPriority(message = "Please Select Valid Task Priority!!")
+	@ValidTaskPriority(message = "Invalid !!")
 	private String priority;
 
 	// @JsonFormat(pattern = "yyyy-MM-dd") we have configered it as global in config
@@ -47,7 +47,7 @@ public abstract class TaskDto implements Serializable {
 
 	private boolean remainderOn;
 
-	@ValidReminderVia(message = "Please Select Valid RemainderVia!!")
+	@ValidReminderVia(message = "Invalid !!")
 	private String remainderVia;
 
 	private String remainderDueAt;

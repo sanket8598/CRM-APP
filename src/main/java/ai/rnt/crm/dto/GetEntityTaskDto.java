@@ -27,10 +27,10 @@ public class GetEntityTaskDto implements Serializable {
 
 	private String subject;
 
-	@ValidTaskStatus(message = "Please Select Valid Task Status!!")
+	@ValidTaskStatus(message = "Invalid !!")
 	private String status;
 
-	@ValidTaskPriority(message = "Please Select Valid Task Priority!!")
+	@ValidTaskPriority(message = "Invalid !!")
 	private String priority;
 
 	@Temporal(DATE)
@@ -49,7 +49,7 @@ public class GetEntityTaskDto implements Serializable {
 
 	private boolean remainderOn;
 
-	@ValidReminderVia(message = "Please Select Valid RemainderVia!!")
+	@ValidReminderVia(message = "Invalid !!")
 	private String remainderVia;
 
 	private String remainderDueAt;
