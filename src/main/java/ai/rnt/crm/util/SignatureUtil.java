@@ -25,12 +25,16 @@ import lombok.extern.slf4j.Slf4j;
 public class SignatureUtil {
 
 	private static final String SECRET_KEY = keyGenerator();
+	
+	private static final String SAME_SECRET_KEY = "Op5sTs3Nr7r9lCSJr2jN3qNyelrSEsOITkQ3CCd/Wl0=";
+
+	private static final String HMAC_SHA_256 = "HmacSHA256";
 
 	public static String generateSignature(String data) {
 		log.info("inside the generateSignature method..{}", data);
 		try {
-			Mac mac = getInstance("HmacSHA256");
-			Key secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), "HmacSHA256");
+			Mac mac = getInstance(HMAC_SHA_256);
+			Key secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), HMAC_SHA_256);
 			mac.init(secretKey);
 			byte[] hmacData = mac.doFinal(data.getBytes());
 			return getEncoder().encodeToString(hmacData);
@@ -50,5 +54,20 @@ public class SignatureUtil {
 		byte[] key = new byte[32];
 		secureRandom.nextBytes(key);
 		return getEncoder().encodeToString(key);
+	}
+
+	public static boolean checkSignature(String amount, String signature) {
+		log.info("inside the checkSignature method..{} {}", amount, signature);
+		try {
+			Mac sha256Hmac = getInstance(HMAC_SHA_256);
+			SecretKeySpec secretKeySpec = new SecretKeySpec(SAME_SECRET_KEY.getBytes(), HMAC_SHA_256);
+			sha256Hmac.init(secretKeySpec);
+			byte[] signedBytes = sha256Hmac.doFinal(amount.getBytes());
+			String expectedSignature = getEncoder().encodeToString(signedBytes);
+			return expectedSignature.equals(signature);
+		} catch (Exception e) {
+			log.error("Got Exception while cheking the signature..{}", e.getMessage());
+			throw new CRMException(e);
+		}
 	}
 }

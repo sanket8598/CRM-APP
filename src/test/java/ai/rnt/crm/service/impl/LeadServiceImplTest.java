@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -103,6 +104,7 @@ import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.EmailUtil;
 import ai.rnt.crm.util.ReadExcelUtil;
+import ai.rnt.crm.util.SignatureUtil;
 import ai.rnt.crm.util.TaskNotificationsUtil;
 
 class LeadServiceImplTest {
@@ -861,6 +863,8 @@ class LeadServiceImplTest {
 	void testQualifyLeadUnSuccess() throws Exception {
 		Integer leadId = 1;
 		QualifyLeadDto dto = new QualifyLeadDto();
+		dto.setBudgetAmount("100");
+		dto.setSignature("uy1KrsQ4MsRvK1AxhwDwZpxkLTehZGrgHzabis5KAbY=");
 		dto.setQualify(true);
 		Leads lead = new Leads();
 		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));

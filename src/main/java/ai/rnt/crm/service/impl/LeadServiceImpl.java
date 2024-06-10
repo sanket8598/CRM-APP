@@ -69,6 +69,7 @@ import static ai.rnt.crm.util.CommonUtil.setServiceFallToLead;
 import static ai.rnt.crm.util.CommonUtil.upNextActivities;
 import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
+import static ai.rnt.crm.util.SignatureUtil.checkSignature;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
@@ -475,6 +476,11 @@ public class LeadServiceImpl implements LeadService {
 		log.info("inside the qualifyLead method...{}", leadId);
 		EnumMap<ApiResponse, Object> qualifyLeadMap = new EnumMap<>(ApiResponse.class);
 		try {
+			if (!checkSignature(dto.getBudgetAmount(), dto.getSignature())) {
+				qualifyLeadMap.put(SUCCESS, false);
+				qualifyLeadMap.put(MESSAGE, "You can't change budget amount !!");
+				return new ResponseEntity<>(qualifyLeadMap, OK);
+			}
 			Opportunity opportunity = null;
 			boolean status = false;
 			qualifyLeadMap.put(SUCCESS, true);
