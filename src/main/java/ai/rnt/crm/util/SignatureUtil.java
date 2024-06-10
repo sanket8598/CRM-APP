@@ -26,8 +26,6 @@ public class SignatureUtil {
 
 	private static final String SECRET_KEY = keyGenerator();
 	
-	private static final String SAME_SECRET_KEY = "Op5sTs3Nr7r9lCSJr2jN3qNyelrSEsOITkQ3CCd/Wl0=";
-
 	private static final String HMAC_SHA_256 = "HmacSHA256";
 
 	public static String generateSignature(String data) {
@@ -60,7 +58,7 @@ public class SignatureUtil {
 		log.info("inside the checkSignature method..{} {}", amount, signature);
 		try {
 			Mac sha256Hmac = getInstance(HMAC_SHA_256);
-			SecretKeySpec secretKeySpec = new SecretKeySpec(SAME_SECRET_KEY.getBytes(), HMAC_SHA_256);
+			SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), HMAC_SHA_256);
 			sha256Hmac.init(secretKeySpec);
 			byte[] signedBytes = sha256Hmac.doFinal(amount.getBytes());
 			String expectedSignature = getEncoder().encodeToString(signedBytes);
