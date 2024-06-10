@@ -874,7 +874,7 @@ class LeadServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Lead Not Qualify", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("You can't change budget amount !!", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
