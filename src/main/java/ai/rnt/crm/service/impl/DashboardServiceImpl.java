@@ -2,6 +2,12 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
 import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
+import static ai.rnt.crm.constants.OppurtunityStatus.LEADS_BY_SOURCE;
+import static ai.rnt.crm.constants.OppurtunityStatus.LOST;
+import static ai.rnt.crm.constants.OppurtunityStatus.OPEN;
+import static ai.rnt.crm.constants.OppurtunityStatus.TOTAL;
+import static ai.rnt.crm.constants.OppurtunityStatus.WON;
+import static ai.rnt.crm.constants.OppurtunityStatus.WORK_ITEM;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
 import static ai.rnt.crm.constants.StatusConstants.OPPORTUNITY;
 import static ai.rnt.crm.dto_mapper.DashboardDtoMapper.TO_DASHBOARD_DTOS;
@@ -76,43 +82,43 @@ public class DashboardServiceImpl implements DashboardService {
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			Map<String, Object> countMap = new HashMap<>();
 			Map<String, Object> dataMap = new HashMap<>();
-			List<Leads> leads = leadDaoService.getAllLeads();
 			List<Opportunity> findAllOpty = opportunityDaoService.findAllOpty();
 			if (auditAwareUtil.isAdmin()) {
-				countMap.put("Total", findAllOpty.stream().count());
-				countMap.put("Won", findAllOpty.stream().filter(WON_OPPORTUNITIES).count());
-				countMap.put("Lost", findAllOpty.stream().filter(LOSS_OPPORTUNITIES).count());
-				countMap.put("Open", findAllOpty.stream().filter(OPEN_OPPORTUNITIES).count());
+				countMap.put(TOTAL, findAllOpty.stream().count());
+				countMap.put(WON, findAllOpty.stream().filter(WON_OPPORTUNITIES).count());
+				countMap.put(LOST, findAllOpty.stream().filter(LOSS_OPPORTUNITIES).count());
+				countMap.put(OPEN, findAllOpty.stream().filter(OPEN_OPPORTUNITIES).count());
 				dataMap.put(COUNTDATA, countMap);
-				if (LEAD.equalsIgnoreCase(field))
-					dataMap.put("workItem", TO_DASHBOARD_DTOS.apply(leads.stream().collect(toList())));
-				else if (OPPORTUNITY.equalsIgnoreCase(field))
-					dataMap.put("optyWorkItem",
-							TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream().collect(toList())));
-				dataMap.put("leadsBySource", leadDaoService.getLeadSourceCount());
+				if (LEAD.equalsIgnoreCase(field)) {
+					List<Leads> leads = leadDaoService.getAllLeads();
+					dataMap.put(WORK_ITEM, TO_DASHBOARD_DTOS.apply(leads.stream().collect(toList())));
+				} else if (OPPORTUNITY.equalsIgnoreCase(field))
+					dataMap.put(WORK_ITEM, TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream().collect(toList())));
+				dataMap.put(LEADS_BY_SOURCE, leadDaoService.getLeadSourceCount());
 				dashboardData.put(DATA, dataMap);
 			} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
-				countMap.put("Total",
+				countMap.put(TOTAL,
 						findAllOpty.stream().filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId)).count());
-				countMap.put("Won",
+				countMap.put(WON,
 						findAllOpty.stream().filter(
 								l -> WON_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 								.count());
-				countMap.put("Lost",
+				countMap.put(LOST,
 						findAllOpty.stream().filter(
 								l -> LOSS_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 								.count());
-				countMap.put("Open",
+				countMap.put(OPEN,
 						findAllOpty.stream().filter(
 								l -> OPEN_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 								.count());
-				if (LEAD.equalsIgnoreCase(field))
-					dataMap.put("workItem", TO_DASHBOARD_DTOS.apply(
+				if (LEAD.equalsIgnoreCase(field)) {
+					List<Leads> leads = leadDaoService.getAllLeads();
+					dataMap.put(WORK_ITEM, TO_DASHBOARD_DTOS.apply(
 							leads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId)).collect(toList())));
-				else if (OPPORTUNITY.equalsIgnoreCase(field))
-					dataMap.put("optyWorkItem", TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream()
+				} else if (OPPORTUNITY.equalsIgnoreCase(field))
+					dataMap.put(WORK_ITEM, TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream()
 							.filter(l -> ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId)).collect(toList())));
-				dataMap.put("leadsBySource", leadDaoService.getLeadSourceCount(loggedInStaffId));
+				dataMap.put(LEADS_BY_SOURCE, leadDaoService.getLeadSourceCount(loggedInStaffId));
 				dataMap.put(COUNTDATA, countMap);
 				dashboardData.put(DATA, dataMap);
 			} else

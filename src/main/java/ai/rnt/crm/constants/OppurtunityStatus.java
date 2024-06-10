@@ -26,7 +26,13 @@ public class OppurtunityStatus {
 	public static final String WON = "Won";
 
 	public static final String LOST = "Lost";
-	
+
 	public static final String IN_PIPELINE = "in-pipeline";
+
+	public static final String TOTAL = "Total";
+
+	public static final String WORK_ITEM = "workItem";
+
+	public static final String LEADS_BY_SOURCE = "leadsBySource";
 
 }

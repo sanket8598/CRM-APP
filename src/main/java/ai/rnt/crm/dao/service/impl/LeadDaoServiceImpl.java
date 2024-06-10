@@ -36,29 +36,34 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 	@Override
 	@CacheEvict(value = LEADS, allEntries = true)
 	public Leads addLead(Leads leads) {
+		log.info("inside the addLead method...");
 		return leadsRepository.save(leads);
 	}
 
 	@Override
 	@Cacheable(value = LEADS)
 	public List<Leads> getLeadsByStatus(String leadsStatus) {
+		log.info("inside the getLeadsByStatus method...{}", leadsStatus);
 		return leadsRepository.findByStatusOrderByCreatedDateDesc(leadsStatus);
 	}
 
 	@Override
 	@Cacheable(value = LEADS)
 	public List<Leads> getAllLeads() {
+		log.info("inside the getAllLeads method...");
 		return leadsRepository.findByOrderByCreatedDateDesc();
 	}
 
 	@Override
 	@Cacheable(value = LEADS)
 	public List<Leads> getLeadDashboardData() {
+		log.info("inside the getLeadDashboardData method...");
 		return leadsRepository.findByOrderByCreatedDateDesc();
 	}
 
 	@Override
 	public Optional<Leads> getLeadById(Integer leadId) {
+		log.info("inside the getLeadById method...{}", leadId);
 		return leadsRepository.findById(leadId);
 	}
 
@@ -81,11 +86,13 @@ public class LeadDaoServiceImpl implements LeadDaoService {
 
 	@Override
 	public List<LeadImportant> findLeadByEmployeeStaffId(Integer loggedInStaffId) {
+		log.info("inside the findLeadByEmployeeStaffId method...{}", loggedInStaffId);
 		return impLeadRepositroy.findByEmployeeStaffId(loggedInStaffId);
 	}
 
 	@Override
 	public List<Leads> getFollowUpLeads(LocalDate todayAsDate, String time) {
+		log.info("inside the getFollowUpLeads method...{}{}", todayAsDate, time);
 		return leadsRepository.findByRemainderDueOnAndRemainderDueAtAndIsFollowUpRemainder(todayAsDate, time, true);
 	}
 
