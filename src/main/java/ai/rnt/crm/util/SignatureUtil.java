@@ -1,17 +1,18 @@
 package ai.rnt.crm.util;
 
+import static java.lang.System.arraycopy;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Base64.getDecoder;
 import static java.util.Base64.getEncoder;
 import static javax.crypto.Mac.getInstance;
 import static lombok.AccessLevel.PRIVATE;
 
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SecureRandom;
-import java.util.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import ai.rnt.crm.exception.CRMException;
@@ -32,9 +33,11 @@ public class SignatureUtil {
 
 	private static final String HMAC_SHA_256 = "HmacSHA256";
 
-	private static final String SAME_SECRET_KEY = "Op5sTs3Nr7r9lCSJr2jN3qNyelrSEsO=";
+	private static final String GCM_ALGORITHM = "AES/GCM/NoPadding";
 
-	private static final String CBC_ALGORITHM = "AES/CBC/PKCS5Padding";
+	private static final int GCM_TAG_LENGTH = 16 * 8;
+
+	private static final int GCM_IV_LENGTH = 12;
 
 	public static String generateSignature(String data) {
 		log.info("inside the generateSignature method..{}", data);
@@ -62,21 +65,21 @@ public class SignatureUtil {
 		return getEncoder().encodeToString(key);
 	}
 
-	public static String decryptAmount(String encryptedData) throws Exception {
-		byte[] decodedData = Base64.getDecoder().decode(encryptedData);
-		byte[] iv = new byte[16];
-		byte[] ciphertext = new byte[decodedData.length - 16];
+	public static String decryptAmount(String encryptedData, String secretKey) throws Exception {
+		byte[] decodedData = getDecoder().decode(encryptedData);
+		byte[] iv = new byte[GCM_IV_LENGTH];
+		byte[] ciphertext = new byte[decodedData.length - GCM_IV_LENGTH];
 
-		System.arraycopy(decodedData, 0, iv, 0, iv.length);
-		System.arraycopy(decodedData, 16, ciphertext, 0, ciphertext.length);
+		arraycopy(decodedData, 0, iv, 0, GCM_IV_LENGTH);
+		arraycopy(decodedData, GCM_IV_LENGTH, ciphertext, 0, ciphertext.length);
 
-		IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-		SecretKeySpec secretKeySpec = new SecretKeySpec(SAME_SECRET_KEY.getBytes(StandardCharsets.UTF_8), "AES");
+		GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+		SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(UTF_8), "AES");
 
-		Cipher cipher = Cipher.getInstance(CBC_ALGORITHM);
-		cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+		Cipher cipher = Cipher.getInstance(GCM_ALGORITHM);
+		cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, gcmParameterSpec);
 
 		byte[] decryptedBytes = cipher.doFinal(ciphertext);
-		return new String(decryptedBytes, StandardCharsets.UTF_8);
+		return new String(decryptedBytes, UTF_8);
 	}
 }

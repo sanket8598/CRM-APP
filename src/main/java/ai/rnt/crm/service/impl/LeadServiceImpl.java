@@ -96,6 +96,8 @@ import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -170,6 +172,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@PropertySource("classpath:confidential.properties")
 public class LeadServiceImpl implements LeadService {
 
 	private final LeadDaoService leadDaoService;
@@ -197,6 +200,9 @@ public class LeadServiceImpl implements LeadService {
 
 	private static final String PRIMFIELD = "PrimaryField";
 	private static final String SECNDFIELD = "SecondaryField";
+
+	@Value("${secretkey}")
+	private String secretKey;
 
 	@Override
 	@Transactional
@@ -490,7 +496,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.setCurrentPhase(dto.getCurrentPhase());
 			lead.setProgressStatus(dto.getProgressStatus());
 			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty())
-				lead.setBudgetAmount(decryptAmount(dto.getBudgetAmount()));
+				lead.setBudgetAmount(decryptAmount(dto.getBudgetAmount(), secretKey));
 			else
 				lead.setBudgetAmount(dto.getBudgetAmount());
 
