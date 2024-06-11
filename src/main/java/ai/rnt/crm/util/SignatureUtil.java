@@ -4,10 +4,14 @@ import static java.util.Base64.getEncoder;
 import static javax.crypto.Mac.getInstance;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.SecureRandom;
+import java.util.Base64;
 
+import javax.crypto.Cipher;
 import javax.crypto.Mac;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import ai.rnt.crm.exception.CRMException;
@@ -25,8 +29,12 @@ import lombok.extern.slf4j.Slf4j;
 public class SignatureUtil {
 
 	private static final String SECRET_KEY = keyGenerator();
-	
+
 	private static final String HMAC_SHA_256 = "HmacSHA256";
+
+	private static final String SAME_SECRET_KEY = "Op5sTs3Nr7r9lCSJr2jN3qNyelrSEsO=";
+
+	private static final String CBC_ALGORITHM = "AES/CBC/PKCS5Padding";
 
 	public static String generateSignature(String data) {
 		log.info("inside the generateSignature method..{}", data);
@@ -54,18 +62,21 @@ public class SignatureUtil {
 		return getEncoder().encodeToString(key);
 	}
 
-	public static boolean checkSignature(String amount, String signature) {
-		log.info("inside the checkSignature method..{} {}", amount, signature);
-		try {
-			Mac sha256Hmac = getInstance(HMAC_SHA_256);
-			SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), HMAC_SHA_256);
-			sha256Hmac.init(secretKeySpec);
-			byte[] signedBytes = sha256Hmac.doFinal(amount.getBytes());
-			String expectedSignature = getEncoder().encodeToString(signedBytes);
-			return expectedSignature.equals(signature);
-		} catch (Exception e) {
-			log.error("Got Exception while cheking the signature..{}", e.getMessage());
-			throw new CRMException(e);
-		}
+	public static String decryptAmount(String encryptedData) throws Exception {
+		byte[] decodedData = Base64.getDecoder().decode(encryptedData);
+		byte[] iv = new byte[16];
+		byte[] ciphertext = new byte[decodedData.length - 16];
+
+		System.arraycopy(decodedData, 0, iv, 0, iv.length);
+		System.arraycopy(decodedData, 16, ciphertext, 0, ciphertext.length);
+
+		IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+		SecretKeySpec secretKeySpec = new SecretKeySpec(SAME_SECRET_KEY.getBytes(StandardCharsets.UTF_8), "AES");
+
+		Cipher cipher = Cipher.getInstance(CBC_ALGORITHM);
+		cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+
+		byte[] decryptedBytes = cipher.doFinal(ciphertext);
+		return new String(decryptedBytes, StandardCharsets.UTF_8);
 	}
 }

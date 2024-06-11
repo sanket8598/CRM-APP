@@ -29,6 +29,4 @@ public class QualifyLeadDto {
 	private String qualifyRemarks;
 
 	private Boolean qualify;
-
-	private String signature;
 }

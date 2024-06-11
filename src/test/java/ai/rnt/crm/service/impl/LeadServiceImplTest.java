@@ -863,8 +863,7 @@ class LeadServiceImplTest {
 	void testQualifyLeadUnSuccess() throws Exception {
 		Integer leadId = 1;
 		QualifyLeadDto dto = new QualifyLeadDto();
-		dto.setBudgetAmount("100");
-		dto.setSignature("uy1KrsQ4MsRvK1AxhwDwZpxkLTehZGrgHzabis5KAbY=");
+		dto.setBudgetAmount("DgNqNmEIJF83/gz7oegdphZ4oZ60YqDqw6i1NC+HDDY=");
 		dto.setQualify(true);
 		Leads lead = new Leads();
 		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
@@ -874,7 +873,7 @@ class LeadServiceImplTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("You can't change budget amount !!", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Lead Not Qualify", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
