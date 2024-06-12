@@ -76,7 +76,7 @@ public class LeadsCardMapperImpl implements LeadsCardMapper {
 		switch (secondaryField) {
 		case LEAD_NAME:
 			return (lead, contacts, leadsCardDto) -> {
-				leadsCardDto.setPrimaryField(
+				leadsCardDto.setSecondaryField(
 						nonNull(contacts) ? contacts.getFirstName() + " " + contacts.getLastName() : "");
 				leadsCardDto.setShortName(shortName(nonNull(contacts) ? contacts.getFirstName() : null,
 						nonNull(contacts) ? contacts.getLastName() : null));
@@ -85,7 +85,7 @@ public class LeadsCardMapperImpl implements LeadsCardMapper {
 			return (lead, contacts, leadsCardDto) -> leadsCardDto.setSecondaryField(lead.getTopic());
 		case COMPANY_NAME:
 			return (lead, contacts, leadsCardDto) -> {
-				leadsCardDto.setPrimaryField(nonNull(contacts) && nonNull(contacts.getCompanyMaster())
+				leadsCardDto.setSecondaryField(nonNull(contacts) && nonNull(contacts.getCompanyMaster())
 						? contacts.getCompanyMaster().getCompanyName()
 						: null);
 				leadsCardDto.setShortName(nonNull(contacts) && nonNull(contacts.getCompanyMaster())
