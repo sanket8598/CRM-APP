@@ -69,7 +69,6 @@ import static ai.rnt.crm.util.CommonUtil.setServiceFallToLead;
 import static ai.rnt.crm.util.CommonUtil.upNextActivities;
 import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
-import static ai.rnt.crm.util.SignatureUtil.decryptAmount;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
 import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
@@ -156,6 +155,7 @@ import ai.rnt.crm.service.LeadService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.EmailUtil;
 import ai.rnt.crm.util.ReadExcelUtil;
+import ai.rnt.crm.util.SignatureUtil;
 import ai.rnt.crm.util.TaskNotificationsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -196,6 +196,7 @@ public class LeadServiceImpl implements LeadService {
 	private final DomainMasterDaoService domainMasterDaoService;
 	private final OpportunityDaoService opportunityDaoService;
 	private final EmailUtil emailUtil;
+	private final SignatureUtil signatureUtil;
 	private final TaskNotificationsUtil taskNotificationsUtil;
 
 	private static final String PRIMFIELD = "PrimaryField";
@@ -213,6 +214,11 @@ public class LeadServiceImpl implements LeadService {
 			Leads leads = TO_LEAD.apply(leadDto).orElseThrow(ResourceNotFoundException::new);
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
 			leads.setStatus(OPEN);
+			if (nonNull(leadDto.getBudgetAmount()) && !leadDto.getBudgetAmount().isEmpty())
+				leads.setBudgetAmount(signatureUtil.decryptAmount(leadDto.getBudgetAmount(), secretKey));
+			else
+				leads.setBudgetAmount(leadDto.getBudgetAmount());
+
 			leads.setDisqualifyAs(OPEN);
 			leads.setPseudoName(auditAwareUtil.getLoggedInUserName());
 			setServiceFallToLead(leadDto.getServiceFallsId(), leads, serviceFallsDaoSevice);
@@ -496,7 +502,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.setCurrentPhase(dto.getCurrentPhase());
 			lead.setProgressStatus(dto.getProgressStatus());
 			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty())
-				lead.setBudgetAmount(decryptAmount(dto.getBudgetAmount(), secretKey));
+				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey));
 			else
 				lead.setBudgetAmount(dto.getBudgetAmount());
 
@@ -587,7 +593,10 @@ public class LeadServiceImpl implements LeadService {
 			Leads lead = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			lead.setTopic(dto.getTopic());
-			lead.setBudgetAmount(dto.getBudgetAmount());
+			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty())
+				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey));
+			else
+				lead.setBudgetAmount(dto.getBudgetAmount());
 			lead.setCustomerNeed(dto.getCustomerNeed());
 			lead.setProposedSolution(dto.getProposedSolution());
 			lead.setPseudoName(dto.getPseudoName());

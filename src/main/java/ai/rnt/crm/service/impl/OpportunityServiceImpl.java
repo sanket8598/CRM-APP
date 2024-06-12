@@ -76,6 +76,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,6 +125,7 @@ import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.service.OpportunityService;
 import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.EmailUtil;
+import ai.rnt.crm.util.SignatureUtil;
 import ai.rnt.crm.util.TaskNotificationsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -136,6 +139,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@PropertySource("classpath:confidential.properties")
 public class OpportunityServiceImpl implements OpportunityService {
 
 	private static final String OPPORTUNITY2 = "Opportunity";
@@ -164,8 +168,12 @@ public class OpportunityServiceImpl implements OpportunityService {
 	private final OpprtAttachmentDaoService opprtAttachmentDaoService;
 	private final TaskNotificationsUtil taskNotificationsUtil;
 	private final EmailUtil emailUtil;
+	private final SignatureUtil signatureUtil;
 
 	private static final String OPPORTUNITY_ID = "opportunityId";
+
+	@Value("${secretkey}")
+	private String secretKey;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityDataByStatus(String status) {
@@ -613,7 +621,10 @@ public class OpportunityServiceImpl implements OpportunityService {
 			lead.setCustomerNeed(dto.getCustomerNeed());
 			lead.setProposedSolution(dto.getProposedSolution());
 			opportunity.setTopic(dto.getTopic());
-			opportunity.setBudgetAmount(dto.getBudgetAmount());
+			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty())
+				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey));
+			else
+				lead.setBudgetAmount(dto.getBudgetAmount());
 			opportunity.setPseudoName(dto.getPseudoName());
 			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));

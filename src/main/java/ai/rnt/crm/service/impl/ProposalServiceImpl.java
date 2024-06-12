@@ -29,6 +29,8 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +52,7 @@ import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.ProposalService;
 import ai.rnt.crm.util.AuditAwareUtil;
+import ai.rnt.crm.util.SignatureUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,6 +64,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@PropertySource("classpath:confidential.properties")
 public class ProposalServiceImpl implements ProposalService {
 
 	private final ProposalDaoService proposalDaoService;
@@ -68,6 +72,10 @@ public class ProposalServiceImpl implements ProposalService {
 	private final OpportunityDaoService opportunityDaoService;
 	private final ServiceFallsDaoSevice serviceFallsDaoSevice;
 	private final AuditAwareUtil auditAwareUtil;
+	private final SignatureUtil signatureUtil;
+
+	@Value("${secretkey}")
+	private String secretKey;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> generateProposalId() {
@@ -225,8 +233,19 @@ public class ProposalServiceImpl implements ProposalService {
 				dto.getProposalServices().stream().forEach(e -> {
 					proposalServicesDaoService.findById(e.getPropServiceId()).ifPresent(ps -> {
 						ps.setServicePrice(e.getServicePrice());
-						proposalById.setSubTotal(dto.getSubTotal());
-						proposalById.setFinalAmount(dto.getFinalAmount());
+						if (nonNull(dto.getSubTotal()) && !dto.getSubTotal().isEmpty()) {
+							try {
+								proposalById.setSubTotal(signatureUtil.decryptAmount(dto.getSubTotal(), secretKey));
+								proposalById
+										.setFinalAmount(signatureUtil.decryptAmount(dto.getFinalAmount(), secretKey));
+							} catch (Exception e1) {
+								log.error("Got Exception while set decrypted amount in updateProposal method..{}",
+										e1.getMessage());
+							}
+						} else {
+							proposalById.setSubTotal(dto.getSubTotal());
+							proposalById.setFinalAmount(dto.getFinalAmount());
+						}
 						proposalById.setDiscount(dto.getDiscount());
 						ps.setProposal(proposalById);
 						try {

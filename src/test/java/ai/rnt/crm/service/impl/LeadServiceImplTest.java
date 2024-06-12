@@ -212,6 +212,9 @@ class LeadServiceImplTest {
 	Description description;
 
 	@Mock
+	SignatureUtil signatureUtil;
+
+	@Mock
 	private Call call;
 
 	@Mock
@@ -859,8 +862,30 @@ class LeadServiceImplTest {
 		assertThrows(CRMException.class, () -> leadService.editLead(leadId));
 	}
 
-	//@Test
+	// @Test
 	void testQualifyLeadUnSuccess() throws Exception {
+		Integer leadId = 1;
+		QualifyLeadDto dto = new QualifyLeadDto();
+		dto.setBudgetAmount("00.00");
+		dto.setQualify(true);
+		Leads lead = new Leads();
+		String secretKey = "Op5sTs3Nr7r9lCSJr2jN3qNyelrSEsO=";
+		// String decryptAmount = SignatureUtil.decryptAmount(dto.getBudgetAmount(),
+		// secretKey);
+		// dto.setBudgetAmount(decryptAmount);
+		when(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey)).thenReturn(anyString());
+		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
+		when(leadDaoService.addLead(any())).thenReturn(lead);
+		when(serviceFallsDaoSevice.findByName("Other")).thenReturn(Optional.of(new ServiceFallsMaster()));
+		when(serviceFallsDaoSevice.getServiceFallById(1)).thenReturn(Optional.of(new ServiceFallsMaster()));
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Lead Not Qualify", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testQualifyLeadUnSuccess1() throws Exception {
 		Integer leadId = 1;
 		QualifyLeadDto dto = new QualifyLeadDto();
 		dto.setBudgetAmount("DgNqNmEIJF83/gz7oegdphZ4oZ60YqDqw6i1NC+HDDY=");
@@ -870,6 +895,7 @@ class LeadServiceImplTest {
 		when(leadDaoService.addLead(any())).thenReturn(lead);
 		when(serviceFallsDaoSevice.findByName("Other")).thenReturn(Optional.of(new ServiceFallsMaster()));
 		when(serviceFallsDaoSevice.getServiceFallById(1)).thenReturn(Optional.of(new ServiceFallsMaster()));
+
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));

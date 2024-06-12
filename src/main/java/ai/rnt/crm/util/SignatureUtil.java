@@ -4,8 +4,9 @@ import static java.lang.System.arraycopy;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Base64.getDecoder;
 import static java.util.Base64.getEncoder;
+import static java.util.Objects.isNull;
+import static javax.crypto.Cipher.DECRYPT_MODE;
 import static javax.crypto.Mac.getInstance;
-import static lombok.AccessLevel.PRIVATE;
 
 import java.security.Key;
 import java.security.SecureRandom;
@@ -15,8 +16,10 @@ import javax.crypto.Mac;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.stereotype.Component;
+
 import ai.rnt.crm.exception.CRMException;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -25,8 +28,9 @@ import lombok.extern.slf4j.Slf4j;
  * @version 1.0
  *
  */
-@NoArgsConstructor(access = PRIVATE)
+@RequiredArgsConstructor
 @Slf4j
+@Component
 public class SignatureUtil {
 
 	private static final String SECRET_KEY = keyGenerator();
@@ -59,27 +63,40 @@ public class SignatureUtil {
 
 	public static String keyGenerator() {
 		log.info("inside the keyGenerator method..");
-		SecureRandom secureRandom = new SecureRandom();
-		byte[] key = new byte[32];
-		secureRandom.nextBytes(key);
-		return getEncoder().encodeToString(key);
+		try {
+			SecureRandom secureRandom = new SecureRandom();
+			byte[] key = new byte[32];
+			secureRandom.nextBytes(key);
+			return getEncoder().encodeToString(key);
+		} catch (Exception e) {
+			log.error("Got exception while generating the secret key...{}", e);
+			throw new CRMException(e);
+		}
 	}
 
-	public static String decryptAmount(String encryptedData, String secretKey) throws Exception {
-		byte[] decodedData = getDecoder().decode(encryptedData);
-		byte[] iv = new byte[GCM_IV_LENGTH];
-		byte[] ciphertext = new byte[decodedData.length - GCM_IV_LENGTH];
+	public String decryptAmount(String encryptedData, String secretKey) throws Exception {
+		log.info("inside the decryptAmount method...{} ", encryptedData, secretKey);
+		try {
+			if (isNull(secretKey))
+				return encryptedData;
+			byte[] decodedData = getDecoder().decode(encryptedData);
+			byte[] iv = new byte[GCM_IV_LENGTH];
+			byte[] ciphertext = new byte[decodedData.length - GCM_IV_LENGTH];
 
-		arraycopy(decodedData, 0, iv, 0, GCM_IV_LENGTH);
-		arraycopy(decodedData, GCM_IV_LENGTH, ciphertext, 0, ciphertext.length);
+			arraycopy(decodedData, 0, iv, 0, GCM_IV_LENGTH);
+			arraycopy(decodedData, GCM_IV_LENGTH, ciphertext, 0, ciphertext.length);
 
-		GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
-		SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(UTF_8), "AES");
+			GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+			SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(UTF_8), "AES");
 
-		Cipher cipher = Cipher.getInstance(GCM_ALGORITHM);
-		cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, gcmParameterSpec);
+			Cipher cipher = Cipher.getInstance(GCM_ALGORITHM);
+			cipher.init(DECRYPT_MODE, secretKeySpec, gcmParameterSpec);
 
-		byte[] decryptedBytes = cipher.doFinal(ciphertext);
-		return new String(decryptedBytes, UTF_8);
+			byte[] decryptedBytes = cipher.doFinal(ciphertext);
+			return new String(decryptedBytes, UTF_8);
+		} catch (Exception e) {
+			log.error("Got exception while decrypting the budget amount...{}", e);
+			throw new CRMException(e);
+		}
 	}
 }
