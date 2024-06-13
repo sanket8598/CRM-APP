@@ -43,6 +43,9 @@ public class SignatureUtil {
 
 	private static final int GCM_IV_LENGTH = 12;
 
+	private static final int IV_LENGTH = 12;
+	private static final int TAG_LENGTH_BIT = 128;
+
 	public static String generateSignature(String data) {
 		log.info("inside the generateSignature method..{}", data);
 		try {
@@ -74,7 +77,7 @@ public class SignatureUtil {
 		}
 	}
 
-	public String decryptAmount(String encryptedData, String secretKey) throws Exception {
+	public String decryptBudgetAmount(String encryptedData, String secretKey) throws Exception {
 		log.info("inside the decryptAmount method...{} ", encryptedData, secretKey);
 		try {
 			if (isNull(secretKey))
@@ -96,6 +99,18 @@ public class SignatureUtil {
 			return new String(decryptedBytes, UTF_8);
 		} catch (Exception e) {
 			log.error("Got exception while decrypting the budget amount...{}", e);
+			throw new CRMException(e);
+		}
+	}
+
+	public String decryptAmount(String encodedString) throws Exception {
+		log.info("inside the decryptAmount method...{} ", encodedString);
+		try {
+			if (isNull(encodedString))
+				return null;
+			return new String(getDecoder().decode(encodedString));
+		} catch (Exception e) {
+			log.error("Got exception while decoding the budget amount...{}", e);
 			throw new CRMException(e);
 		}
 	}

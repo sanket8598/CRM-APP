@@ -235,9 +235,8 @@ public class ProposalServiceImpl implements ProposalService {
 						ps.setServicePrice(e.getServicePrice());
 						if (nonNull(dto.getSubTotal()) && !dto.getSubTotal().isEmpty()) {
 							try {
-								proposalById.setSubTotal(signatureUtil.decryptAmount(dto.getSubTotal(), secretKey));
-								proposalById
-										.setFinalAmount(signatureUtil.decryptAmount(dto.getFinalAmount(), secretKey));
+								proposalById.setSubTotal(signatureUtil.decryptAmount(dto.getSubTotal()));
+								proposalById.setFinalAmount(signatureUtil.decryptAmount(dto.getFinalAmount()));
 							} catch (Exception e1) {
 								log.error("Got Exception while set decrypted amount in updateProposal method..{}",
 										e1.getMessage());

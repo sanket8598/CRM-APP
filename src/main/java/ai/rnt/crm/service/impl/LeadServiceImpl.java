@@ -215,7 +215,7 @@ public class LeadServiceImpl implements LeadService {
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
 			leads.setStatus(OPEN);
 			if (nonNull(leadDto.getBudgetAmount()) && !leadDto.getBudgetAmount().isEmpty())
-				leads.setBudgetAmount(signatureUtil.decryptAmount(leadDto.getBudgetAmount(), secretKey));
+				leads.setBudgetAmount(signatureUtil.decryptAmount(leadDto.getBudgetAmount()));
 			else
 				leads.setBudgetAmount(leadDto.getBudgetAmount());
 
@@ -502,7 +502,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.setCurrentPhase(dto.getCurrentPhase());
 			lead.setProgressStatus(dto.getProgressStatus());
 			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty())
-				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey));
+				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount()));
 			else
 				lead.setBudgetAmount(dto.getBudgetAmount());
 
@@ -594,7 +594,7 @@ public class LeadServiceImpl implements LeadService {
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			lead.setTopic(dto.getTopic());
 			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty())
-				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey));
+				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount()));
 			else
 				lead.setBudgetAmount(dto.getBudgetAmount());
 			lead.setCustomerNeed(dto.getCustomerNeed());
