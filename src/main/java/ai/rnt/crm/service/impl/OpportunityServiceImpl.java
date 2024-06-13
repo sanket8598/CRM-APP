@@ -622,9 +622,9 @@ public class OpportunityServiceImpl implements OpportunityService {
 			lead.setProposedSolution(dto.getProposedSolution());
 			opportunity.setTopic(dto.getTopic());
 			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty())
-				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount()));
+				opportunity.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount()));
 			else
-				lead.setBudgetAmount(dto.getBudgetAmount());
+				opportunity.setBudgetAmount(dto.getBudgetAmount());
 			opportunity.setPseudoName(dto.getPseudoName());
 			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
