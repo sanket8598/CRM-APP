@@ -25,6 +25,7 @@ import static ai.rnt.crm.constants.MessageConstants.WAIT_FOR;
 import static ai.rnt.crm.constants.RegexConstant.IS_DIGIT;
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.constants.StatusConstants.CALL;
+import static ai.rnt.crm.constants.StatusConstants.DESCRIPTION;
 import static ai.rnt.crm.constants.StatusConstants.EMAIL;
 import static ai.rnt.crm.constants.StatusConstants.LEAD;
 import static ai.rnt.crm.constants.StatusConstants.MEETING;
@@ -55,6 +56,7 @@ import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDateDateWithTime;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
+import static java.lang.Boolean.TRUE;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.time.LocalDateTime.now;
@@ -432,6 +434,13 @@ public class CommonUtil {
 			List<Email> emails, List<Meetings> meetings, EmployeeService employeeService) {
 		List<TimeLineActivityDto> upNext = calls.stream().filter(UPNEXT_CALL).map(call -> {
 			EditCallDto callDto = new EditCallDto();
+			if (TRUE.equals(call.getIsOpportunity())) {
+				callDto.setParentId(call.getLead().getOpportunity().getOpportunityId());
+				callDto.setActivityFrom(OPPORTUNITY);
+			} else {
+				callDto.setParentId(call.getLead().getLeadId());
+				callDto.setActivityFrom(LEAD);
+			}
 			callDto.setId(call.getCallId());
 			callDto.setSubject(call.getSubject());
 			callDto.setType(CALL);
@@ -447,6 +456,13 @@ public class CommonUtil {
 
 		upNext.addAll(visits.stream().filter(UPNEXT_VISIT).map(visit -> {
 			EditVisitDto editVisitDto = new EditVisitDto();
+			if (TRUE.equals(visit.getIsOpportunity())) {
+				editVisitDto.setParentId(visit.getLead().getOpportunity().getOpportunityId());
+				editVisitDto.setActivityFrom(OPPORTUNITY);
+			} else {
+				editVisitDto.setParentId(visit.getLead().getLeadId());
+				editVisitDto.setActivityFrom(LEAD);
+			}
 			editVisitDto.setId(visit.getVisitId());
 			editVisitDto.setLocation(visit.getLocation());
 			editVisitDto.setSubject(visit.getSubject());
@@ -461,6 +477,13 @@ public class CommonUtil {
 		}).collect(toList()));
 		upNext.addAll(meetings.stream().filter(UPNEXT_MEETING).map(meet -> {
 			EditMeetingDto meetDto = new EditMeetingDto();
+			if (TRUE.equals(meet.getIsOpportunity())) {
+				meetDto.setParentId(meet.getLead().getOpportunity().getOpportunityId());
+				meetDto.setActivityFrom(OPPORTUNITY);
+			} else {
+				meetDto.setParentId(meet.getLead().getLeadId());
+				meetDto.setActivityFrom(LEAD);
+			}
 			meetDto.setId(meet.getMeetingId());
 			meetDto.setType(MEETING);
 			employeeService.getById(meet.getCreatedBy())
@@ -484,7 +507,7 @@ public class CommonUtil {
 			DescriptionDto descriptionDto = new DescriptionDto();
 			descriptionDto.setDescId(description.getDescId());
 			descriptionDto.setSubject(description.getSubject());
-			descriptionDto.setType("Description");
+			descriptionDto.setType(DESCRIPTION);
 			descriptionDto.setDesc(description.getDesc());
 			descriptionDto.setStatus(description.getStatus());
 			descriptionDto.setGetDate(description.getDate());

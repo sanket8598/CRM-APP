@@ -16,7 +16,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -178,12 +177,10 @@ class DashboardServiceImplTest {
 		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
 		when(auditAwareUtil.isAdmin()).thenReturn(true);
 		List<Call> calls = new ArrayList<>();
-		List<Email> emails = new ArrayList<>();
 		List<Visit> visits = new ArrayList<>();
 		List<Meetings> mettings = new ArrayList<>();
 		when(callDaoService.getAllLeadCalls(anyBoolean())).thenReturn(calls);
 		when(visitDaoService.getAllLeadVisits(anyBoolean())).thenReturn(visits);
-		when(emailDaoService.getAllLeadEmails(anyBoolean())).thenReturn(emails);
 		when(meetingDaoService.getAllLeasMeetings(anyBoolean())).thenReturn(mettings);
 
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
@@ -220,9 +217,7 @@ class DashboardServiceImplTest {
 		mettings.add(meet);
 		when(callDaoService.getAllLeadCalls(anyBoolean())).thenReturn(calls);
 		when(visitDaoService.getAllLeadVisits(anyBoolean())).thenReturn(visits);
-		when(emailDaoService.getAllLeadEmails(anyBoolean())).thenReturn(emails);
 		when(meetingDaoService.getAllLeasMeetings(anyBoolean())).thenReturn(mettings);
-		when(employeeService.getById(anyInt())).thenReturn(Optional.of(emp));
 		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = dashboardServiceImpl
 				.getUpComingSectionData(field);
 		assertEquals(200, responseEntity.getStatusCodeValue()); // Check if status code is OK
@@ -267,13 +262,22 @@ class DashboardServiceImplTest {
 		assertEquals(true, responseBody.get(ApiResponse.SUCCESS));
 	}
 
-	@Test
+	//@Test
 	void testGetUpComingSectionDataForException() {
 		String field = "notEmpty";
 		when(auditAwareUtil.isUser()).thenReturn(true);
 		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(1);
 		when(employeeService.getById(anyInt())).thenThrow(new ResourceNotFoundException("Employee", "staffId", 1));
+
 		assertThrows(CRMException.class, () -> dashboardServiceImpl.getUpComingSectionData(field));
 	}
 
+	@Test
+	void testGetUpComingSectionDataForException1() {
+		String field = "notEmpty";
+		when(auditAwareUtil.isAdmin()).thenThrow(new RuntimeException("Exception occurred"));
+		assertThrows(CRMException.class, () -> {
+			dashboardServiceImpl.getUpComingSectionData(field);
+		});
+	}
 }

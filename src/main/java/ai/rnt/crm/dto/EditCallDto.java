@@ -10,6 +10,8 @@ import lombok.Setter;
 public class EditCallDto extends TimeLineActivityDto {
 
 	private Integer id;
+	private Integer parentId;
+	private String activityFrom;
 	private String type;
 	private String subject;
 	private String body;

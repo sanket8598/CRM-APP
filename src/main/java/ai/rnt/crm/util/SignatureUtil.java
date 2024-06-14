@@ -1,6 +1,5 @@
 package ai.rnt.crm.util;
 
-import static java.lang.System.arraycopy;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Base64.getDecoder;
 import static java.util.Base64.getEncoder;
@@ -13,7 +12,7 @@ import java.security.SecureRandom;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
-import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.stereotype.Component;
@@ -36,15 +35,6 @@ public class SignatureUtil {
 	private static final String SECRET_KEY = keyGenerator();
 
 	private static final String HMAC_SHA_256 = "HmacSHA256";
-
-	private static final String GCM_ALGORITHM = "AES/GCM/NoPadding";
-
-	private static final int GCM_TAG_LENGTH = 16 * 8;
-
-	private static final int GCM_IV_LENGTH = 12;
-
-	private static final int IV_LENGTH = 12;
-	private static final int TAG_LENGTH_BIT = 128;
 
 	public static String generateSignature(String data) {
 		log.info("inside the generateSignature method..{}", data);
@@ -77,40 +67,20 @@ public class SignatureUtil {
 		}
 	}
 
-	public String decryptBudgetAmount(String encryptedData, String secretKey) throws Exception {
-		log.info("inside the decryptAmount method...{} ", encryptedData, secretKey);
+	public String decryptAmount(String encryptedData, String secretKey, String cbcAlgo) throws Exception {
+		log.info("inside the decryptAmount method using AES/CBC...{}{}{} ", encryptedData, secretKey, cbcAlgo);
 		try {
-			if (isNull(secretKey))
-				return encryptedData;
+			if (isNull(encryptedData) && isNull(secretKey))
+				return null;
 			byte[] decodedData = getDecoder().decode(encryptedData);
-			byte[] iv = new byte[GCM_IV_LENGTH];
-			byte[] ciphertext = new byte[decodedData.length - GCM_IV_LENGTH];
-
-			arraycopy(decodedData, 0, iv, 0, GCM_IV_LENGTH);
-			arraycopy(decodedData, GCM_IV_LENGTH, ciphertext, 0, ciphertext.length);
-
-			GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(GCM_TAG_LENGTH, iv);
+			IvParameterSpec ivParameterSpec = new IvParameterSpec(secretKey.getBytes(UTF_8));
 			SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(UTF_8), "AES");
-
-			Cipher cipher = Cipher.getInstance(GCM_ALGORITHM);
-			cipher.init(DECRYPT_MODE, secretKeySpec, gcmParameterSpec);
-
-			byte[] decryptedBytes = cipher.doFinal(ciphertext);
+			Cipher cipher = Cipher.getInstance(cbcAlgo);
+			cipher.init(DECRYPT_MODE, secretKeySpec, ivParameterSpec);
+			byte[] decryptedBytes = cipher.doFinal(decodedData);
 			return new String(decryptedBytes, UTF_8);
 		} catch (Exception e) {
-			log.error("Got exception while decrypting the budget amount...{}", e);
-			throw new CRMException(e);
-		}
-	}
-
-	public String decryptAmount(String encodedString) throws Exception {
-		log.info("inside the decryptAmount method...{} ", encodedString);
-		try {
-			if (isNull(encodedString))
-				return null;
-			return new String(getDecoder().decode(encodedString));
-		} catch (Exception e) {
-			log.error("Got exception while decoding the budget amount...{}", e);
+			log.error("Got exception while decrypting the budget amount using AES/CBC...{}", e);
 			throw new CRMException(e);
 		}
 	}

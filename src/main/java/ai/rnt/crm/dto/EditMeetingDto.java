@@ -13,6 +13,10 @@ public class EditMeetingDto extends TimeLineActivityDto {
 
 	private Integer id;
 
+	private Integer parentId;
+
+	private String activityFrom;
+
 	private String subject;
 
 	private String body;

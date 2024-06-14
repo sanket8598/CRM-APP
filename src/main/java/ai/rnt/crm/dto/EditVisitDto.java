@@ -17,6 +17,10 @@ public class EditVisitDto extends TimeLineActivityDto {
 
 	private Integer id;
 
+	private Integer parentId;
+	
+	private String activityFrom;
+
 	private String location;
 
 	private String subject;

@@ -873,7 +873,7 @@ class LeadServiceImplTest {
 		// String decryptAmount = SignatureUtil.decryptAmount(dto.getBudgetAmount(),
 		// secretKey);
 		// dto.setBudgetAmount(decryptAmount);
-		when(signatureUtil.decryptAmount(dto.getBudgetAmount())).thenReturn(anyString());
+		//when(signatureUtil.decryptAmount(dto.getBudgetAmount())).thenReturn(anyString());
 		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
 		when(leadDaoService.addLead(any())).thenReturn(lead);
 		when(serviceFallsDaoSevice.findByName("Other")).thenReturn(Optional.of(new ServiceFallsMaster()));

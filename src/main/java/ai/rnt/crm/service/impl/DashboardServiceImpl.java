@@ -1,7 +1,6 @@
 package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.CRMConstants.COUNTDATA;
-import static ai.rnt.crm.constants.CRMConstants.STAFF_ID;
 import static ai.rnt.crm.constants.OppurtunityStatus.LEADS_BY_SOURCE;
 import static ai.rnt.crm.constants.OppurtunityStatus.LOST;
 import static ai.rnt.crm.constants.OppurtunityStatus.OPEN;
@@ -45,7 +44,6 @@ import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Opportunity;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
-import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.DashboardService;
 import ai.rnt.crm.service.EmployeeService;
 import ai.rnt.crm.util.AuditAwareUtil;
@@ -67,7 +65,6 @@ public class DashboardServiceImpl implements DashboardService {
 	private final OpportunityDaoService opportunityDaoService;
 	private final CallDaoService callDaoService;
 	private final AuditAwareUtil auditAwareUtil;
-	private final EmailDaoService emailDaoService;
 	private final VisitDaoService visitDaoService;
 	private final MeetingDaoService meetingDaoService;
 	private final EmployeeService employeeService;
@@ -151,13 +148,14 @@ public class DashboardServiceImpl implements DashboardService {
 			if (auditAwareUtil.isAdmin())
 				upComingData.put(DATA,
 						getUpnextActivities(callDaoService.getAllLeadCalls(isOpportunity),
-								visitDaoService.getAllLeadVisits(isOpportunity),
-								emailDaoService.getAllLeadEmails(isOpportunity),
+								visitDaoService.getAllLeadVisits(isOpportunity), null,
 								meetingDaoService.getAllLeasMeetings(isOpportunity), employeeService));
 			else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
-				String emailId = employeeService.getById(loggedInStaffId)
-						.orElseThrow(() -> new ResourceNotFoundException("Employee", STAFF_ID, loggedInStaffId))
-						.getEmailId();
+				/*
+				 * String emailId = employeeService.getById(loggedInStaffId) .orElseThrow(() ->
+				 * new ResourceNotFoundException("Employee", STAFF_ID, loggedInStaffId))
+				 * .getEmailId();
+				 */
 				upComingData.put(DATA,
 						getUpnextActivities(
 								callDaoService.getAllLeadCalls(isOpportunity).stream()
@@ -166,9 +164,7 @@ public class DashboardServiceImpl implements DashboardService {
 								visitDaoService.getAllLeadVisits(isOpportunity).stream()
 										.filter(visit -> visit.getVisitBy().getStaffId().equals(loggedInStaffId))
 										.collect(Collectors.toList()),
-								emailDaoService.getAllLeadEmails(isOpportunity).stream()
-										.filter(email -> email.getMailFrom().equalsIgnoreCase(emailId))
-										.collect(Collectors.toList()),
+								null,
 								meetingDaoService.getAllLeasMeetings(isOpportunity).stream()
 										.filter(meet -> meet.getAssignTo().getStaffId().equals(loggedInStaffId))
 										.collect(Collectors.toList()),

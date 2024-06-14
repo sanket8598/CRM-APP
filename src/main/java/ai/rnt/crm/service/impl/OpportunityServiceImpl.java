@@ -175,6 +175,9 @@ public class OpportunityServiceImpl implements OpportunityService {
 	@Value("${secretkey}")
 	private String secretKey;
 
+	@Value("${cbcalgo}")
+	private String cbcAlgo;
+
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getOpportunityDataByStatus(String status) {
 		log.info("inside the getOpportunityDataByStatus method...{}", status);
@@ -622,7 +625,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			lead.setProposedSolution(dto.getProposedSolution());
 			opportunity.setTopic(dto.getTopic());
 			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty())
-				opportunity.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount()));
+				opportunity.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey, cbcAlgo));
 			else
 				opportunity.setBudgetAmount(dto.getBudgetAmount());
 			opportunity.setPseudoName(dto.getPseudoName());

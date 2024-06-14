@@ -77,6 +77,9 @@ public class ProposalServiceImpl implements ProposalService {
 	@Value("${secretkey}")
 	private String secretKey;
 
+	@Value("${cbcalgo}")
+	private String cbcAlgo;
+
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> generateProposalId() {
 		log.info("inside the generateProposalId method...");
@@ -235,8 +238,10 @@ public class ProposalServiceImpl implements ProposalService {
 						ps.setServicePrice(e.getServicePrice());
 						if (nonNull(dto.getSubTotal()) && !dto.getSubTotal().isEmpty()) {
 							try {
-								proposalById.setSubTotal(signatureUtil.decryptAmount(dto.getSubTotal()));
-								proposalById.setFinalAmount(signatureUtil.decryptAmount(dto.getFinalAmount()));
+								proposalById.setSubTotal(
+										signatureUtil.decryptAmount(dto.getSubTotal(), secretKey, cbcAlgo));
+								proposalById.setFinalAmount(
+										signatureUtil.decryptAmount(dto.getFinalAmount(), secretKey, cbcAlgo));
 							} catch (Exception e1) {
 								log.error("Got Exception while set decrypted amount in updateProposal method..{}",
 										e1.getMessage());

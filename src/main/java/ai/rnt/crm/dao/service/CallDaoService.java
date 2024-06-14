@@ -32,5 +32,5 @@ public interface CallDaoService extends CrudService<Call, CallDto> {
 
 	List<Call> getCallsByLeadIdAndIsOpportunity(Integer leadId);
 
-	List<Call> getAllLeadCalls(boolean isOpprtunity);
+	List<Call> getAllLeadCalls(boolean isOpportunity);
 }
