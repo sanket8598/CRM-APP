@@ -35,7 +35,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import ai.rnt.crm.dao.service.CallDaoService;
-import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;

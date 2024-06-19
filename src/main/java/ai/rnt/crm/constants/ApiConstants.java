@@ -116,6 +116,9 @@ public final class ApiConstants {
 	public static final String UPDATE_EMAIL = SEPERATOR + UPDATE + SEPERATOR + EMAIL_ID + SEPERATOR + STATUS;
 	public static final String ASSIGN_EMAIL = SEPERATOR + ASSIGN;
 	public static final String DELETE_EMAIL = SEPERATOR + DELETE + SEPERATOR + EMAIL_ID;
+	
+	// Customer
+    public static final String CUSTOMER = BASE + "customer" + SEPERATOR;
 
 	// City
 	public static final String CITY = BASE + "city" + SEPERATOR;
