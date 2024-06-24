@@ -2,8 +2,8 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static ai.rnt.crm.dto_mapper.CountryDtoMapper.TO_COUNTRY;
-import static ai.rnt.crm.dto_mapper.CountryDtoMapper.TO_COUNTRY_DTO;
 import static ai.rnt.crm.dto_mapper.CountryDtoMapper.TO_COUNTRY_DTOS;
+import static ai.rnt.crm.dto_mapper.CountryDtoMapper.TO_COUNTRY_DTO_DATA;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
@@ -89,7 +89,7 @@ public class CountryServiceImpl implements CountryService {
 		log.info("inside the getCountry method...{}", countryId);
 		EnumMap<ApiResponse, Object> getCountryData = new EnumMap<>(ApiResponse.class);
 		try {
-			getCountryData.put(DATA, TO_COUNTRY_DTO.apply(countryDaoService.findCountryById(countryId)
+			getCountryData.put(DATA, TO_COUNTRY_DTO_DATA.apply(countryDaoService.findCountryById(countryId)
 					.orElseThrow(() -> new ResourceNotFoundException("CountryMaster", "countryId", countryId))));
 			getCountryData.put(SUCCESS, true);
 			return new ResponseEntity<>(getCountryData, OK);
