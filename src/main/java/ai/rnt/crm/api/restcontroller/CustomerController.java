@@ -19,13 +19,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(CUSTOMER)
 @RequiredArgsConstructor
 public class CustomerController {
-	
+
 	private final CustomerService customerService;
-	
+
 	@PreAuthorize(CHECK_BOTH_ACCESS)
-	@GetMapping()
-	public ResponseEntity<EnumMap<ApiResponse, Object>> customerDashboardData(){
+	@GetMapping
+	public ResponseEntity<EnumMap<ApiResponse, Object>> customerDashboardData() {
 		return customerService.customerDashBoardData();
 	}
-
 }

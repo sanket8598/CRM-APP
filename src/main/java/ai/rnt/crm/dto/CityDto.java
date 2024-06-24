@@ -11,5 +11,5 @@ public class CityDto {
 
 	private String city;
 
-	private Integer stateId;
+	private StateDto state;
 }

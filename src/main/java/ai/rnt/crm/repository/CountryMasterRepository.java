@@ -10,4 +10,5 @@ public interface CountryMasterRepository extends JpaRepository<CountryMaster, In
 
 	Optional<CountryMaster> findTopByCountry(String countryName);
 
+	boolean existsByCountry(String country);
 }

@@ -9,8 +9,12 @@ import ai.rnt.crm.entity.CountryMaster;
 public interface CountryDaoService extends CrudService<CountryMaster, CountryDto> {
 
 	List<CountryMaster> getAllCountry();
-   
+
 	Optional<CountryMaster> findByCountryName(String countryName);
 
 	CountryMaster addCountry(CountryMaster country);
+
+	Optional<CountryMaster> findCountryById(Integer countryId);
+
+	boolean isCountryPresent(String country);
 }

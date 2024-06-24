@@ -3,7 +3,7 @@ package ai.rnt.crm.service.impl;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
 
@@ -27,13 +27,13 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> customerDashBoardData() {
 		log.info("inside the customerDashBoardData method...");
-		EnumMap<ApiResponse, Object> data = new EnumMap<>(ApiResponse.class);
+		EnumMap<ApiResponse, Object> customerDashbordData = new EnumMap<>(ApiResponse.class);
 		try {
-			data.put(DATA, TO_CONTACT_DTOS.apply(contactDaoService.findAllPrimaryContacts()));
-			data.put(SUCCESS, true);
-			return new ResponseEntity<>(data, CREATED);
+			customerDashbordData.put(DATA, TO_CONTACT_DTOS.apply(contactDaoService.findAllPrimaryContacts()));
+			customerDashbordData.put(SUCCESS, true);
+			return new ResponseEntity<>(customerDashbordData, OK);
 		} catch (Exception e) {
-			data.put(SUCCESS, false);
+			customerDashbordData.put(SUCCESS, false);
 			log.error("error occured while getting customer list..{}", e.getMessage());
 			throw new CRMException(e);
 		}

@@ -1,10 +1,12 @@
 package ai.rnt.crm.api.restcontroller;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,9 +20,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import ai.rnt.crm.dto.DescriptionDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadSortFilterDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
@@ -214,5 +218,23 @@ class LeadsControllerTest {
 		when(leadService.getForQualifyLead(leadId)).thenReturn(expectedResponse);
 		leadsController.editQualifyLead(leadId);
 		verify(leadService).getForQualifyLead(leadId);
+	}
+
+	@Test
+	void testAddDescription() {
+		Integer leadId = 1;
+		DescriptionDto descriptionDto = new DescriptionDto();
+		descriptionDto.setDesc("Sample Description");
+		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+		expectedResponse.put(ApiResponse.SUCCESS, "Description added successfully");
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = new ResponseEntity<>(expectedResponse,
+				HttpStatus.CREATED);
+		when(leadService.addDescription(descriptionDto, leadId)).thenReturn(responseEntity);
+		ResponseEntity<EnumMap<ApiResponse, Object>> actualResponse = leadsController.addDescription(descriptionDto,
+				leadId);
+		assertEquals(responseEntity, actualResponse);
+		assertEquals(HttpStatus.CREATED, actualResponse.getStatusCode());
+		assertEquals(expectedResponse, actualResponse.getBody());
+		verify(leadService, times(1)).addDescription(descriptionDto, leadId);
 	}
 }

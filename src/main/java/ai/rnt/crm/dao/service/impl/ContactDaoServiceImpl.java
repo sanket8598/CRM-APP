@@ -47,4 +47,16 @@ public class ContactDaoServiceImpl implements ContactDaoService {
 		log.info("inside the findAllPrimaryContacts method...");
 		return contactRepository.findByPrimaryTrue();
 	}
+
+	@Override
+	public List<Contacts> findAllContacts() {
+		log.info("inside the findAllContacts method...");
+		return contactRepository.findAll();
+	}
+
+	@Override
+	public List<Contacts> findByCompanyId(Integer companyId) {
+		log.info("inside the ContactDaoServiceImpl findByCompanyId method...{}", companyId);
+		return contactRepository.findByCompanyMasterCompanyId(companyId);
+	}
 }

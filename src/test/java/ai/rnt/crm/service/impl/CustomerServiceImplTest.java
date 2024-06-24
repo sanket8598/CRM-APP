@@ -8,7 +8,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
 
@@ -40,7 +40,7 @@ class CustomerServiceImplTest {
 		when(contactDaoService.findAllPrimaryContacts()).thenReturn(asList(contacts1, contacts2));
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = customerServiceImpl.customerDashBoardData();
 		assertNotNull(response);
-		assertEquals(CREATED, response.getStatusCode());
+		assertEquals(OK, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(SUCCESS));
 	}
 

@@ -11,4 +11,6 @@ public interface ContactRepository extends JpaRepository<Contacts, Integer> {
 	List<Contacts> findByLeadLeadIdOrderByCreatedDate(Integer leadId);
 
 	List<Contacts> findByPrimaryTrue();
+
+	List<Contacts> findByCompanyMasterCompanyId(Integer companyId);
 }

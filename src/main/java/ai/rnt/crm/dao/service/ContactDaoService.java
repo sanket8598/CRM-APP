@@ -16,4 +16,8 @@ public interface ContactDaoService extends CrudService<Contacts, ContactDto> {
 
 	public List<Contacts> findAllPrimaryContacts();
 
+	public List<Contacts> findAllContacts();
+
+	public List<Contacts> findByCompanyId(Integer companyId);
+
 }

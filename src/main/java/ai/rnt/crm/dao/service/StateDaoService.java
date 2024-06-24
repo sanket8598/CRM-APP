@@ -9,9 +9,14 @@ import ai.rnt.crm.entity.StateMaster;
 public interface StateDaoService extends CrudService<StateMaster, StateDto> {
 
 	List<StateMaster> getAllState();
-	
+
 	Optional<StateMaster> findBystate(String state);
 
 	StateMaster addState(StateMaster state);
 
+	List<StateMaster> findByCountryId(Integer countryId);
+
+	boolean isStatePresent(String state, Integer countryId);
+
+	Optional<StateMaster> findStateById(Integer stateId);
 }
