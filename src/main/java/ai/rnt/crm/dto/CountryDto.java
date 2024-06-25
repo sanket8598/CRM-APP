@@ -13,6 +13,4 @@ public class CountryDto {
 
 	private String country;
 
-	private List<StateDto> states;
-
 }

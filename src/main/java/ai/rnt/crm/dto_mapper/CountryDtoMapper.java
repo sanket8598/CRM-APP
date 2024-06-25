@@ -9,8 +9,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.CityDto;
+import ai.rnt.crm.dto.CountryAndStateDto;
 import ai.rnt.crm.dto.CountryDto;
-import ai.rnt.crm.dto.StateDto;
+import ai.rnt.crm.dto.StateAndCityDto;
 import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.StateMaster;
@@ -59,11 +60,11 @@ public class CountryDtoMapper {
 	public static final Function<Collection<CountryMaster>, List<CountryDto>> TO_COUNTRY_DTOS = e -> e.stream()
 			.map(dm -> TO_COUNTRY_DTO.apply(dm).get()).collect(Collectors.toList());
 
-	public static final Function<CountryMaster, Optional<CountryDto>> TO_COUNTRY_DTO_DATA = countryMaster -> {
+	public static final Function<CountryMaster, Optional<CountryAndStateDto>> TO_COUNTRY_DTO_DATA = countryMaster -> {
 		if (countryMaster == null) {
 			return Optional.empty();
 		}
-		CountryDto countryDto = new CountryDto();
+		CountryAndStateDto countryDto = new CountryAndStateDto();
 		countryDto.setCountryId(countryMaster.getCountryId());
 		countryDto.setCountry(countryMaster.getCountry());
 		countryDto.setStates(countryMaster.getStates().stream().map(stateMaster -> mapToStateDto(stateMaster))
@@ -71,8 +72,8 @@ public class CountryDtoMapper {
 		return Optional.of(countryDto);
 	};
 
-	private static StateDto mapToStateDto(StateMaster stateMaster) {
-		StateDto stateDto = new StateDto();
+	private static StateAndCityDto mapToStateDto(StateMaster stateMaster) {
+		StateAndCityDto stateDto = new StateAndCityDto();
 		stateDto.setStateId(stateMaster.getStateId());
 		stateDto.setState(stateMaster.getState());
 		stateDto.setCities(stateMaster.getCities().stream().map(cityMaster -> mapToCityDto(cityMaster))
