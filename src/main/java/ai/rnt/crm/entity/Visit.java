@@ -2,6 +2,7 @@ package ai.rnt.crm.entity;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
+import static org.hibernate.annotations.FetchMode.JOIN;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.Where;
 
 import lombok.Getter;
@@ -64,5 +66,6 @@ public class Visit extends CommonField {
 	private Leads lead;
 	
 	@OneToMany(mappedBy = "visit", cascade = ALL, orphanRemoval = true)
+	@Fetch(JOIN)
 	private List<VisitTask> visitTasks = new ArrayList<>();
 }

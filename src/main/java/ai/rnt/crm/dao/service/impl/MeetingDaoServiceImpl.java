@@ -38,7 +38,7 @@ public class MeetingDaoServiceImpl implements MeetingDaoService {
 	private final MeetingTaskRepository meetingTaskRepository;
 
 	@Override
-	//@CacheEvict(value = { MEETINGS, MEETINGS_BY_LEAD_ID }, allEntries = true)
+	@CacheEvict(value = { MEETINGS, MEETINGS_BY_LEAD_ID }, allEntries = true)
 	public Meetings addMeeting(Meetings metting) {
 		log.info("inside the addMeeting method...");
 		return meetingRepository.save(metting);
@@ -90,7 +90,7 @@ public class MeetingDaoServiceImpl implements MeetingDaoService {
 	}
 
 	@Override
-//	@Cacheable(value = MEETINGS, key = "#isOpportunity", condition = "#isOpportunity!=null")
+	@Cacheable(value = MEETINGS, key = "#isOpportunity", condition = "#isOpportunity!=null")
 	public List<Meetings> getAllLeasMeetings(boolean isOpportunity) {
 		log.info("inside the getAllLeasMeetings method...{}", isOpportunity);
 		return meetingRepository.findByIsOpportunityOrderByCreatedDateDesc(isOpportunity);

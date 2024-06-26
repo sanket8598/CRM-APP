@@ -5,7 +5,9 @@ import static java.util.Objects.nonNull;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
+import static org.hibernate.annotations.LazyCollectionOption.FALSE;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,7 +15,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -22,6 +23,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.Where;
 
 import lombok.Getter;
@@ -85,7 +87,7 @@ public class Meetings extends Auditable {
 	@Column(name = "mtg_status")
 	private String meetingStatus;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = LAZY)
 	@JoinColumn(name = "mtg_assign_to", updatable = true, nullable = false)
 	private EmployeeMaster assignTo;
 
@@ -97,9 +99,11 @@ public class Meetings extends Auditable {
 	private Boolean isOpportunity;
 
 	@OneToMany(mappedBy = "meetings", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
+	@LazyCollection(FALSE)
 	private List<MeetingAttachments> meetingAttachments = new ArrayList<>();
 
 	@OneToMany(mappedBy = "meetings", cascade = ALL, orphanRemoval = true)
+	@LazyCollection(FALSE)
 	private List<MeetingTask> meetingTasks = new ArrayList<>();
 
 	@Transient

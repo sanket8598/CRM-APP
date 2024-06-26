@@ -2,6 +2,7 @@ package ai.rnt.crm.entity;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.GenerationType.IDENTITY;
+import static org.hibernate.annotations.LazyCollectionOption.TRUE;
 
 import java.util.List;
 
@@ -15,7 +16,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
 
 import lombok.Getter;
@@ -38,12 +38,11 @@ public class MeetingTask extends Task {
 	private Integer meetingTaskId;
 
 	@JoinColumn(name = "crm_mtg_id", updatable = true)
-	@LazyCollection(LazyCollectionOption.TRUE)
+	@LazyCollection(TRUE)
 	@ManyToOne
 	private Meetings meetings;
 
 	@JoinColumn(name = "task_assign_to", updatable = true)
-	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private EmployeeMaster assignTo;
 

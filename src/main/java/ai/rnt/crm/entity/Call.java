@@ -3,6 +3,7 @@ package ai.rnt.crm.entity;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.GenerationType.IDENTITY;
+import static org.hibernate.annotations.FetchMode.JOIN;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.hibernate.annotations.Where;
@@ -71,6 +73,7 @@ public class Call extends CommonField {
 	private Boolean isOpportunity;
 	
 	@OneToMany(mappedBy = "call", cascade = ALL, orphanRemoval = true)
+	@Fetch(JOIN)
 	private List<PhoneCallTask> callTasks = new ArrayList<>();
 	
 }

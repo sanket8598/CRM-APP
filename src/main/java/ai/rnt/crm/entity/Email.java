@@ -5,6 +5,7 @@ import static java.util.Objects.nonNull;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
+import static org.hibernate.annotations.FetchMode.JOIN;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Where;
 
 import lombok.Getter;
@@ -87,7 +87,7 @@ public class Email extends Auditable {
 	private Leads lead;
 
 	@OneToMany(mappedBy = "mail", cascade = { REMOVE, REFRESH }, orphanRemoval = true)
-	@Fetch(FetchMode.JOIN)
+	@Fetch(JOIN)
 	private List<Attachment> attachment = new ArrayList<>();
 
 	@Transient
