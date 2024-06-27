@@ -1,6 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
-import static ai.rnt.crm.constants.CacheConstant.LEADS;
+import static ai.rnt.crm.constants.CacheConstant.CONTACT;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +25,7 @@ public class ContactDaoServiceImpl implements ContactDaoService {
 	private final ContactRepository contactRepository;
 
 	@Override
-	@CacheEvict(value = LEADS, allEntries = true)
+	@CacheEvict(value = CONTACT, allEntries = true)
 	public Contacts addContact(Contacts contact) {
 		log.info("inside the addContact method...");
 		return contactRepository.save(contact);
@@ -44,7 +44,7 @@ public class ContactDaoServiceImpl implements ContactDaoService {
 	}
 
 	@Override
-	@Cacheable(value = LEADS)
+	@Cacheable(value = CONTACT)
 	public List<Contacts> findAllPrimaryContacts() {
 		log.info("inside the findAllPrimaryContacts method...");
 		return contactRepository.findByPrimaryTrue();
