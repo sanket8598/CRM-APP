@@ -1,12 +1,15 @@
 package ai.rnt.crm.dto_mapper;
 
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+import static java.util.stream.Collectors.toList;
+import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import ai.rnt.crm.dto.CityDto;
 import ai.rnt.crm.dto.CountryAndStateDto;
@@ -15,11 +18,10 @@ import ai.rnt.crm.dto.StateAndCityDto;
 import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.StateMaster;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = PRIVATE)
 public class CountryDtoMapper {
-
-	CountryDtoMapper() {
-	}
 
 	/**
 	 * This function will convert CompanyDto into optional Country Entity. <b>This
@@ -38,7 +40,7 @@ public class CountryDtoMapper {
 	 *
 	 */
 	public static final Function<Collection<CountryDto>, List<CountryMaster>> TO_COUNTRYS = e -> e.stream()
-			.map(dm -> TO_COUNTRY.apply(dm).get()).collect(Collectors.toList());
+			.map(dm -> TO_COUNTRY.apply(dm).get()).collect(toList());
 
 	/**
 	 * This function will convert Country Entity into optional CountryDto . <b>This
@@ -58,26 +60,24 @@ public class CountryDtoMapper {
 	 *
 	 */
 	public static final Function<Collection<CountryMaster>, List<CountryDto>> TO_COUNTRY_DTOS = e -> e.stream()
-			.map(dm -> TO_COUNTRY_DTO.apply(dm).get()).collect(Collectors.toList());
+			.map(dm -> TO_COUNTRY_DTO.apply(dm).get()).collect(toList());
 
 	public static final Function<CountryMaster, Optional<CountryAndStateDto>> TO_COUNTRY_DTO_DATA = countryMaster -> {
 		if (countryMaster == null) {
-			return Optional.empty();
+			return empty();
 		}
 		CountryAndStateDto countryDto = new CountryAndStateDto();
 		countryDto.setCountryId(countryMaster.getCountryId());
 		countryDto.setCountry(countryMaster.getCountry());
-		countryDto.setStates(countryMaster.getStates().stream().map(stateMaster -> mapToStateDto(stateMaster))
-				.collect(Collectors.toList()));
-		return Optional.of(countryDto);
+		countryDto.setStates(countryMaster.getStates().stream().map(CountryDtoMapper::mapToStateDto).collect(toList()));
+		return of(countryDto);
 	};
 
 	private static StateAndCityDto mapToStateDto(StateMaster stateMaster) {
 		StateAndCityDto stateDto = new StateAndCityDto();
 		stateDto.setStateId(stateMaster.getStateId());
 		stateDto.setState(stateMaster.getState());
-		stateDto.setCities(stateMaster.getCities().stream().map(cityMaster -> mapToCityDto(cityMaster))
-				.collect(Collectors.toList()));
+		stateDto.setCities(stateMaster.getCities().stream().map(CountryDtoMapper::mapToCityDto).collect(toList()));
 		return stateDto;
 	}
 
