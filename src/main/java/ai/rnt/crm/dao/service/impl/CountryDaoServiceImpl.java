@@ -1,6 +1,7 @@
 package ai.rnt.crm.dao.service.impl;
 
 import static ai.rnt.crm.constants.CacheConstant.COUNTRY;
+import static ai.rnt.crm.constants.CacheConstant.COUNTRY_ID;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class CountryDaoServiceImpl implements CountryDaoService {
 	}
 
 	@Override
-	@Cacheable(COUNTRY)
+	@Cacheable(value = COUNTRY, key = "#countryName", condition = "#countryName!=null")
 	public Optional<CountryMaster> findByCountryName(String countryName) {
 		log.info("inside the findByCountryName method...{}", countryName);
 		return countryMasterRepository.findTopByCountry(countryName);
@@ -46,12 +47,14 @@ public class CountryDaoServiceImpl implements CountryDaoService {
 	}
 
 	@Override
+	@Cacheable(value = COUNTRY, key = COUNTRY_ID, condition = "#countryId!=null")
 	public Optional<CountryMaster> findCountryById(Integer countryId) {
 		log.info("inside the findCountryById method...{}", countryId);
 		return countryMasterRepository.findById(countryId);
 	}
 
 	@Override
+	@Cacheable(value = COUNTRY, key = "#country", condition = "#country!=null")
 	public boolean isCountryPresent(String country) {
 		log.info("inside the isCountryPresent method...{}", country);
 		return countryMasterRepository.existsByCountry(country);

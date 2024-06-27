@@ -1,6 +1,8 @@
 package ai.rnt.crm.dao.service.impl;
 
 import static ai.rnt.crm.constants.CacheConstant.CITY;
+import static ai.rnt.crm.constants.CacheConstant.CITY_ID;
+import static ai.rnt.crm.constants.CacheConstant.STATE_ID;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +34,7 @@ public class CityDaoServiceImpl implements CityDaoService {
 	}
 
 	@Override
-	@Cacheable(CITY)
+	@Cacheable(value = CITY, key = "#cityName", condition = "#cityName!=null")
 	public Optional<CityMaster> existCityByName(String cityName) {
 		log.info("inside the existCityByName method...{}", cityName);
 		return cityMasterRepository.findTopByCity(cityName);
@@ -46,18 +48,21 @@ public class CityDaoServiceImpl implements CityDaoService {
 	}
 
 	@Override
+	@Cacheable(value = CITY, key = STATE_ID, condition = "#stateId!=null")
 	public List<CityMaster> findByStateId(Integer stateId) {
 		log.info("inside the findByStateId method...{}", stateId);
 		return cityMasterRepository.findByStateStateId(stateId);
 	}
 
 	@Override
+	@Cacheable(value = CITY, key = "#city + '-' + #stateId", condition = "#city!=null && #stateId != null")
 	public boolean isCityPresent(String city, Integer stateId) {
 		log.info("inside the isCityPresent method...{}{}", city, stateId);
 		return cityMasterRepository.existsByCityAndStateStateId(city, stateId);
 	}
 
 	@Override
+	@Cacheable(value = CITY, key = CITY_ID, condition = "#cityId!=null")
 	public Optional<CityMaster> findCityById(Integer cityId) {
 		log.info("inside the findCityById method...{}{}", cityId);
 		return cityMasterRepository.findById(cityId);

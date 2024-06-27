@@ -23,6 +23,12 @@ public final class CacheConstant {
 	public static final String COUNTRY = "countries";
 	public static final String CITY = "cities";
 	public static final String CONTACT = "contact";
+	public static final String COMPANY = "company";
+
+	public static final String STATE_ID = "#stateId";
+	public static final String COUNTRY_ID = "#countryId";
+	public static final String CITY_ID = "#cityId";
+	public static final String COMPANY_ID = "#companyId";
 
 	public static final String DOMAIN = "domain";
 	public static final String DOMAIN_ID = "#domainId";

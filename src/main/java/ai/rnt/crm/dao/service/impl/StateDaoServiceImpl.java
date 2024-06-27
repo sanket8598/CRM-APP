@@ -1,6 +1,8 @@
 package ai.rnt.crm.dao.service.impl;
 
+import static ai.rnt.crm.constants.CacheConstant.COUNTRY_ID;
 import static ai.rnt.crm.constants.CacheConstant.STATES;
+import static ai.rnt.crm.constants.CacheConstant.STATE_ID;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,18 +48,21 @@ public class StateDaoServiceImpl implements StateDaoService {
 	}
 
 	@Override
+	@Cacheable(value = STATES, key = COUNTRY_ID, condition = "#countryId!=null")
 	public List<StateMaster> findByCountryId(Integer countryId) {
 		log.info("inside the state master dao findByCountryId method...{}", countryId);
 		return stateMasterRepository.findByCountryCountryId(countryId);
 	}
 
 	@Override
+	@Cacheable(value = STATES, key = "#state + '-' + #countryId", condition = "#state!=null && #countryId != null")
 	public boolean isStatePresent(String state, Integer countryId) {
 		log.info("inside the state master dao isStatePresent method...{}{}", state, countryId);
 		return stateMasterRepository.existsByStateAndCountryCountryId(state, countryId);
 	}
 
 	@Override
+	@Cacheable(value = STATES, key = STATE_ID, condition = "#stateId!=null")
 	public Optional<StateMaster> findStateById(Integer stateId) {
 		log.info("inside the state master dao findStateById method...{}{}", stateId);
 		return stateMasterRepository.findById(stateId);

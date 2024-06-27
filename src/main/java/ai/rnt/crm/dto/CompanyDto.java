@@ -1,5 +1,7 @@
 package ai.rnt.crm.dto;
 
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,9 +13,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CompanyDto {
+public class CompanyDto implements Serializable{
 
-    private Integer companyId;
+	private static final long serialVersionUID = 1L;
+
+	private Integer companyId;
     
 	private String companyName;
 	
