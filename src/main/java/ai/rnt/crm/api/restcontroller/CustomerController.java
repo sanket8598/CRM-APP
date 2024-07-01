@@ -8,6 +8,7 @@ import java.util.EnumMap;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,5 +27,12 @@ public class CustomerController {
 	@GetMapping
 	public ResponseEntity<EnumMap<ApiResponse, Object>> customerDashboardData() {
 		return customerService.customerDashBoardData();
+	}
+
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/{field}/{customerId}")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> editCustomer(@PathVariable(name = "field", required = true) String field
+			,@PathVariable Integer customerId) {
+		return customerService.editCustomer(field,customerId);
 	}
 }

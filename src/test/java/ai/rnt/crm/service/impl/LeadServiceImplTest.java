@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -852,7 +851,7 @@ class LeadServiceImplTest {
 		when(visit.getUpdatedDate()).thenReturn(LocalDateTime.now());
 		when(call.getUpdatedDate()).thenReturn(LocalDateTime.now());
 		when(email.getUpdatedDate()).thenReturn(LocalDateTime.now());
-		ResponseEntity<EnumMap<ApiResponse, Object>> response1 = leadService.editLead(leadId);
+		leadService.editLead(leadId);
 	}
 
 	@Test
@@ -869,11 +868,11 @@ class LeadServiceImplTest {
 		dto.setBudgetAmount("00.00");
 		dto.setQualify(true);
 		Leads lead = new Leads();
-		//String secretKey = "Op5sTs3Nr7r9lCSJr2jN3qNyelrSEsO=";
+		// String secretKey = "Op5sTs3Nr7r9lCSJr2jN3qNyelrSEsO=";
 		// String decryptAmount = SignatureUtil.decryptAmount(dto.getBudgetAmount(),
 		// secretKey);
 		// dto.setBudgetAmount(decryptAmount);
-		//when(signatureUtil.decryptAmount(dto.getBudgetAmount())).thenReturn(anyString());
+		// when(signatureUtil.decryptAmount(dto.getBudgetAmount())).thenReturn(anyString());
 		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
 		when(leadDaoService.addLead(any())).thenReturn(lead);
 		when(serviceFallsDaoSevice.findByName("Other")).thenReturn(Optional.of(new ServiceFallsMaster()));
@@ -971,8 +970,6 @@ class LeadServiceImplTest {
 		leadDto.setDomainId("Domain1");
 		CompanyMaster companyMaster = new CompanyMaster();
 		companyMaster.setCompanyId(1);
-		Leads leads = new Leads();
-		Contacts contact = new Contacts();
 		when(companyMasterDaoService.findByCompanyName(leadDto.getCompanyName()))
 				.thenReturn(Optional.of(new CompanyDto()));
 		when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
