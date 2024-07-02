@@ -48,5 +48,6 @@ public final class CRMConstants {
 	public static final String ON_HOLD_TASK_COUNT = ON_HOLD_TASK_KEY + COUNT;
 	public static final String NOT_STARTED_TASK_COUNT = NOT_STARTED_TASK_KEY + COUNT;
 	public static final String COUNT_BY_STATUS = "countByStatus";
-
+	public static final String CONTACT_INFO = "ContactInfo";
+	public static final String DESCRIPTION_DATA = "descriptionData";
 }

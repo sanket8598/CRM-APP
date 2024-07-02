@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.OK;
@@ -22,20 +23,33 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dao.service.CallDaoService;
+import ai.rnt.crm.dao.service.CityDaoService;
+import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.ContactDaoService;
+import ai.rnt.crm.dao.service.CountryDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
 import ai.rnt.crm.dao.service.OpportunityDaoService;
+import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
+import ai.rnt.crm.dto.CityDto;
+import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.ContactDto;
+import ai.rnt.crm.dto.CountryDto;
 import ai.rnt.crm.dto.EditContactDto;
+import ai.rnt.crm.dto.StateDto;
+import ai.rnt.crm.entity.CityMaster;
+import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
+import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.Opportunity;
+import ai.rnt.crm.entity.StateMaster;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.service.EmployeeService;
@@ -66,6 +80,18 @@ class CustomerServiceImplTest {
 
 	@Mock
 	private OpportunityDaoService opportunityDaoService;
+
+	@Mock
+	private CompanyMasterDaoService companyMasterDaoService;
+
+	@Mock
+	private CityDaoService cityDaoService;
+
+	@Mock
+	private StateDaoService stateDaoService;
+
+	@Mock
+	private CountryDaoService countryDaoService;
 
 	@InjectMocks
 	private CustomerServiceImpl customerServiceImpl;
@@ -142,5 +168,50 @@ class CustomerServiceImplTest {
 		String field = "lead";
 		when(contactDaoService.findById(customerId)).thenThrow(new RuntimeException("Error"));
 		assertThrows(CRMException.class, () -> customerServiceImpl.editCustomer(field, customerId));
+	}
+
+	@Test
+	void testUpdateCustomerSuccess() {
+		ContactDto contactDto = new ContactDto();
+		CompanyDto companyDto = new CompanyDto();
+		companyDto.setCompanyId(1);
+		CountryDto countryDto = new CountryDto();
+		countryDto.setCountryId(1);
+		StateDto stateDto = new StateDto();
+		stateDto.setStateId(1);
+		CityDto cityDto = new CityDto();
+		cityDto.setCityId(1);
+
+		companyDto.setCountry(countryDto);
+		companyDto.setState(stateDto);
+		companyDto.setCity(cityDto);
+		contactDto.setCompanyMaster(companyDto);
+
+		Contacts contact = new Contacts();
+		CompanyMaster companyMaster = new CompanyMaster();
+		CountryMaster countryMaster = new CountryMaster();
+		StateMaster stateMaster = new StateMaster();
+		CityMaster cityMaster = new CityMaster();
+
+		when(contactDaoService.findById(anyInt())).thenReturn(Optional.of(contact));
+		when(companyMasterDaoService.findCompanyById(1)).thenReturn(Optional.of(companyMaster));
+		when(countryDaoService.findCountryById(1)).thenReturn(Optional.of(countryMaster));
+		when(stateDaoService.findStateById(1)).thenReturn(Optional.of(stateMaster));
+		when(cityDaoService.findCityById(1)).thenReturn(Optional.of(cityMaster));
+		when(contactDaoService.addContact(any(Contacts.class))).thenReturn(contact);
+
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = customerServiceImpl.updateCustomer(contactDto, 1);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(true, response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Customer Updated Successfully !!", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testUpdateCustomerException() {
+		Integer customerId = 1;
+		ContactDto contactDto = new ContactDto();
+		when(contactDaoService.findById(customerId)).thenThrow(new RuntimeException("Error"));
+		assertThrows(CRMException.class, () -> customerServiceImpl.updateCustomer(contactDto, customerId));
 	}
 }
