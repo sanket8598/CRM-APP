@@ -133,7 +133,7 @@ public class CountryServiceImpl implements CountryService {
 					.orElseThrow(() -> new ResourceNotFoundException("CountryMaster", "countryId", countryId));
 			if (!companyMasterDaoService.findByCountryId(countryId).isEmpty()
 					|| !stateDaoService.findByCountryId(countryId).isEmpty()) {
-				deleteCountryData.put(MESSAGE, "You Can't Delete This Country!!");
+				deleteCountryData.put(MESSAGE, "This country is in use, You can't delete.");
 				deleteCountryData.put(SUCCESS, false);
 				return new ResponseEntity<>(deleteCountryData, OK);
 			}

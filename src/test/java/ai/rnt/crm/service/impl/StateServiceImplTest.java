@@ -213,7 +213,7 @@ class StateServiceImplTest {
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("You Can't Delete This State Is In Use!!", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("This state is in use, You can't delete.", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test

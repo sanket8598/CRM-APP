@@ -138,7 +138,7 @@ public class StateServiceImpl implements StateService {
 					.orElseThrow(() -> new ResourceNotFoundException("StateMaster", "stateId", stateId));
 			if (!companyMasterDaoService.findByStateId(stateId).isEmpty()
 					|| !cityDaoService.findByStateId(stateId).isEmpty()) {
-				deleteData.put(MESSAGE, "You Can't Delete This State Is In Use!!");
+				deleteData.put(MESSAGE, "This state is in use, You can't delete.");
 				deleteData.put(SUCCESS, false);
 				return new ResponseEntity<>(deleteData, OK);
 			}

@@ -138,7 +138,7 @@ public class CityServiceImpl implements CityService {
 			CityMaster city = cityDaoService.findCityById(cityId)
 					.orElseThrow(() -> new ResourceNotFoundException("CityMaster", "cityId", cityId));
 			if (!companyMasterDaoService.findByCityId(cityId).isEmpty()) {
-				deleteCityData.put(MESSAGE, "You Can't Delete This City Is In Use!!");
+				deleteCityData.put(MESSAGE, "This city is in use, You can't delete.");
 				deleteCityData.put(SUCCESS, false);
 				return new ResponseEntity<>(deleteCityData, OK);
 			}

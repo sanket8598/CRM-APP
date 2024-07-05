@@ -186,7 +186,7 @@ class CountryServiceImplTest {
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("You Can't Delete This Country!!", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("This country is in use, You can't delete.", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test

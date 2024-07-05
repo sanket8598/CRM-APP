@@ -257,7 +257,7 @@ class CompanyServiceImplTest {
 		EnumMap<ApiResponse, Object> responseBody = responseEntity.getBody();
 		assertNotNull(responseBody);
 		assertFalse((Boolean) responseBody.get(ApiResponse.SUCCESS));
-		assertEquals("You Can't Delete This Company Is In Use!!", responseBody.get(ApiResponse.MESSAGE));
+		assertEquals("This company is in use, You can't delete.", responseBody.get(ApiResponse.MESSAGE));
 		verify(companyMasterDaoService, times(1)).findCompanyById(companyId);
 		verify(contactDaoService, times(1)).findByCompanyId(companyId);
 	}

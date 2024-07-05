@@ -149,7 +149,7 @@ public class CompanyServiceImpl implements CompanyService {
 			CompanyMaster company = companyMasterDaoService.findCompanyById(companyId)
 					.orElseThrow(() -> new ResourceNotFoundException("CompanyMaster", "companyId", companyId));
 			if (!contactDaoService.findByCompanyId(companyId).isEmpty()) {
-				deleteCompanyData.put(MESSAGE, "You Can't Delete This Company Is In Use!!");
+				deleteCompanyData.put(MESSAGE, "This company is in use, You can't delete.");
 				deleteCompanyData.put(SUCCESS, false);
 				return new ResponseEntity<>(deleteCompanyData, OK);
 			}
