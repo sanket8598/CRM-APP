@@ -4,10 +4,14 @@ import static ai.rnt.crm.util.FunctionUtil.evalMapper;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -69,17 +73,25 @@ public class CountryDtoMapper {
 		CountryAndStateDto countryDto = new CountryAndStateDto();
 		countryDto.setCountryId(countryMaster.getCountryId());
 		countryDto.setCountry(countryMaster.getCountry());
-		countryDto.setStates(countryMaster.getStates().stream().map(CountryDtoMapper::mapToStateDto).collect(toList()));
+		Map<Integer, StateAndCityDto> stateMap = new HashMap<>();
+		for (StateMaster stateMaster : countryMaster.getStates()) {
+			StateAndCityDto stateDto = stateMap.computeIfAbsent(stateMaster.getStateId(), id -> {
+				StateAndCityDto newStateDto = new StateAndCityDto();
+				newStateDto.setStateId(stateMaster.getStateId());
+				newStateDto.setState(stateMaster.getState());
+				newStateDto.setCities(new ArrayList<>());
+				return newStateDto;
+			});
+			Map<Integer, CityDto> cityMap = stateDto.getCities().stream()
+					.collect(toMap(CityDto::getCityId, city -> city));
+			for (CityMaster cityMaster : stateMaster.getCities()) {
+				cityMap.putIfAbsent(cityMaster.getCityId(), mapToCityDto(cityMaster));
+			}
+			stateDto.setCities(new ArrayList<>(cityMap.values()));
+		}
+		countryDto.setStates(new ArrayList<>(stateMap.values()));
 		return of(countryDto);
 	};
-
-	private static StateAndCityDto mapToStateDto(StateMaster stateMaster) {
-		StateAndCityDto stateDto = new StateAndCityDto();
-		stateDto.setStateId(stateMaster.getStateId());
-		stateDto.setState(stateMaster.getState());
-		stateDto.setCities(stateMaster.getCities().stream().map(CountryDtoMapper::mapToCityDto).collect(toList()));
-		return stateDto;
-	}
 
 	private static CityDto mapToCityDto(CityMaster cityMaster) {
 		CityDto cityDto = new CityDto();
