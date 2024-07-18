@@ -75,7 +75,7 @@ public class Contacts extends Auditable {
 	@JoinColumn(name = "lead_id",nullable = true)
 	private Leads lead;
 	
-	@ManyToOne
+	@ManyToOne(cascade = ALL)
 	@JoinColumn(name = "company_id",nullable = true)
 	private CompanyMaster companyMaster;
 
