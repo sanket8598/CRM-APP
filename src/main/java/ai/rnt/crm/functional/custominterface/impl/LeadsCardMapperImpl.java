@@ -9,6 +9,7 @@ import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_SOURCE;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.SERVICE_FALLS_INTO;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
+import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.LeadsCardUtil.shortName;
 import static java.util.Objects.nonNull;
 
@@ -32,6 +33,7 @@ public class LeadsCardMapperImpl implements LeadsCardMapper {
 		leadsCardDto.setDisqualifyAs(lead.getDisqualifyAs());
 		leadsCardDto.setStatus(lead.getStatus());
 		leadsCardDto.setImportant(lead.getImportant());
+		leadsCardDto.setCreatedDate(convertDate(lead.getCreatedDate()));
 
 		PrimaryFieldMapper primaryFieldMapper = getPrimaryFieldMapper(primaryField);
 		SecondaryFieldMapper secondaryFieldMapper = getSecondaryFieldMapper(secondaryField);

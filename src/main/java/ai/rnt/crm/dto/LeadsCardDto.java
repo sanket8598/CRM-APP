@@ -20,5 +20,7 @@ public class LeadsCardDto {
 	private String primaryField;
 
 	private String secondaryField;
+	
+	private String createdDate;
 
 }
