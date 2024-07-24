@@ -30,7 +30,7 @@ public class CityDaoServiceImpl implements CityDaoService {
 	@Cacheable(CITY)
 	public List<CityMaster> getAllCity() {
 		log.info("inside the getAllCity method...{}");
-		return cityMasterRepository.findAll();
+		return cityMasterRepository.findByOrderByCityAsc();
 	}
 
 	@Override

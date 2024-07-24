@@ -17,5 +17,7 @@ public class CountryDto implements Serializable {
 
 	@NotBlank(message = "country should not be null or empty!!")
 	private String country;
+	
+	private CurrencyDto currency;
 
 }

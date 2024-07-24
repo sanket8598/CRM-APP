@@ -3,9 +3,12 @@ package ai.rnt.crm.dto.opportunity.mapper;
 import static ai.rnt.crm.dto_mapper.LeadsDtoMapper.TO_DASHBOARD_LEADDTO;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toList;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -36,8 +39,25 @@ public class OpportunityDtoMapper {
 		return opportunityDashboardDto;
 	};
 
-	public static final Function<Collection<Opportunity>, List<OpportunityDto>> TO_DASHBOARD_OPPORTUNITY_DTOS = e -> e
-			.stream().map(dm -> TO_DASHBOARD_OPPORTUNITY_DTO.apply(dm).get()).collect(Collectors.toList());
+	public static final Function<Collection<Opportunity>, List<OpportunityDto>> TO_DASHBOARD_OPPORTUNITY_DTOS = e -> {
+		Comparator<OpportunityDto> oppNameAndCompanyNameComp = (l1,
+				l2) -> isNull(l1.getTopic()) || isNull(l2.getTopic()) ? 1
+						: l1.getTopic().toLowerCase().compareTo(l2.getTopic().toLowerCase());
+		oppNameAndCompanyNameComp.thenComparing((ld1, ld2) -> ((isNull(ld1.getLeadDashboardDto())
+				|| isNull(ld2.getLeadDashboardDto()))
+				|| (isNull(ld1.getLeadDashboardDto().getPrimaryContact())
+						|| isNull(ld2.getLeadDashboardDto().getPrimaryContact()))
+				|| (isNull(ld1.getLeadDashboardDto().getPrimaryContact().getCompanyMaster())
+						|| isNull(ld2.getLeadDashboardDto().getPrimaryContact().getCompanyMaster()))
+				|| (isNull(ld1.getLeadDashboardDto().getPrimaryContact().getCompanyMaster().getCompanyName())
+						|| isNull(ld2.getLeadDashboardDto().getPrimaryContact().getCompanyMaster().getCompanyName())))
+								? 1
+								: ld1.getLeadDashboardDto().getPrimaryContact().getCompanyMaster().getCompanyName()
+										.compareTo(ld2.getLeadDashboardDto().getPrimaryContact().getCompanyMaster()
+												.getCompanyName()));
+		return e.stream().map(dm -> TO_DASHBOARD_OPPORTUNITY_DTO.apply(dm).get()).sorted(oppNameAndCompanyNameComp)
+				.collect(toList());
+	};
 
 	public static final Function<Opportunity, Optional<GraphicalDataDto>> TO_GRAPHICAL_DATA_DTO = e -> evalMapper(e,
 			GraphicalDataDto.class);
@@ -52,7 +72,7 @@ public class OpportunityDtoMapper {
 			QualifyLeadDto.class);
 
 	public static final Function<Collection<Leads>, List<QualifyLeadDto>> TO_QUALIFY_LEAD_DTOS = e -> e.stream()
-			.map(dm -> TO_QUALIFY_LEAD_DTO.apply(dm).get()).collect(Collectors.toList());
+			.map(dm -> TO_QUALIFY_LEAD_DTO.apply(dm).get()).collect(toList());
 
 	public static final Function<Opportunity, Optional<AnalysisOpportunityDto>> TO_ANALYSIS_OPPORTUNITY_DTO = e -> evalMapper(
 			e, AnalysisOpportunityDto.class);

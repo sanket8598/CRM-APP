@@ -29,7 +29,7 @@ public class CountryDaoServiceImpl implements CountryDaoService {
 	@Cacheable(COUNTRY)
 	public List<CountryMaster> getAllCountry() {
 		log.info("inside the getAllCountry method...{}");
-		return countryMasterRepository.findAll();
+		return countryMasterRepository.findByOrderByCountryAsc();
 	}
 
 	@Override

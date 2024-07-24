@@ -2,9 +2,6 @@ package ai.rnt.crm.dto;
 
 import static java.util.Objects.nonNull;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ai.rnt.crm.util.LeadsCardUtil;
 import lombok.Getter;
 import lombok.Setter;

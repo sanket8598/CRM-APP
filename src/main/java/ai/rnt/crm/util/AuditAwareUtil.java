@@ -8,7 +8,6 @@ import static org.springframework.security.core.context.SecurityContextHolder.ge
 
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
@@ -21,11 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class AuditAwareUtil {
-	
+
 	private final JWTTokenHelper helper;
-	
-	@Value("${spring.profiles.active}")
-	public static  String activeProfile;
 
 	public Integer getLoggedInStaffId() {
 		log.info("inside getLoggedInStaffId method... ");

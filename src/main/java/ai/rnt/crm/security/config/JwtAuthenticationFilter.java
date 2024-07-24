@@ -71,13 +71,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				return;
 			} else {
 				String requestTokenHeader = request.getHeader(AUTHORIZATION);
-				
+
 				if (isNull(requestTokenHeader))
 					throw new MissingServletRequestPartException("AUTHORIZATION Header is missing");
 				String userName;
 				if (nonNull(requestTokenHeader) && requestTokenHeader.startsWith(TOKEN_PREFIX_BEARER)) {
 					requestTokenHeader = requestTokenHeader.substring(7);
-					JsonNode json = new ObjectMapper().readTree(new JwtTokenDecoder().testDecodeJWT(requestTokenHeader));
+					JsonNode json = new ObjectMapper()
+							.readTree(new JwtTokenDecoder().testDecodeJWT(requestTokenHeader));
 					if (!request.getRemoteAddr().equalsIgnoreCase(json.get("ipAddress").toString().replace("\"", "")))
 						throw new ResponseStatusException(UNAUTHORIZED, "Access Denied!!");
 					userName = this.helper.extractUsername(requestTokenHeader);

@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import static ai.rnt.crm.constants.CacheConstant.LEADS;
 import static ai.rnt.crm.constants.CacheConstant.CONTACT;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class ContactDaoServiceImpl implements ContactDaoService {
 	private final ContactRepository contactRepository;
 
 	@Override
-	@CacheEvict(value = CONTACT, allEntries = true)
+	@CacheEvict(value = {CONTACT,LEADS}, allEntries = true)
 	public Contacts addContact(Contacts contact) {
 		log.info("inside the addContact method...");
 		return contactRepository.save(contact);

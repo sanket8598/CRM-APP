@@ -445,6 +445,7 @@ public class CommonUtil {
 			callDto.setSubject(call.getSubject());
 			callDto.setType(CALL);
 			callDto.setBody(call.getComment());
+			callDto.setShortName(shortName(call.getCallTo()));
 			callDto.setCreatedOn(convertDateDateWithTime(call.getStartDate(), call.getStartTime12Hours()));
 			TO_EMPLOYEE.apply(call.getCallFrom()).ifPresent(e -> {
 				callDto.setCallFrom(e.getFirstName() + " " + e.getLastName());

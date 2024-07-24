@@ -250,6 +250,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityDataByStatus.put(SUCCESS, true);
 			return new ResponseEntity<>(opportunityDataByStatus, OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("Got exception while getting the opportunity data by status...{}", e.getMessage());
 			throw new CRMException(e);
 		}

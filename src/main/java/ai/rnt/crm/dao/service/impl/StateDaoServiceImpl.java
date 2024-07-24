@@ -30,7 +30,7 @@ public class StateDaoServiceImpl implements StateDaoService {
 	@Cacheable(STATES)
 	public List<StateMaster> getAllState() {
 		log.info("inside the getAllState method...{}");
-		return stateMasterRepository.findAll();
+		return stateMasterRepository.findByOrderByStateAsc();
 	}
 
 	@Override

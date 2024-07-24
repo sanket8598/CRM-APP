@@ -15,4 +15,6 @@ public interface CityMasterRepository extends JpaRepository<CityMaster, Integer>
 
 	boolean existsByCityAndStateStateId(String city, Integer stateId);
 
+	List<CityMaster> findByOrderByCityAsc();
+
 }

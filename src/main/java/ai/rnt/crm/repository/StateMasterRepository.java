@@ -17,4 +17,6 @@ public interface StateMasterRepository extends JpaRepository<StateMaster, Intege
 
 	boolean existsByStateAndCountryCountryId(String state, Integer countryId);
 
+	List<StateMaster> findByOrderByStateAsc();
+
 }

@@ -3,10 +3,12 @@ package ai.rnt.crm.dto_mapper;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
 import static ai.rnt.crm.util.ConvertDateFormatUtil.convertDate;
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toList;
 import static lombok.AccessLevel.PRIVATE;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -74,8 +76,24 @@ public class LeadsDtoMapper {
 		return leadDashboardDto;
 	};
 
-	public static final Function<Collection<Leads>, List<LeadDashboardDto>> TO_DASHBOARD_LEADDTOS = e -> e.stream()
-			.map(dm -> TO_DASHBOARD_LEADDTO.apply(dm).get()).collect(toList());
+	public static final Function<Collection<Leads>, List<LeadDashboardDto>> TO_DASHBOARD_LEADDTOS = e -> {
+		Comparator<LeadDashboardDto> nameAndCompanyNameComp = (l1,
+				l2) -> ((isNull(l1.getPrimaryContact()) || isNull(l2.getPrimaryContact()))
+						|| (isNull(l1.getPrimaryContact().getName())
+								|| isNull(l2.getPrimaryContact().getName()))) ? 1
+										: l1.getPrimaryContact().getName()
+												.compareTo(l2.getPrimaryContact().getName());
+		nameAndCompanyNameComp.thenComparing((ld1,
+				ld2) -> ((isNull(ld1.getPrimaryContact()) || isNull(ld2.getPrimaryContact()))
+						|| (isNull(ld1.getPrimaryContact().getCompanyMaster())
+								|| isNull(ld2.getPrimaryContact().getCompanyMaster()))
+						|| (isNull(ld1.getPrimaryContact().getCompanyMaster().getCompanyName())
+								|| isNull(ld2.getPrimaryContact().getCompanyMaster().getCompanyName()))) ? 1
+										: ld1.getPrimaryContact().getCompanyMaster().getCompanyName().compareTo(
+												ld2.getPrimaryContact().getCompanyMaster().getCompanyName()));
+		return e.stream().map(dm -> TO_DASHBOARD_LEADDTO.apply(dm).get()).sorted(nameAndCompanyNameComp)
+				.collect(toList());
+	};
 
 	public static final Function<Leads, Optional<LeadsCardDto>> TO_DASHBOARD_CARDS_LEADDTO = e -> evalMapper(e,
 			LeadsCardDto.class);

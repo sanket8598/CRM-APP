@@ -11,6 +11,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -51,5 +53,9 @@ public class CountryMaster extends Auditable {
 	@OneToMany(cascade = ALL, mappedBy = "country")
 	@Fetch(JOIN)
 	private List<StateMaster> states = new ArrayList<>();
+	
+	@ManyToOne(cascade = ALL)
+	@JoinColumn(name = "currency_id")
+	private CurrencyMaster currency;
 
 }
