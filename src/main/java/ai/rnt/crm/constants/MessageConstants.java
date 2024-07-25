@@ -11,6 +11,7 @@ public final class MessageConstants {
 	public static final String ACCESS_DENIED = "You Don't Have The Access !!";
 	public static final String TOKEN_EXPIRED = "JWT Token is Expired !!";
 	public static final String ERROR_MSG = "Something unexpected happened !!";
+	public static final String DUPLICATE_DATA_ERROR_MSG = "This record already exists in our database !!";
 	public static final String WAIT_FOR = "Wait for %d day(s)";
 	public static final String NO_ACTIVITY = "No Upcoming Activities";
 	public static final String SOON_MORE = "Soon More Activities";

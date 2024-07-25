@@ -3,6 +3,7 @@ package ai.rnt.crm.exception.handler;
 import static ai.rnt.crm.constants.MessageConstants.ACCESS_DENIED;
 import static ai.rnt.crm.constants.MessageConstants.BAD_CREDENTIALS;
 import static ai.rnt.crm.constants.MessageConstants.ERROR_MSG;
+import static ai.rnt.crm.constants.MessageConstants.DUPLICATE_DATA_ERROR_MSG;
 import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
 import static ai.rnt.crm.util.HttpUtils.getURL;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
@@ -88,6 +89,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		log.error("handleMissingServletRequestParameter api error: {}", apiError);
 		return new ResponseEntity<>(apiError, new HttpHeaders(), apiError.getHttpStatus());
 	}
+
 	/**
 	 * {@inheritDoc}
 	 * 
@@ -173,6 +175,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), UNAUTHORIZED);
 		else if (exc.getException() instanceof NullPointerException)
 			return new ResponseEntity<>(new ApiError(false, ERROR_MSG), INTERNAL_SERVER_ERROR);
+		else if (exc.getException() instanceof org.hibernate.exception.ConstraintViolationException)
+			return new ResponseEntity<>(new ApiError(false, DUPLICATE_DATA_ERROR_MSG), BAD_REQUEST);
 		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), INTERNAL_SERVER_ERROR);
 	}
 
@@ -222,20 +226,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<>(
 				new ApiError(BAD_REQUEST, !errors.isEmpty() ? errors.get(0).split(":")[1] : null, errors), BAD_REQUEST);
 	}
-	
-	 @ExceptionHandler(SignatureException.class)
-	    public ResponseEntity<ApiError> handleSignatureException(SignatureException ex) {
-		 return new ResponseEntity<>(new ApiError(false,"JWT Signature Is Not Valid!!"), UNAUTHORIZED);
-	    }
-	 @ExceptionHandler(ExpiredJwtException.class)
-	 public ResponseEntity<ApiError> handleSignatureException(ExpiredJwtException ex) {
-		 return new ResponseEntity<>(new ApiError(false,TOKEN_EXPIRED), UNAUTHORIZED);
-	 }
-	 @ExceptionHandler(MalformedJwtException.class)
-	 public ResponseEntity<ApiError> handleMalformedJwtException(MalformedJwtException ex) {
-		 return new ResponseEntity<>(new ApiError(false,"JWT Token is Not Valid!!"), FORBIDDEN);
-	 }
-	
+
+	@ExceptionHandler(SignatureException.class)
+	public ResponseEntity<ApiError> handleSignatureException(SignatureException ex) {
+		return new ResponseEntity<>(new ApiError(false, "JWT Signature Is Not Valid!!"), UNAUTHORIZED);
+	}
+
+	@ExceptionHandler(ExpiredJwtException.class)
+	public ResponseEntity<ApiError> handleSignatureException(ExpiredJwtException ex) {
+		return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), UNAUTHORIZED);
+	}
+
+	@ExceptionHandler(MalformedJwtException.class)
+	public ResponseEntity<ApiError> handleMalformedJwtException(MalformedJwtException ex) {
+		return new ResponseEntity<>(new ApiError(false, "JWT Token is Not Valid!!"), FORBIDDEN);
+	}
 
 	@ExceptionHandler({ SQLException.class })
 	protected ResponseEntity<ApiError> handleDBException(Exception exc) {
@@ -245,7 +250,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(Exception.class)
 	protected ResponseEntity<ApiError> handleAllException(Exception exc) {
-		log.error("inside All exception and api error handler: {}{}", exc.getMessage(),exc);
+		log.error("inside All exception and api error handler: {}{}", exc.getMessage(), exc);
 		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), INTERNAL_SERVER_ERROR);
 	}
 
