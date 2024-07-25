@@ -14,6 +14,8 @@ import static ai.rnt.crm.dto_mapper.DashboardDtoMapper.TO_OPTY_MAIN_DASHBOARD_DT
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.ASSIGNED_TO_FILTER;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.DISQUALIFIED_LEAD_FILTER;
+import static ai.rnt.crm.functional.predicates.OpportunityPredicates.ACTIVE_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.ASSIGNED_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.OPEN_OPPORTUNITIES;
@@ -69,12 +71,13 @@ public class DashboardServiceImpl implements DashboardService {
 	private final EmployeeService employeeService;
 
 	@Override
-	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData(String field) {
-		log.info("inside the getDashboardData method...{}", field);
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData(String field, String status) {
+		log.info("inside the getDashboardData method...{}{}", field, status);
 		EnumMap<ApiResponse, Object> dashboardData = new EnumMap<>(ApiResponse.class);
 		try {
-			if (isNull(field) || field.isEmpty())
+			if (isNull(field) || field.isEmpty() || isNull(status) || status.isEmpty())
 				return new ResponseEntity<>(dashboardData, OK);
+			String checkStatus = "inactive";
 			Integer loggedInStaffId = auditAwareUtil.getLoggedInStaffId();
 			Map<String, Object> countMap = new HashMap<>();
 			Map<String, Object> dataMap = new HashMap<>();
@@ -86,10 +89,18 @@ public class DashboardServiceImpl implements DashboardService {
 				countMap.put(OPEN, findAllOpty.stream().filter(OPEN_OPPORTUNITIES).count());
 				dataMap.put(COUNTDATA, countMap);
 				if (LEAD.equalsIgnoreCase(field)) {
-					List<Leads> leads = leadDaoService.getAllLeads();
-					dataMap.put(WORK_ITEM, TO_DASHBOARD_DTOS.apply(leads.stream().collect(toList())));
+					dataMap.put(WORK_ITEM, TO_DASHBOARD_DTOS.apply(leadDaoService.getAllLeads().stream().filter(e -> {
+						return nonNull(status) && status.equalsIgnoreCase(checkStatus)
+								? DISQUALIFIED_LEAD_FILTER.test(e)
+								: !DISQUALIFIED_LEAD_FILTER.test(e);
+					}).collect(toList())));
 				} else if (OPPORTUNITY.equalsIgnoreCase(field))
-					dataMap.put(WORK_ITEM, TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream().collect(toList())));
+					dataMap.put(WORK_ITEM,
+							TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream()
+									.filter(opt -> nonNull(status) && status.equalsIgnoreCase(checkStatus)
+											? LOSS_OPPORTUNITIES.test(opt)
+											: ACTIVE_OPPORTUNITIES.test(opt))
+									.collect(toList())));
 				dataMap.put(LEADS_BY_SOURCE, leadDaoService.getLeadSourceCount());
 				dashboardData.put(DATA, dataMap);
 			} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
@@ -109,11 +120,21 @@ public class DashboardServiceImpl implements DashboardService {
 								.count());
 				if (LEAD.equalsIgnoreCase(field)) {
 					List<Leads> leads = leadDaoService.getAllLeads();
-					dataMap.put(WORK_ITEM, TO_DASHBOARD_DTOS.apply(
-							leads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId)).collect(toList())));
+					dataMap.put(WORK_ITEM,
+							TO_DASHBOARD_DTOS
+									.apply(leads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
+											.filter(e -> status.equalsIgnoreCase("inactive")
+													? DISQUALIFIED_LEAD_FILTER.test(e)
+													: !DISQUALIFIED_LEAD_FILTER.test(e))
+											.collect(toList())));
 				} else if (OPPORTUNITY.equalsIgnoreCase(field))
-					dataMap.put(WORK_ITEM, TO_OPTY_MAIN_DASHBOARD_DTOS.apply(findAllOpty.stream()
-							.filter(l -> ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId)).collect(toList())));
+					dataMap.put(WORK_ITEM,
+							TO_OPTY_MAIN_DASHBOARD_DTOS.apply(
+									findAllOpty.stream().filter(l -> ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
+											.filter(opt -> nonNull(status) && status.equalsIgnoreCase(checkStatus)
+													? LOSS_OPPORTUNITIES.test(opt)
+													: ACTIVE_OPPORTUNITIES.test(opt))
+											.collect(toList())));
 				dataMap.put(LEADS_BY_SOURCE, leadDaoService.getLeadSourceCount(loggedInStaffId));
 				dataMap.put(COUNTDATA, countMap);
 				dashboardData.put(DATA, dataMap);

@@ -10,6 +10,7 @@ import static ai.rnt.crm.util.StringUtil.hasWhitespace;
 import static ai.rnt.crm.util.StringUtil.splitByWhitespace;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.time.LocalDateTime.now;
 import static java.util.Objects.nonNull;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -31,6 +32,7 @@ import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.service.ContactService;
+import ai.rnt.crm.util.AuditAwareUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ContactServiceImpl implements ContactService {
 	private final LeadDaoService leadDaoService;
 	private final ContactDaoService contactDaoService;
+	private final AuditAwareUtil auditAwareUtil;
 
 	@Override
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addContact(ContactDto contactDto, Integer leadId) {
@@ -58,7 +61,7 @@ public class ContactServiceImpl implements ContactService {
 					contact.setLastName("null".equalsIgnoreCase(names[1]) ? null : names[1]);
 				} else {
 					contact.setFirstName(nonNull(contactDto.getName()) ? contactDto.getName() : "");
-				    contact.setLastName(null);
+					contact.setLastName(null);
 				}
 			}
 			contact.setCompanyMaster(company);
@@ -111,7 +114,7 @@ public class ContactServiceImpl implements ContactService {
 					contact.setLastName("null".equalsIgnoreCase(names[1]) ? null : names[1]);
 				} else {
 					contact.setFirstName(contactDto.getName());
-					 contact.setLastName(null);
+					contact.setLastName(null);
 				}
 			}
 			contact.setContactNumberPrimary(contactDto.getContactNumberPrimary());
@@ -147,6 +150,33 @@ public class ContactServiceImpl implements ContactService {
 			return new ResponseEntity<>(updateContactMap, OK);
 		} catch (Exception e) {
 			log.error("error occured while updating the contact of a lead...{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteContact(Integer contactId) {
+		log.info("inside the deleteContact method...{}", contactId);
+		EnumMap<ApiResponse, Object> deleteContactMap = new EnumMap<>(ApiResponse.class);
+		try {
+			deleteContactMap.put(SUCCESS, true);
+			Contacts contact = contactDaoService.findById(contactId)
+					.orElseThrow(() -> new ResourceNotFoundException("Contact", "contactId", contactId));
+			if (TRUE.equals(contact.getPrimary()))
+				deleteContactMap.put(MESSAGE, "Can't Delete,Ensure it's not a primary contact !!");
+			else {
+				contact.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+				contact.setDeletedDate(now());
+				if (nonNull(contactDaoService.addContact(contact)))
+					deleteContactMap.put(MESSAGE, "Contact Deleted Successfully !!");
+				else {
+					deleteContactMap.put(SUCCESS, false);
+					deleteContactMap.put(MESSAGE, "Contact Not Deleted !!");
+				}
+			}
+			return new ResponseEntity<>(deleteContactMap, OK);
+		} catch (Exception e) {
+			log.error("error occured while deleting the contact of a lead...{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

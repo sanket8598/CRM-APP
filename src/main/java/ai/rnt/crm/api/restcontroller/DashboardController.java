@@ -25,10 +25,10 @@ public class DashboardController {
 	private final DashboardService dashboardService;
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
-	@GetMapping("{field}")
+	@GetMapping("{field}/{status}")
 	public ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData(
-			@PathVariable(name = "field", required = true) String field) {
-		return dashboardService.getDashboardData(field);
+			@PathVariable(name = "field", required = true) String field,@PathVariable(name = "status", required = true) String status) {
+		return dashboardService.getDashboardData(field,status);
 	}
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)

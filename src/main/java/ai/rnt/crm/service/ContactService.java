@@ -15,4 +15,6 @@ public interface ContactService {
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getContact(Integer contactId);
 
+	ResponseEntity<EnumMap<ApiResponse, Object>> deleteContact(Integer contactId);
+
 }

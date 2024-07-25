@@ -3,7 +3,6 @@ package ai.rnt.crm.functional.predicates;
 import static ai.rnt.crm.constants.OppurtunityStatus.ANALYSIS;
 import static ai.rnt.crm.constants.OppurtunityStatus.CLOSE;
 import static ai.rnt.crm.constants.OppurtunityStatus.LOST;
-import static ai.rnt.crm.constants.OppurtunityStatus.OPEN;
 import static ai.rnt.crm.constants.OppurtunityStatus.PROPOSE;
 import static ai.rnt.crm.constants.OppurtunityStatus.QUALIFY;
 import static ai.rnt.crm.constants.OppurtunityStatus.WON;
@@ -42,8 +41,10 @@ public class OpportunityPredicates {
 	public static final Predicate<Opportunity> LOSS_OPPORTUNITIES = l -> nonNull(l.getStatus())
 			&& l.getStatus().equalsIgnoreCase(LOST);
 
-	public static final Predicate<Opportunity> OPEN_OPPORTUNITIES = l -> nonNull(l.getStatus())
-			&& l.getStatus().equalsIgnoreCase(OPEN);
+	public static final Predicate<Opportunity> OPEN_OPPORTUNITIES = IN_PIPELINE_OPPORTUNITIES::test;
+
+	public static final Predicate<Opportunity> ACTIVE_OPPORTUNITIES = op -> IN_PIPELINE_OPPORTUNITIES.test(op)
+			|| WON_OPPORTUNITIES.test(op);
 
 	public static final BiPredicate<Opportunity, Integer> ASSIGNED_OPPORTUNITIES = (l,
 			loggedInStaffId) -> l.getEmployee().getStaffId().equals(loggedInStaffId)

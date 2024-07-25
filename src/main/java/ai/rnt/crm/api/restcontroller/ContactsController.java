@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,5 +60,11 @@ public class ContactsController {
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateContact(@RequestBody @Valid ContactDto contactDto,
 			@PathVariable Integer contactId) {
 		return contactService.updateContact(contactDto, contactId);
+	}
+	
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@DeleteMapping(CONTACT_ID)
+	public ResponseEntity<EnumMap<ApiResponse, Object>> deleteContact(@PathVariable Integer contactId) {
+		return contactService.deleteContact(contactId);
 	}
 }

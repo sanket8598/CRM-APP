@@ -8,8 +8,9 @@ import ai.rnt.crm.enums.ApiResponse;
 
 public interface DashboardService {
 
-	ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData(String field);
+	ResponseEntity<EnumMap<ApiResponse, Object>> getDashboardData(String field,String status);
 
 	ResponseEntity<EnumMap<ApiResponse, Object>> getUpComingSectionData(String field);
+
 
 }
