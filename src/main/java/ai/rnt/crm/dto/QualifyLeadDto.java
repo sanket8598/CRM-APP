@@ -6,6 +6,8 @@ import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,4 +39,7 @@ public class QualifyLeadDto {
 	@NotNull(message = "Closed Date should not be null!!")
 	@FutureOrPresent(message = "Closed date must not be smaller than today's date!!")
 	private LocalDate closedOn;
+	
+	@JsonFormat(pattern = "dd-MMM-yyyy")
+	private LocalDate closedDate;
 }

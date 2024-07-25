@@ -39,17 +39,23 @@ public class LeadsPredicates {
 	public static final Predicate<Call> ACTIVE_CALL = call -> (isNull(call.getStatus())
 			|| call.getStatus().equalsIgnoreCase(SAVE));
 
+	public static final Predicate<Leads> INACTIVE_LEAD_FILTER = l -> nonNull(l.getStatus())
+			&& l.getStatus().equalsIgnoreCase(CLOSE_AS_DISQUALIFIED);
+	
+	
 	/*
 	 * * This Predicate return true if it the lead has disqualified.
 	 * 
 	 * @since version 1.0
 	 */
-	public static final Predicate<Leads> DISQUALIFIED_LEAD_FILTER = l -> nonNull(l.getStatus())
-			&& l.getStatus().equalsIgnoreCase(CLOSE_AS_DISQUALIFIED)
+	public static final Predicate<Leads> DISQUALIFIED_LEAD_FILTER = l -> INACTIVE_LEAD_FILTER.test(l)
 			&& (l.getDisqualifyAs().equalsIgnoreCase(LOST) || l.getDisqualifyAs().equalsIgnoreCase(NON_CONTACTABLE)
 					|| l.getDisqualifyAs().equalsIgnoreCase(NO_LONGER_INTERESTED)
 					|| l.getDisqualifyAs().equalsIgnoreCase(CANCELED)
 					|| l.getDisqualifyAs().equalsIgnoreCase(NON_WORKABLE));
+	
+	
+	
 	/*
 	 * * This Predicate return true if it the lead has Qaulified.
 	 * 
