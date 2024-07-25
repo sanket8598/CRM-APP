@@ -80,7 +80,7 @@ class DashboardServiceImplTest {
         when(opportunityDaoService.findAllOpty()).thenReturn(mockOpportunityList());
         when(leadDaoService.getAllLeads()).thenReturn(mockLeadList());
         when(leadDaoService.getLeadSourceCount()).thenReturn(mockLeadSourceCount());
-        ResponseEntity<EnumMap<ApiResponse, Object>> response = dashboardServiceImpl.getDashboardData("Lead");
+        ResponseEntity<EnumMap<ApiResponse, Object>> response = dashboardServiceImpl.getDashboardData("Lead", "Active");
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
@@ -95,7 +95,7 @@ class DashboardServiceImplTest {
 		when(opportunityDaoService.findAllOpty()).thenReturn(mockOpportunityList());
 		when(leadDaoService.getAllLeads()).thenReturn(mockLeadList());
 		when(leadDaoService.getLeadSourceCount(mockStaffId)).thenReturn(mockLeadSourceCount());
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = dashboardServiceImpl.getDashboardData("Lead");
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = dashboardServiceImpl.getDashboardData("Lead", "Active");
 		assertNotNull(response);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
@@ -106,7 +106,7 @@ class DashboardServiceImplTest {
     void testGetDashboardDataException() {
         when(auditAwareUtil.isAdmin()).thenThrow(new RuntimeException("Exception occurred"));
         assertThrows(CRMException.class, () -> {
-        	dashboardServiceImpl.getDashboardData("Lead");
+        	dashboardServiceImpl.getDashboardData("Lead", "Active");
         });
     }
 

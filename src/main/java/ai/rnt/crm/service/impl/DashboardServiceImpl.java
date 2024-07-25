@@ -14,7 +14,7 @@ import static ai.rnt.crm.dto_mapper.DashboardDtoMapper.TO_OPTY_MAIN_DASHBOARD_DT
 import static ai.rnt.crm.enums.ApiResponse.DATA;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.ASSIGNED_TO_FILTER;
-import static ai.rnt.crm.functional.predicates.LeadsPredicates.DISQUALIFIED_LEAD_FILTER;
+import static ai.rnt.crm.functional.predicates.LeadsPredicates.INACTIVE_LEAD_FILTER;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.ACTIVE_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.ASSIGNED_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORTUNITIES;
@@ -90,9 +90,8 @@ public class DashboardServiceImpl implements DashboardService {
 				dataMap.put(COUNTDATA, countMap);
 				if (LEAD.equalsIgnoreCase(field)) {
 					dataMap.put(WORK_ITEM, TO_DASHBOARD_DTOS.apply(leadDaoService.getAllLeads().stream().filter(e -> {
-						return nonNull(status) && status.equalsIgnoreCase(checkStatus)
-								? DISQUALIFIED_LEAD_FILTER.test(e)
-								: !DISQUALIFIED_LEAD_FILTER.test(e);
+						return nonNull(status) && status.equalsIgnoreCase(checkStatus) ? INACTIVE_LEAD_FILTER.test(e)
+								: !INACTIVE_LEAD_FILTER.test(e);
 					}).collect(toList())));
 				} else if (OPPORTUNITY.equalsIgnoreCase(field))
 					dataMap.put(WORK_ITEM,
@@ -124,8 +123,8 @@ public class DashboardServiceImpl implements DashboardService {
 							TO_DASHBOARD_DTOS
 									.apply(leads.stream().filter(l -> ASSIGNED_TO_FILTER.test(l, loggedInStaffId))
 											.filter(e -> status.equalsIgnoreCase("inactive")
-													? DISQUALIFIED_LEAD_FILTER.test(e)
-													: !DISQUALIFIED_LEAD_FILTER.test(e))
+													? INACTIVE_LEAD_FILTER.test(e)
+													: !INACTIVE_LEAD_FILTER.test(e))
 											.collect(toList())));
 				} else if (OPPORTUNITY.equalsIgnoreCase(field))
 					dataMap.put(WORK_ITEM,
