@@ -1,6 +1,10 @@
 package ai.rnt.crm.dto;
 
+import java.time.LocalDate;
+
+import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -29,4 +33,8 @@ public class QualifyLeadDto {
 	private String qualifyRemarks;
 
 	private Boolean qualify;
+
+	@NotNull(message = "Closed Date should not be null!!")
+	@FutureOrPresent(message = "Closed date must not be smaller than today's date!!")
+	private LocalDate closedOn;
 }

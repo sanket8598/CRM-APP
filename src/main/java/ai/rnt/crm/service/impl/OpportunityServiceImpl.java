@@ -454,6 +454,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setProgressStatus(dto.getProgressStatus());
 			opportunityData.setTimeline(dto.getTimeline());
 			opportunityData.setAnalysisRemarks(dto.getAnalysisRemarks());
+			opportunityData.setStatus(ANALYSIS);
 			opportunityData.setLeads(leads);
 			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateAnalysisData.put(SUCCESS, true);
@@ -503,6 +504,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunityData.setPresentProposal(dto.getPresentProposal());
 			opportunityData.setFinalCommAndTimeline(dto.getFinalCommAndTimeline());
 			opportunityData.setProposeRemarks(dto.getProposeRemarks());
+			opportunityData.setStatus(PROPOSE);
 			if (nonNull(opportunityDaoService.addOpportunity(opportunityData))) {
 				updateProposeData.put(SUCCESS, true);
 				updateProposeData.put(MESSAGE, "Proposed Successfully..!!");

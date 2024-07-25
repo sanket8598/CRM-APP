@@ -71,6 +71,7 @@ import static ai.rnt.crm.util.CompanyUtil.addUpdateCompanyDetails;
 import static ai.rnt.crm.util.LeadsCardUtil.checkDuplicateLead;
 import static ai.rnt.crm.util.XSSUtil.sanitize;
 import static java.lang.Boolean.TRUE;
+import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
@@ -512,7 +513,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.setDisqualifyAs(QUALIFIED);
 			lead.setStatus(CLOSE_AS_QUALIFIED);
 			if (nonNull(dto.getQualify()) && TRUE.equals(dto.getQualify())) {
-				opportunity = addToOpputunity(lead);
+				opportunity = addToOpputunity(lead, dto.getClosedOn());
 				status = nonNull(opportunity);
 				if (nonNull(leadDaoService.addLead(lead)) && status) {
 					qualifyLeadMap.put(MESSAGE, "Lead Qualified Successfully");
@@ -915,9 +916,9 @@ public class LeadServiceImpl implements LeadService {
 		}
 	}
 
-	public Opportunity addToOpputunity(Leads leads) {
+	public Opportunity addToOpputunity(Leads leads, LocalDate closedDate) {
 		Opportunity opportunity = new Opportunity();
-		opportunity.setStatus(OppurtunityStatus.OPEN);
+		opportunity.setStatus(OppurtunityStatus.QUALIFY);
 		opportunity.setBudgetAmount(leads.getBudgetAmount());
 		opportunity.setTopic(leads.getTopic());
 		opportunity.setPseudoName(leads.getPseudoName());
@@ -925,8 +926,9 @@ public class LeadServiceImpl implements LeadService {
 		opportunity.setProgressStatus(leads.getProgressStatus());
 		opportunity.setEmployee(leads.getEmployee());
 		opportunity.setLeads(leads);
+		opportunity.setClosedOn(closedDate);
 		employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(opportunity::setAssignBy);
-		opportunity.setAssignDate(LocalDate.now());
+		opportunity.setAssignDate(now());
 		return opportunityDaoService.addOpportunity(opportunity);
 	}
 

@@ -2,6 +2,7 @@ package ai.rnt.crm.service.impl;
 
 import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
+import static java.time.LocalDate.now;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,6 +22,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -610,7 +612,7 @@ class LeadServiceImplTest {
 		opportunity.setEmployee(employee);
 		opportunity.setLeads(leads);
 		when(opportunityDaoService.addOpportunity(any())).thenReturn(opportunity);
-		opportunity = leadService.addToOpputunity(leads);
+		opportunity = leadService.addToOpputunity(leads,now());
 		assertNotNull(opportunity);
 		assertEquals(OppurtunityStatus.OPEN, opportunity.getStatus());
 		assertEquals(leads.getBudgetAmount(), opportunity.getBudgetAmount());
@@ -623,7 +625,7 @@ class LeadServiceImplTest {
 	void testAddToOpportunityFailure() {
 		Leads leads = new Leads();
 		when(opportunityDaoService.addOpportunity(any())).thenReturn(null);
-		Opportunity opportunity = leadService.addToOpputunity(leads);
+		Opportunity opportunity = leadService.addToOpputunity(leads,now());
 		assertNull(opportunity);
 	}
 
