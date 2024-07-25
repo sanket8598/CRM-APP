@@ -409,6 +409,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Leads lead = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
 			Optional<QualifyLeadDto> dto = TO_QUALIFY_LEAD_DTO.apply(lead);
+			if (nonNull(lead.getOpportunity()))
+				dto.ifPresent(d -> d.setClosedDate(lead.getOpportunity().getClosedOn()));
 			qualifyData.put(DATA, dto);
 			qualifyData.put(SUCCESS, true);
 			return new ResponseEntity<>(qualifyData, OK);
