@@ -48,7 +48,7 @@ public class ContactDaoServiceImpl implements ContactDaoService {
 	@Cacheable(value = CONTACT)
 	public List<Contacts> findAllPrimaryContacts() {
 		log.info("inside the findAllPrimaryContacts method...");
-		return contactRepository.findByPrimaryTrue();
+		return contactRepository.findByPrimaryTrueOrderByFirstNameAscLastNameAsc();
 	}
 
 	@Override
