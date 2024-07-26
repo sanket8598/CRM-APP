@@ -20,6 +20,7 @@ import ai.rnt.crm.dto.EmployeeDto;
 import ai.rnt.crm.entity.EmployeeMaster;
 import ai.rnt.crm.exception.ResourceNotFoundException;
 import ai.rnt.crm.projection.EmailIdProjection;
+import ai.rnt.crm.projection.StaffIdProjection;
 import ai.rnt.crm.repository.EmployeeMasterRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -69,12 +70,14 @@ public class EmployeeDaoServiceImpl implements EmployeeDaoService {
 
 	@Override
 	public String getEmailId(Integer staffId) {
-		return employeeMasterRepository.findEmailIdByStaffId(staffId).getEmailId();
+		Optional<EmailIdProjection> emailId = employeeMasterRepository.findEmailIdByStaffId(staffId);
+		return  emailId.isPresent()?emailId.get().getEmailId():null;
 	}
 
 	@Override
 	public Integer findTopStaffIdByEmailId(String email) {
-		return employeeMasterRepository.findTopStaffIdByEmailId(email).getStaffId();
+		Optional<StaffIdProjection> staffId = employeeMasterRepository.findTopStaffIdByEmailId(email);
+		return staffId.isPresent()?staffId.get().getStaffId():null;
 	}
 
 }

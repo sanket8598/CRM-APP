@@ -59,6 +59,8 @@ public class EditLeadDto {
 	private ContactDto primaryContact;
 
 	private OpportunityDto opportunity;
+	
+	private CurrencyDto currency;
 
 	public String getShortName() {
 		return nonNull(primaryContact)

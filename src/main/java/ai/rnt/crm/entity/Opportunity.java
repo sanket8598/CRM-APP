@@ -195,4 +195,8 @@ public class Opportunity extends Auditable {
 
 	@OneToMany(mappedBy = "opportunity", cascade = ALL)
 	private List<Proposal> proposals = new ArrayList<>();
+	
+	@ManyToOne(cascade = ALL)
+	@JoinColumn(name = "currency_id")
+	private CurrencyMaster currency;
 }

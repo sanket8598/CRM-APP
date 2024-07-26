@@ -162,6 +162,10 @@ public class Leads extends Auditable {
 
 	@OneToOne(mappedBy = "leads", cascade = ALL, orphanRemoval = true)
 	private Opportunity opportunity;
+	
+	@ManyToOne(cascade = ALL)
+	@JoinColumn(name = "currency_id")
+	private CurrencyMaster currency;
 
 	@Transient
 	public String getRemainderDueAt12Hours() {

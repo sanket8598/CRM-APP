@@ -36,6 +36,7 @@ import static ai.rnt.crm.constants.StatusConstants.QUALIFIED;
 import static ai.rnt.crm.constants.StatusConstants.QUALIFIED_LEAD;
 import static ai.rnt.crm.dto_mapper.CompanyDtoMapper.TO_COMPANY;
 import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTO;
+import static ai.rnt.crm.dto_mapper.ContactDtoMapper.TO_CONTACT_DTOS;
 import static ai.rnt.crm.dto_mapper.DomainMasterDtoMapper.TO_DOMAIN_DTOS;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_EMPLOYEE;
 import static ai.rnt.crm.dto_mapper.EmployeeToDtoMapper.TO_Employees;
@@ -482,6 +483,7 @@ public class LeadServiceImpl implements LeadService {
 			lead.put(DATA, dataMap);
 			return new ResponseEntity<>(lead, OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("Got Exception while editing the lead data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
@@ -968,6 +970,21 @@ public class LeadServiceImpl implements LeadService {
 			return new ResponseEntity<>(dataMap, CREATED);
 		} catch (Exception e) {
 			log.error("Got Exception while adding the description..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	@Override
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getContactInfo(Integer leadId) {
+		log.info("inside the addDescription method...{}", leadId);
+		EnumMap<ApiResponse, Object> contactInfoMap = new EnumMap<>(ApiResponse.class);
+		try {
+			contactInfoMap.put(SUCCESS, true);
+			contactInfoMap.put(DATA, TO_CONTACT_DTOS.apply(leadDaoService.getLeadById(leadId)
+					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId)).getContacts()));
+			return new ResponseEntity<>(contactInfoMap, OK);
+		} catch (Exception e) {
+			log.error("Got Exception while the getContactInfo..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ai.rnt.crm.dto.ContactDto;
+import ai.rnt.crm.dto.CurrencyDto;
 import ai.rnt.crm.dto.EmployeeDto;
 import ai.rnt.crm.dto.LeadDashboardDto;
 import lombok.Getter;
@@ -65,6 +66,8 @@ public class OpportunityDto {
 	private List<ContactDto> contacts;
 
 	private String createdOn;
+
+	private CurrencyDto currency;
 
 	public String getShortName() {
 		return nonNull(leadDashboardDto) && nonNull(leadDashboardDto.getPrimaryContact()) ? shortName(

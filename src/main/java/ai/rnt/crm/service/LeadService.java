@@ -51,4 +51,6 @@ public interface LeadService {
 
 	public ResponseEntity<EnumMap<ApiResponse, Object>> addDescription(DescriptionDto dto, Integer leadId);
 
+	public ResponseEntity<EnumMap<ApiResponse, Object>> getContactInfo(Integer leadId);
+
 }

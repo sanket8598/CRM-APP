@@ -19,7 +19,7 @@ public interface EmployeeMasterRepository extends JpaRepository<EmployeeMaster, 
 	List<EmailIdProjection> findEmailIdByDepartureDateIsNullOrDepartureDateBefore(
 			LocalDate deparatureDateShouldSmaller);
 
-	EmailIdProjection findEmailIdByStaffId(Integer staffId);
+	Optional<EmailIdProjection> findEmailIdByStaffId(Integer staffId);
 
-	StaffIdProjection findTopStaffIdByEmailId(String email);
+	Optional<StaffIdProjection> findTopStaffIdByEmailId(String email);
 }

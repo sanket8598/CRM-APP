@@ -77,20 +77,20 @@ public class LeadsDtoMapper {
 	};
 
 	public static final Function<Collection<Leads>, List<LeadDashboardDto>> TO_DASHBOARD_LEADDTOS = e -> {
-		Comparator<LeadDashboardDto> nameAndCompanyNameComp = (l1,
-				l2) -> ((isNull(l1.getPrimaryContact()) || isNull(l2.getPrimaryContact()))
-						|| (isNull(l1.getPrimaryContact().getName())
-								|| isNull(l2.getPrimaryContact().getName()))) ? 1
-										: l1.getPrimaryContact().getName()
-												.compareTo(l2.getPrimaryContact().getName());
-		nameAndCompanyNameComp.thenComparing((ld1,
+		Comparator<LeadDashboardDto> nameAndCompanyNameComp = (ld1,
 				ld2) -> ((isNull(ld1.getPrimaryContact()) || isNull(ld2.getPrimaryContact()))
 						|| (isNull(ld1.getPrimaryContact().getCompanyMaster())
 								|| isNull(ld2.getPrimaryContact().getCompanyMaster()))
 						|| (isNull(ld1.getPrimaryContact().getCompanyMaster().getCompanyName())
 								|| isNull(ld2.getPrimaryContact().getCompanyMaster().getCompanyName()))) ? 1
 										: ld1.getPrimaryContact().getCompanyMaster().getCompanyName().compareTo(
-												ld2.getPrimaryContact().getCompanyMaster().getCompanyName()));
+												ld2.getPrimaryContact().getCompanyMaster().getCompanyName());
+		nameAndCompanyNameComp.thenComparing((l1,
+				l2) -> ((isNull(l1.getPrimaryContact()) || isNull(l2.getPrimaryContact()))
+						|| (isNull(l1.getPrimaryContact().getName())
+								|| isNull(l2.getPrimaryContact().getName()))) ? 1
+										: l1.getPrimaryContact().getName()
+												.compareTo(l2.getPrimaryContact().getName()));
 		return e.stream().map(dm -> TO_DASHBOARD_LEADDTO.apply(dm).get()).sorted(nameAndCompanyNameComp)
 				.collect(toList());
 	};

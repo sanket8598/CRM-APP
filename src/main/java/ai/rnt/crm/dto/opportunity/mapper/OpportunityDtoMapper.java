@@ -40,10 +40,7 @@ public class OpportunityDtoMapper {
 	};
 
 	public static final Function<Collection<Opportunity>, List<OpportunityDto>> TO_DASHBOARD_OPPORTUNITY_DTOS = e -> {
-		Comparator<OpportunityDto> oppNameAndCompanyNameComp = (l1,
-				l2) -> isNull(l1.getTopic()) || isNull(l2.getTopic()) ? 1
-						: l1.getTopic().toLowerCase().compareTo(l2.getTopic().toLowerCase());
-		oppNameAndCompanyNameComp.thenComparing((ld1, ld2) -> ((isNull(ld1.getLeadDashboardDto())
+		Comparator<OpportunityDto> oppNameAndCompanyNameComp =(ld1, ld2) -> ((isNull(ld1.getLeadDashboardDto())
 				|| isNull(ld2.getLeadDashboardDto()))
 				|| (isNull(ld1.getLeadDashboardDto().getPrimaryContact())
 						|| isNull(ld2.getLeadDashboardDto().getPrimaryContact()))
@@ -54,7 +51,10 @@ public class OpportunityDtoMapper {
 								? 1
 								: ld1.getLeadDashboardDto().getPrimaryContact().getCompanyMaster().getCompanyName()
 										.compareTo(ld2.getLeadDashboardDto().getPrimaryContact().getCompanyMaster()
-												.getCompanyName()));
+												.getCompanyName());
+		oppNameAndCompanyNameComp.thenComparing((l1,
+				l2) -> isNull(l1.getTopic()) || isNull(l2.getTopic()) ? 1
+						: l1.getTopic().toLowerCase().compareTo(l2.getTopic().toLowerCase()));
 		return e.stream().map(dm -> TO_DASHBOARD_OPPORTUNITY_DTO.apply(dm).get()).sorted(oppNameAndCompanyNameComp)
 				.collect(toList());
 	};

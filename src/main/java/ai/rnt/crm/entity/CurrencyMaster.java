@@ -50,4 +50,10 @@ public class CurrencyMaster extends Auditable {
 
 	@OneToMany(mappedBy = "currency", cascade = ALL, orphanRemoval = true)
 	private List<CountryMaster> countryMaster;
+	
+	@OneToMany(mappedBy = "currency", orphanRemoval = true)
+	private List<Leads> lead;
+	
+	@OneToMany(mappedBy = "currency", orphanRemoval = true)
+	private List<Opportunity> opprtunity;
 }

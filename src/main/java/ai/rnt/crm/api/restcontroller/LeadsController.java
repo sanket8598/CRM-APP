@@ -190,4 +190,10 @@ public class LeadsController {
 			@Min(1) @PathVariable(name = "leadId") Integer leadId) {
 		return leadService.addDescription(dto, leadId);
 	}
+	
+	@PreAuthorize(CHECK_BOTH_ACCESS)
+	@GetMapping("/{leadId}/contact/info")
+	public ResponseEntity<EnumMap<ApiResponse, Object>> contactInfo(@Min(1) @PathVariable(name = "leadId") Integer leadId) {
+		return leadService.getContactInfo(leadId);
+	}
 }
