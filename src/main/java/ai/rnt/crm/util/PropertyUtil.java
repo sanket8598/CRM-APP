@@ -25,9 +25,9 @@ public class PropertyUtil {
 	protected String password;
 	
 	protected static final Properties PROPERTIES = new Properties();
-	protected static final String HOST = "smtp.zoho.com";
+	protected static final String HOST = "smtp.office365.com";
+	//"smtp.zoho.com"
 	
-
 	static {
 		PROPERTIES.put("mail.smtp.host", HOST);
 		PROPERTIES.put("mail.smtp.port", "587");
