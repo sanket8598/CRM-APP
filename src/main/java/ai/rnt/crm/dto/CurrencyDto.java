@@ -14,5 +14,7 @@ public class CurrencyDto implements Serializable {
 	private Integer currencyId;
 	
 	private String currencySymbol;
+	
+	private String currencyName;
 
 }
