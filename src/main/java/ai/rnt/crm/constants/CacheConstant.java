@@ -45,4 +45,6 @@ public final class CacheConstant {
 	public static final String CALL_TASK = "callTask";
 	public static final String VISIT_TASK = "visitTask";
 	public static final String MEETING_TASK = "meetingTask";
+	
+	public static final String CURRENCY = "currency";
 }

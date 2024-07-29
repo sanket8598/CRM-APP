@@ -59,5 +59,7 @@ public class UpdateLeadDto {
 	private String proposedSolution;
 	private String pseudoName;
 	private String linkedinId;
+	
+	private CurrencyDto currency;
 
 }

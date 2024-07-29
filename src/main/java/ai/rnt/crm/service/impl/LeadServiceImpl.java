@@ -77,6 +77,8 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.poi.ss.usermodel.WorkbookFactory.create;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -112,6 +114,7 @@ import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.ContactDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
+import ai.rnt.crm.dao.service.CurrencyDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.ExcelHeaderDaoService;
@@ -135,6 +138,7 @@ import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
+import ai.rnt.crm.entity.CurrencyMaster;
 import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.Email;
@@ -200,6 +204,7 @@ public class LeadServiceImpl implements LeadService {
 	private final EmailUtil emailUtil;
 	private final SignatureUtil signatureUtil;
 	private final TaskNotificationsUtil taskNotificationsUtil;
+	private final CurrencyDaoService currencyDaoService;
 
 	private static final String PRIMFIELD = "PrimaryField";
 	private static final String SECNDFIELD = "SecondaryField";
@@ -514,6 +519,10 @@ public class LeadServiceImpl implements LeadService {
 
 			lead.setDisqualifyAs(QUALIFIED);
 			lead.setStatus(CLOSE_AS_QUALIFIED);
+			if (nonNull(dto.getCurrency()))
+				addCurrencyDetails(dto.getCurrency().getCurrencySymbol(), dto.getCurrency().getCurrencyName(),
+						dto.getCurrency().getCurrencyId()).ifPresent(lead::setCurrency);
+
 			if (nonNull(dto.getQualify()) && TRUE.equals(dto.getQualify())) {
 				opportunity = addToOpputunity(lead, dto.getClosedOn());
 				status = nonNull(opportunity);
@@ -606,6 +615,10 @@ public class LeadServiceImpl implements LeadService {
 			lead.setCustomerNeed(dto.getCustomerNeed());
 			lead.setProposedSolution(dto.getProposedSolution());
 			lead.setPseudoName(dto.getPseudoName());
+
+			if (nonNull(dto.getCurrency()))
+				addCurrencyDetails(dto.getCurrency().getCurrencySymbol(), dto.getCurrency().getCurrencyName(),
+						dto.getCurrency().getCurrencyId()).ifPresent(lead::setCurrency);
 
 			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
@@ -862,19 +875,20 @@ public class LeadServiceImpl implements LeadService {
 		contact.setBusinessCardType(leadDto.getBusinessCardType());
 		contact.setLinkedinId(leadDto.getLinkedinId());
 		contact.setPrimary(true);
-		setCompanyDetailsToContact(existCompany, leadDto, contact);
+		setCompanyDetailsToContact(existCompany, leadDto, contact, leads);
 		contact.setLead(leads);
 		leads.setContacts(asList(contact));
 		return contact;
 	}
 
-	public void setCompanyDetailsToContact(Optional<CompanyDto> existCompany, LeadDto leadDto, Contacts contact) {
+	public void setCompanyDetailsToContact(Optional<CompanyDto> existCompany, LeadDto leadDto, Contacts contact,
+			Leads leads) {
 		log.info("inside the setCompanyDetailsToContact method...");
 		if (existCompany.isPresent()) {
 			existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());
 			CompanyMaster company = TO_COMPANY.apply(existCompany.orElseThrow(ResourceNotFoundException::new))
 					.orElseThrow(ResourceNotFoundException::new);
-			setLocationToCompany(leadDto.getLocation(), company);
+			setLocationToCompany(leadDto.getLocation(), company, leadDto, leads);
 			contact.setCompanyMaster(
 					TO_COMPANY.apply(companyMasterDaoService.save(company).orElseThrow(ResourceNotFoundException::new))
 							.orElseThrow(ResourceNotFoundException::new));
@@ -883,25 +897,57 @@ public class LeadServiceImpl implements LeadService {
 					.apply(CompanyDto.builder().companyName(leadDto.getCompanyName())
 							.companyWebsite(leadDto.getCompanyWebsite()).build())
 					.orElseThrow(ResourceNotFoundException::new);
-			setLocationToCompany(leadDto.getLocation(), company);
+			setLocationToCompany(leadDto.getLocation(), company, leadDto, leads);
 			companyMasterDaoService.save(company)
 					.ifPresent(e -> TO_COMPANY.apply(e).ifPresent(contact::setCompanyMaster));
 		}
 
 	}
 
-	public void setLocationToCompany(String location, CompanyMaster company) {
+	public void setLocationToCompany(String location, CompanyMaster company, LeadDto leadDto, Leads leads) {
 		log.info("inside the setLocationToCompany method...{} ", location);
 		if (nonNull(location) && !location.isEmpty()) {
 			Optional<CountryMaster> country = countryDaoService.findByCountryName(location);
-			if (country.isPresent())
-				country.ifPresent(company::setCountry);
-			else {
+			if (country.isPresent()) {
+				if (isNull(country.get().getCurrency())) {
+					addCurrencyDetails(leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
+							.ifPresent(country.get()::setCurrency);
+					company.setCountry(countryDaoService.addCountry(country.get()));
+					leads.setCurrency(company.getCountry().getCurrency());
+				} else {
+					country.ifPresent(company::setCountry);
+					addCurrencyDetails(leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
+							.ifPresent(leads::setCurrency);
+				}
+			} else {
 				CountryMaster countryMaster = new CountryMaster();
 				countryMaster.setCountry(sanitize(location));
+				addCurrencyDetails(leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
+						.ifPresent(countryMaster::setCurrency);
 				company.setCountry(countryDaoService.addCountry(countryMaster));
+				leads.setCurrency(company.getCountry().getCurrency());
 			}
 		}
+	}
+
+	private Optional<CurrencyMaster> addCurrencyDetails(String currencySymbol, String currencyName,
+			Integer currencyId) {
+		if (nonNull(currencyId))
+			return currencyDaoService.findCurrency(currencyId);
+		else if (nonNull(currencySymbol) && nonNull(currencyName)) {
+			Optional<CurrencyMaster> currencyByName = currencyDaoService.findCurrencyByName(currencyName);
+			if (currencyByName.isPresent())
+				return currencyByName;
+			Optional<CurrencyMaster> currencyBySymbol = currencyDaoService.findCurrencyBySymbol(currencySymbol);
+			if (currencyBySymbol.isPresent())
+				return currencyBySymbol;
+			CurrencyMaster currencyMaster = new CurrencyMaster();
+			currencyMaster.setCurrencyName(currencyName);
+			currencyMaster.setCurrencyCode(currencyName);
+			currencyMaster.setCurrencySymbol(currencySymbol);
+			return ofNullable(currencyDaoService.addCurrency(currencyMaster));
+		}
+		return empty();
 	}
 
 	@Override
@@ -929,6 +975,7 @@ public class LeadServiceImpl implements LeadService {
 		opportunity.setEmployee(leads.getEmployee());
 		opportunity.setLeads(leads);
 		opportunity.setClosedOn(closedDate);
+		opportunity.setCurrency(leads.getCurrency());
 		employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(opportunity::setAssignBy);
 		opportunity.setAssignDate(now());
 		return opportunityDaoService.addOpportunity(opportunity);

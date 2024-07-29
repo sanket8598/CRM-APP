@@ -163,7 +163,7 @@ public class Leads extends Auditable {
 	@OneToOne(mappedBy = "leads", cascade = ALL, orphanRemoval = true)
 	private Opportunity opportunity;
 	
-	@ManyToOne(cascade = ALL)
+	@ManyToOne(cascade = {DETACH,MERGE})
 	@JoinColumn(name = "currency_id")
 	private CurrencyMaster currency;
 

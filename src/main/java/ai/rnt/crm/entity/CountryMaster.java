@@ -1,6 +1,8 @@
 package ai.rnt.crm.entity;
 
 import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.DETACH;
+import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.GenerationType.IDENTITY;
 import static org.hibernate.annotations.FetchMode.JOIN;
 
@@ -57,7 +59,7 @@ public class CountryMaster extends Auditable {
 	@Fetch(JOIN)
 	private List<StateMaster> states = new ArrayList<>();
 
-	@ManyToOne(cascade = ALL)
+	@ManyToOne(cascade = {DETACH,MERGE})
 	@JoinColumn(name = "currency_id")
 	private CurrencyMaster currency;
 

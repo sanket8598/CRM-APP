@@ -201,6 +201,5 @@ public interface CrudService<ENTITY, DTO> {
 	default boolean existsById(Integer id) throws Exception {
 		throw new UnsupportedOperationException("existByid method is not implemented");
 	}
-
 	
 }

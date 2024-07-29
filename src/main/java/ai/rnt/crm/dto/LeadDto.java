@@ -65,7 +65,11 @@ public class LeadDto {
 	private Integer assignTo;
 
 	private String status;
-
+	
+	private String currencyName;
+	
+	private String currencySymbol;
+	
 	@ValidDisqualifiedStatus(message = "Disqualified-As is not valid!!", groups = DisqualifiedLead.class)
 	private String disqualifyAs;
 

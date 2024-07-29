@@ -42,4 +42,6 @@ public class QualifyLeadDto {
 	
 	@JsonFormat(pattern = "dd-MMM-yyyy")
 	private LocalDate closedDate;
+	
+	private CurrencyDto currency;
 }
