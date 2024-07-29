@@ -43,6 +43,7 @@ import static ai.rnt.crm.functional.predicates.OpportunityPredicates.ASSIGNED_OP
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.IN_PIPELINE_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.LOSS_OPPORTUNITIES;
 import static ai.rnt.crm.functional.predicates.OpportunityPredicates.WON_OPPORTUNITIES;
+import static ai.rnt.crm.util.CommonUtil.addCurrencyDetails;
 import static ai.rnt.crm.util.CommonUtil.getActivityData;
 import static ai.rnt.crm.util.CommonUtil.getDescData;
 import static ai.rnt.crm.util.CommonUtil.getTaskDataMap;
@@ -88,6 +89,7 @@ import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.ContactDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
+import ai.rnt.crm.dao.service.CurrencyDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
@@ -169,6 +171,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 	private final TaskNotificationsUtil taskNotificationsUtil;
 	private final EmailUtil emailUtil;
 	private final SignatureUtil signatureUtil;
+	private final CurrencyDaoService currencyDaoService;
 
 	private static final String OPPORTUNITY_ID = "opportunityId";
 
@@ -634,9 +637,13 @@ public class OpportunityServiceImpl implements OpportunityService {
 			else
 				opportunity.setBudgetAmount(dto.getBudgetAmount());
 			opportunity.setPseudoName(dto.getPseudoName());
+			if (nonNull(dto.getCurrency()))
+				addCurrencyDetails(currencyDaoService, dto.getCurrency().getCurrencySymbol(),
+						dto.getCurrency().getCurrencyName(), dto.getCurrency().getCurrencyId())
+						.ifPresent(opportunity::setCurrency);
 			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
-			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService, dto,
+			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService,currencyDaoService, dto,
 					contact);
 			setServiceFallToLead(dto.getServiceFallsId(), lead, serviceFallsDaoSevice);
 			setLeadSourceToLead(dto.getLeadSourceId(), lead, leadSourceDaoService);

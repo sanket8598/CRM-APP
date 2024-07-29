@@ -68,6 +68,8 @@ import static java.util.Comparator.naturalOrder;
 import static java.util.Map.Entry.comparingByKey;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 import static java.util.regex.Pattern.compile;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -80,7 +82,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import ai.rnt.crm.dao.service.CurrencyDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
@@ -92,6 +96,7 @@ import ai.rnt.crm.dto.EditVisitDto;
 import ai.rnt.crm.dto.MainTaskDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.entity.Call;
+import ai.rnt.crm.entity.CurrencyMaster;
 import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.Email;
@@ -501,6 +506,26 @@ public class CommonUtil {
 		upNext.sort((t1, t2) -> parse(t1.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)
 				.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 		return upNext;
+	}
+	
+	public static Optional<CurrencyMaster> addCurrencyDetails(CurrencyDaoService currencyDaoService,String currencySymbol, String currencyName,
+			Integer currencyId) {
+		if (nonNull(currencyId))
+			return currencyDaoService.findCurrency(currencyId);
+		else if (nonNull(currencySymbol) && nonNull(currencyName)) {
+			Optional<CurrencyMaster> currencyByName = currencyDaoService.findCurrencyByName(currencyName);
+			if (currencyByName.isPresent())
+				return currencyByName;
+			Optional<CurrencyMaster> currencyBySymbol = currencyDaoService.findCurrencyBySymbol(currencySymbol);
+			if (currencyBySymbol.isPresent())
+				return currencyBySymbol;
+			CurrencyMaster currencyMaster = new CurrencyMaster();
+			currencyMaster.setCurrencyName(currencyName);
+			currencyMaster.setCurrencyCode(currencyName);
+			currencyMaster.setCurrencySymbol(currencySymbol);
+			return ofNullable(currencyDaoService.addCurrency(currencyMaster));
+		}
+		return empty();
 	}
 
 	public static List<DescriptionDto> getDescData(List<Description> descriptions) {

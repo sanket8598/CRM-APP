@@ -59,6 +59,7 @@ import static ai.rnt.crm.functional.predicates.LeadsPredicates.CLOSE_LEAD_FILTER
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.DISQUALIFIED_LEAD_FILTER;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.OPEN_LEAD_FILTER;
 import static ai.rnt.crm.functional.predicates.LeadsPredicates.QUALIFIED_LEAD_FILTER;
+import static ai.rnt.crm.util.CommonUtil.addCurrencyDetails;
 import static ai.rnt.crm.util.CommonUtil.getActivityData;
 import static ai.rnt.crm.util.CommonUtil.getDescData;
 import static ai.rnt.crm.util.CommonUtil.getTaskDataMap;
@@ -77,8 +78,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.poi.ss.usermodel.WorkbookFactory.create;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -138,7 +137,6 @@ import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
-import ai.rnt.crm.entity.CurrencyMaster;
 import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.Email;
@@ -520,8 +518,9 @@ public class LeadServiceImpl implements LeadService {
 			lead.setDisqualifyAs(QUALIFIED);
 			lead.setStatus(CLOSE_AS_QUALIFIED);
 			if (nonNull(dto.getCurrency()))
-				addCurrencyDetails(dto.getCurrency().getCurrencySymbol(), dto.getCurrency().getCurrencyName(),
-						dto.getCurrency().getCurrencyId()).ifPresent(lead::setCurrency);
+				addCurrencyDetails(currencyDaoService, dto.getCurrency().getCurrencySymbol(),
+						dto.getCurrency().getCurrencyName(), dto.getCurrency().getCurrencyId())
+						.ifPresent(lead::setCurrency);
 
 			if (nonNull(dto.getQualify()) && TRUE.equals(dto.getQualify())) {
 				opportunity = addToOpputunity(lead, dto.getClosedOn());
@@ -617,12 +616,13 @@ public class LeadServiceImpl implements LeadService {
 			lead.setPseudoName(dto.getPseudoName());
 
 			if (nonNull(dto.getCurrency()))
-				addCurrencyDetails(dto.getCurrency().getCurrencySymbol(), dto.getCurrency().getCurrencyName(),
-						dto.getCurrency().getCurrencyId()).ifPresent(lead::setCurrency);
+				addCurrencyDetails(currencyDaoService, dto.getCurrency().getCurrencySymbol(),
+						dto.getCurrency().getCurrencyName(), dto.getCurrency().getCurrencyId())
+						.ifPresent(lead::setCurrency);
 
 			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
-			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService, dto,
+			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService,currencyDaoService, dto,
 					contact);
 			setServiceFallToLead(dto.getServiceFallsId(), lead, serviceFallsDaoSevice);
 			setLeadSourceToLead(dto.getLeadSourceId(), lead, leadSourceDaoService);
@@ -910,44 +910,26 @@ public class LeadServiceImpl implements LeadService {
 			Optional<CountryMaster> country = countryDaoService.findByCountryName(location);
 			if (country.isPresent()) {
 				if (isNull(country.get().getCurrency())) {
-					addCurrencyDetails(leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
+					addCurrencyDetails(currencyDaoService, leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
 							.ifPresent(country.get()::setCurrency);
 					company.setCountry(countryDaoService.addCountry(country.get()));
 					leads.setCurrency(company.getCountry().getCurrency());
 				} else {
 					country.ifPresent(company::setCountry);
-					addCurrencyDetails(leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
+					addCurrencyDetails(currencyDaoService, leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
 							.ifPresent(leads::setCurrency);
 				}
 			} else {
 				CountryMaster countryMaster = new CountryMaster();
 				countryMaster.setCountry(sanitize(location));
-				addCurrencyDetails(leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
+				addCurrencyDetails(currencyDaoService, leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
 						.ifPresent(countryMaster::setCurrency);
 				company.setCountry(countryDaoService.addCountry(countryMaster));
 				leads.setCurrency(company.getCountry().getCurrency());
 			}
-		}
-	}
-
-	private Optional<CurrencyMaster> addCurrencyDetails(String currencySymbol, String currencyName,
-			Integer currencyId) {
-		if (nonNull(currencyId))
-			return currencyDaoService.findCurrency(currencyId);
-		else if (nonNull(currencySymbol) && nonNull(currencyName)) {
-			Optional<CurrencyMaster> currencyByName = currencyDaoService.findCurrencyByName(currencyName);
-			if (currencyByName.isPresent())
-				return currencyByName;
-			Optional<CurrencyMaster> currencyBySymbol = currencyDaoService.findCurrencyBySymbol(currencySymbol);
-			if (currencyBySymbol.isPresent())
-				return currencyBySymbol;
-			CurrencyMaster currencyMaster = new CurrencyMaster();
-			currencyMaster.setCurrencyName(currencyName);
-			currencyMaster.setCurrencyCode(currencyName);
-			currencyMaster.setCurrencySymbol(currencySymbol);
-			return ofNullable(currencyDaoService.addCurrency(currencyMaster));
-		}
-		return empty();
+		} else
+			addCurrencyDetails(currencyDaoService, leadDto.getCurrencySymbol(), leadDto.getCurrencyName(), null)
+					.ifPresent(leads::setCurrency);
 	}
 
 	@Override
