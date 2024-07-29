@@ -6,6 +6,7 @@ import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 
 import java.util.EnumMap;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class CountryController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addCountry(@RequestBody CountryDto dto) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addCountry(@RequestBody @Valid CountryDto dto) {
 		return countryService.addCountry(dto);
 	}
 
@@ -51,7 +52,7 @@ public class CountryController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping("/{countryId}")
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCountry(@RequestBody CountryDto dto,
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCountry(@RequestBody @Valid CountryDto dto,
 			@Min(1) @PathVariable Integer countryId) {
 		return countryService.updateCountry(dto, countryId);
 	}

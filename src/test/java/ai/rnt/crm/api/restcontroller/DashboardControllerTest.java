@@ -35,7 +35,7 @@ class DashboardControllerTest {
 				.ok(new EnumMap<>(ApiResponse.class));
 		when(dashboardService.getDashboardData("Lead","Active")).thenReturn(expectedResponse);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = dashboardController.getDashboardData("Lead","Active");
-		verify(dashboardService).getDashboardData("Lead","inactive");
+		verify(dashboardService).getDashboardData("Lead","Active");
 		assertEquals(expectedResponse, response);
 	}
 

@@ -6,6 +6,7 @@ import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 
 import java.util.EnumMap;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class CityController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PostMapping
-	public ResponseEntity<EnumMap<ApiResponse, Object>> addCity(@RequestBody CityDto dto) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> addCity(@RequestBody @Valid CityDto dto) {
 		return cityService.addCity(dto);
 	}
 
@@ -58,7 +59,7 @@ public class CityController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCity(@RequestBody CityDto dto) {
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCity(@RequestBody @Valid CityDto dto) {
 		return cityService.updateCity(dto);
 	}
 

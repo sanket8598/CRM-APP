@@ -47,7 +47,7 @@ class CityDaoServiceImplTest {
 		List<CityMaster> list = new ArrayList<>();
 		when(cityMasterRepository.findAll()).thenReturn(list);
 		cityDaoServiceImpl.getAllCity();
-		verify(cityMasterRepository).findAll();
+		verify(cityMasterRepository).findByOrderByCityAsc();
 	}
 
 	@Test

@@ -49,7 +49,7 @@ class StateDaoServiceImplTest {
 		List<StateMaster> stateList = new ArrayList<>();
 		when(stateMasterRepository.findAll()).thenReturn(stateList);
 		stateDaoServiceImpl.getAllState();
-		verify(stateMasterRepository).findAll();
+		verify(stateMasterRepository).findByOrderByStateAsc();
 	}
 
 	@Test

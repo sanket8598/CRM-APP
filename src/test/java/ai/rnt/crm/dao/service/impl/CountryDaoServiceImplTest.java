@@ -47,7 +47,7 @@ class CountryDaoServiceImplTest {
 		List<CountryMaster> list = new ArrayList<>();
 		when(countryMasterRepository.findAll()).thenReturn(list);
 		countryDaoServiceImpl.getAllCountry();
-		verify(countryMasterRepository).findAll();
+		verify(countryMasterRepository).findByOrderByCountryAsc();
 	}
 
 	@Test
