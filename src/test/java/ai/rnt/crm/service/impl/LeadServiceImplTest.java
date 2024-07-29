@@ -68,6 +68,7 @@ import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
 import ai.rnt.crm.dto.ContactDto;
+import ai.rnt.crm.dto.CurrencyDto;
 import ai.rnt.crm.dto.DescriptionDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
@@ -85,6 +86,7 @@ import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.CountryMaster;
+import ai.rnt.crm.entity.CurrencyMaster;
 import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.Email;
@@ -692,28 +694,31 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void testUpdateLeadContact_Success() {
-		Integer leadId = 1;
-		UpdateLeadDto dto = mock(UpdateLeadDto.class);
-		Leads lead = mock(Leads.class);
-		Contacts contact = mock(Contacts.class);
-		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-		result.put(MESSAGE, "Lead Details Updated Successfully !!");
-		result.put(SUCCESS, true);
-		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
-		when(lead.getContacts()).thenReturn(Arrays.asList(contact));
-		when(contact.getPrimary()).thenReturn(true);
-		when(contact.getPrimary()).thenReturn(true);
-		when(cityDaoService.existCityByName("dhjsd")).thenReturn(Optional.of(mock(CityMaster.class)));
-		when(stateDaoService.findBystate("dfs")).thenReturn(Optional.of(mock(StateMaster.class)));
-		when(countryDaoService.findByCountryName("sfgdfsd")).thenReturn(Optional.of(mock(CountryMaster.class)));
-		when(companyMasterDaoService.findByCompanyName("fsdfsdds")).thenReturn(Optional.of(mock(CompanyDto.class)));
-		when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(mock(CountryMaster.class));
-		when(stateDaoService.addState(any(StateMaster.class))).thenReturn(mock(StateMaster.class));
-		when(cityDaoService.addCity(any(CityMaster.class))).thenReturn(mock(CityMaster.class));
-		when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
-		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = leadService.updateLeadContact(leadId, dto);
-		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+	void testUpdateLeadContactSuccess() {
+	    Integer leadId = 1;
+	    UpdateLeadDto dto = mock(UpdateLeadDto.class);
+	    CurrencyDto currencyDto = new CurrencyDto();
+	    currencyDto.setCurrencySymbol("$");
+	    // Ensure that the getCurrency method returns the CurrencyDto object
+	    when(dto.getCurrency()).thenReturn(currencyDto);
+	    Leads lead = mock(Leads.class);
+	    Contacts contact = mock(Contacts.class);
+	    EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+	    result.put(ApiResponse.MESSAGE, "Lead Details Updated Successfully !!");
+	    result.put(ApiResponse.SUCCESS, true);
+	    when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
+	    when(lead.getContacts()).thenReturn(Arrays.asList(contact));
+	    when(contact.getPrimary()).thenReturn(true);
+	    when(cityDaoService.existCityByName("dhjsd")).thenReturn(Optional.of(mock(CityMaster.class)));
+	    when(stateDaoService.findBystate("dfs")).thenReturn(Optional.of(mock(StateMaster.class)));
+	    when(countryDaoService.findByCountryName("sfgdfsd")).thenReturn(Optional.of(mock(CountryMaster.class)));
+	    when(companyMasterDaoService.findByCompanyName("fsdfsdds")).thenReturn(Optional.of(mock(CompanyDto.class)));
+	    when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(mock(CountryMaster.class));
+	    when(stateDaoService.addState(any(StateMaster.class))).thenReturn(mock(StateMaster.class));
+	    when(cityDaoService.addCity(any(CityMaster.class))).thenReturn(mock(CityMaster.class));
+	    when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
+	    ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = leadService.updateLeadContact(leadId, dto);
+	    assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 	}
 
 	@Test
@@ -912,13 +917,20 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void testSetLocationToCompanyLocationNotNull() {
-		String location = "Some Location";
-		CompanyMaster company = new CompanyMaster();
-		when(countryDaoService.findByCountryName(location)).thenReturn(Optional.empty());
-		leadService.setLocationToCompany(location, company);
-		assertNull(company.getCountry());
-		verify(countryDaoService, times(1)).findByCountryName(location);
+	void testSetLocationToCompanyLocationNotNull1() {
+	    String location = "Pune";
+	    CompanyMaster company = mock(CompanyMaster.class);
+	    LeadDto leadDto = new LeadDto();
+	    Leads leads = new Leads();
+	    CurrencyMaster currencyMaster = new CurrencyMaster();
+	    currencyMaster.setCurrencySymbol("$");
+	    CountryMaster countryMaster = new CountryMaster();
+	    countryMaster.setCurrency(currencyMaster);
+	    when(company.getCountry()).thenReturn(countryMaster);
+	    when(countryDaoService.findByCountryName(location)).thenReturn(Optional.empty());
+	    leadService.setLocationToCompany(location, company, leadDto, leads);
+	    assertNotNull(company.getCountry());
+	    verify(countryDaoService, times(1)).findByCountryName(location);
 	}
 
 	@Test
@@ -926,10 +938,15 @@ class LeadServiceImplTest {
 		String location = "Some Location";
 		CompanyMaster company = new CompanyMaster();
 		CountryMaster countryMaster = new CountryMaster();
+		LeadDto leadDto = new LeadDto();
+		Leads leads = new Leads();
 		countryMaster.setCountry(location);
+		CurrencyMaster currencyMaster = new CurrencyMaster();
+		countryMaster.setCurrency(currencyMaster);
+		company.setCountry(countryMaster);
 		Optional<CountryMaster> countryOptional = Optional.of(countryMaster);
 		when(countryDaoService.findByCountryName(location)).thenReturn(countryOptional);
-		leadService.setLocationToCompany(location, company);
+		leadService.setLocationToCompany(location, company,leadDto,leads);
 		assertEquals(countryMaster, company.getCountry());
 		verify(countryDaoService, times(1)).findByCountryName(location);
 		verify(countryDaoService, never()).addCountry(any());
@@ -943,7 +960,7 @@ class LeadServiceImplTest {
 		countryMaster.setCountry(location);
 		when(countryDaoService.findByCountryName(location)).thenReturn(Optional.empty());
 		when(countryDaoService.addCountry(any())).thenReturn(countryMaster);
-		leadService.setLocationToCompany(location, company);
+		leadService.setLocationToCompany(location, company,leadDto,leads);
 		assertEquals(countryMaster, company.getCountry());
 		verify(countryDaoService, times(1)).findByCountryName(location);
 		verify(countryDaoService, times(1)).addCountry(any());

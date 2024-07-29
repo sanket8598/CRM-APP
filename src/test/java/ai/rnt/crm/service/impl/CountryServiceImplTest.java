@@ -97,7 +97,7 @@ class CountryServiceImplTest {
 		assertNotNull(response);
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Country Added Successfully", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Country Added Successfully !!", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test
@@ -110,7 +110,7 @@ class CountryServiceImplTest {
 		assertNotNull(response);
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Country Not Added", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Country Not Added !!", response.getBody().get(ApiResponse.MESSAGE));
 	}
 
 	@Test

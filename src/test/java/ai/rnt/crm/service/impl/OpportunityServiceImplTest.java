@@ -48,6 +48,7 @@ import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.dto.CompanyDto;
+import ai.rnt.crm.dto.CurrencyDto;
 import ai.rnt.crm.dto.EditCallDto;
 import ai.rnt.crm.dto.EditEmailDto;
 import ai.rnt.crm.dto.EditMeetingDto;
@@ -366,6 +367,8 @@ class OpportunityServiceImplTest {
 		when(opportunityDaoService.findOpportunity(opportunityId)).thenReturn(Optional.of(opportunity));
 		when(opportunityDaoService.addOpportunity(opportunity)).thenReturn(opportunity);
 		Leads leads = new Leads();
+		CurrencyDto currencyDto = new CurrencyDto();
+		currencyDto.setCurrencySymbol("$");
 
 		List<Contacts> contact = new ArrayList<>();
 		Contacts contact1 = new Contacts();
@@ -373,6 +376,7 @@ class OpportunityServiceImplTest {
 		contact.add(contact1);
 		leads.setContacts(contact);
 		opportunity.setLeads(leads);
+		dto.setCurrency(currencyDto);;
 		dto.setCompanyName("RNT");
 		dto.setCountry("India");
 		dto.setState("Maharashtra");

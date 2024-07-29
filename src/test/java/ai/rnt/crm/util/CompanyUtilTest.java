@@ -19,8 +19,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
+import ai.rnt.crm.dao.service.CurrencyDaoService;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dto.CompanyDto;
+import ai.rnt.crm.dto.CurrencyDto;
 import ai.rnt.crm.dto.UpdateLeadDto;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.Contacts;
@@ -56,17 +58,20 @@ class CompanyUtilTest {
 		CityDaoService cityDaoService = mock(CityDaoService.class);
 		StateDaoService stateDaoService = mock(StateDaoService.class);
 		CountryDaoService countryDaoService = mock(CountryDaoService.class);
+		CurrencyDaoService currencyDaoService = mock(CurrencyDaoService.class);
 		CompanyMasterDaoService companyMasterDaoService = mock(CompanyMasterDaoService.class);
 		UpdateLeadDto dto = new UpdateLeadDto();
 		dto.setCompanyName("RNT");
 		Contacts contact = new Contacts();
 		CompanyMaster companyMaster = new CompanyMaster();
 		companyMaster.setCompanyId(1);
+		CurrencyDto currencyDto = new CurrencyDto();
+		currencyDto.setCurrencySymbol("$");
+		dto.setCurrency(currencyDto);
 		when(companyMasterDaoService.findByCompanyName(Mockito.anyString())).thenReturn(Optional.of(mock(CompanyDto.class)));
 		when(companyMasterDaoService.save(companyMaster)).thenReturn(Optional.of(mock(CompanyDto.class)));
-		
 		CompanyUtil.addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService,
-				dto, contact);
+				currencyDaoService,dto, contact);
 		verify(companyMasterDaoService).findByCompanyName(dto.getCompanyName());
 	}
 
@@ -76,14 +81,18 @@ class CompanyUtilTest {
 		StateDaoService stateDaoService = mock(StateDaoService.class);
 		CountryDaoService countryDaoService = mock(CountryDaoService.class);
 		CompanyMasterDaoService companyMasterDaoService = mock(CompanyMasterDaoService.class);
+		CurrencyDaoService currencyDaoService = mock(CurrencyDaoService.class);
 		UpdateLeadDto dto = new UpdateLeadDto();
 		Contacts contact = new Contacts();
 		CompanyMaster companyMaster = new CompanyMaster();
 		companyMaster.setCompanyId(1);
+		CurrencyDto currencyDto = new CurrencyDto();
+		currencyDto.setCurrencySymbol("$");
+		dto.setCurrency(currencyDto);
 		when(companyMasterDaoService.findByCompanyName(dto.getCompanyName())).thenReturn(Optional.empty());
 		when(companyMasterDaoService.save(companyMaster)).thenReturn(Optional.of(mock(CompanyDto.class)));
 		CompanyUtil.addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService,
-				dto, contact);
+				currencyDaoService,dto, contact);
 		verify(companyMasterDaoService).findByCompanyName(dto.getCompanyName());
 	}
 }
