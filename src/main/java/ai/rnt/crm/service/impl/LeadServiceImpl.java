@@ -498,7 +498,6 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> qualifyLeadMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Opportunity opportunity = null;
-			boolean status = false;
 			qualifyLeadMap.put(SUCCESS, true);
 			qualifyLeadMap.put(MESSAGE, "Lead Not Qualify");
 			Leads lead = leadDaoService.getLeadById(leadId)
@@ -524,8 +523,7 @@ public class LeadServiceImpl implements LeadService {
 
 			if (nonNull(dto.getQualify()) && TRUE.equals(dto.getQualify())) {
 				opportunity = addToOpputunity(lead, dto.getClosedOn());
-				status = nonNull(opportunity);
-				if (nonNull(leadDaoService.addLead(lead)) && status) {
+				if (nonNull(leadDaoService.addLead(lead)) && nonNull(opportunity)) {
 					qualifyLeadMap.put(MESSAGE, "Lead Qualified Successfully");
 					qualifyLeadMap.put(DATA, opportunity.getOpportunityId());
 				} else
@@ -538,6 +536,7 @@ public class LeadServiceImpl implements LeadService {
 			}
 			return new ResponseEntity<>(qualifyLeadMap, OK);
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("Got Exception while qualifying the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
@@ -956,8 +955,8 @@ public class LeadServiceImpl implements LeadService {
 		opportunity.setProgressStatus(leads.getProgressStatus());
 		opportunity.setEmployee(leads.getEmployee());
 		opportunity.setLeads(leads);
-		opportunity.setClosedOn(closedDate);
 		opportunity.setCurrency(leads.getCurrency());
+		opportunity.setClosedOn(closedDate);
 		employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(opportunity::setAssignBy);
 		opportunity.setAssignDate(now());
 		return opportunityDaoService.addOpportunity(opportunity);

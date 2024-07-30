@@ -175,7 +175,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), UNAUTHORIZED);
 		else if (exc.getException() instanceof NullPointerException)
 			return new ResponseEntity<>(new ApiError(false, ERROR_MSG), INTERNAL_SERVER_ERROR);
-		else if (exc.getException() instanceof org.hibernate.exception.ConstraintViolationException)
+		else if (exc.getException() instanceof org.hibernate.exception.ConstraintViolationException || exc.getException() instanceof org.springframework.dao.DataIntegrityViolationException)
 			return new ResponseEntity<>(new ApiError(false, DUPLICATE_DATA_ERROR_MSG), BAD_REQUEST);
 		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), INTERNAL_SERVER_ERROR);
 	}

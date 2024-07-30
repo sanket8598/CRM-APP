@@ -1,6 +1,8 @@
 package ai.rnt.crm.entity;
 
 import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.CascadeType.DETACH;
+import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -138,8 +140,8 @@ public class Opportunity extends Auditable {
 	@Column(name = "assign_on")
 	private LocalDate assignDate;
 
-	@OneToOne(cascade = ALL)
-	@JoinColumn(name = "lead_id", unique = true)
+	@OneToOne
+	@JoinColumn(name = "lead_id", unique = true,updatable=false)
 	private Leads leads;
 
 	@OneToMany(mappedBy = "opportunity", cascade = ALL, orphanRemoval = true)
@@ -196,7 +198,7 @@ public class Opportunity extends Auditable {
 	@OneToMany(mappedBy = "opportunity", cascade = ALL)
 	private List<Proposal> proposals = new ArrayList<>();
 	
-	@ManyToOne(cascade = ALL)
+	@ManyToOne(cascade = {MERGE,DETACH})
 	@JoinColumn(name = "currency_id")
 	private CurrencyMaster currency;
 }
