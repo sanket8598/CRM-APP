@@ -19,6 +19,8 @@ class EditVisitDtoTest {
 		String shortName = "JD";
 		String dueDate = "2024-03-05";
 		String status = "Scheduled";
+		Integer parentId =1;
+		 String activityFrom = "Lead";
 		Integer assignTo = 2;
 		editVisitDto.setId(id);
 		editVisitDto.setLocation(location);
@@ -29,8 +31,12 @@ class EditVisitDtoTest {
 		editVisitDto.setDueDate(dueDate);
 		editVisitDto.setStatus(status);
 		editVisitDto.setAssignTo(assignTo);
+		editVisitDto.setParentId(parentId);
+		editVisitDto.setActivityFrom(activityFrom);
 		
 		dto1.setId(id);
+		dto1.setParentId(parentId);
+		dto1.setActivityFrom(activityFrom);
 		dto1.setLocation(location);
 		dto1.setSubject(subject);
 		dto1.setBody(body);
@@ -53,5 +59,7 @@ class EditVisitDtoTest {
 		assertEquals(dueDate, editVisitDto.getDueDate());
 		assertEquals(status, editVisitDto.getStatus());
 		assertEquals(assignTo, editVisitDto.getAssignTo());
+		assertEquals(parentId, editVisitDto.getParentId());
+		assertEquals(activityFrom, editVisitDto.getActivityFrom());
 	}
 }

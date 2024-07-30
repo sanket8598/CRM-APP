@@ -18,11 +18,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -614,7 +614,7 @@ class LeadServiceImplTest {
 		opportunity.setEmployee(employee);
 		opportunity.setLeads(leads);
 		when(opportunityDaoService.addOpportunity(any())).thenReturn(opportunity);
-		opportunity = leadService.addToOpputunity(leads,now());
+		opportunity = leadService.addToOpputunity(leads, now());
 		assertNotNull(opportunity);
 		assertEquals(OppurtunityStatus.OPEN, opportunity.getStatus());
 		assertEquals(leads.getBudgetAmount(), opportunity.getBudgetAmount());
@@ -627,7 +627,7 @@ class LeadServiceImplTest {
 	void testAddToOpportunityFailure() {
 		Leads leads = new Leads();
 		when(opportunityDaoService.addOpportunity(any())).thenReturn(null);
-		Opportunity opportunity = leadService.addToOpputunity(leads,now());
+		Opportunity opportunity = leadService.addToOpputunity(leads, now());
 		assertNull(opportunity);
 	}
 
@@ -695,30 +695,30 @@ class LeadServiceImplTest {
 
 	@Test
 	void testUpdateLeadContactSuccess() {
-	    Integer leadId = 1;
-	    UpdateLeadDto dto = mock(UpdateLeadDto.class);
-	    CurrencyDto currencyDto = new CurrencyDto();
-	    currencyDto.setCurrencySymbol("$");
-	    // Ensure that the getCurrency method returns the CurrencyDto object
-	    when(dto.getCurrency()).thenReturn(currencyDto);
-	    Leads lead = mock(Leads.class);
-	    Contacts contact = mock(Contacts.class);
-	    EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
-	    result.put(ApiResponse.MESSAGE, "Lead Details Updated Successfully !!");
-	    result.put(ApiResponse.SUCCESS, true);
-	    when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
-	    when(lead.getContacts()).thenReturn(Arrays.asList(contact));
-	    when(contact.getPrimary()).thenReturn(true);
-	    when(cityDaoService.existCityByName("dhjsd")).thenReturn(Optional.of(mock(CityMaster.class)));
-	    when(stateDaoService.findBystate("dfs")).thenReturn(Optional.of(mock(StateMaster.class)));
-	    when(countryDaoService.findByCountryName("sfgdfsd")).thenReturn(Optional.of(mock(CountryMaster.class)));
-	    when(companyMasterDaoService.findByCompanyName("fsdfsdds")).thenReturn(Optional.of(mock(CompanyDto.class)));
-	    when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(mock(CountryMaster.class));
-	    when(stateDaoService.addState(any(StateMaster.class))).thenReturn(mock(StateMaster.class));
-	    when(cityDaoService.addCity(any(CityMaster.class))).thenReturn(mock(CityMaster.class));
-	    when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
-	    ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = leadService.updateLeadContact(leadId, dto);
-	    assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+		Integer leadId = 1;
+		UpdateLeadDto dto = mock(UpdateLeadDto.class);
+		CurrencyDto currencyDto = new CurrencyDto();
+		currencyDto.setCurrencySymbol("$");
+		// Ensure that the getCurrency method returns the CurrencyDto object
+		when(dto.getCurrency()).thenReturn(currencyDto);
+		Leads lead = mock(Leads.class);
+		Contacts contact = mock(Contacts.class);
+		EnumMap<ApiResponse, Object> result = new EnumMap<>(ApiResponse.class);
+		result.put(ApiResponse.MESSAGE, "Lead Details Updated Successfully !!");
+		result.put(ApiResponse.SUCCESS, true);
+		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
+		when(lead.getContacts()).thenReturn(Arrays.asList(contact));
+		when(contact.getPrimary()).thenReturn(true);
+		when(cityDaoService.existCityByName("dhjsd")).thenReturn(Optional.of(mock(CityMaster.class)));
+		when(stateDaoService.findBystate("dfs")).thenReturn(Optional.of(mock(StateMaster.class)));
+		when(countryDaoService.findByCountryName("sfgdfsd")).thenReturn(Optional.of(mock(CountryMaster.class)));
+		when(companyMasterDaoService.findByCompanyName("fsdfsdds")).thenReturn(Optional.of(mock(CompanyDto.class)));
+		when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(mock(CountryMaster.class));
+		when(stateDaoService.addState(any(StateMaster.class))).thenReturn(mock(StateMaster.class));
+		when(cityDaoService.addCity(any(CityMaster.class))).thenReturn(mock(CityMaster.class));
+		when(companyMasterDaoService.save(any(CompanyMaster.class))).thenReturn(Optional.of(mock(CompanyDto.class)));
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = leadService.updateLeadContact(leadId, dto);
+		assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
 	}
 
 	@Test
@@ -918,19 +918,19 @@ class LeadServiceImplTest {
 
 	@Test
 	void testSetLocationToCompanyLocationNotNull1() {
-	    String location = "Pune";
-	    CompanyMaster company = mock(CompanyMaster.class);
-	    LeadDto leadDto = new LeadDto();
-	    Leads leads = new Leads();
-	    CurrencyMaster currencyMaster = new CurrencyMaster();
-	    currencyMaster.setCurrencySymbol("$");
-	    CountryMaster countryMaster = new CountryMaster();
-	    countryMaster.setCurrency(currencyMaster);
-	    when(company.getCountry()).thenReturn(countryMaster);
-	    when(countryDaoService.findByCountryName(location)).thenReturn(Optional.empty());
-	    leadService.setLocationToCompany(location, company, leadDto, leads);
-	    assertNotNull(company.getCountry());
-	    verify(countryDaoService, times(1)).findByCountryName(location);
+		String location = "Pune";
+		CompanyMaster company = mock(CompanyMaster.class);
+		LeadDto leadDto = new LeadDto();
+		Leads leads = new Leads();
+		CurrencyMaster currencyMaster = new CurrencyMaster();
+		currencyMaster.setCurrencySymbol("$");
+		CountryMaster countryMaster = new CountryMaster();
+		countryMaster.setCurrency(currencyMaster);
+		when(company.getCountry()).thenReturn(countryMaster);
+		when(countryDaoService.findByCountryName(location)).thenReturn(Optional.empty());
+		leadService.setLocationToCompany(location, company, leadDto, leads);
+		assertNotNull(company.getCountry());
+		verify(countryDaoService, times(1)).findByCountryName(location);
 	}
 
 	@Test
@@ -946,7 +946,7 @@ class LeadServiceImplTest {
 		company.setCountry(countryMaster);
 		Optional<CountryMaster> countryOptional = Optional.of(countryMaster);
 		when(countryDaoService.findByCountryName(location)).thenReturn(countryOptional);
-		leadService.setLocationToCompany(location, company,leadDto,leads);
+		leadService.setLocationToCompany(location, company, leadDto, leads);
 		assertEquals(countryMaster, company.getCountry());
 		verify(countryDaoService, times(1)).findByCountryName(location);
 		verify(countryDaoService, never()).addCountry(any());
@@ -960,7 +960,7 @@ class LeadServiceImplTest {
 		countryMaster.setCountry(location);
 		when(countryDaoService.findByCountryName(location)).thenReturn(Optional.empty());
 		when(countryDaoService.addCountry(any())).thenReturn(countryMaster);
-		leadService.setLocationToCompany(location, company,leadDto,leads);
+		leadService.setLocationToCompany(location, company, leadDto, leads);
 		assertEquals(countryMaster, company.getCountry());
 		verify(countryDaoService, times(1)).findByCountryName(location);
 		verify(countryDaoService, times(1)).addCountry(any());
@@ -1084,5 +1084,25 @@ class LeadServiceImplTest {
 	void testAddDescriptionException() {
 		when(leadDaoService.getLeadById(1)).thenThrow(ResourceNotFoundException.class);
 		assertThrows(CRMException.class, () -> leadService.addDescription(descriptionDto,1));
+	}
+
+	@Test
+	void testGetContactInfoSuccess() {
+		Integer leadId = 1;
+		Leads lead = mock(Leads.class);
+		List<Contacts> contacts = Arrays.asList(mock(Contacts.class), mock(Contacts.class));
+		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
+		when(lead.getContacts()).thenReturn(contacts);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.getContactInfo(leadId);
+		assertEquals(OK, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(SUCCESS));
+		verify(leadDaoService).getLeadById(leadId);
+	}
+
+	@Test
+	void testGetContactInfoException() {
+		Integer leadId = 1;
+		when(leadDaoService.getLeadById(1)).thenThrow(ResourceNotFoundException.class);
+		assertThrows(CRMException.class, () -> leadService.getContactInfo(leadId));
 	}
 }

@@ -2,9 +2,13 @@ package ai.rnt.crm.service.impl;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.exception.CRMException;
+import ai.rnt.crm.util.AuditAwareUtil;
 import ai.rnt.crm.util.ContactUtil;
 
 class ContactServiceImplTest {
@@ -42,6 +47,9 @@ class ContactServiceImplTest {
 	private ContactUtil contactUtil;
 
 	@Mock
+	private AuditAwareUtil auditAwareUtil;
+
+	@Mock
 	private LeadDaoService leadDaoService;
 
 	@InjectMocks
@@ -49,15 +57,15 @@ class ContactServiceImplTest {
 
 	@Autowired
 	MockMvc mockMvc;
-	
+
 	@InjectMocks
 	ContactDto contactDto;
 	@InjectMocks
 	ContactDto contact2;
-	
+
 	@InjectMocks
 	Contacts contactDto1;
-	
+
 	@BeforeEach
 	void setup() {
 		MockitoAnnotations.openMocks(this);
@@ -70,7 +78,7 @@ class ContactServiceImplTest {
 		contactDto.setPrimary(true);
 
 		Integer leadId = 1;
-       
+
 		List<Contacts> existingContacts = new ArrayList<>();
 		Contacts existingContact = new Contacts();
 		existingContact.setPrimary(true);
@@ -84,6 +92,7 @@ class ContactServiceImplTest {
 		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
 
 	}
+
 	@Test
 	void addContactTest1() {
 		ContactDto contactDto1 = new ContactDto();
@@ -96,7 +105,7 @@ class ContactServiceImplTest {
 		contactDto1.setDesignation("Hon");
 		CompanyMaster companyMaster1 = new CompanyMaster();
 		companyMaster1.setCompanyId(1);
-		Leads lead=new Leads();
+		Leads lead = new Leads();
 		lead.setLeadId(1);
 		when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(lead));
 		contactDto1.setPrimary(true);
@@ -124,6 +133,7 @@ class ContactServiceImplTest {
 		assertEquals(HttpStatus.CREATED, response1.getStatusCode());
 		assertFalse((Boolean) response1.getBody().get(ApiResponse.SUCCESS));
 	}
+
 	@Test
 	void addContactTest3() {
 		contact2.setName("hon");
@@ -143,85 +153,55 @@ class ContactServiceImplTest {
 		assertEquals(HttpStatus.CREATED, response2.getStatusCode());
 		assertFalse((Boolean) response2.getBody().get(ApiResponse.SUCCESS));
 	}
-	
+
 	@Test
 	void testaddContactException() {
 		Integer contactId = 1;
 		contactDto1.setPrimary(true);
 		when(contactDaoService.contactsOfLead(contactId)).thenThrow(CRMException.class);
 		assertThrows(CRMException.class, () -> {
-			contactServiceImpl.addContact(contactDto,contactId);
+			contactServiceImpl.addContact(contactDto, contactId);
 		});
 	}
-    @Test
-    void testGetContactNotFound() {
-        Integer contactId = 1;
-        assertThrows(CRMException.class, () -> {
-        	contactServiceImpl.getContact(contactId);
-        });
-    }
-    
-    @Test
-    void testUpdateContactSuccess() {
-        // Mock data
-        ContactDto contactDto = new ContactDto();
-        contactDto.setName("John Doe");
-        Integer contactId = 1;
 
-        // Mock existing contact
-        Contacts existingContact = new Contacts();
-        existingContact.setContactId(contactId);
-        existingContact.setLead(new Leads());
-        when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
-        ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
+	@Test
+	void testGetContactNotFound() {
+		Integer contactId = 1;
+		assertThrows(CRMException.class, () -> {
+			contactServiceImpl.getContact(contactId);
+		});
+	}
 
-    @Test
-    void testUpdateContactNotFound() {
-        // Mock data
-        ContactDto contactDto = new ContactDto();
-        Integer contactId = 1;
-        when(contactDaoService.findById(contactId)).thenReturn(Optional.empty());
-        assertThrows(CRMException.class, () -> {
-            contactServiceImpl.updateContact(contactDto, contactId);
-        });
-    }
+	@Test
+	void testUpdateContactSuccess() {
+		// Mock data
+		ContactDto contactDto = new ContactDto();
+		contactDto.setName("John Doe");
+		Integer contactId = 1;
 
-    @Test
-    void testUpdateContactSuceess() {
-    	ContactDto contactDto = new ContactDto();
-    	contactDto.setName("Hon");
-    	contactDto.setFirstName("Hon");
-    	contactDto.setLastName("Hon");
-    	contactDto.setLastName("Hon");
-    	contactDto.setDesignation("Hon");
-    	contactDto.setDesignation("Hon");
-    	contactDto.setDesignation("Hon");
-    	CompanyMaster companyMaster1 = new CompanyMaster();
-    	companyMaster1.setCompanyId(1);
-    	Leads lead=new Leads();
-    	lead.setLeadId(1);
-    	when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(lead));
-    	contactDto.setPrimary(true);
-    	Integer contactId = 1;
-    	Contacts existingContact = new Contacts();
-    	existingContact.setContactId(contactId);
-    	existingContact.setPrimary(true);
-    	existingContact.setLead(lead);
-    	
-    	List<Contacts> existingContacts = new ArrayList<>();
-    	existingContacts.add(existingContact);
-    	
-    	when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
-    	when(contactDaoService.contactsOfLead(anyInt())).thenReturn(existingContacts);
-    	when(contactDaoService.addContact(any())).thenReturn(existingContact);
-    	ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
-    	assertEquals("Contact Updated Successfully !!", response.getBody().get(ApiResponse.MESSAGE));
-    }
-    @Test
-    void testUpdateContactUnmarkPrimary() {
-        ContactDto contactDto = new ContactDto();
+		// Mock existing contact
+		Contacts existingContact = new Contacts();
+		existingContact.setContactId(contactId);
+		existingContact.setLead(new Leads());
+		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+	}
+
+	@Test
+	void testUpdateContactNotFound() {
+		// Mock data
+		ContactDto contactDto = new ContactDto();
+		Integer contactId = 1;
+		when(contactDaoService.findById(contactId)).thenReturn(Optional.empty());
+		assertThrows(CRMException.class, () -> {
+			contactServiceImpl.updateContact(contactDto, contactId);
+		});
+	}
+
+	@Test
+	void testUpdateContactSuceess() {
+		ContactDto contactDto = new ContactDto();
 		contactDto.setName("Hon");
 		contactDto.setFirstName("Hon");
 		contactDto.setLastName("Hon");
@@ -231,28 +211,29 @@ class ContactServiceImplTest {
 		contactDto.setDesignation("Hon");
 		CompanyMaster companyMaster1 = new CompanyMaster();
 		companyMaster1.setCompanyId(1);
-		Leads lead=new Leads();
+		Leads lead = new Leads();
 		lead.setLeadId(1);
 		when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(lead));
 		contactDto.setPrimary(true);
-        Integer contactId = 1;
-        Contacts existingContact = new Contacts();
-        existingContact.setContactId(contactId);
-        existingContact.setPrimary(true);
-        existingContact.setLead(lead);
+		Integer contactId = 1;
+		Contacts existingContact = new Contacts();
+		existingContact.setContactId(contactId);
+		existingContact.setPrimary(true);
+		existingContact.setLead(lead);
 
-        List<Contacts> existingContacts = new ArrayList<>();
-        existingContacts.add(existingContact);
+		List<Contacts> existingContacts = new ArrayList<>();
+		existingContacts.add(existingContact);
 
-        when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
-        when(contactDaoService.contactsOfLead(anyInt())).thenReturn(existingContacts);
-        ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
-        assertEquals("Contact Not Updated !!", response.getBody().get(ApiResponse.MESSAGE));
-    }
-    
-    @Test
-    void testUpdateContactUnmarkPrimary1() {
-        ContactDto contactDto = new ContactDto();
+		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
+		when(contactDaoService.contactsOfLead(anyInt())).thenReturn(existingContacts);
+		when(contactDaoService.addContact(any())).thenReturn(existingContact);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
+		assertEquals("Contact Updated Successfully !!", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testUpdateContactUnmarkPrimary() {
+		ContactDto contactDto = new ContactDto();
 		contactDto.setName("Hon");
 		contactDto.setFirstName("Hon");
 		contactDto.setLastName("Hon");
@@ -262,59 +243,147 @@ class ContactServiceImplTest {
 		contactDto.setDesignation("Hon");
 		CompanyMaster companyMaster1 = new CompanyMaster();
 		companyMaster1.setCompanyId(1);
-		Leads lead=new Leads();
+		Leads lead = new Leads();
+		lead.setLeadId(1);
+		when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(lead));
+		contactDto.setPrimary(true);
+		Integer contactId = 1;
+		Contacts existingContact = new Contacts();
+		existingContact.setContactId(contactId);
+		existingContact.setPrimary(true);
+		existingContact.setLead(lead);
+
+		List<Contacts> existingContacts = new ArrayList<>();
+		existingContacts.add(existingContact);
+
+		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
+		when(contactDaoService.contactsOfLead(anyInt())).thenReturn(existingContacts);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
+		assertEquals("Contact Not Updated !!", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testUpdateContactUnmarkPrimary1() {
+		ContactDto contactDto = new ContactDto();
+		contactDto.setName("Hon");
+		contactDto.setFirstName("Hon");
+		contactDto.setLastName("Hon");
+		contactDto.setLastName("Hon");
+		contactDto.setDesignation("Hon");
+		contactDto.setDesignation("Hon");
+		contactDto.setDesignation("Hon");
+		CompanyMaster companyMaster1 = new CompanyMaster();
+		companyMaster1.setCompanyId(1);
+		Leads lead = new Leads();
 		lead.setLeadId(1);
 		when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(lead));
 		contactDto.setPrimary(false);
-        Integer contactId = 1;
-        Contacts existingContact = new Contacts();
-        existingContact.setContactId(contactId);
-        existingContact.setPrimary(true);
-        existingContact.setLead(lead);
+		Integer contactId = 1;
+		Contacts existingContact = new Contacts();
+		existingContact.setContactId(contactId);
+		existingContact.setPrimary(true);
+		existingContact.setLead(lead);
 
-        List<Contacts> existingContacts = new ArrayList<>();
-        existingContacts.add(existingContact);
+		List<Contacts> existingContacts = new ArrayList<>();
+		existingContacts.add(existingContact);
 
-        when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
-        when(contactDaoService.contactsOfLead(anyInt())).thenReturn(existingContacts);
+		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
+		when(contactDaoService.contactsOfLead(anyInt())).thenReturn(existingContacts);
 
-        ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
-        assertEquals("Cannot unmark the only contact as primary !!", response.getBody().get(ApiResponse.MESSAGE));
-    }
-    @Test
-    void testUpdateContactUnmarkPrimaryScen2() {
-    	ContactDto contactDto = new ContactDto();
-    	contactDto.setName("Hon");
-    	contactDto.setFirstName("Hon");
-    	contactDto.setLastName("Hon");
-    	contactDto.setLastName("Hon");
-    	contactDto.setDesignation("Hon");
-    	contactDto.setDesignation("Hon");
-    	contactDto.setDesignation("Hon");
-    	CompanyMaster companyMaster1 = new CompanyMaster();
-    	companyMaster1.setCompanyId(1);
-    	Leads lead=new Leads();
-    	lead.setLeadId(1);
-    	when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(lead));
-    	contactDto.setPrimary(false);
-    	Integer contactId = 1;
-    	Contacts existingContact = new Contacts();
-    	existingContact.setContactId(contactId);
-    	existingContact.setPrimary(true);
-    	existingContact.setLead(lead);
-    	Contacts existingContact1 = new Contacts();
-    	existingContact1.setContactId(contactId);
-    	existingContact1.setPrimary(true);
-    	existingContact1.setLead(lead);
-    	
-    	List<Contacts> existingContacts = new ArrayList<>();
-    	existingContacts.add(existingContact);
-    	existingContacts.add(existingContact1);
-    	
-    	when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
-    	when(contactDaoService.contactsOfLead(anyInt())).thenReturn(existingContacts);
-    	ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
-    	assertEquals("Cannot unmark the only contact as primary !!", response.getBody().get(ApiResponse.MESSAGE));
-    }
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
+		assertEquals("Cannot unmark the only contact as primary !!", response.getBody().get(ApiResponse.MESSAGE));
+	}
 
+	@Test
+	void testUpdateContactUnmarkPrimaryScen2() {
+		ContactDto contactDto = new ContactDto();
+		contactDto.setName("Hon");
+		contactDto.setFirstName("Hon");
+		contactDto.setLastName("Hon");
+		contactDto.setLastName("Hon");
+		contactDto.setDesignation("Hon");
+		contactDto.setDesignation("Hon");
+		contactDto.setDesignation("Hon");
+		CompanyMaster companyMaster1 = new CompanyMaster();
+		companyMaster1.setCompanyId(1);
+		Leads lead = new Leads();
+		lead.setLeadId(1);
+		when(leadDaoService.getLeadById(anyInt())).thenReturn(Optional.of(lead));
+		contactDto.setPrimary(false);
+		Integer contactId = 1;
+		Contacts existingContact = new Contacts();
+		existingContact.setContactId(contactId);
+		existingContact.setPrimary(true);
+		existingContact.setLead(lead);
+		Contacts existingContact1 = new Contacts();
+		existingContact1.setContactId(contactId);
+		existingContact1.setPrimary(true);
+		existingContact1.setLead(lead);
+
+		List<Contacts> existingContacts = new ArrayList<>();
+		existingContacts.add(existingContact);
+		existingContacts.add(existingContact1);
+
+		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(existingContact));
+		when(contactDaoService.contactsOfLead(anyInt())).thenReturn(existingContacts);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.updateContact(contactDto, contactId);
+		assertEquals("Cannot unmark the only contact as primary !!", response.getBody().get(ApiResponse.MESSAGE));
+	}
+
+	@Test
+	void testDeleteContactSuccess() {
+		Integer contactId = 1;
+		Contacts contact = mock(Contacts.class);
+		when(contact.getPrimary()).thenReturn(false);
+		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(contact));
+		when(contactDaoService.addContact(any(Contacts.class))).thenReturn(contact);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.deleteContact(contactId);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Contact Deleted Successfully !!", response.getBody().get(ApiResponse.MESSAGE));
+		verify(contact).setDeletedBy(any(Integer.class));
+		verify(contact).setDeletedDate(any());
+		verify(contactDaoService).addContact(contact);
+	}
+
+	@Test
+	void testDeletePrimaryContact() {
+		Integer contactId = 1;
+		Contacts contact = mock(Contacts.class);
+		when(contact.getPrimary()).thenReturn(true);
+		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(contact));
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.deleteContact(contactId);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Can't Delete,Ensure it's not a primary contact !!", response.getBody().get(ApiResponse.MESSAGE));
+		verify(contact, never()).setDeletedBy(any(Integer.class));
+		verify(contact, never()).setDeletedDate(any());
+		verify(contactDaoService, never()).addContact(contact);
+	}
+
+	@Test
+	void testDeleteContactFailure() {
+		Integer contactId = 1;
+		Contacts contact = mock(Contacts.class);
+		when(contact.getPrimary()).thenReturn(false);
+		when(contactDaoService.findById(contactId)).thenReturn(Optional.of(contact));
+		when(contactDaoService.addContact(any(Contacts.class))).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactServiceImpl.deleteContact(contactId);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Contact Not Deleted !!", response.getBody().get(ApiResponse.MESSAGE));
+		verify(contact).setDeletedBy(any(Integer.class));
+		verify(contact).setDeletedDate(any());
+		verify(contactDaoService).addContact(contact);
+	}
+
+	@Test
+	void testDeleteContactException() {
+		Integer contactId = 1;
+		when(contactDaoService.findById(contactId)).thenThrow(new RuntimeException("Database error"));
+		Exception exception = assertThrows(CRMException.class, () -> {
+			contactServiceImpl.deleteContact(contactId);
+		});
+		assertEquals("java.lang.RuntimeException: Database error", exception.getMessage());
+	}
 }

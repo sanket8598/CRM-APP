@@ -30,6 +30,7 @@ class CountryMasterTest {
 		countryMaster.setCountry("India");
 		countryMaster.setContacts(contacts);
 		countryMaster.setStates(states);
+		countryMaster.setCountryCode("+91");
 		assertEquals(1, countryMaster.getCountryId());
 	}
 }

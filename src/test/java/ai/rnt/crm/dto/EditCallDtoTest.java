@@ -13,6 +13,8 @@ class EditCallDtoTest {
 		EditCallDto dto1 = new EditCallDto();
 
 		Integer id = 1;
+		Integer parentId =1;
+		String activityFrom = "Lead";
 		String type = "Incoming";
 		String subject = "Meeting";
 		String body = "Discuss project updates";
@@ -27,6 +29,8 @@ class EditCallDtoTest {
 		String status = "Completed";
 		Integer assignTo = 2;
 		editCallDto.setId(id);
+		editCallDto.setParentId(parentId);
+		editCallDto.setActivityFrom(activityFrom);
 		editCallDto.setType(type);
 		editCallDto.setSubject(subject);
 		editCallDto.setBody(body);
@@ -41,6 +45,8 @@ class EditCallDtoTest {
 		editCallDto.setStatus(status);
 		editCallDto.setAssignTo(assignTo);
 		dto1.setId(id);
+		dto1.setParentId(parentId);
+		dto1.setActivityFrom(activityFrom);
 		dto1.setType(type);
 		dto1.setSubject(subject);
 		dto1.setBody(body);
@@ -72,5 +78,7 @@ class EditCallDtoTest {
 		assertEquals(dueDate, editCallDto.getDueDate());
 		assertEquals(status, editCallDto.getStatus());
 		assertEquals(assignTo, editCallDto.getAssignTo());
+		assertEquals(parentId, editCallDto.getParentId());
+		assertEquals(activityFrom, editCallDto.getActivityFrom());
 	}
 }

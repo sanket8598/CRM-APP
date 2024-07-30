@@ -24,6 +24,8 @@ class EditMeetingDtoTest {
 		String dueDate = "2024-03-05";
 		String status = "Scheduled";
 		Integer assignTo = 2;
+		Integer parentId = 1;
+		String activityFrom = "Lead";
 		List<MeetingAttachmentsDto> attachments = new ArrayList<>();
 		attachments.add(new MeetingAttachmentsDto());
 		attachments.add(new MeetingAttachmentsDto());
@@ -36,7 +38,11 @@ class EditMeetingDtoTest {
 		editMeetingDto.setStatus(status);
 		editMeetingDto.setAssignTo(assignTo);
 		editMeetingDto.setAttachments(attachments);
+		editMeetingDto.setParentId(parentId);
+		editMeetingDto.setActivityFrom(activityFrom);
 		dto1.setId(id);
+		dto1.setParentId(parentId);
+		dto1.setActivityFrom(activityFrom);
 		dto1.setSubject(subject);
 		dto1.setBody(body);
 		dto1.setType(type);
@@ -59,6 +65,8 @@ class EditMeetingDtoTest {
 		assertEquals(status, editMeetingDto.getStatus());
 		assertEquals(assignTo, editMeetingDto.getAssignTo());
 		assertEquals(attachments, editMeetingDto.getAttachments());
+		assertEquals(parentId, editMeetingDto.getParentId());
+		assertEquals(activityFrom, editMeetingDto.getActivityFrom());
 	}
 	
 	@Test
