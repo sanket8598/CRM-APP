@@ -1,5 +1,6 @@
 package ai.rnt.crm.util;
 
+import static java.util.Optional.empty;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -10,6 +11,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -28,6 +32,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import ai.rnt.crm.dao.service.CurrencyDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.LeadSourceDaoService;
 import ai.rnt.crm.dao.service.ServiceFallsDaoSevice;
@@ -37,6 +42,7 @@ import ai.rnt.crm.dto.MainTaskDto;
 import ai.rnt.crm.dto.ServiceFallsDto;
 import ai.rnt.crm.dto.TimeLineActivityDto;
 import ai.rnt.crm.entity.Call;
+import ai.rnt.crm.entity.CurrencyMaster;
 import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.DomainMaster;
 import ai.rnt.crm.entity.EmployeeMaster;
@@ -55,11 +61,15 @@ import ai.rnt.crm.repository.CallRepository;
 import ai.rnt.crm.repository.LeadsRepository;
 import ai.rnt.crm.repository.MeetingRepository;
 import ai.rnt.crm.repository.VisitRepository;
+import ai.rnt.crm.service.EmployeeService;
 
 class CommonUtilTest {
 
 	@Mock
 	private CallRepository callRepository;
+
+	@Mock
+	private EmployeeService employeeService;
 
 	@Mock
 	private VisitRepository visitRepository;
@@ -69,6 +79,9 @@ class CommonUtilTest {
 
 	@Mock
 	private LeadsRepository leadsRepository;
+
+	@Mock
+	private CurrencyDaoService currencyDaoService;
 
 	@Mock
 	private List<Call> mockCalls;
@@ -405,7 +418,6 @@ class CommonUtilTest {
 		desc1.setStatus("Status 1");
 		desc1.setDate(LocalDate.now());
 		desc1.setAction("Action 1");
-
 		Description desc2 = new Description();
 		desc2.setDescId(2);
 		desc2.setSubject("Subject 2");
@@ -413,9 +425,7 @@ class CommonUtilTest {
 		desc2.setStatus("Status 2");
 		desc2.setDate(LocalDate.now());
 		desc2.setAction("Action 2");
-
 		List<Description> descriptions = Arrays.asList(desc1, desc2);
-
 		DescriptionDto dto1 = new DescriptionDto();
 		dto1.setDescId(1);
 		dto1.setSubject("Subject 1");
@@ -424,7 +434,6 @@ class CommonUtilTest {
 		dto1.setStatus("Status 1");
 		dto1.setGetDate(LocalDate.now());
 		dto1.setAction("Action 1");
-
 		DescriptionDto dto2 = new DescriptionDto();
 		dto2.setDescId(2);
 		dto2.setSubject("Subject 2");
@@ -433,7 +442,6 @@ class CommonUtilTest {
 		dto2.setStatus("Status 2");
 		dto2.setGetDate(LocalDate.now());
 		dto2.setAction("Action 2");
-
 		List<DescriptionDto> expected = Arrays.asList(dto1, dto2);
 		List<DescriptionDto> actual = commonUtil.getDescData(descriptions);
 
@@ -447,5 +455,55 @@ class CommonUtilTest {
 			assertEquals(expected.get(i).getGetDate(), actual.get(i).getGetDate());
 			assertEquals(expected.get(i).getAction(), actual.get(i).getAction());
 		}
+	}
+
+	@Test
+	void testAddCurrencyDetailsWithCurrencyId() {
+		Integer currencyId = 1;
+		CurrencyMaster currencyMaster = new CurrencyMaster();
+		when(currencyDaoService.findCurrency(currencyId)).thenReturn(Optional.of(currencyMaster));
+		Optional<CurrencyMaster> result = commonUtil.addCurrencyDetails(currencyDaoService, null, null, currencyId);
+		assertEquals(Optional.of(currencyMaster), result);
+		verify(currencyDaoService, times(1)).findCurrency(currencyId);
+		verifyNoMoreInteractions(currencyDaoService);
+	}
+
+	@Test
+	void testAddCurrencyDetailsWithCurrencySymbolAndNameExisting() {
+		String currencySymbol = "$";
+		String currencyName = "USD";
+		CurrencyMaster currencyMaster = new CurrencyMaster();
+		when(currencyDaoService.findCurrencyByName(currencyName)).thenReturn(Optional.of(currencyMaster));
+		Optional<CurrencyMaster> result = commonUtil.addCurrencyDetails(currencyDaoService, currencySymbol,
+				currencyName, null);
+		assertEquals(Optional.of(currencyMaster), result);
+		verify(currencyDaoService, times(1)).findCurrencyByName(currencyName);
+		verifyNoMoreInteractions(currencyDaoService);
+	}
+
+	@Test
+	void testAddCurrencyDetailsWithCurrencySymbolAndNameNotExisting() {
+		String currencySymbol = "$";
+		String currencyName = "USD";
+		CurrencyMaster currencyMaster = new CurrencyMaster();
+		currencyMaster.setCurrencyName(currencyName);
+		currencyMaster.setCurrencyCode(currencyName);
+		currencyMaster.setCurrencySymbol(currencySymbol);
+		when(currencyDaoService.findCurrencyByName(currencyName)).thenReturn(empty());
+		when(currencyDaoService.findCurrencyBySymbol(currencySymbol)).thenReturn(empty());
+		when(currencyDaoService.addCurrency(any(CurrencyMaster.class))).thenReturn(currencyMaster);
+		Optional<CurrencyMaster> result = commonUtil.addCurrencyDetails(currencyDaoService, currencySymbol,
+				currencyName, null);
+		verify(currencyDaoService, times(1)).findCurrencyByName(currencyName);
+		verify(currencyDaoService, times(1)).findCurrencyBySymbol(currencySymbol);
+		verify(currencyDaoService, times(1)).addCurrency(any(CurrencyMaster.class));
+		verifyNoMoreInteractions(currencyDaoService);
+	}
+
+	@Test
+	void testAddCurrencyDetailsWithNullInputs() {
+		Optional<CurrencyMaster> result = commonUtil.addCurrencyDetails(currencyDaoService, null, null, null);
+		assertEquals(empty(), result);
+		verifyNoMoreInteractions(currencyDaoService);
 	}
 }

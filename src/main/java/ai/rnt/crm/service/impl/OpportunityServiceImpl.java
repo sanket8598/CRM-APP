@@ -276,12 +276,12 @@ public class OpportunityServiceImpl implements OpportunityService {
 				if (auditAwareUtil.isAdmin()) {
 					countMap.put("inPipelineAmount",
 							amountInWords(opportunityDashboardData.stream()
-									.filter(opt -> asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE).contains(opt.getStatus())
+									.filter(opt -> IN_PIPELINE_OPPORTUNITIES.test(opt)
 											&& (nonNull(opt.getBudgetAmount()) && !opt.getBudgetAmount().isEmpty()))
 									.mapToDouble(e -> valueOf(e.getBudgetAmount().replace(",", ""))).sum()));
 					countMap.put("inPipeline",
 							opportunityDashboardData.stream()
-									.filter(opt -> asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE).contains(opt.getStatus()))
+									.filter(IN_PIPELINE_OPPORTUNITIES)
 									.count());
 					countMap.put("won", opportunityDashboardData.stream()
 							.filter(opt -> opt.getStatus().equalsIgnoreCase(WON)).count());
@@ -290,7 +290,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 					double totalBudgetAmount = opportunityDashboardData.stream()
 							.filter(e -> nonNull(e.getBudgetAmount()) && !e.getBudgetAmount().isEmpty())
 							.mapToDouble(e -> valueOf(e.getBudgetAmount().replace(",", ""))).sum();
-					List<GraphicalDataDto> graph = opportunityDashboardData.stream().map(opt -> {
+					List<GraphicalDataDto> graph = opportunityDashboardData.stream().filter(IN_PIPELINE_OPPORTUNITIES).map(opt -> {
 						GraphicalDataDto graphicalData = TO_GRAPHICAL_DATA_DTO.apply(opt).get();
 						opt.getLeads().getContacts().stream().filter(Contacts::getPrimary).findFirst()
 								.ifPresent(e -> graphicalData.setCompanyName(e.getCompanyMaster().getCompanyName()));
@@ -371,12 +371,12 @@ public class OpportunityServiceImpl implements OpportunityService {
 		countMap.put("inPipelineAmount",
 				amountInWords(opportunityDashboardData.stream()
 						.filter(opt -> ASSIGNED_OPPORTUNITIES.test(opt, loggedInStaffId)
-								&& asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE).contains(opt.getStatus())
+								&& IN_PIPELINE_OPPORTUNITIES.test(opt)
 								&& nonNull(opt.getBudgetAmount()))
 						.mapToDouble(e -> valueOf(e.getBudgetAmount().replace(",", ""))).sum()));
 		countMap.put("inPipeline",
 				opportunityDashboardData.stream().filter(opt -> ASSIGNED_OPPORTUNITIES.test(opt, loggedInStaffId)
-						&& asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE).contains(opt.getStatus())).count());
+						&& IN_PIPELINE_OPPORTUNITIES.test(opt)).count());
 		countMap.put("won", opportunityDashboardData.stream().filter(
 				opt -> ASSIGNED_OPPORTUNITIES.test(opt, loggedInStaffId) && opt.getStatus().equalsIgnoreCase(WON))
 				.count());
@@ -387,7 +387,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 				.filter(e -> ASSIGNED_OPPORTUNITIES.test(e, loggedInStaffId) && nonNull(e.getBudgetAmount()))
 				.mapToDouble(e -> valueOf(e.getBudgetAmount().replace(",", ""))).sum();
 		List<GraphicalDataDto> graph = opportunityDashboardData.stream()
-				.filter(e -> ASSIGNED_OPPORTUNITIES.test(e, loggedInStaffId)).map(opt -> {
+				.filter(e -> ASSIGNED_OPPORTUNITIES.test(e, loggedInStaffId) &&  IN_PIPELINE_OPPORTUNITIES.test(e)).map(opt -> {
 					GraphicalDataDto graphicalData = TO_GRAPHICAL_DATA_DTO.apply(opt).get();
 					opt.getLeads().getContacts().stream().filter(Contacts::getPrimary).findFirst()
 							.ifPresent(e -> graphicalData.setCompanyName(e.getCompanyMaster().getCompanyName()));

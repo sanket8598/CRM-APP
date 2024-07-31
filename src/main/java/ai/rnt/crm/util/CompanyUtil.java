@@ -54,7 +54,7 @@ public class CompanyUtil {
 				.ifPresent(comp -> TO_COMPANY.apply(comp).ifPresent(contact::setCompanyMaster));
 	}
 
-	private static void setCompDetails(Optional<CountryMaster> findByCountryName, Optional<StateMaster> findBystate,
+	public static void setCompDetails(Optional<CountryMaster> findByCountryName, Optional<StateMaster> findBystate,
 			Optional<CityMaster> existCityByName, UpdateLeadDto dto, CompanyMaster companyMaster,
 			CityDaoService cityDaoService, StateDaoService stateDaoService, CountryDaoService countryDaoService,
 			CurrencyDaoService currencyDaoService) {
