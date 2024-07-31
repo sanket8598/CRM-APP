@@ -40,7 +40,7 @@ public class QualifyLeadDto {
 	@FutureOrPresent(message = "Closed date must not be smaller than today's date!!")
 	private LocalDate closedOn;
 	
-	@JsonFormat(pattern = "dd-MMM-yyyy")
+	@JsonFormat(pattern = "dd-MM-yyyy")
 	private LocalDate closedDate;
 	
 	private CurrencyDto currency;

@@ -498,10 +498,14 @@ public class LeadServiceImpl implements LeadService {
 		EnumMap<ApiResponse, Object> qualifyLeadMap = new EnumMap<>(ApiResponse.class);
 		try {
 			Opportunity opportunity = null;
+			Opportunity optyData = null;
 			qualifyLeadMap.put(SUCCESS, true);
 			qualifyLeadMap.put(MESSAGE, "Lead Not Qualify");
 			Leads lead = leadDaoService.getLeadById(leadId)
 					.orElseThrow(() -> new ResourceNotFoundException(LEAD, LEAD_ID, leadId));
+			if (nonNull(lead.getOpportunity()))
+				optyData = lead.getOpportunity();
+
 			lead.setRequirementShared(dto.getRequirementShared());
 			lead.setIdentifyDecisionMaker(dto.getIdentifyDecisionMaker());
 			lead.setFirstMeetingDone(dto.getFirstMeetingDone());
@@ -509,11 +513,14 @@ public class LeadServiceImpl implements LeadService {
 			lead.setQualifyRemarks(dto.getQualifyRemarks());
 			lead.setCurrentPhase(dto.getCurrentPhase());
 			lead.setProgressStatus(dto.getProgressStatus());
-			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty())
+			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty()) {
 				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey, cbcAlgo));
-			else
+				optyData.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey, cbcAlgo));
+				optyData.setClosedOn(dto.getClosedOn());
+			} else {
 				lead.setBudgetAmount(dto.getBudgetAmount());
-
+				optyData.setBudgetAmount(dto.getBudgetAmount());
+			}
 			lead.setDisqualifyAs(QUALIFIED);
 			lead.setStatus(CLOSE_AS_QUALIFIED);
 			if (nonNull(dto.getCurrency()))
@@ -529,9 +536,10 @@ public class LeadServiceImpl implements LeadService {
 				} else
 					qualifyLeadMap.put(SUCCESS, false);
 			} else {
-				if (nonNull(leadDaoService.addLead(lead)))
+				if (nonNull(leadDaoService.addLead(lead))) {
+					opportunityDaoService.save(optyData);
 					qualifyLeadMap.put(MESSAGE, "Save Successfully");
-				else
+				} else
 					qualifyLeadMap.put(SUCCESS, false);
 			}
 			return new ResponseEntity<>(qualifyLeadMap, OK);
@@ -621,8 +629,8 @@ public class LeadServiceImpl implements LeadService {
 
 			Contacts contact = lead.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 					.orElseThrow(() -> new ResourceNotFoundException("Primary Contact"));
-			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService,currencyDaoService, dto,
-					contact);
+			addUpdateCompanyDetails(cityDaoService, stateDaoService, countryDaoService, companyMasterDaoService,
+					currencyDaoService, dto, contact);
 			setServiceFallToLead(dto.getServiceFallsId(), lead, serviceFallsDaoSevice);
 			setLeadSourceToLead(dto.getLeadSourceId(), lead, leadSourceDaoService);
 			setDomainToLead(dto.getDomainId(), lead, domainMasterDaoService);

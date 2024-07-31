@@ -2,7 +2,6 @@ package ai.rnt.crm.entity;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.DETACH;
-import static javax.persistence.CascadeType.MERGE;
 import static javax.persistence.CascadeType.REFRESH;
 import static javax.persistence.CascadeType.REMOVE;
 import static javax.persistence.GenerationType.IDENTITY;
@@ -131,17 +130,17 @@ public class Opportunity extends Auditable {
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private EmployeeMaster employee;
-	
+
 	@JoinColumn(name = "assign_by", updatable = true)
 	@LazyCollection(LazyCollectionOption.TRUE)
 	@ManyToOne
 	private EmployeeMaster assignBy;
-	
+
 	@Column(name = "assign_on")
 	private LocalDate assignDate;
 
 	@OneToOne
-	@JoinColumn(name = "lead_id", unique = true,updatable=false)
+	@JoinColumn(name = "lead_id", unique = true, updatable = false)
 	private Leads leads;
 
 	@OneToMany(mappedBy = "opportunity", cascade = ALL, orphanRemoval = true)
@@ -191,14 +190,14 @@ public class Opportunity extends Auditable {
 
 	@Column(name = "descrp")
 	private String description;
-	
+
 	@Column(name = "feedback")
 	private String feedback;
 
 	@OneToMany(mappedBy = "opportunity", cascade = ALL)
 	private List<Proposal> proposals = new ArrayList<>();
-	
-	@ManyToOne(cascade = {MERGE,DETACH})
+
+	@ManyToOne(cascade = DETACH)
 	@JoinColumn(name = "currency_id")
 	private CurrencyMaster currency;
 }
