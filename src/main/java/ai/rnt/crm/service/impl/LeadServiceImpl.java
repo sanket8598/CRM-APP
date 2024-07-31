@@ -537,7 +537,7 @@ public class LeadServiceImpl implements LeadService {
 					qualifyLeadMap.put(SUCCESS, false);
 			} else {
 				if (nonNull(leadDaoService.addLead(lead))) {
-					opportunityDaoService.save(optyData);
+					opportunityDaoService.addOpportunity(optyData);
 					qualifyLeadMap.put(MESSAGE, "Save Successfully");
 				} else
 					qualifyLeadMap.put(SUCCESS, false);
