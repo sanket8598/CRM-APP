@@ -7,6 +7,8 @@ import lombok.Setter;
 @Setter
 public class GraphicalDataDto {
 
+	private Integer opportunityId;
+	
 	private String topic;
 
 	private String status;
