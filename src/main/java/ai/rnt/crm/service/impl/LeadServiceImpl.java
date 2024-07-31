@@ -515,11 +515,14 @@ public class LeadServiceImpl implements LeadService {
 			lead.setProgressStatus(dto.getProgressStatus());
 			if (nonNull(dto.getBudgetAmount()) && !dto.getBudgetAmount().isEmpty()) {
 				lead.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey, cbcAlgo));
-				optyData.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey, cbcAlgo));
-				optyData.setClosedOn(dto.getClosedOn());
+				if (nonNull(optyData)) {
+					optyData.setBudgetAmount(signatureUtil.decryptAmount(dto.getBudgetAmount(), secretKey, cbcAlgo));
+					optyData.setClosedOn(dto.getClosedOn());
+				}
 			} else {
 				lead.setBudgetAmount(dto.getBudgetAmount());
-				optyData.setBudgetAmount(dto.getBudgetAmount());
+				if (nonNull(optyData))
+					optyData.setBudgetAmount(dto.getBudgetAmount());
 			}
 			lead.setDisqualifyAs(QUALIFIED);
 			lead.setStatus(CLOSE_AS_QUALIFIED);
