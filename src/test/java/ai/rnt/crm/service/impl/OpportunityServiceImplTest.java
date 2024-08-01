@@ -360,7 +360,7 @@ class OpportunityServiceImplTest {
 	}
 
 	@Test
-	void testUpdateOpportunitySuccess() {
+	void testUpdateOpportunitySuccess() throws Exception {
 		UpdateLeadDto dto = new UpdateLeadDto();
 		Integer opportunityId = 123;
 		Opportunity opportunity = new Opportunity();

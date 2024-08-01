@@ -872,7 +872,7 @@ public class LeadServiceImpl implements LeadService {
 		employeeService.findByName(firstName, lastName).ifPresent(leads::setEmployee);
 	}
 
-	public Contacts setContactDetailsToLead(Optional<CompanyDto> existCompany, LeadDto leadDto, Leads leads) {
+	public Contacts setContactDetailsToLead(Optional<CompanyDto> existCompany, LeadDto leadDto, Leads leads) throws ResourceNotFoundException, Exception {
 		log.info("inside the setContactDetailsToLead method...");
 		Contacts contact = new Contacts();
 		contact.setFirstName(leadDto.getFirstName());
@@ -892,7 +892,7 @@ public class LeadServiceImpl implements LeadService {
 	}
 
 	public void setCompanyDetailsToContact(Optional<CompanyDto> existCompany, LeadDto leadDto, Contacts contact,
-			Leads leads) {
+			Leads leads) throws ResourceNotFoundException, Exception {
 		log.info("inside the setCompanyDetailsToContact method...");
 		if (existCompany.isPresent()) {
 			existCompany.get().setCompanyWebsite(leadDto.getCompanyWebsite());

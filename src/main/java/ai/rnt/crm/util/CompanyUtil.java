@@ -31,7 +31,7 @@ public class CompanyUtil {
 
 	public static void addUpdateCompanyDetails(CityDaoService cityDaoService, StateDaoService stateDaoService,
 			CountryDaoService countryDaoService, CompanyMasterDaoService companyMasterDaoService,
-			CurrencyDaoService currencyDaoService, UpdateLeadDto dto, Contacts contact) {
+			CurrencyDaoService currencyDaoService, UpdateLeadDto dto, Contacts contact) throws Exception {
 		log.info("inside the addUpdateCompanyDetails method...{}");
 		Optional<CityMaster> existCityByName = cityDaoService.existCityByName(dto.getCity());
 		Optional<StateMaster> findBystate = stateDaoService.findBystate(dto.getState());

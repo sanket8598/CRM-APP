@@ -173,7 +173,7 @@ class CompanyServiceImplTest {
 	}
 
 	@Test
-	void testUpdateCompanySuccess() {
+	void testUpdateCompanySuccess() throws Exception {
 		CompanyDto dto = new CompanyDto();
 		CountryDto countryDto = new CountryDto();
 		StateDto stateDto = new StateDto();
@@ -214,7 +214,7 @@ class CompanyServiceImplTest {
 	}
 
 	@Test
-	void testDeleteCompanySuccess() {
+	void testDeleteCompanySuccess() throws Exception {
 		int companyId = 1;
 		int loggedInStaffId = 123;
 		ZonedDateTime now = ZonedDateTime.now(systemDefault).withZoneSameInstant(indiaZone);

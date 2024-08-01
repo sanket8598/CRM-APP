@@ -30,14 +30,14 @@ public class CompanyMasterDaoServiceImpl implements CompanyMasterDaoService {
 	private final CompanyMasterRepository companyMasterRepository;
 
 	@Override
-	@Cacheable(value = "companyDto", key = COMPANY_ID, condition = "#companyId!=null")
+	@Cacheable(value = { COMPANY, "companyDto" }, key = COMPANY_ID, condition = "#companyId!=null")
 	public Optional<CompanyDto> getById(Integer companyId) {
 		log.info("inside the CompanyMasterDaoServiceImpl getById method...{}", companyId);
 		return TO_COMPANY_DTO.apply(companyMasterRepository.findById(companyId).orElseThrow(null));
 	}
 
 	@Override
-	@CacheEvict(value = "companyDto", allEntries = true)
+	@CacheEvict(value = { COMPANY, "companyDto" }, allEntries = true)
 	public Optional<CompanyDto> save(CompanyMaster companyMaster) {
 		log.info("inside the CompanyMasterDaoServiceImpl save method...{}");
 		return TO_COMPANY_DTO.apply(companyMasterRepository.save(companyMaster));
@@ -58,7 +58,7 @@ public class CompanyMasterDaoServiceImpl implements CompanyMasterDaoService {
 	}
 
 	@Override
-	@Cacheable(value = COMPANY, key = COMPANY_ID, condition = "#companyId!=null")
+	@Cacheable(value = { COMPANY, "companyDto" }, key = COMPANY_ID, condition = "#companyId!=null")
 	public Optional<CompanyMaster> findCompanyById(Integer companyId) {
 		log.info("inside the findCompanyById method...{}", companyId);
 		return companyMasterRepository.findById(companyId);

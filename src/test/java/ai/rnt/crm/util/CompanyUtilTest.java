@@ -63,7 +63,7 @@ class CompanyUtilTest {
 	}
 
 	@Test
-	void testAddUpdateCompanyDetailsCompanyExists() {
+	void testAddUpdateCompanyDetailsCompanyExists() throws Exception {
 		CityDaoService cityDaoService = mock(CityDaoService.class);
 		StateDaoService stateDaoService = mock(StateDaoService.class);
 		CountryDaoService countryDaoService = mock(CountryDaoService.class);
@@ -85,7 +85,7 @@ class CompanyUtilTest {
 	}
 
 	@Test
-	void testAddUpdateCompanyDetailsCompanyDoesNotExist() {
+	void testAddUpdateCompanyDetailsCompanyDoesNotExist() throws Exception {
 		CityDaoService cityDaoService = mock(CityDaoService.class);
 		StateDaoService stateDaoService = mock(StateDaoService.class);
 		CountryDaoService countryDaoService = mock(CountryDaoService.class);

@@ -632,7 +632,7 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void createLeadUnSuccess() {
+	void createLeadUnSuccess() throws Exception {
 		LeadDto dto = mock(LeadDto.class);
 		dto.setAssignTo(1);
 		dto.setFirstName("sanket");
@@ -694,7 +694,7 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void testUpdateLeadContactSuccess() {
+	void testUpdateLeadContactSuccess() throws Exception {
 		Integer leadId = 1;
 		UpdateLeadDto dto = mock(UpdateLeadDto.class);
 		CurrencyDto currencyDto = new CurrencyDto();
@@ -981,7 +981,7 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void testBuildLeadObjIfSuccess() {
+	void testBuildLeadObjIfSuccess() throws Exception {
 		LeadDto leadDto = new LeadDto();
 		leadDto.setCompanyName("Company1");
 		leadDto.setServiceFallsId("ServiceFall1");
@@ -1001,7 +1001,7 @@ class LeadServiceImplTest {
 	}
 
 	@Test
-	void testBuildLeadObjElseSuccess1() {
+	void testBuildLeadObjElseSuccess1() throws Exception {
 		LeadDto leadDto = new LeadDto();
 		leadDto.setCompanyName("Company1");
 		leadDto.setServiceFallsId(null);
