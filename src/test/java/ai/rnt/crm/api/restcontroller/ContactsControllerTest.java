@@ -1,5 +1,7 @@
 package ai.rnt.crm.api.restcontroller;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dto.ContactDto;
@@ -58,4 +61,21 @@ class ContactsControllerTest {
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = contactsController.updateContact(contactDto, 1);
 		verify(contactService).updateContact(contactDto, 1);
 	}
+	
+	 @Test
+	    void testDeleteContact() {
+	        Integer contactId = 1;
+	        EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+	        expectedResponse.put(ApiResponse.SUCCESS, "Contact deleted successfully");
+	        ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = new ResponseEntity<>(expectedResponse, HttpStatus.OK);
+
+	        when(contactService.deleteContact(contactId)).thenReturn(responseEntity);
+
+	        ResponseEntity<EnumMap<ApiResponse, Object>> actualResponse = contactsController.deleteContact(contactId);
+
+	        assertEquals(responseEntity, actualResponse);
+	        assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+	        assertEquals(expectedResponse, actualResponse.getBody());
+	        verify(contactService, times(1)).deleteContact(contactId);
+	    }
 }

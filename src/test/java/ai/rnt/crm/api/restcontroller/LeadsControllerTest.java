@@ -237,4 +237,19 @@ class LeadsControllerTest {
 		assertEquals(expectedResponse, actualResponse.getBody());
 		verify(leadService, times(1)).addDescription(descriptionDto, leadId);
 	}
+
+	@Test
+	void testContactInfo() {
+		Integer leadId = 123;
+		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+		expectedResponse.put(ApiResponse.SUCCESS, "Contact Info Data");
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = new ResponseEntity<>(expectedResponse,
+				HttpStatus.OK);
+		when(leadService.getContactInfo(leadId)).thenReturn(responseEntity);
+		ResponseEntity<EnumMap<ApiResponse, Object>> actualResponse = leadsController.contactInfo(leadId);
+		assertEquals(responseEntity, actualResponse);
+		assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+		assertEquals(expectedResponse, actualResponse.getBody());
+		verify(leadService, times(1)).getContactInfo(leadId);
+	}
 }

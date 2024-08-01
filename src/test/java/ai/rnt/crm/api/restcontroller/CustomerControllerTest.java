@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import ai.rnt.crm.dto.ContactDto;
 import ai.rnt.crm.enums.ApiResponse;
 import ai.rnt.crm.service.CustomerService;
 
@@ -43,5 +44,39 @@ class CustomerControllerTest {
 		assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
 		assertEquals(expectedResponse, actualResponse.getBody());
 		verify(customerService, times(1)).customerDashBoardData();
+	}
+
+	@Test
+	void testEditCustomer() {
+		Integer customerId = 1;
+		String field = "name";
+		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+		expectedResponse.put(ApiResponse.SUCCESS, "Customer details updated successfully");
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = new ResponseEntity<>(expectedResponse,
+				HttpStatus.OK);
+		when(customerService.editCustomer(field, customerId)).thenReturn(responseEntity);
+		ResponseEntity<EnumMap<ApiResponse, Object>> actualResponse = customerController.editCustomer(customerId,
+				field);
+		assertEquals(responseEntity, actualResponse);
+		assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+		assertEquals(expectedResponse, actualResponse.getBody());
+		verify(customerService, times(1)).editCustomer(field, customerId);
+	}
+
+	@Test
+	void testUpdateCustomer() {
+		Integer customerId = 1;
+		ContactDto contactDto = new ContactDto(); // Initialize as needed
+		EnumMap<ApiResponse, Object> expectedResponse = new EnumMap<>(ApiResponse.class);
+		expectedResponse.put(ApiResponse.SUCCESS, "Customer updated successfully");
+		ResponseEntity<EnumMap<ApiResponse, Object>> responseEntity = new ResponseEntity<>(expectedResponse,
+				HttpStatus.OK);
+		when(customerService.updateCustomer(contactDto, customerId)).thenReturn(responseEntity);
+		ResponseEntity<EnumMap<ApiResponse, Object>> actualResponse = customerController.updateCustomer(contactDto,
+				customerId);
+		assertEquals(responseEntity, actualResponse);
+		assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
+		assertEquals(expectedResponse, actualResponse.getBody());
+		verify(customerService, times(1)).updateCustomer(contactDto, customerId);
 	}
 }

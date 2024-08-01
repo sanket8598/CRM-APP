@@ -486,7 +486,6 @@ public class LeadServiceImpl implements LeadService {
 			lead.put(DATA, dataMap);
 			return new ResponseEntity<>(lead, OK);
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error("Got Exception while editing the lead data..{}", e.getMessage());
 			throw new CRMException(e);
 		}
@@ -547,7 +546,6 @@ public class LeadServiceImpl implements LeadService {
 			}
 			return new ResponseEntity<>(qualifyLeadMap, OK);
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error("Got Exception while qualifying the lead..{}", e.getMessage());
 			throw new CRMException(e);
 		}
