@@ -868,28 +868,6 @@ class LeadServiceImplTest {
 		assertThrows(CRMException.class, () -> leadService.editLead(leadId));
 	}
 
-	// @Test
-	void testQualifyLeadUnSuccess() throws Exception {
-		Integer leadId = 1;
-		QualifyLeadDto dto = new QualifyLeadDto();
-		dto.setBudgetAmount("00.00");
-		dto.setQualify(true);
-		Leads lead = new Leads();
-		// String secretKey = "Op5sTs3Nr7r9lCSJr2jN3qNyelrSEsO=";
-		// String decryptAmount = SignatureUtil.decryptAmount(dto.getBudgetAmount(),
-		// secretKey);
-		// dto.setBudgetAmount(decryptAmount);
-		// when(signatureUtil.decryptAmount(dto.getBudgetAmount())).thenReturn(anyString());
-		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
-		when(leadDaoService.addLead(any())).thenReturn(lead);
-		when(serviceFallsDaoSevice.findByName("Other")).thenReturn(Optional.of(new ServiceFallsMaster()));
-		when(serviceFallsDaoSevice.getServiceFallById(1)).thenReturn(Optional.of(new ServiceFallsMaster()));
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Lead Not Qualify", response.getBody().get(ApiResponse.MESSAGE));
-	}
-
 	@Test
 	void testQualifyLeadUnSuccess1() throws Exception {
 		Integer leadId = 1;
@@ -897,11 +875,34 @@ class LeadServiceImplTest {
 		dto.setBudgetAmount("DgNqNmEIJF83/gz7oegdphZ4oZ60YqDqw6i1NC+HDDY=");
 		dto.setQualify(true);
 		Leads lead = new Leads();
+		Opportunity opty = new Opportunity();
+		opty.setOpportunityId(1);
+		lead.setOpportunity(opty);
 		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
 		when(leadDaoService.addLead(any())).thenReturn(lead);
 		when(serviceFallsDaoSevice.findByName("Other")).thenReturn(Optional.of(new ServiceFallsMaster()));
 		when(serviceFallsDaoSevice.getServiceFallById(1)).thenReturn(Optional.of(new ServiceFallsMaster()));
 
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
+		assertEquals("Lead Not Qualify", response.getBody().get(ApiResponse.MESSAGE));
+	}
+	
+	@Test
+	void testQualifyLeadUnSuccess2() throws Exception {
+		Integer leadId = 1;
+		QualifyLeadDto dto = new QualifyLeadDto();
+		dto.setBudgetAmount(null);
+		dto.setQualify(true);
+		Leads lead = new Leads();
+		Opportunity opty = new Opportunity();
+		opty.setOpportunityId(1);
+		lead.setOpportunity(opty);
+		when(leadDaoService.getLeadById(leadId)).thenReturn(Optional.of(lead));
+		when(leadDaoService.addLead(any())).thenReturn(lead);
+		when(serviceFallsDaoSevice.findByName("Other")).thenReturn(Optional.of(new ServiceFallsMaster()));
+		when(serviceFallsDaoSevice.getServiceFallById(1)).thenReturn(Optional.of(new ServiceFallsMaster()));
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
@@ -928,6 +929,25 @@ class LeadServiceImplTest {
 		countryMaster.setCurrency(currencyMaster);
 		when(company.getCountry()).thenReturn(countryMaster);
 		when(countryDaoService.findByCountryName(location)).thenReturn(Optional.empty());
+		leadService.setLocationToCompany(location, company, leadDto, leads);
+		assertNotNull(company.getCountry());
+		verify(countryDaoService, times(1)).findByCountryName(location);
+	}
+	
+	@Test
+	void testSetLocationToCompanyLocationIf() {
+		String location = "Pune";
+		CompanyMaster company = mock(CompanyMaster.class);
+		LeadDto leadDto = new LeadDto();
+		Leads leads = new Leads();
+		CurrencyMaster currencyMaster = new CurrencyMaster();
+		currencyMaster.setCurrencySymbol("$");
+		CountryMaster countryMaster = new CountryMaster();
+		countryMaster.setCountry("India");
+		countryMaster.setCurrency(null);
+		when(company.getCountry()).thenReturn(countryMaster);
+		//when(countryMaster.getCurrency()).thenReturn(null);
+		when(countryDaoService.findByCountryName(location)).thenReturn(Optional.of(new CountryMaster()));
 		leadService.setLocationToCompany(location, company, leadDto, leads);
 		assertNotNull(company.getCountry());
 		verify(countryDaoService, times(1)).findByCountryName(location);
