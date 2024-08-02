@@ -19,11 +19,6 @@ public class TaskNotificationsUtil {
 	private final WebSocketService webSocketService;
 	private final TaskNotificationServiceImpl taskNotificationServiceImpl;
 
-	public void sendNotificationIfPresent() {
-		log.info("inside the sendNotificationIfPresent method...{}");
-		taskNotificationDaoService.allNotifications().stream().map(taskNotificationServiceImpl::getMessage)
-				.forEach(this::sentNotification);
-	}
 
 	public void sentNotification(TaskNotificationsDto dto) {
 		log.info("inside the sentNotification method sending the notification to the websocket...{}",

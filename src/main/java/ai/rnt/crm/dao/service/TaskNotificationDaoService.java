@@ -14,8 +14,6 @@ public interface TaskNotificationDaoService extends CrudService<TaskNotification
 
 	TaskNotifications seenNotification(TaskNotifications notifyData);
 	
-	List<TaskNotifications> allNotifications();
-	
 	TaskNotifications addNotification(TaskNotifications taskNotifications);
 
 }

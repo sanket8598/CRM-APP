@@ -48,12 +48,4 @@ public class TaskNotificationDaoServiceImpl implements TaskNotificationDaoServic
 		log.info("inside the seenNotification method...");
 		return addNotification(notifyData);
 	}
-
-	@Cacheable("notifications")
-	@Override
-	public List<TaskNotifications> allNotifications() {
-		log.info("inside the allNotifications method...");
-		return taskNotificationsRepository.findByNotifStatusOrderByCreatedDateDesc(true);
-	}
-
 }

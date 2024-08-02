@@ -167,7 +167,6 @@ public class TaskRemainderUtil {
 					log.error("Got exception while sending the scheduled emails...{}", e1);
 				}
 			});
-			taskNotificationsUtil.sendNotificationIfPresent();
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);
 			throw new CRMException(e);
