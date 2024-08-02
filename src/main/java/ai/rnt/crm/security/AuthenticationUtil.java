@@ -27,6 +27,8 @@ public class AuthenticationUtil {
 		List<String> api = new ArrayList<>();
 		api.add("/api/v1/auth/login"); 
 		api.add("/send-notification"); 
+		api.add("/crmnotification"); 
+		api.add("/crmnotification/info"); 
 		api.add("/api/v1/auth/tokenparse"); 
 		api.add("/v3/api-docs"); 
 		api.add("/v2/api-docs"); 
@@ -38,7 +40,7 @@ public class AuthenticationUtil {
 		
 	};
 	
-	public static final String[] PUBLIC_URLS = { "/send-notification","/api/v1/auth/**", "/v3/api-docs", "/v2/api-docs",
+	public static final String[] PUBLIC_URLS = {"/crmnotification","/crmnotification/**","/api/v1/auth/**", "/v3/api-docs", "/v2/api-docs",
 			"/swagger-resources/**", "/swagger-ui/**", "/webjars/**" };
 	public static final String[] ADMIN_URLS = { "/api/v1/admin/**" };
 	public static final String[] USER_URLS = { "/api/v1/user/**"};
