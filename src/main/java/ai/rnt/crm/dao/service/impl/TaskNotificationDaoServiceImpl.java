@@ -36,7 +36,6 @@ public class TaskNotificationDaoServiceImpl implements TaskNotificationDaoServic
 		return taskNotificationsRepository.findByNotifToStaffIdAndNotifStatusOrderByCreatedDateDesc(staffId, true);
 	}
 
-	@Cacheable(value="notifications",key = "#notifId!=null")
 	@Override
 	public Optional<TaskNotifications> getNotificationById(Integer notifId) {
 		log.info("inside the getNotifications method with notification id...{}", notifId);
