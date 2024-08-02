@@ -739,7 +739,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			taskNotifications.setCreatedBy(1375);
 			taskNotifications.setNotifTo(taskNotifications.getOpportunity().getEmployee());
 			taskNotifications.setNotifStatus(true);
-			taskNotificationsUtil.sendAssignOptyNotification(taskNotifications);
+			taskNotificationsUtil.sendTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending assign opportunity notification..{}", e);
 			throw new CRMException(e);
@@ -761,8 +761,8 @@ public class OpportunityServiceImpl implements OpportunityService {
 			opportunity.setSlaSigned(false);
 			opportunity.setSowSigned(false);
 			opportunity.setNdaSigned(false);
-			opportunity.setFeedback(null);
 			opportunity.setThankMailSent(false);
+			opportunity.setFeedback(null);
 			opportunity.setDescription(null);
 			opportunity.setLostReason(null);
 			if (nonNull(opportunityDaoService.addOpportunity(opportunity))) {

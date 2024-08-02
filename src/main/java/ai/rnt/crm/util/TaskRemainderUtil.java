@@ -167,6 +167,7 @@ public class TaskRemainderUtil {
 					log.error("Got exception while sending the scheduled emails...{}", e1);
 				}
 			});
+			taskNotificationsUtil.sendNotificationIfPresent();
 		} catch (Exception e) {
 			log.error("Got Exception while sending mails to the task of call, visit and meeting..{}", e);
 			throw new CRMException(e);
@@ -182,7 +183,7 @@ public class TaskRemainderUtil {
 			taskNotifications.setCreatedBy(1375);
 			taskNotifications.setNotifTo(taskNotifications.getCallTask().getAssignTo());
 			taskNotifications.setNotifStatus(true);
-			taskNotificationsUtil.sendCallTaskNotification(taskNotifications);
+			taskNotificationsUtil.sendTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending callTask notification..{}", e);
 			throw new CRMException(e);
@@ -198,7 +199,7 @@ public class TaskRemainderUtil {
 			taskNotifications.setCreatedBy(1375);
 			taskNotifications.setNotifTo(taskNotifications.getVisitTask().getAssignTo());
 			taskNotifications.setNotifStatus(true);
-			taskNotificationsUtil.sendVisitTaskNotification(taskNotifications);
+			taskNotificationsUtil.sendTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending visitTask notification..{}", e);
 			throw new CRMException(e);
@@ -214,7 +215,7 @@ public class TaskRemainderUtil {
 			taskNotifications.setCreatedBy(1375);
 			taskNotifications.setNotifTo(taskNotifications.getMeetingTask().getAssignTo());
 			taskNotifications.setNotifStatus(true);
-			taskNotificationsUtil.sendMeetingTaskNotification(taskNotifications);
+			taskNotificationsUtil.sendTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending meetingTask notification..{}", e);
 			throw new CRMException(e);
@@ -230,7 +231,7 @@ public class TaskRemainderUtil {
 			taskNotifications.setCreatedBy(1375);
 			taskNotifications.setNotifTo(taskNotifications.getLeadTask().getAssignTo());
 			taskNotifications.setNotifStatus(true);
-			taskNotificationsUtil.sendLeadTaskNotification(taskNotifications);
+			taskNotificationsUtil.sendTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending leadTask notification..{}", e);
 			throw new CRMException(e);
@@ -246,7 +247,7 @@ public class TaskRemainderUtil {
 			taskNotifications.setCreatedBy(1375);
 			taskNotifications.setNotifTo(taskNotifications.getLeads().getEmployee());
 			taskNotifications.setNotifStatus(true);
-			taskNotificationsUtil.sendFollowUpLeadNotification(taskNotifications);
+			taskNotificationsUtil.sendTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending follow up lead notification..{}", e);
 			throw new CRMException(e);

@@ -10,9 +10,6 @@ import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -44,12 +41,8 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 		log.info("inside the getNotification method...{}", staffId);
 		EnumMap<ApiResponse, Object> notification = new EnumMap<>(ApiResponse.class);
 		try {
-			Map<String, Object> countData = new HashMap<>();
-			List<TaskNotifications> notifyData = taskNotificationDaoService.getNotifications(staffId);
-			List<TaskNotificationsDto> notifications = notifyData.stream().map(this::getMessage).collect(toList());
-			countData.put("Count", notifyData.stream().count());
-			countData.put("Notifications", notifications);
-			notification.put(DATA, countData);
+			notification.put(DATA, taskNotificationDaoService.getNotifications(staffId).stream().map(this::getMessage)
+					.collect(toList()));
 			notification.put(SUCCESS, true);
 			return new ResponseEntity<>(notification, OK);
 		} catch (Exception e) {
@@ -86,6 +79,7 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 				TaskNotificationsDto dto = new TaskNotificationsDto();
 				dto.setNotifStatus(notification.isNotifStatus());
 				dto.setNotifId(notification.getNotifId());
+				dto.setAssignTo(notification.getNotifTo().getStaffId());
 				if (nonNull(notification.getCallTask())) {
 					dto.setMessage(format(msg, notification.getCallTask().getSubject(), convertDateDateWithTime(
 							notification.getCallTask().getDueDate(), notification.getCallTask().getDueTime12Hours())));

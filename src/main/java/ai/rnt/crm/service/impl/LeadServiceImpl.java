@@ -980,7 +980,7 @@ public class LeadServiceImpl implements LeadService {
 			taskNotifications.setCreatedBy(1375);
 			taskNotifications.setNotifTo(taskNotifications.getLeads().getEmployee());
 			taskNotifications.setNotifStatus(true);
-			taskNotificationsUtil.sendFollowUpLeadNotification(taskNotifications);
+			taskNotificationsUtil.sendTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending assign lead notification..{}", e);
 			throw new CRMException(e);

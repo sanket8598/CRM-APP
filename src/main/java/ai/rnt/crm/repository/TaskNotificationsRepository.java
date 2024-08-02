@@ -10,4 +10,6 @@ public interface TaskNotificationsRepository extends JpaRepository<TaskNotificat
 
 	List<TaskNotifications> findByNotifToStaffIdAndNotifStatusOrderByCreatedDateDesc(Integer staffId,
 			boolean notifyStatus);
+
+	List<TaskNotifications> findByNotifStatusOrderByCreatedDateDesc(boolean notifyStatus);
 }
