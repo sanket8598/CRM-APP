@@ -6,17 +6,19 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -56,34 +58,21 @@ class TaskNotificationServiceImplTest {
 
 	@Test
 	void getNotificationTest() {
-		Integer staffId = 1477;
-		TaskNotifications notification1 = new TaskNotifications();
-		TaskNotifications notification2 = new TaskNotifications();
-		List<TaskNotifications> notificationsList = Arrays.asList(notification1, notification2);
-		when(taskNotificationDaoService.getNotifications(staffId)).thenReturn(notificationsList);
+		Integer staffId = 1;
+		TaskNotifications taskNotification = new TaskNotifications();
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setStaffId(1);
+		taskNotification.setNotifTo(employeeMaster);
+		when(taskNotificationDaoService.getNotifications(staffId)).thenReturn(Arrays.asList(taskNotification));
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = taskNotificationService.getNotification(staffId);
 		assertNotNull(response);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertTrue((boolean) response.getBody().get(ApiResponse.SUCCESS));
-		Map<String, Object> responseData = (Map<String, Object>) response.getBody().get(ApiResponse.DATA);
-		assertNotNull(responseData);
-		assertEquals(2, (long) responseData.get("Count"));
-		assertTrue(responseData.get("Notifications") instanceof List);
-		assertEquals(2, ((List<?>) responseData.get("Notifications")).size());
-	}
-
-	@Test
-	void getNotificationEmptyNotificationsListTest() {
-		Integer staffId = 1477;
-		when(taskNotificationDaoService.getNotifications(staffId)).thenReturn(Collections.emptyList());
-		ResponseEntity<EnumMap<ApiResponse, Object>> response = taskNotificationService.getNotification(staffId);
-		assertNotNull(response);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertTrue((boolean) response.getBody().get(ApiResponse.SUCCESS));
-		Map<String, Object> responseData = (Map<String, Object>) response.getBody().get(ApiResponse.DATA);
-		assertNotNull(responseData);
-		assertEquals(0, (long) responseData.get("Count"));
-		assertTrue(((List<?>) responseData.get("Notifications")).isEmpty());
+		assertEquals(200, response.getStatusCodeValue());
+		EnumMap<ApiResponse, Object> body = response.getBody();
+		assertNotNull(body);
+		assertTrue((Boolean) body.get(ApiResponse.SUCCESS));
+		assertNotNull(body.get(ApiResponse.DATA));
+		assertEquals(1, ((List<?>) body.get(ApiResponse.DATA)).size());
+		verify(taskNotificationDaoService, times(1)).getNotifications(staffId);
 	}
 
 	@Test
@@ -113,13 +102,16 @@ class TaskNotificationServiceImplTest {
 	}
 
 	@Test
-	void getMessage_CallTaskNotNull() {
+	void getMessageCallTaskNotNull() {
 		TaskNotifications notification = new TaskNotifications();
 		PhoneCallTask callTask = new PhoneCallTask();
 		callTask.setSubject("Call Subject");
 		callTask.setDueDate(convertToDateViaInstant(new Date()));
 		callTask.setDueTime("12:00 PM");
 		notification.setCallTask(callTask);
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setStaffId(1);
+		notification.setNotifTo(employeeMaster);
 		TaskNotificationsDto result = taskNotificationService.getMessage(notification);
 		assertNotNull(result);
 		assertFalse(result.isNotifStatus());
@@ -134,6 +126,9 @@ class TaskNotificationServiceImplTest {
 		visitTask.setDueDate(convertToDateViaInstant(new Date()));
 		visitTask.setDueTime("12:00 PM");
 		notification.setVisitTask(visitTask);
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setStaffId(1);
+		notification.setNotifTo(employeeMaster);
 		TaskNotificationsDto result = taskNotificationService.getMessage(notification);
 		assertNotNull(result);
 		assertFalse(result.isNotifStatus());
@@ -158,6 +153,9 @@ class TaskNotificationServiceImplTest {
 		meetingTask.setDueDate(convertToDateViaInstant(new Date()));
 		meetingTask.setDueTime("12:00 PM");
 		notification.setMeetingTask(meetingTask);
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setStaffId(1);
+		notification.setNotifTo(employeeMaster);
 		TaskNotificationsDto result = taskNotificationService.getMessage(notification);
 		assertNotNull(result);
 		assertFalse(result.isNotifStatus());
@@ -172,6 +170,9 @@ class TaskNotificationServiceImplTest {
 		leadTask.setDueDate(convertToDateViaInstant(new Date()));
 		leadTask.setDueTime("12:00 PM");
 		notification.setLeadTask(leadTask);
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		employeeMaster.setStaffId(1);
+		notification.setNotifTo(employeeMaster);
 		TaskNotificationsDto result = taskNotificationService.getMessage(notification);
 		assertNotNull(result);
 		assertFalse(result.isNotifStatus());
@@ -189,6 +190,7 @@ class TaskNotificationServiceImplTest {
 		List<Contacts> contacts = new ArrayList<>();
 		leads.setContacts(contacts);
 		notification.setLeads(leads);
+		notification.setNotifTo(employeeMaster);
 		TaskNotificationsDto result = taskNotificationService.getMessage(notification);
 		assertNotNull(result);
 		assertFalse(result.isNotifStatus());
@@ -208,9 +210,18 @@ class TaskNotificationServiceImplTest {
 		leads.setContacts(contacts);
 		opportunity.setLeads(leads);
 		notification.setOpportunity(opportunity);
+		notification.setNotifTo(employeeMaster);
 		TaskNotificationsDto result = taskNotificationService.getMessage(notification);
 		assertNotNull(result);
 		assertFalse(result.isNotifStatus());
 		assertNotNull(result.getMessage());
+	}
+
+	@Test
+	void testGetMessageException() {
+		TaskNotifications notification = mock(TaskNotifications.class);
+		doThrow(new RuntimeException("Test exception")).when(notification).getNotifTo();
+		TaskNotificationsDto result = taskNotificationService.getMessage(notification);
+		assertNull(result);
 	}
 }

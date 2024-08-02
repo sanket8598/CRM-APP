@@ -1,6 +1,12 @@
 package ai.rnt.crm.util;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,55 +14,45 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import ai.rnt.crm.config.WebSocketService;
+import ai.rnt.crm.dao.service.TaskNotificationDaoService;
+import ai.rnt.crm.dto.TaskNotificationsDto;
 import ai.rnt.crm.entity.TaskNotifications;
 import ai.rnt.crm.repository.TaskNotificationsRepository;
+import ai.rnt.crm.service.impl.TaskNotificationServiceImpl;
 
 class TaskNotificationsUtilTest {
 
-	 @Mock
-	    private TaskNotificationsRepository taskNotificationsRepository;
+	@Mock
+	private TaskNotificationsRepository taskNotificationsRepository;
 
-	    @InjectMocks
-	    private TaskNotificationsUtil taskNotificationsUtil;
+	@Mock
+	private WebSocketService webSocketService;
 
-	    @BeforeEach
-	    public void setup() {
-	        MockitoAnnotations.openMocks(this);
-	    }
+	@Mock
+	private TaskNotificationServiceImpl taskNotificationServiceImpl;
 
-	    @Test
-	    public void testSendCallTaskNotification() {
-	        TaskNotifications taskNotifications = new TaskNotifications();
-	        taskNotificationsUtil.sendCallTaskNotification(taskNotifications);
-	        verify(taskNotificationsRepository).save(taskNotifications);
-	    }
+	@Mock
+	private TaskNotificationDaoService taskNotificationDaoService;
 
-	    @Test
-	    public void testSendVisitTaskNotification() {
-	        TaskNotifications taskNotifications = new TaskNotifications();
-	        taskNotificationsUtil.sendVisitTaskNotification(taskNotifications);
-	        verify(taskNotificationsRepository).save(taskNotifications);
-	    }
+	@InjectMocks
+	private TaskNotificationsUtil taskNotificationsUtil;
 
-	    @Test
-	    public void testSendMeetingTaskNotification() {
-	        TaskNotifications taskNotifications = new TaskNotifications();
-	        taskNotificationsUtil.sendMeetingTaskNotification(taskNotifications);
-	        verify(taskNotificationsRepository).save(taskNotifications);
-	    }
+	@BeforeEach
+	public void setup() {
+		MockitoAnnotations.openMocks(this);
+	}
 
-	    @Test
-	    public void testSendFollowUpLeadNotification() {
-	        TaskNotifications taskNotifications = new TaskNotifications();
-	        taskNotificationsUtil.sendFollowUpLeadNotification(taskNotifications);
-	        verify(taskNotificationsRepository).save(taskNotifications);
-	    }
-
-	    @Test
-	    public void testSendLeadTaskNotification() {
-	        TaskNotifications taskNotifications = new TaskNotifications();
-	        taskNotificationsUtil.sendLeadTaskNotification(taskNotifications);
-	        verify(taskNotificationsRepository).save(taskNotifications);
-	    }
-
+	@Test
+	void testSendTaskNotification() {
+		TaskNotifications taskNotifications = mock(TaskNotifications.class);
+		TaskNotifications notification = mock(TaskNotifications.class);
+		TaskNotificationsDto dto = mock(TaskNotificationsDto.class);
+		when(taskNotificationDaoService.addNotification(taskNotifications)).thenReturn(notification);
+		when(taskNotificationServiceImpl.getMessage(notification)).thenReturn(dto);
+		taskNotificationsUtil.sendTaskNotification(taskNotifications);
+		verify(taskNotificationDaoService).addNotification(taskNotifications);
+		verify(taskNotificationServiceImpl).getMessage(notification);
+		verify(webSocketService).sendNotification(anyString(), eq(dto));
+	}
 }
