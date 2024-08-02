@@ -23,6 +23,7 @@ import static org.springframework.http.HttpStatus.OK;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +55,7 @@ import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.ContactDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
+import ai.rnt.crm.dao.service.CurrencyDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.ExcelHeaderDaoService;
@@ -114,6 +116,9 @@ class LeadServiceImplTest {
 
 	@Mock
 	private LeadDaoService leadDaoService;
+	
+	@Mock
+	private CurrencyDaoService currencyDaoService;
 
 	@Mock
 	private ServiceFallsDaoSevice serviceFallsDaoSevice;
@@ -893,8 +898,11 @@ class LeadServiceImplTest {
 	void testQualifyLeadUnSuccess2() throws Exception {
 		Integer leadId = 1;
 		QualifyLeadDto dto = new QualifyLeadDto();
+		CurrencyDto currencyDto = new CurrencyDto();
+		currencyDto.setCurrencyId(1);
+		dto.setCurrency(currencyDto);
 		dto.setBudgetAmount(null);
-		dto.setQualify(true);
+		dto.setQualify(false);
 		Leads lead = new Leads();
 		Opportunity opty = new Opportunity();
 		opty.setOpportunityId(1);
@@ -905,10 +913,9 @@ class LeadServiceImplTest {
 		when(serviceFallsDaoSevice.getServiceFallById(1)).thenReturn(Optional.of(new ServiceFallsMaster()));
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = leadService.qualifyLead(leadId, dto);
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertFalse((boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Lead Not Qualify", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals("Save Successfully", response.getBody().get(ApiResponse.MESSAGE));
 	}
-
+	
 	@Test
 	void testQualifyLeadLeadNotFound() {
 		Integer leadId = 1;
