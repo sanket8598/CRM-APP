@@ -3,8 +3,6 @@ package ai.rnt.crm.dao.service.impl;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,21 +20,18 @@ public class TaskNotificationDaoServiceImpl implements TaskNotificationDaoServic
 
 	private final TaskNotificationsRepository taskNotificationsRepository;
 
-	@CacheEvict(value = "notifications", allEntries = true)
 	@Override
 	public TaskNotifications addNotification(TaskNotifications taskNotifications) {
 		log.info("inside the addNotification method...");
 		return taskNotificationsRepository.save(taskNotifications);
 	}
 
-	@Cacheable(value = "notifications", key = "#staffId", condition = "#staffId!=null")
 	@Override
 	public List<TaskNotifications> getNotifications(Integer staffId) {
 		log.info("inside the getNotifications method with staffId...{}", staffId);
 		return taskNotificationsRepository.findByNotifToStaffIdAndNotifStatusOrderByCreatedDateDesc(staffId, true);
 	}
 
-	@Cacheable(value = "notifications", key = "#notifId", condition = "#notifId!=null")
 	@Override
 	public Optional<TaskNotifications> getNotificationById(Integer notifId) {
 		log.info("inside the getNotifications method with notification id...{}", notifId);

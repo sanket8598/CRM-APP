@@ -126,6 +126,8 @@ public class EmailUtil extends PropertyUtil {
 	}
 
 	public Session getSession() {
+		if(nonNull(getUserName()) && getUserName().endsWith(".com"))
+			PROPERTIES.put("mail.smtp.host", "smtp.zoho.com");
 		return Session.getInstance(PROPERTIES, new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -262,6 +264,7 @@ public class EmailUtil extends PropertyUtil {
 			msg.setContent(content.toString(), TEXT_HTML);
 			send(msg);
 		} catch (Exception e) {
+			e.printStackTrace();
 			log.error("Got Exception while sending meeting task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}

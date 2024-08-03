@@ -26,12 +26,13 @@ public class PropertyUtil {
 	
 	protected static final Properties PROPERTIES = new Properties();
 	protected static final String HOST = "smtp.office365.com";
-	//"smtp.zoho.com"
 	
 	static {
 		PROPERTIES.put("mail.smtp.host", HOST);
 		PROPERTIES.put("mail.smtp.port", "587");
 		PROPERTIES.put("mail.smtp.auth", true);
 		PROPERTIES.put("mail.smtp.starttls.enable", true);
+		PROPERTIES.put("mail.smtp.ssl.protocols","TLSv1.2");
+		
 	}
 }
