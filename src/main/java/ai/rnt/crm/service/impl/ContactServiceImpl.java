@@ -125,6 +125,7 @@ public class ContactServiceImpl implements ContactService {
 			contact.setBusinessCard(contactDto.getBusinessCard());
 			contact.setBusinessCardName(contactDto.getBusinessCardName());
 			contact.setBusinessCardType(contactDto.getBusinessCardType());
+			contact.setPersonalEmail(contactDto.getPersonalEmail());
 
 			List<Contacts> existingContacts = contactDaoService.contactsOfLead(contact.getLead().getLeadId());
 			boolean isPrimary = existingContacts.stream().anyMatch(Contacts::getPrimary);
