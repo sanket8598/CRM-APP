@@ -1,5 +1,6 @@
 package ai.rnt.crm.service.impl;
 
+import static ai.rnt.crm.enums.ApiResponse.MESSAGE;
 import static ai.rnt.crm.enums.ApiResponse.SUCCESS;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -9,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import java.util.ArrayList;
@@ -22,13 +24,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
+import ai.rnt.crm.dao.service.CurrencyDaoService;
 import ai.rnt.crm.dao.service.StateDaoService;
 import ai.rnt.crm.dto.CountryDto;
+import ai.rnt.crm.dto.CurrencyDto;
 import ai.rnt.crm.entity.CompanyMaster;
 import ai.rnt.crm.entity.CountryMaster;
 import ai.rnt.crm.enums.ApiResponse;
@@ -43,6 +46,9 @@ class CountryServiceImplTest {
 
 	@Mock
 	private CountryDaoService countryDaoService;
+
+	@Mock
+	private CurrencyDaoService currencyDaoService;;
 
 	@Mock
 	private AuditAwareUtil auditAwareUtil;
@@ -82,22 +88,27 @@ class CountryServiceImplTest {
 		when(countryDaoService.isCountryPresent(countryDto.getCountry())).thenReturn(true);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.addCountry(countryDto);
 		assertNotNull(response);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("This Country Is Already Present !!", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals(OK, response.getStatusCode());
+		assertFalse((Boolean) response.getBody().get(SUCCESS));
+		assertEquals("This Country Is Already Present !!", response.getBody().get(MESSAGE));
 	}
 
 	@Test
 	void testAddCountryCountryAddedSuccessfully() {
 		CountryDto countryDto = new CountryDto();
+		CurrencyDto currencyDto = new CurrencyDto();
+		currencyDto.setCurrencyId(1);
+		currencyDto.setCurrencyName("USD");
+		currencyDto.setCurrencySymbol("$");
+		countryDto.setCurrency(currencyDto);
 		countryDto.setCountry("India");
 		CountryMaster countryMaster = mock(CountryMaster.class);
 		when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(countryMaster);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.addCountry(countryDto);
 		assertNotNull(response);
-		assertEquals(HttpStatus.CREATED, response.getStatusCode());
-		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Country Added Successfully !!", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals(CREATED, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(SUCCESS));
+		assertEquals("Country Added Successfully !!", response.getBody().get(MESSAGE));
 	}
 
 	@Test
@@ -108,9 +119,9 @@ class CountryServiceImplTest {
 		when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(null);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.addCountry(countryDto);
 		assertNotNull(response);
-		assertEquals(HttpStatus.CREATED, response.getStatusCode());
-		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Country Not Added !!", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals(CREATED, response.getStatusCode());
+		assertFalse((Boolean) response.getBody().get(SUCCESS));
+		assertEquals("Country Not Added !!", response.getBody().get(MESSAGE));
 	}
 
 	@Test
@@ -124,8 +135,8 @@ class CountryServiceImplTest {
 		 when(countryDaoService.findCountryById(1)).thenReturn(Optional.of(new CountryMaster()));
 	        ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.getCountry(1);
 	        assertNotNull(response);
-	        assertEquals(HttpStatus.OK, response.getStatusCode());
-	        assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
+	        assertEquals(OK, response.getStatusCode());
+	        assertTrue((Boolean) response.getBody().get(SUCCESS));
 	    }
 
 	@Test
@@ -139,14 +150,51 @@ class CountryServiceImplTest {
 	@Test
 	void testUpdateCountrySuccess() {
 		CountryDto countryDto = new CountryDto();
+		CurrencyDto currencyDto = new CurrencyDto();
+		currencyDto.setCurrencyId(1);
+		currencyDto.setCurrencyName("USD");
+		currencyDto.setCurrencySymbol("$");
+		countryDto.setCurrency(currencyDto);
 		countryDto.setCountry("India");
 		when(countryDaoService.findCountryById(1)).thenReturn(Optional.of(countryMaster));
 		when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(countryMaster);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.updateCountry(countryDto, 1);
 		assertNotNull(response);
-		assertEquals(HttpStatus.CREATED, response.getStatusCode());
-		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Country Updated Successfully", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals(CREATED, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(SUCCESS));
+		assertEquals("Country Updated Successfully", response.getBody().get(MESSAGE));
+	}
+
+	@Test
+	void testUpdateCountryElse() {
+		CountryDto countryDto = mock(CountryDto.class);
+		CurrencyDto currencyDto = new CurrencyDto();
+		currencyDto.setCurrencyId(1);
+		countryDto.setCountryId(1);
+		currencyDto.setCurrencyName("USD");
+		currencyDto.setCurrencySymbol("$");
+		countryDto.setCurrency(currencyDto);
+		countryDto.setCountry("India");
+		when(countryDaoService.findCountryById(1)).thenReturn(Optional.of(countryMaster));
+		when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.updateCountry(countryDto, 1);
+		assertNotNull(response);
+		assertEquals("Country Not Update.", response.getBody().get(MESSAGE));
+	}
+
+	@Test
+	void testUpdateCountryIfBlock() {
+		CountryDto countryDto = new CountryDto();
+		CurrencyDto currencyDto = new CurrencyDto();
+		currencyDto.setCurrencyId(1);
+		currencyDto.setCurrencyName("USD");
+		currencyDto.setCurrencySymbol("$");
+		countryDto.setCurrency(currencyDto);
+		countryDto.setCountry("India");
+		when(countryDaoService.isCountryPresent(countryDto.getCountry(), 1)).thenReturn(true);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.updateCountry(countryDto, 1);
+		assertNotNull(response);
+		assertEquals(OK, response.getStatusCode());
 	}
 
 	@Test
@@ -171,9 +219,24 @@ class CountryServiceImplTest {
 		when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(countryMaster);
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.deleteCountry(countryId);
 		assertNotNull(response);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertTrue((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("Country Deleted Successfully", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals(OK, response.getStatusCode());
+		assertTrue((Boolean) response.getBody().get(SUCCESS));
+		assertEquals("Country Deleted Successfully", response.getBody().get(MESSAGE));
+	}
+	
+	@Test
+	void testDeleteCountryElse() {
+		int countryId = 1;
+		int loggedInStaffId = 100;
+		when(auditAwareUtil.getLoggedInStaffId()).thenReturn(loggedInStaffId);
+		when(countryDaoService.findCountryById(countryId)).thenReturn(Optional.of(countryMaster));
+		when(companyMasterDaoService.findByCountryId(countryId)).thenReturn(Collections.emptyList());
+		when(stateDaoService.findByCountryId(countryId)).thenReturn(Collections.emptyList());
+		when(countryDaoService.addCountry(any(CountryMaster.class))).thenReturn(null);
+		ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.deleteCountry(countryId);
+		assertNotNull(response);
+		assertEquals(OK, response.getStatusCode());
+		assertEquals("Country Not Delete.", response.getBody().get(MESSAGE));
 	}
 
 	@Test
@@ -184,9 +247,9 @@ class CountryServiceImplTest {
 				.thenReturn(Collections.singletonList(new CompanyMaster()));
 		ResponseEntity<EnumMap<ApiResponse, Object>> response = countryServiceImpl.deleteCountry(countryId);
 		assertNotNull(response);
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertFalse((Boolean) response.getBody().get(ApiResponse.SUCCESS));
-		assertEquals("This country is in use, You can't delete.", response.getBody().get(ApiResponse.MESSAGE));
+		assertEquals(OK, response.getStatusCode());
+		assertFalse((Boolean) response.getBody().get(SUCCESS));
+		assertEquals("This country is in use, You can't delete.", response.getBody().get(MESSAGE));
 	}
 
 	@Test

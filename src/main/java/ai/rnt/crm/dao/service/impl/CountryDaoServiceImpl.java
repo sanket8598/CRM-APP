@@ -59,4 +59,11 @@ public class CountryDaoServiceImpl implements CountryDaoService {
 		log.info("inside the isCountryPresent method...{}", country);
 		return countryMasterRepository.existsByCountry(country);
 	}
+
+	@Override
+	@Cacheable(value = COUNTRY, key = "#country + '_' + #countryId", condition = "#country != null && #countryId != null")
+	public boolean isCountryPresent(String country, Integer countryId) {
+		log.info("inside the isCountryPresent method...{}{}", country, countryId);
+		return countryMasterRepository.existsByCountryAndCountryIdNot(country, countryId);
+	}
 }

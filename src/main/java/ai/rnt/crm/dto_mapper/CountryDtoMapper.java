@@ -18,9 +18,11 @@ import java.util.function.Function;
 import ai.rnt.crm.dto.CityDto;
 import ai.rnt.crm.dto.CountryAndStateDto;
 import ai.rnt.crm.dto.CountryDto;
+import ai.rnt.crm.dto.CurrencyDto;
 import ai.rnt.crm.dto.StateAndCityDto;
 import ai.rnt.crm.entity.CityMaster;
 import ai.rnt.crm.entity.CountryMaster;
+import ai.rnt.crm.entity.CurrencyMaster;
 import ai.rnt.crm.entity.StateMaster;
 import lombok.NoArgsConstructor;
 
@@ -38,6 +40,7 @@ public class CountryDtoMapper {
 	 */
 	public static final Function<CountryDto, Optional<CountryMaster>> TO_COUNTRY = e -> evalMapper(e,
 			CountryMaster.class);
+	
 	/**
 	 * @since 11-09-2023
 	 * @version 1.0
@@ -99,4 +102,7 @@ public class CountryDtoMapper {
 		cityDto.setCity(cityMaster.getCity());
 		return cityDto;
 	}
+	
+	public static final Function<CurrencyDto, Optional<CurrencyMaster>> TO_CURRENCY = e -> evalMapper(e,
+			CurrencyMaster.class);
 }
