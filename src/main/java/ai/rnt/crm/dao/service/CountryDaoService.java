@@ -17,4 +17,6 @@ public interface CountryDaoService extends CrudService<CountryMaster, CountryDto
 	Optional<CountryMaster> findCountryById(Integer countryId);
 
 	boolean isCountryPresent(String country);
+	
+	boolean isCountryPresent(String country,Integer countryId);
 }

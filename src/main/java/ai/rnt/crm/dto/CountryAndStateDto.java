@@ -13,7 +13,7 @@ public class CountryAndStateDto {
 
 	private String country;
 	
-	private CurrencyDto currency;
+	private String countryFlag;
 
 	private List<StateAndCityDto> states;
 }

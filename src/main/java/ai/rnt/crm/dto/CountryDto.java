@@ -22,6 +22,8 @@ public class CountryDto implements Serializable {
 	
 	private String countryCode;
 	
+	private String countryFlag;
+	
 	private CurrencyDto currency;
 
 }

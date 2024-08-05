@@ -14,4 +14,6 @@ public interface CountryMasterRepository extends JpaRepository<CountryMaster, In
 	boolean existsByCountry(String country);
 
 	List<CountryMaster> findByOrderByCountryAsc();
+
+	boolean existsByCountryAndCountryIdNot(String country, Integer countryId);
 }

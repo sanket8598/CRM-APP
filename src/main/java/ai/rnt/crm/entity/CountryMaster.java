@@ -51,6 +51,9 @@ public class CountryMaster extends Auditable {
 
 	@Column(name = "country_code")
 	private String countryCode;
+	
+	@Column(name = "country_flag", columnDefinition = "LONGTEXT")
+	private String countryFlag;
 
 	@OneToMany(cascade = ALL, mappedBy = "country")
 	private List<CompanyMaster> contacts = new ArrayList<>();
@@ -59,7 +62,7 @@ public class CountryMaster extends Auditable {
 	@Fetch(JOIN)
 	private List<StateMaster> states = new ArrayList<>();
 
-	@ManyToOne(cascade = {DETACH,MERGE})
+	@ManyToOne
 	@JoinColumn(name = "currency_id")
 	private CurrencyMaster currency;
 
