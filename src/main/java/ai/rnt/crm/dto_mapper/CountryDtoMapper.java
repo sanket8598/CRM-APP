@@ -76,6 +76,7 @@ public class CountryDtoMapper {
 		CountryAndStateDto countryDto = new CountryAndStateDto();
 		countryDto.setCountryId(countryMaster.getCountryId());
 		countryDto.setCountry(countryMaster.getCountry());
+		countryDto.setCountryFlag(countryMaster.getCountryFlag());
 		Map<Integer, StateAndCityDto> stateMap = new HashMap<>();
 		for (StateMaster stateMaster : countryMaster.getStates()) {
 			StateAndCityDto stateDto = stateMap.computeIfAbsent(stateMaster.getStateId(), id -> {
