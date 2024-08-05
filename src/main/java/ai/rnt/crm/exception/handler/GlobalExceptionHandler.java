@@ -2,8 +2,8 @@ package ai.rnt.crm.exception.handler;
 
 import static ai.rnt.crm.constants.MessageConstants.ACCESS_DENIED;
 import static ai.rnt.crm.constants.MessageConstants.BAD_CREDENTIALS;
-import static ai.rnt.crm.constants.MessageConstants.ERROR_MSG;
 import static ai.rnt.crm.constants.MessageConstants.DUPLICATE_DATA_ERROR_MSG;
+import static ai.rnt.crm.constants.MessageConstants.ERROR_MSG;
 import static ai.rnt.crm.constants.MessageConstants.TOKEN_EXPIRED;
 import static ai.rnt.crm.util.HttpUtils.getURL;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCause;
@@ -175,8 +175,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 			return new ResponseEntity<>(new ApiError(false, TOKEN_EXPIRED), UNAUTHORIZED);
 		else if (exc.getException() instanceof NullPointerException)
 			return new ResponseEntity<>(new ApiError(false, ERROR_MSG), INTERNAL_SERVER_ERROR);
-		else if (exc.getException() instanceof org.hibernate.exception.ConstraintViolationException || exc.getException() instanceof org.springframework.dao.DataIntegrityViolationException)
+		else if (exc.getException() instanceof org.hibernate.exception.ConstraintViolationException)
 			return new ResponseEntity<>(new ApiError(false, DUPLICATE_DATA_ERROR_MSG), BAD_REQUEST);
+		else if (exc.getException() instanceof org.springframework.dao.DataIntegrityViolationException)
+			return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), BAD_REQUEST);
 		return new ResponseEntity<>(new ApiError(false, getRootCause(exc).getMessage()), INTERNAL_SERVER_ERROR);
 	}
 

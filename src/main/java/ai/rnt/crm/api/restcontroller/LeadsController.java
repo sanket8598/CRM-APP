@@ -24,6 +24,7 @@ import static ai.rnt.crm.constants.RoleConstants.CHECK_BOTH_ACCESS;
 import java.util.EnumMap;
 import java.util.Map;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -127,7 +128,7 @@ public class LeadsController {
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping(QUALIFY_LEAD)
 	public ResponseEntity<EnumMap<ApiResponse, Object>> qualifyLead(@PathVariable Integer leadId,
-			@RequestBody QualifyLeadDto dto) {
+			@RequestBody @Valid QualifyLeadDto dto) {
 		return leadService.qualifyLead(leadId, dto);
 	}
 

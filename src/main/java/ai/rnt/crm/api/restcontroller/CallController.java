@@ -69,7 +69,7 @@ public class CallController {
 
 	@PreAuthorize(CHECK_BOTH_ACCESS)
 	@PutMapping(UPDATE_CALL)
-	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(@RequestBody CallDto dto,
+	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCall(@RequestBody @Valid CallDto dto,
 			@Min(1) @PathVariable(name = "callId") Integer callId,
 			@NotBlank(message = "Status should not be null!!") @PathVariable(name = "status") String status) {
 		return callService.updateCall(dto, callId, status);

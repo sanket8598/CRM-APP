@@ -34,13 +34,14 @@ public class CallDto {
 	private String callTo;
 
 	@NotBlank(message = "Subject should not be null or empty!!")
+	@Size(max = 250,message = "Subject shouldn't be greater than {max} characters!!")
 	private String subject;
 
 	@ValidCallDirection(message = "Invalid !!")
 	private String direction;
 
 	@NotBlank(message = "Phone Number should not be null or empty!!")
-	@Size(min = 10, max = 14)
+	@Size(min = 10, max = 14,message = "Phone number should be {min} to {max} digits!!")
 	// @Pattern(regexp =
 	// "^(\\+\\d{1,2}\\s?)?(\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4})$", message =
 	// "Please Enter a valid Phone Number!!")

@@ -12,6 +12,8 @@ public class CountryAndStateDto {
 	private Integer countryId;
 
 	private String country;
+	
+	private CurrencyDto currency;
 
 	private List<StateAndCityDto> states;
 }

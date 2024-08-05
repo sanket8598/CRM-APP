@@ -2,6 +2,7 @@ package ai.rnt.crm.dto;
 
 import java.time.LocalDate;
 
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -24,10 +25,12 @@ public class QualifyLeadDto {
 
 	private String currentPhase;
 
+	@AssertTrue(message = "Please select requirement shared!!")
 	private Boolean requirementShared = false;
 
 	private Boolean identifyDecisionMaker = false;
 
+	@AssertTrue(message = "Please select first meeting done!!")
 	private Boolean firstMeetingDone = false;
 
 	private String customerReadiness;
