@@ -22,6 +22,7 @@ import ai.rnt.crm.dto.QualifyLeadDto;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Description;
 import ai.rnt.crm.entity.Leads;
+import ai.rnt.crm.exception.CRMException;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = PRIVATE)
@@ -69,9 +70,10 @@ public class LeadsDtoMapper {
 		Optional<LeadDashboardDto> leadDashboardDto = evalMapper(e, LeadDashboardDto.class);
 		leadDashboardDto.ifPresent(l -> {
 			l.setCreatedOn(convertDate(e.getCreatedDate()));
-			l.setPrimaryContact(
-					TO_CONTACT_DTO.apply(e.getContacts().stream().filter(Contacts::getPrimary).findFirst().orElse(null))
-							.orElse(null));
+			e.getContacts().stream().filter(Contacts::getPrimary).map(TO_CONTACT_DTO).findFirst()
+					.orElseThrow(() -> new CRMException("No Primary Contact found for lead id: " + l.getLeadId()))
+					.ifPresent(l::setPrimaryContact);
+
 		});
 		return leadDashboardDto;
 	};
@@ -83,14 +85,12 @@ public class LeadsDtoMapper {
 								|| isNull(ld2.getPrimaryContact().getCompanyMaster()))
 						|| (isNull(ld1.getPrimaryContact().getCompanyMaster().getCompanyName())
 								|| isNull(ld2.getPrimaryContact().getCompanyMaster().getCompanyName()))) ? 1
-										: ld1.getPrimaryContact().getCompanyMaster().getCompanyName().compareTo(
-												ld2.getPrimaryContact().getCompanyMaster().getCompanyName());
+										: ld1.getPrimaryContact().getCompanyMaster().getCompanyName()
+												.compareTo(ld2.getPrimaryContact().getCompanyMaster().getCompanyName());
 		nameAndCompanyNameComp.thenComparing((l1,
 				l2) -> ((isNull(l1.getPrimaryContact()) || isNull(l2.getPrimaryContact()))
-						|| (isNull(l1.getPrimaryContact().getName())
-								|| isNull(l2.getPrimaryContact().getName()))) ? 1
-										: l1.getPrimaryContact().getName()
-												.compareTo(l2.getPrimaryContact().getName()));
+						|| (isNull(l1.getPrimaryContact().getName()) || isNull(l2.getPrimaryContact().getName()))) ? 1
+								: l1.getPrimaryContact().getName().compareTo(l2.getPrimaryContact().getName()));
 		return e.stream().map(dm -> TO_DASHBOARD_LEADDTO.apply(dm).get()).sorted(nameAndCompanyNameComp)
 				.collect(toList());
 	};
