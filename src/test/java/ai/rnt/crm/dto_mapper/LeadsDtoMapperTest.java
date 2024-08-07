@@ -18,6 +18,7 @@ import ai.rnt.crm.dto.LeadDashboardDto;
 import ai.rnt.crm.dto.LeadDto;
 import ai.rnt.crm.dto.LeadsCardDto;
 import ai.rnt.crm.dto.QualifyLeadDto;
+import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Leads;
 
 class LeadsDtoMapperTest {
@@ -97,7 +98,13 @@ class LeadsDtoMapperTest {
 	@Test
 	void testToDashboardLeadDto() {
 		Leads leads = new Leads();
+		Contacts contacts = new Contacts();
+		List<Contacts> con = new ArrayList<>();
+		contacts.setPrimary(true);
 		leads.setCreatedDate(LocalDateTime.now());
+		leads.setLeadId(1);
+		con.add(contacts);
+		leads.setContacts(con);
 		Optional<LeadDashboardDto> leadDashboardDtoOptional = LeadsDtoMapper.TO_DASHBOARD_LEADDTO.apply(leads);
 		assertNotNull(leadDashboardDtoOptional);
 		assertTrue(leadDashboardDtoOptional.isPresent());

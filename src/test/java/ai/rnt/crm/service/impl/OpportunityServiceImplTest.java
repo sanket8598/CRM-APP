@@ -37,6 +37,7 @@ import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
 import ai.rnt.crm.dao.service.ContactDaoService;
 import ai.rnt.crm.dao.service.CountryDaoService;
+import ai.rnt.crm.dao.service.CurrencyDaoService;
 import ai.rnt.crm.dao.service.DomainMasterDaoService;
 import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
@@ -101,6 +102,9 @@ class OpportunityServiceImplTest {
 
 	@Mock
 	private CountryDaoService countryDaoService;
+	
+	@Mock
+	private CurrencyDaoService currencyDaoService ;
 
 	@Mock
 	private LeadDaoService leadDaoService;
@@ -693,6 +697,13 @@ class OpportunityServiceImplTest {
 	void testGetOpportunityData_Success() {
 		Opportunity opportunity = new Opportunity();
 		Leads leads = new Leads();
+		Contacts contacts = new Contacts();
+		List<Contacts> con = new ArrayList<>();
+		contacts.setPrimary(true);
+		leads.setCreatedDate(LocalDateTime.now());
+		leads.setLeadId(1);
+		con.add(contacts);
+		leads.setContacts(con);
 		EmployeeMaster employeeMaster = new EmployeeMaster();
 		employeeMaster.setFirstName("test");
 		employeeMaster.setLastName("data");
@@ -745,6 +756,13 @@ class OpportunityServiceImplTest {
 	void testTimelinegetOpportunitySuccess() {
 		Opportunity opportunity = new Opportunity();
 		Leads leads = new Leads();
+		Contacts contacts = new Contacts();
+		List<Contacts> con = new ArrayList<>();
+		contacts.setPrimary(true);
+		leads.setCreatedDate(LocalDateTime.now());
+		leads.setLeadId(1);
+		con.add(contacts);
+		leads.setContacts(con);
 		EmployeeMaster employeeMaster = new EmployeeMaster();
 		employeeMaster.setFirstName("test");
 		employeeMaster.setLastName("data");

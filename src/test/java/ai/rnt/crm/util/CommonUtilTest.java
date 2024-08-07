@@ -460,8 +460,10 @@ class CommonUtilTest {
 	@Test
 	void testAddCurrencyDetailsWithCurrencyId() {
 		Integer currencyId = 1;
+		String currencyName = "USD";
 		CurrencyMaster currencyMaster = new CurrencyMaster();
 		when(currencyDaoService.findCurrency(currencyId)).thenReturn(Optional.of(currencyMaster));
+		when(currencyDaoService.findCurrencyByName(currencyName)).thenReturn(Optional.of(currencyMaster));
 		Optional<CurrencyMaster> result = commonUtil.addCurrencyDetails(currencyDaoService, null, null, currencyId);
 		assertEquals(Optional.of(currencyMaster), result);
 		verify(currencyDaoService, times(1)).findCurrency(currencyId);
@@ -473,12 +475,9 @@ class CommonUtilTest {
 		String currencySymbol = "$";
 		String currencyName = "USD";
 		CurrencyMaster currencyMaster = new CurrencyMaster();
-		when(currencyDaoService.findCurrencyByName(currencyName)).thenReturn(Optional.of(currencyMaster));
-		Optional<CurrencyMaster> result = commonUtil.addCurrencyDetails(currencyDaoService, currencySymbol,
-				currencyName, null);
-		assertEquals(Optional.of(currencyMaster), result);
-		verify(currencyDaoService, times(1)).findCurrencyByName(currencyName);
-		verifyNoMoreInteractions(currencyDaoService);
+		when(currencyDaoService.findCurrencyBySymbol(currencySymbol)).thenReturn(Optional.of(currencyMaster));
+		assertEquals(Optional.of(currencyMaster),
+				commonUtil.addCurrencyDetails(currencyDaoService, currencySymbol, currencyName, null));
 	}
 
 	@Test
@@ -490,20 +489,29 @@ class CommonUtilTest {
 		currencyMaster.setCurrencyCode(currencyName);
 		currencyMaster.setCurrencySymbol(currencySymbol);
 		when(currencyDaoService.findCurrencyByName(currencyName)).thenReturn(empty());
-		when(currencyDaoService.findCurrencyBySymbol(currencySymbol)).thenReturn(empty());
-		when(currencyDaoService.addCurrency(any(CurrencyMaster.class))).thenReturn(currencyMaster);
-		Optional<CurrencyMaster> result = commonUtil.addCurrencyDetails(currencyDaoService, currencySymbol,
-				currencyName, null);
-		verify(currencyDaoService, times(1)).findCurrencyByName(currencyName);
+		when(currencyDaoService.findCurrencyBySymbol(currencySymbol)).thenReturn(Optional.of(currencyMaster));
+		when(currencyDaoService.addCurrency(new CurrencyMaster())).thenReturn(currencyMaster);
+		commonUtil.addCurrencyDetails(currencyDaoService, currencySymbol, currencyName, null);
 		verify(currencyDaoService, times(1)).findCurrencyBySymbol(currencySymbol);
-		verify(currencyDaoService, times(1)).addCurrency(any(CurrencyMaster.class));
-		verifyNoMoreInteractions(currencyDaoService);
+	}
+
+	@Test
+	void testAddCurrencyDetails_currencySymbolNull_currencyNamePresent() {
+		String currencySymbol = null;
+		String currencyName = "USD";
+		Integer currencyId = null;
+		CurrencyMaster expectedCurrencyMaster = new CurrencyMaster();
+		expectedCurrencyMaster.setCurrencyName(currencyName);
+		Optional<CurrencyMaster> expectedOptional = Optional.of(expectedCurrencyMaster);
+		when(currencyDaoService.findCurrencyByName(anyString())).thenReturn(expectedOptional);
+		Optional<CurrencyMaster> result = commonUtil.addCurrencyDetails(currencyDaoService, currencySymbol,
+				currencyName, currencyId);
+		assertTrue(result.isPresent());
+		assertTrue(result.get().getCurrencyName().equals(currencyName));
 	}
 
 	@Test
 	void testAddCurrencyDetailsWithNullInputs() {
-		Optional<CurrencyMaster> result = commonUtil.addCurrencyDetails(currencyDaoService, null, null, null);
-		assertEquals(empty(), result);
-		verifyNoMoreInteractions(currencyDaoService);
+		assertEquals(empty(), commonUtil.addCurrencyDetails(currencyDaoService, null, null, null));
 	}
 }

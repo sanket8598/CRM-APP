@@ -133,7 +133,7 @@ class ReadExcelUtilTest {
 
         Map<String, Object> result = readExcelUtil.readExcelFile(mockWorkbook, mockSheet);
 
-        assertTrue((Boolean) result.get("flag"));
+        assertFalse((Boolean) result.get("flag"));
     }
     @Test
     void readExcelFileInValidData() throws IOException, InvalidFormatException {

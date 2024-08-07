@@ -21,8 +21,18 @@ class CountryAndStateDtoTest {
 	    void testCountryGetterSetter() {
 	        CountryAndStateDto countryAndStateDto = new CountryAndStateDto();
 	        String country = "India";
+	        String countryFlag = "szdxfcgvhbnm,.fhbjnkm";
+	        String currencySymbol = "$";
+	        CurrencyDto currencyDto = new CurrencyDto();
+	        currencyDto.setCurrencyId(1);
+	        countryAndStateDto.setCurrency(currencyDto);
+	        countryAndStateDto.getCurrency();
 	        countryAndStateDto.setCountry(country);
+	        countryAndStateDto.setCountryFlag(countryFlag);
+	        countryAndStateDto.setCurrencySymbol(currencySymbol);
 	        assertEquals(country, countryAndStateDto.getCountry());
+	        assertEquals(countryFlag, countryAndStateDto.getCountryFlag());
+	        assertEquals(currencySymbol, countryAndStateDto.getCurrencySymbol());
 	    }
 
 	    @Test
