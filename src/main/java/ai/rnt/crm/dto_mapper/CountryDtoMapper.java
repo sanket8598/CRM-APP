@@ -1,6 +1,7 @@
 package ai.rnt.crm.dto_mapper;
 
 import static ai.rnt.crm.util.FunctionUtil.evalMapper;
+import static java.util.Objects.nonNull;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.stream.Collectors.toList;
@@ -40,7 +41,7 @@ public class CountryDtoMapper {
 	 */
 	public static final Function<CountryDto, Optional<CountryMaster>> TO_COUNTRY = e -> evalMapper(e,
 			CountryMaster.class);
-	
+
 	/**
 	 * @since 11-09-2023
 	 * @version 1.0
@@ -76,7 +77,10 @@ public class CountryDtoMapper {
 		CountryAndStateDto countryDto = new CountryAndStateDto();
 		countryDto.setCountryId(countryMaster.getCountryId());
 		countryDto.setCountry(countryMaster.getCountry());
-		countryDto.setCountryFlag(countryMaster.getCountryFlag());
+		if (nonNull(countryMaster.getCountryFlag()))
+			countryDto.setCountryFlag(countryMaster.getCountryFlag());
+		if (nonNull(countryMaster.getCurrency()))
+			countryDto.setCurrencySymbol(countryMaster.getCurrency().getCurrencySymbol());
 		Map<Integer, StateAndCityDto> stateMap = new HashMap<>();
 		for (StateMaster stateMaster : countryMaster.getStates()) {
 			StateAndCityDto stateDto = stateMap.computeIfAbsent(stateMaster.getStateId(), id -> {
@@ -103,7 +107,7 @@ public class CountryDtoMapper {
 		cityDto.setCity(cityMaster.getCity());
 		return cityDto;
 	}
-	
+
 	public static final Function<CurrencyDto, Optional<CurrencyMaster>> TO_CURRENCY = e -> evalMapper(e,
 			CurrencyMaster.class);
 }

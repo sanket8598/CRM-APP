@@ -108,7 +108,7 @@ public class ReadExcelUtil {
 	}
 
 	private Map<String, Object> createLeadFromExcelData(String data, int fieldCount, LeadDto leadDto, int rowNum) {
-		log.info("inside the createLeadFromExcelData method...{}",data);
+		log.info("inside the createLeadFromExcelData method...{}", data);
 		StringBuilder errorList = new StringBuilder();
 		Map<String, Object> dataMap = new HashMap<>();
 		switch (fieldCount) {
@@ -141,8 +141,8 @@ public class ReadExcelUtil {
 			break;
 		case 3:
 			if (nonNull(data) && !data.isEmpty())
-				if (isValidPhoneNumber("+" + data.replace("'","")))
-					leadDto.setPhoneNumber("+" + data.replace("'",""));
+				if (isValidPhoneNumber("+" + data.replace("'", "")))
+					leadDto.setPhoneNumber(data.replace("'", ""));
 				else
 					errorList.append("Please Enter Valid Phone Number On Row No: " + rowNum);
 			break;
@@ -173,15 +173,20 @@ public class ReadExcelUtil {
 		case 8:
 			if (nonNull(data) && !data.isEmpty())
 				leadDto.setCompanyWebsite(data);
-			/*
-			 * else errorList.append("Please Enter The Company Website On Row No: " +
-			 * rowNum);
-			 */
 			break;
 		case 9:
 			leadDto.setLocation(data);
-			break;	
+			break;
 		case 10:
+			if (nonNull(data) && !data.isEmpty())
+				if (data.length() == 1)
+					leadDto.setCurrencySymbol(data);
+				else
+					leadDto.setCurrencyName(data);
+			else
+				errorList.append("Please Enter The Currency Symbol/Name On Row No: " + rowNum);
+			break;
+		case 11:
 			if (nonNull(data) && !data.isEmpty()) {
 				if (isValidBudgetAmount(data))
 					leadDto.setBudgetAmount(commaSepAmount(parseDouble(data)));
@@ -189,20 +194,19 @@ public class ReadExcelUtil {
 					errorList.append("Please Enter The Valid Budget Amount On Row No: " + rowNum);
 			}
 			break;
-		case 11:
+		case 12:
 			if (nonNull(data) && !data.isEmpty())
 				leadDto.setServiceFallsId(data);
 			else
 				leadDto.setServiceFallsId("Other");
-//				errorList.append("Please Enter The Service Falls Into On Row No: " + rowNum);
-			break;
-		case 12:
-			leadDto.setLeadSourceId(data);
 			break;
 		case 13:
-			leadDto.setDomainId(data);
+			leadDto.setLeadSourceId(data);
 			break;
 		case 14:
+			leadDto.setDomainId(data);
+			break;
+		case 15:
 			leadDto.setPseudoName(data);
 			break;
 		default:

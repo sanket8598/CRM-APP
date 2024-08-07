@@ -67,6 +67,9 @@ public class LoginController {
 
 	@Value("${pass.enc.algo}")
 	private String algo;
+	
+	@Value("${email.userName}")
+	private String emailFrom;
 
 	private final AuthenticationManager authenticationManager;
 

@@ -23,6 +23,7 @@ import static ai.rnt.crm.constants.ExcelConstants.LEAD_DATA;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.LEAD_NAME;
 import static ai.rnt.crm.constants.LeadEntityFieldConstant.TOPIC;
 import static ai.rnt.crm.constants.MessageConstants.MSG;
+import static ai.rnt.crm.constants.OppurtunityStatus.QUALIFY;
 import static ai.rnt.crm.constants.StatusConstants.ALL;
 import static ai.rnt.crm.constants.StatusConstants.ALL_LEAD;
 import static ai.rnt.crm.constants.StatusConstants.CLOSE_AS_DISQUALIFIED;
@@ -107,7 +108,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import ai.rnt.crm.constants.ApiResponseKeyConstant;
-import ai.rnt.crm.constants.OppurtunityStatus;
 import ai.rnt.crm.dao.service.CallDaoService;
 import ai.rnt.crm.dao.service.CityDaoService;
 import ai.rnt.crm.dao.service.CompanyMasterDaoService;
@@ -813,6 +813,8 @@ public class LeadServiceImpl implements LeadService {
 		try {
 			leads.setStatus(OPEN);
 			leads.setDisqualifyAs(OPEN);
+			employeeService.getById(auditAwareUtil.getLoggedInStaffId()).ifPresent(leads::setAssignBy);
+			leads.setAssignDate(LocalDate.now());
 			Optional<CompanyDto> existCompany = companyMasterDaoService.findByCompanyName(leadDto.getCompanyName());
 			contact = setContactDetailsToLead(existCompany, leadDto, leads);
 			if (nonNull(leadDto.getServiceFallsId()) && !leadDto.getServiceFallsId().isEmpty()) {
@@ -956,7 +958,7 @@ public class LeadServiceImpl implements LeadService {
 
 	public Opportunity addToOpputunity(Leads leads, LocalDate closedDate) {
 		Opportunity opportunity = new Opportunity();
-		opportunity.setStatus(OppurtunityStatus.QUALIFY);
+		opportunity.setStatus(QUALIFY);
 		opportunity.setBudgetAmount(leads.getBudgetAmount());
 		opportunity.setTopic(leads.getTopic());
 		opportunity.setPseudoName(leads.getPseudoName());

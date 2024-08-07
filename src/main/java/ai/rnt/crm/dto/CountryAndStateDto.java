@@ -14,6 +14,8 @@ public class CountryAndStateDto {
 	private String country;
 	
 	private String countryFlag;
+	
+	private String currencySymbol;
 
 	private CurrencyDto currency;
 	

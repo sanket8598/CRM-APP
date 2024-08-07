@@ -43,8 +43,12 @@ import lombok.extern.slf4j.Slf4j;
 public class JWTTokenHelper {
 
 	private final EmployeeService service;
+	
 	@Value("${jwt.secret.key}")
 	private String secret;
+	
+	@Value("${email.from}")
+	private String emailFrom;
 	
 
 	public static final long JWT_TOKEN_VALIDITY = 5000L * 60 * 60; //3 hr
@@ -76,7 +80,7 @@ public class JWTTokenHelper {
 		service.getEmployeeByUserId(userDetails.getUsername()).ifPresent(emp -> {
 			claims.put(FULL_NAME, emp.getFirstName() + " " + emp.getLastName());
 			claims.put(STAFF_ID, emp.getStaffId());
-			claims.put(EMAIL_ID, emp.getEmailID());
+			claims.put(EMAIL_ID, emailFrom);
 			claims.put("ipAddress", ipAddress);
 			claims.put(ROLE, RoleUtil
 					.getSingleRole(emp.getEmployeeRole().stream().map(Role::getRoleName).collect(Collectors.toList())));

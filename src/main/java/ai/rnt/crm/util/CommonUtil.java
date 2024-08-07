@@ -507,18 +507,20 @@ public class CommonUtil {
 				.compareTo(parse(t2.getCreatedOn(), DATE_TIME_WITH_AM_OR_PM)));
 		return upNext;
 	}
-	
-	public static Optional<CurrencyMaster> addCurrencyDetails(CurrencyDaoService currencyDaoService,String currencySymbol, String currencyName,
-			Integer currencyId) {
+
+	public static Optional<CurrencyMaster> addCurrencyDetails(CurrencyDaoService currencyDaoService,
+			String currencySymbol, String currencyName, Integer currencyId) {
 		if (nonNull(currencyId))
 			return currencyDaoService.findCurrency(currencyId);
-		else if (nonNull(currencySymbol) && nonNull(currencyName)) {
-			Optional<CurrencyMaster> currencyByName = currencyDaoService.findCurrencyByName(currencyName);
-			if (currencyByName.isPresent())
-				return currencyByName;
+		else if (nonNull(currencySymbol)) {
 			Optional<CurrencyMaster> currencyBySymbol = currencyDaoService.findCurrencyBySymbol(currencySymbol);
 			if (currencyBySymbol.isPresent())
 				return currencyBySymbol;
+		} else if (nonNull(currencyName)) {
+			Optional<CurrencyMaster> currencyByName = currencyDaoService.findCurrencyByName(currencyName);
+			if (currencyByName.isPresent())
+				return currencyByName;
+		} else {
 			CurrencyMaster currencyMaster = new CurrencyMaster();
 			currencyMaster.setCurrencyName(currencyName);
 			currencyMaster.setCurrencyCode(currencyName);

@@ -21,9 +21,6 @@ public class PropertyUtil {
 	@Value("${email.userName}")
 	protected String userName;
 	
-	@Value("${email.password}")
-	protected String password;
-	
 	protected static final Properties PROPERTIES = new Properties();
 	protected static final String HOST = "smtp.office365.com";
 	

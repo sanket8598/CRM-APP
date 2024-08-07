@@ -754,7 +754,7 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Opportunity opportunity = opportunityDaoService.findOpportunity(optyId)
 					.orElseThrow(() -> new ResourceNotFoundException(OPPORTUNITY2, OPTY_ID, optyId));
 			opportunity.setStatus(PROPOSE);
-			opportunity.setCurrentPhase("Propose");
+			opportunity.setCurrentPhase(PROPOSE);
 			opportunity.setProgressStatus("Active");
 			opportunity.setProjectKickoff(false);
 			opportunity.setFinalisingTeam(false);

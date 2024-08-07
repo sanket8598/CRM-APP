@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -179,6 +181,7 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
+	@Transactional
 	public ResponseEntity<EnumMap<ApiResponse, Object>> updateCustomer(ContactDto contactDto, Integer customerId) {
 		log.info("inside the updateCustomer method...{}", customerId);
 		EnumMap<ApiResponse, Object> customerData = new EnumMap<>(ApiResponse.class);
@@ -221,9 +224,11 @@ public class CustomerServiceImpl implements CustomerService {
 			companyMaster.setState(stateMaster);
 			companyMaster.setCity(cityMaster);
 			contact.setCompanyMaster(companyMaster);
-			if (nonNull(contactDaoService.addContact(contact))) {
-				customerData.put(MESSAGE, "Customer Updated Successfully !!");
-				customerData.put(SUCCESS, true);
+			if (nonNull(companyMasterDaoService.save(companyMaster))) {
+				if (nonNull(contactDaoService.addContact(contact))) {
+					customerData.put(MESSAGE, "Customer Updated Successfully !!");
+					customerData.put(SUCCESS, true);
+				}
 			} else
 				customerData.put(MESSAGE, "Customer Not Updated !!");
 
