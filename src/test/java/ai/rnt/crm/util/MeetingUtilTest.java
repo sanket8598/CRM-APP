@@ -71,8 +71,8 @@ class MeetingUtilTest {
 	@Test
 	void testFormatDateValidInput() throws ParseException {
 		LocalDate currentDate = LocalDate.now();
-		LocalDate previousDate = currentDate.minusDays(1);
-		String expectedDateStr = previousDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		//LocalDate previousDate = currentDate.minusDays(1);
+		String expectedDateStr = currentDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 		String formattedDate = meetingUtil
 				.formatDate(Date.from(currentDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 		assertEquals(expectedDateStr, formattedDate);

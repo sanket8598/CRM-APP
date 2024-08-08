@@ -512,22 +512,22 @@ public class CommonUtil {
 			String currencySymbol, String currencyName, Integer currencyId) {
 		if (nonNull(currencyId))
 			return currencyDaoService.findCurrency(currencyId);
-		else if (nonNull(currencySymbol)) {
-			Optional<CurrencyMaster> currencyBySymbol = currencyDaoService.findCurrencyBySymbol(currencySymbol);
-			if (currencyBySymbol.isPresent())
-				return currencyBySymbol;
-		} else if (nonNull(currencyName)) {
-			Optional<CurrencyMaster> currencyByName = currencyDaoService.findCurrencyByName(currencyName);
-			if (currencyByName.isPresent())
-				return currencyByName;
-		} else {
+		else {
+			if (nonNull(currencySymbol)) {
+				Optional<CurrencyMaster> currencyBySymbol = currencyDaoService.findCurrencyBySymbol(currencySymbol);
+				if (currencyBySymbol.isPresent())
+					return currencyBySymbol;
+			} else if (nonNull(currencyName)) {
+				Optional<CurrencyMaster> currencyByName = currencyDaoService.findCurrencyByName(currencyName);
+				if (currencyByName.isPresent())
+					return currencyByName;
+			}
 			CurrencyMaster currencyMaster = new CurrencyMaster();
 			currencyMaster.setCurrencyName(currencyName);
 			currencyMaster.setCurrencyCode(currencyName);
 			currencyMaster.setCurrencySymbol(currencySymbol);
 			return ofNullable(currencyDaoService.addCurrency(currencyMaster));
 		}
-		return empty();
 	}
 
 	public static List<DescriptionDto> getDescData(List<Description> descriptions) {

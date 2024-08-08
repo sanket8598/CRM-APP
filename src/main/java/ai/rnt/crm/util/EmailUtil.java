@@ -264,7 +264,6 @@ public class EmailUtil extends PropertyUtil {
 			msg.setContent(content.toString(), TEXT_HTML);
 			send(msg);
 		} catch (Exception e) {
-			e.printStackTrace();
 			log.error("Got Exception while sending meeting task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}

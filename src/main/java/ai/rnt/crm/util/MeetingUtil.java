@@ -1,5 +1,6 @@
 package ai.rnt.crm.util;
 
+import static ai.rnt.crm.constants.SchedularConstant.INDIA_ZONE;
 import static java.lang.String.format;
 import static java.time.LocalDateTime.ofInstant;
 import static java.time.LocalTime.parse;
@@ -127,6 +128,8 @@ public class MeetingUtil extends PropertyUtil {
 	}
 
 	private Session getSession() {
+		if (nonNull(userName) && userName.endsWith(".com"))
+			PROPERTIES.put("mail.smtp.host", "smtp.zoho.com");
 		return Session.getInstance(PROPERTIES, new Authenticator() {
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
@@ -147,13 +150,13 @@ public class MeetingUtil extends PropertyUtil {
 	public String formatDate(Date date) {
 		log.info("inside the meetingUtil formatDate method...{}", date);
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		dateFormat.setTimeZone(getTimeZone("UTC+05:30"));
+		dateFormat.setTimeZone(getTimeZone(INDIA_ZONE));
 		return dateFormat.format(date);
 	}
 
 	public String formatDateTime(Date date, String time) {
 		log.info("inside the meetingUtil formatDateTime method...{}", date);
-		return ofInstant(date.toInstant(), of("UTC+05:30")).toLocalDate().atTime(parseTime(time))
+		return ofInstant(date.toInstant(), of(INDIA_ZONE)).toLocalDate().atTime(parseTime(time))
 				.format(ofPattern("yyyyMMdd'T'HHmmss"));
 	}
 

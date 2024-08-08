@@ -77,6 +77,9 @@ public class CountryDtoMapper {
 		CountryAndStateDto countryDto = new CountryAndStateDto();
 		CurrencyDto currencyDto = new CurrencyDto();
 		countryDto.setCountryId(countryMaster.getCountryId());
+		if (nonNull(countryMaster.getCountryCode()))
+			countryDto.setCountryCode(countryMaster.getCountryCode());
+
 		countryDto.setCountry(countryMaster.getCountry());
 		if (nonNull(countryMaster.getCountryFlag()))
 			countryDto.setCountryFlag(countryMaster.getCountryFlag());
