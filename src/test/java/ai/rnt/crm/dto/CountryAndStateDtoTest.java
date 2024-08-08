@@ -21,12 +21,15 @@ class CountryAndStateDtoTest {
 	    void testCountryGetterSetter() {
 	        CountryAndStateDto countryAndStateDto = new CountryAndStateDto();
 	        String country = "India";
+	        String countryCode ="INR";
 	        String countryFlag = "szdxfcgvhbnm,.fhbjnkm";
 	        String currencySymbol = "$";
 	        CurrencyDto currencyDto = new CurrencyDto();
 	        currencyDto.setCurrencyId(1);
 	        countryAndStateDto.setCurrency(currencyDto);
+	        countryAndStateDto.setCountryCode(countryCode);
 	        countryAndStateDto.getCurrency();
+	        countryAndStateDto.getCountryCode();
 	        countryAndStateDto.setCountry(country);
 	        countryAndStateDto.setCountryFlag(countryFlag);
 	        countryAndStateDto.setCurrencySymbol(currencySymbol);
