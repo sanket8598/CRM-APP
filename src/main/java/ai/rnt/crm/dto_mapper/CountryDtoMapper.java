@@ -75,12 +75,17 @@ public class CountryDtoMapper {
 			return empty();
 		}
 		CountryAndStateDto countryDto = new CountryAndStateDto();
+		CurrencyDto currencyDto = new CurrencyDto();
 		countryDto.setCountryId(countryMaster.getCountryId());
 		countryDto.setCountry(countryMaster.getCountry());
 		if (nonNull(countryMaster.getCountryFlag()))
 			countryDto.setCountryFlag(countryMaster.getCountryFlag());
-		if (nonNull(countryMaster.getCurrency()))
-			countryDto.setCurrencySymbol(countryMaster.getCurrency().getCurrencySymbol());
+		if (nonNull(countryMaster.getCurrency())) {
+			currencyDto.setCurrencyId(countryMaster.getCurrency().getCurrencyId());
+			currencyDto.setCurrencySymbol(countryMaster.getCurrency().getCurrencySymbol());
+			currencyDto.setCurrencyName(countryMaster.getCurrency().getCurrencyName());
+			countryDto.setCurrency(currencyDto);
+		}
 		Map<Integer, StateAndCityDto> stateMap = new HashMap<>();
 		for (StateMaster stateMaster : countryMaster.getStates()) {
 			StateAndCityDto stateDto = stateMap.computeIfAbsent(stateMaster.getStateId(), id -> {
