@@ -117,7 +117,7 @@ public class CountryServiceImpl implements CountryService {
 					.orElseThrow(() -> new ResourceNotFoundException("CountryMaster", "countryId", countryId));
 			if (nonNull(dto) && nonNull(dto.getCountry()))
 				countryById.setCountry(dto.getCountry());
-			if (nonNull(dto.getCurrency()))
+			if (nonNull(dto) && nonNull(dto.getCurrency()))
 				addCurrencyDetails(currencyDaoService, dto.getCurrency().getCurrencySymbol(),
 						dto.getCurrency().getCurrencyName(), dto.getCurrency().getCurrencyId())
 						.ifPresent(countryById::setCurrency);
