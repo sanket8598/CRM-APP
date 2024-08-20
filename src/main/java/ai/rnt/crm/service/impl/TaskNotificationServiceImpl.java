@@ -98,6 +98,10 @@ public class TaskNotificationServiceImpl implements TaskNotificationService {
 					dto.setMessage(format(msg, notification.getLeadTask().getSubject(), convertDateDateWithTime(
 							notification.getLeadTask().getDueDate(), notification.getLeadTask().getDueTime12Hours())));
 					dto.setLeadTaskId(notification.getLeadTask().getLeadTaskId());
+				} else if (nonNull(notification.getOptyTask())) {
+					dto.setMessage(format(msg, notification.getOptyTask().getSubject(), convertDateDateWithTime(
+							notification.getOptyTask().getDueDate(), notification.getOptyTask().getDueTime12Hours())));
+					dto.setOptyTaskId(notification.getOptyTask().getOptyTaskId());
 				} else if (nonNull(notification.getLeads())) {
 					dto.setMessage(format(leadMsg,
 							notification.getLeads().getContacts().stream().filter(Contacts::getPrimary)

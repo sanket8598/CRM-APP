@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service.impl;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,5 +43,11 @@ public class OpportunityTaskDaoServiceImpl implements OpportunityTaskDaoService 
 	public Optional<OpportunityTask> getOptyTaskById(Integer taskId) {
 		log.info("inside the OpportunityTaskDaoServiceImpl getOptyTaskById method...{}", taskId);
 		return opportunityTaskRespoitory.findById(taskId);
+	}
+
+	@Override
+	public List<OpportunityTask> getTodaysOptyTask(LocalDate todayAsDate, String time) {
+		log.info("inside the getTodaysOptyTask method...{}{}", todayAsDate, time);
+		return opportunityTaskRespoitory.findByRemainderDueOnAndRemainderDueAtAndRemainderOn(todayAsDate, time, true);
 	}
 }

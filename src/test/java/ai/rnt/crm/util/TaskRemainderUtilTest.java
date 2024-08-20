@@ -31,6 +31,7 @@ import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadTaskDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
+import ai.rnt.crm.dao.service.OpportunityTaskDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.entity.Call;
 import ai.rnt.crm.entity.Contacts;
@@ -39,6 +40,8 @@ import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
 import ai.rnt.crm.entity.Meetings;
+import ai.rnt.crm.entity.Opportunity;
+import ai.rnt.crm.entity.OpportunityTask;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.Visit;
 import ai.rnt.crm.entity.VisitTask;
@@ -59,6 +62,9 @@ class TaskRemainderUtilTest {
 
 	@Mock
 	LeadTaskDaoService leadTaskDaoService;
+	
+	@Mock
+	OpportunityTaskDaoService opportunityTaskDaoService;
 
 	@Mock
 	LeadDaoService leadDaoService;
@@ -96,11 +102,13 @@ class TaskRemainderUtilTest {
 		when(visitDaoService.getTodaysAllVisitTask(any(), any())).thenReturn(createMockVisitTaskList());
 		when(meetingDaoService.getTodaysMeetingTask(any(), any())).thenReturn(createMockMeetingTaskList());
 		when(leadTaskDaoService.getTodaysLeadTask(any(), any())).thenReturn(createMockLeadTaskList());
+		when(opportunityTaskDaoService.getTodaysOptyTask(any(), any())).thenReturn(createMockOptyTaskList());
 		when(leadDaoService.getFollowUpLeads(any(), any())).thenReturn(createMockLeaList());
 		when(callDaoService.getCallTaskById(any())).thenReturn(Optional.of(new PhoneCallTask()));
 		when(visitDaoService.getVisitTaskById(any())).thenReturn(Optional.of(new VisitTask()));
 		when(meetingDaoService.getMeetingTaskById(any())).thenReturn(Optional.of(new MeetingTask()));
 		when(leadTaskDaoService.getTaskById(any())).thenReturn(Optional.of(new LeadTask()));
+		when(opportunityTaskDaoService.getOptyTaskById(any())).thenReturn(Optional.of(new OpportunityTask()));
 		when(leadDaoService.getLeadById(any())).thenReturn(Optional.of(new Leads()));
 		LocalDateTime currentTime = now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime();
 		String time = currentTime.format(ofPattern("HH:mm"));
@@ -225,6 +233,35 @@ class TaskRemainderUtilTest {
 		return leadTaskList;
 	}
 
+	private List<OpportunityTask> createMockOptyTaskList() {
+		List<OpportunityTask> opportunityTaskList = new ArrayList<>();
+		EmployeeMaster employeeMaster = new EmployeeMaster();
+		Leads lead = new Leads();
+		Opportunity opportunity = new Opportunity();
+		List<Contacts> contacts = new ArrayList<>();
+		Contacts contact = new Contacts();
+		contact.setPrimary(true);
+		contact.setFirstName("test");
+		contact.setLastName("testdata");
+		lead.setLeadId(1);
+		contacts.add(contact);
+		lead.setContacts(contacts);
+		opportunity.setLeads(lead);
+		employeeMaster.setStaffId(1477);
+		OpportunityTask opportunityTask1 = new OpportunityTask();
+		opportunityTask1.setOptyTaskId(1);
+		opportunityTask1.setRemainderVia("Both");
+		employeeMaster.setEmailId("s.wakankar@rnt.ai");
+		opportunityTask1.setAssignTo(employeeMaster);
+		opportunityTask1.setCreatedBy(1477);
+		opportunityTask1.setSubject("test");
+		opportunityTask1.setDueDate(LocalDate.now());
+		opportunityTask1.setOpportunity(opportunity);
+		opportunityTask1.setRemainderVia("Both");
+		opportunityTaskList.add(opportunityTask1);
+		return opportunityTaskList;
+	}
+
 	private List<Leads> createMockLeaList() {
 		List<Leads> leadList = new ArrayList<>();
 		EmployeeMaster employeeMaster = new EmployeeMaster();
@@ -271,6 +308,12 @@ class TaskRemainderUtilTest {
 	void testLeadNotificationException() {
 		when(leadTaskDaoService.getTaskById(1)).thenThrow(ResourceNotFoundException.class);
 		assertThrows(CRMException.class, () -> taskRemainderUtil.leadNotification(123));
+	}
+	
+	@Test
+	void testOptyNotificationException() {
+		when(opportunityTaskDaoService.getOptyTaskById(1)).thenThrow(ResourceNotFoundException.class);
+		assertThrows(CRMException.class, () -> taskRemainderUtil.optyNotification(123));
 	}
 
 	@Test

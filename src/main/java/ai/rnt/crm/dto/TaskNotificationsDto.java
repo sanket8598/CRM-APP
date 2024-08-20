@@ -14,6 +14,7 @@ public class TaskNotificationsDto {
 	private Integer meetingTaskId;
 	private Integer visitTaskId;
 	private Integer leadTaskId;
+	private Integer optyTaskId;
 	private Integer leadId;
 	private Integer optyId;
 	private Integer assignTo;

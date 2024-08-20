@@ -51,7 +51,7 @@ public class MeetingDaoServiceImpl implements MeetingDaoService {
 	}
 
 	@Override
-	@CacheEvict(value = MEETING_TASK, allEntries = true)
+	@CacheEvict(value = { MEETING_TASK, MEETINGS_BY_LEAD_ID }, allEntries = true)
 	public MeetingTask addMeetingTask(MeetingTask meetingTask) {
 		log.info("inside the addMeetingTask method...");
 		return meetingTaskRepository.save(meetingTask);

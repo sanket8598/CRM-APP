@@ -1,5 +1,6 @@
 package ai.rnt.crm.util;
 
+import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.nonNull;
@@ -39,6 +40,7 @@ import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
 import ai.rnt.crm.entity.Opportunity;
+import ai.rnt.crm.entity.OpportunityTask;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.VisitTask;
 import ai.rnt.crm.exception.CRMException;
@@ -126,7 +128,7 @@ public class EmailUtil extends PropertyUtil {
 	}
 
 	public Session getSession() {
-		if(nonNull(getUserName()) && getUserName().endsWith(".com"))
+		if (nonNull(getUserName()) && getUserName().endsWith(".com"))
 			PROPERTIES.put("mail.smtp.host", "smtp.zoho.com");
 		return Session.getInstance(PROPERTIES, new Authenticator() {
 			@Override
@@ -184,7 +186,7 @@ public class EmailUtil extends PropertyUtil {
 			String leadName = callTask.getCall().getLead().getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
-					.append(String.format("%s",
+					.append(format("%s",
 							DEAR + callTask.getAssignTo().getFirstName() + " " + callTask.getAssignTo().getLastName()
 									+ COMMA_BR_BR)
 							+ "I hope this email finds you well. This is a friendly reminder about the Task  for the "
@@ -218,7 +220,7 @@ public class EmailUtil extends PropertyUtil {
 			String leadName = visitTask.getVisit().getLead().getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
-					.append(String.format("%s",
+					.append(format("%s",
 							DEAR + visitTask.getAssignTo().getFirstName() + " " + visitTask.getAssignTo().getLastName()
 									+ COMMA_BR_BR)
 							+ I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE
@@ -253,7 +255,7 @@ public class EmailUtil extends PropertyUtil {
 			String leadName = meetingTask.getMeetings().getLead().getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
-					.append(String.format("%s",
+					.append(format("%s",
 							DEAR + meetingTask.getAssignTo().getFirstName() + " "
 									+ meetingTask.getAssignTo().getLastName() + COMMA_BR_BR)
 							+ I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE
@@ -270,7 +272,7 @@ public class EmailUtil extends PropertyUtil {
 	}
 
 	public void sendLeadTaskReminderMail(LeadTask leadTask, String emailId) {
-		log.info("inside the sendLeadTaskReminderMail method...}");
+		log.info("inside the sendLeadTaskReminderMail method...{}", emailId);
 		try {
 			Message msg = new MimeMessage(getSession());
 
@@ -288,7 +290,7 @@ public class EmailUtil extends PropertyUtil {
 			String leadName = leadTask.getLead().getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
-					.append(String.format("%s",
+					.append(format("%s",
 							DEAR + leadTask.getAssignTo().getFirstName() + " " + leadTask.getAssignTo().getLastName()
 									+ COMMA_BR_BR)
 							+ I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE
@@ -300,6 +302,41 @@ public class EmailUtil extends PropertyUtil {
 			send(msg);
 		} catch (Exception e) {
 			log.error("Got Exception while sending lead task reminder mail..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
+
+	public void sendOptyTaskReminderMail(OpportunityTask optyTask, String emailId) {
+		log.info("inside the sendOptyTaskReminderMail method...{}", emailId);
+		try {
+			Message msg = new MimeMessage(getSession());
+
+			InternetAddress[] recipientAddress = new InternetAddress[1];
+			recipientAddress[0] = new InternetAddress(optyTask.getAssignTo().getEmailId());
+			if (nonNull(emailId) && !emailId.isEmpty()) {
+				recipientAddress = new InternetAddress[2];
+				recipientAddress[0] = new InternetAddress(optyTask.getAssignTo().getEmailId());
+				recipientAddress[1] = new InternetAddress(emailId);
+			}
+			msg.setFrom(new InternetAddress(getUserName()));
+			msg.setRecipients(TO, recipientAddress);
+			msg.setSubject(TASK_REMINDER + optyTask.getSubject() + " - " + formatDate(optyTask.getDueDate()));
+			msg.setSentDate(new Date());
+			String optyName = optyTask.getOpportunity().getLeads().getContacts().stream().filter(Contacts::getPrimary)
+					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
+			StringBuilder content = new StringBuilder().append("<br>")
+					.append(format("%s",
+							DEAR + optyTask.getAssignTo().getFirstName() + " " + optyTask.getAssignTo().getLastName()
+									+ COMMA_BR_BR)
+							+ I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE
+							+ optyTask.getOpportunity().getTopic() + " by " + optyName + "."
+							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(optyTask.getDueDate()) + " At "
+							+ optyTask.getDueTime12Hours() + ".")
+					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
+			msg.setContent(content.toString(), TEXT_HTML);
+			send(msg);
+		} catch (Exception e) {
+			log.error("Got Exception while sending opportunity task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
 		}
 	}
@@ -322,7 +359,7 @@ public class EmailUtil extends PropertyUtil {
 			msg.setSubject("Follow-Up Reminder : " + leads.getTopic() + " by " + leadName + "-"
 					+ formatDate(leads.getRemainderDueOn()) + " At " + leads.getRemainderDueAt12Hours());
 			msg.setSentDate(new Date());
-			StringBuilder content = new StringBuilder().append("<br>").append(String.format("%s",
+			StringBuilder content = new StringBuilder().append("<br>").append(format("%s",
 					DEAR + leads.getEmployee().getFirstName() + " " + leads.getEmployee().getLastName() + COMMA_BR_BR)
 					+ "I hope this email finds you well. This is a friendly reminder about the follow-up for the lead: "
 					+ leads.getTopic() + " by " + leadName + ".").append(BR).append(REGARDS).append("<br>")
@@ -361,7 +398,7 @@ public class EmailUtil extends PropertyUtil {
 			String primaryPhoneNumber = leads.getContacts().stream().filter(Contacts::getPrimary).findFirst()
 					.map(Contacts::getContactNumberPrimary).orElse("No primary contact found.");
 			StringBuilder content = new StringBuilder().append("<br>")
-					.append(String.format("%s",
+					.append(format("%s",
 							DEAR + leads.getEmployee().getFirstName() + " " + leads.getEmployee().getLastName()
 									+ COMMA_BR_BR)
 							+ "A new lead has been assigned to you in CRM system:" + BR + "Lead Name : " + leadName
@@ -396,7 +433,7 @@ public class EmailUtil extends PropertyUtil {
 			String primaryPhoneNumber = opportunity.getLeads().getContacts().stream().filter(Contacts::getPrimary)
 					.findFirst().map(Contacts::getContactNumberPrimary).orElse("No primary contact found.");
 			StringBuilder content = new StringBuilder().append("<br>")
-					.append(String.format("%s",
+					.append(format("%s",
 							DEAR + opportunity.getEmployee().getFirstName() + " "
 									+ opportunity.getEmployee().getLastName() + COMMA_BR_BR)
 							+ "A new opportunity has been assigned to you in CRM system:" + BR + "Opportunity Name : "

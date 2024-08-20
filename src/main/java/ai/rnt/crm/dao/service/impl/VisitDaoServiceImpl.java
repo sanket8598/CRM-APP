@@ -58,7 +58,7 @@ public class VisitDaoServiceImpl implements VisitDaoService {
 	}
 
 	@Override
-	@CacheEvict(value = VISIT_TASK, allEntries = true)
+	@CacheEvict(value = { VISIT_TASK, VISITS_BY_LEAD_ID }, allEntries = true)
 	public VisitTask addVisitTask(VisitTask visitTask) {
 		log.info("inside the addVisitTask method...");
 		return visitTaskRepository.save(visitTask);

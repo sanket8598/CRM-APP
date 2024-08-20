@@ -58,7 +58,7 @@ public class CallDaoServiceImpl implements CallDaoService {
 	}
 
 	@Override
-	@CacheEvict(value = CALL_TASK, allEntries = true)
+	@CacheEvict(value = {CALLS_BY_LEAD_ID,CALL_TASK}, allEntries = true)
 	public PhoneCallTask addCallTask(PhoneCallTask phoneCallTask) {
 		log.info("inside the addCallTask method...");
 		return callTaskRepository.save(phoneCallTask);

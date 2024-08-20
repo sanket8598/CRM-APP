@@ -1,5 +1,6 @@
 package ai.rnt.crm.dao.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,5 +14,7 @@ public interface OpportunityTaskDaoService extends CrudService<OpportunityTask, 
 	OpportunityTask addOptyTask(OpportunityTask opportunityTask);
 
 	Optional<OpportunityTask> getOptyTaskById(Integer taskId);
+
+	List<OpportunityTask> getTodaysOptyTask(LocalDate todayAsDate, String time);
 
 }
