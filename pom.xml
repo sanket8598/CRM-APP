@@ -101,12 +101,12 @@
 			<artifactId>unirest-java</artifactId>
 			<version>1.4.9</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.sun.mail/javax.mail -->
+		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail -->
 		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>${mail.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.googlecode.libphonenumber/libphonenumber -->
 		<dependency>
 			<groupId>com.googlecode.libphonenumber</groupId>
@@ -146,6 +146,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
+
 
 	</dependencies>
 

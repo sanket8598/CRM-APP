@@ -151,28 +151,27 @@ public class EmailServiceImpl implements EmailService {
 		EnumMap<ApiResponse, Object> delEmailMap = new EnumMap<>(ApiResponse.class);
 		Email updatedEmail = null;
 		try {
-                Integer staffId=auditAwareUtil.getLoggedInStaffId();
-				Email mail = emailDaoService.findById(mailId);
-				List<Attachment> attachment = mail.getAttachment();
-				if (nonNull(attachment) && !attachment.isEmpty()) {
-					for (Attachment e : attachment) {
-						e.setDeletedBy(staffId);
-						e.setDeletedDate(
-								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
-						e.getMail().setDeletedBy(staffId);
-						e.getMail().setDeletedDate(
-								now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
-						e.setMail(e.getMail());
-						attachmentDaoService.addAttachment(e);
-						updatedEmail = emailDaoService.email(mail);
-					}
-				} else {
-					mail.setDeletedBy(staffId);
-					mail.setDeletedDate(now().atZone(systemDefault())
-				            .withZoneSameInstant(of(INDIA_ZONE))
-				            .toLocalDateTime());
+			Integer staffId = auditAwareUtil.getLoggedInStaffId();
+			Email mail = emailDaoService.findById(mailId);
+			List<Attachment> attachment = mail.getAttachment();
+			if (nonNull(attachment) && !attachment.isEmpty()) {
+				for (Attachment e : attachment) {
+					e.setDeletedBy(staffId);
+					e.setDeletedDate(
+							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+					e.getMail().setDeletedBy(staffId);
+					e.getMail().setDeletedDate(
+							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+					e.setMail(e.getMail());
+					attachmentDaoService.addAttachment(e);
 					updatedEmail = emailDaoService.email(mail);
 				}
+			} else {
+				mail.setDeletedBy(staffId);
+				mail.setDeletedDate(
+						now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+				updatedEmail = emailDaoService.email(mail);
+			}
 			if (nonNull(updatedEmail)) {
 				delEmailMap.put(MESSAGE, "Email deleted Successfully.");
 				delEmailMap.put(SUCCESS, true);
@@ -246,9 +245,12 @@ public class EmailServiceImpl implements EmailService {
 			boolean saveStatus = false;
 			Email sendEmail = null;
 			Email email = emailDaoService.findById(mailId);
-			email.setToMail(dto.getMailTo().stream().collect(Collectors.joining(",")));
-			email.setBccMail(dto.getBcc().stream().collect(Collectors.joining(",")));
-			email.setCcMail(dto.getCc().stream().collect(Collectors.joining(",")));
+			if (nonNull(dto.getMailTo()) && !dto.getMailTo().isEmpty())
+				email.setToMail(dto.getMailTo().stream().collect(Collectors.joining(",")));
+			if (nonNull(dto.getBcc()) && !dto.getBcc().isEmpty())
+				email.setBccMail(dto.getBcc().stream().collect(Collectors.joining(",")));
+			if (nonNull(dto.getCc()) && !dto.getCc().isEmpty())
+				email.setCcMail(dto.getCc().stream().collect(Collectors.joining(",")));
 			email.setContent(dto.getContent());
 			email.setSubject(dto.getSubject());
 			email.setMailFrom(dto.getMailFrom());
@@ -257,16 +259,16 @@ public class EmailServiceImpl implements EmailService {
 			email.setScheduledOn(dto.getScheduledOn());
 			email.setScheduledAt(dto.getScheduledAt());
 
-			List<Integer> newIds = dto.getAttachment().stream().map(AttachmentDto::getEmailAttchId).collect(toList());
-		List<Attachment> emailList=email.getAttachment().stream().filter(e -> !newIds.contains(e.getEmailAttchId()))
-			.filter(Objects::nonNull)
-			.collect(toList());
-		emailList.stream().forEach(data -> {
-			data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
-			data.setDeletedDate(
-					now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
-			attachmentDaoService.addAttachment(data);
-		});
+				List<Integer> newIds = dto.getAttachment().stream().map(AttachmentDto::getEmailAttchId)
+						.collect(toList());
+				List<Attachment> emailList = email.getAttachment().stream()
+						.filter(e -> !newIds.contains(e.getEmailAttchId())).filter(Objects::nonNull).collect(toList());
+				emailList.stream().forEach(data -> {
+					data.setDeletedBy(auditAwareUtil.getLoggedInStaffId());
+					data.setDeletedDate(
+							now().atZone(systemDefault()).withZoneSameInstant(of(INDIA_ZONE)).toLocalDateTime());
+					attachmentDaoService.addAttachment(data);
+				});
 			if (dto.getAttachment().isEmpty()) {
 				sendEmail = emailDaoService.email(email);
 				saveStatus = nonNull(sendEmail);

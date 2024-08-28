@@ -12,7 +12,6 @@ import static java.util.TimeZone.getTimeZone;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.joining;
 import static javax.mail.Message.RecipientType.TO;
-import static javax.mail.Transport.send;
 import static javax.mail.internet.InternetAddress.parse;
 
 import java.io.IOException;
@@ -23,13 +22,9 @@ import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.mail.Authenticator;
 import javax.mail.BodyPart;
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -38,6 +33,7 @@ import javax.mail.internet.MimePart;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import ai.rnt.crm.dto.MeetingAttachmentsDto;
@@ -57,12 +53,12 @@ import lombok.extern.slf4j.Slf4j;
 @PropertySource("classpath:confidential.properties")
 public class MeetingUtil extends PropertyUtil {
 
-	private final EmailUtil emailUtil;
+	private final JavaMailSender emailSender;
 
 	public void scheduleMeetingInOutlook(MeetingDto dto) throws Exception {
 		log.info("inside the scheduleMeetingInOutlook method...{}");
 		try {
-			Message msg = new MimeMessage(getSession());
+			MimeMessage msg = emailSender.createMimeMessage();
 			msg.setFrom(new InternetAddress(userName));
 			((MimePart) msg).addHeaderLine("method=REQUEST");
 			((MimePart) msg).addHeaderLine("charset=UTF-8");
@@ -91,7 +87,7 @@ public class MeetingUtil extends PropertyUtil {
 			bc.setContent(dto.getDescription(), "text/html");
 			multipart.addBodyPart(messageBodyPart);
 			msg.setContent(multipart);
-			send(msg);
+			emailSender.send(msg);
 		} catch (Exception ex) {
 			log.error("exception occured while adding the meeting in outlook..{}", ex.getMessage());
 		}
@@ -127,17 +123,6 @@ public class MeetingUtil extends PropertyUtil {
 		return res.toString();
 	}
 
-	private Session getSession() {
-		if (nonNull(userName) && userName.endsWith(".com"))
-			PROPERTIES.put("mail.smtp.host", "smtp.zoho.com");
-		return Session.getInstance(PROPERTIES, new Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(userName, emailUtil.getMailPassword(userName));
-			}
-		});
-	}
-
 	private MimeBodyPart createAttachment(MeetingAttachmentsDto attachment) throws MessagingException, IOException {
 		log.info("inside the meetingUtil createAttachment method...");
 		MimeBodyPart attachmentPart = new MimeBodyPart();
@@ -164,4 +149,5 @@ public class MeetingUtil extends PropertyUtil {
 		log.info("inside the meetingUtil parseTime method...{}", time);
 		return parse(time, ofPattern("HH:mm", US));
 	}
+
 }

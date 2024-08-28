@@ -26,11 +26,13 @@ import ai.rnt.crm.dao.service.EmployeeDaoService;
 import ai.rnt.crm.dao.service.LeadDaoService;
 import ai.rnt.crm.dao.service.LeadTaskDaoService;
 import ai.rnt.crm.dao.service.MeetingDaoService;
+import ai.rnt.crm.dao.service.OpportunityTaskDaoService;
 import ai.rnt.crm.dao.service.VisitDaoService;
 import ai.rnt.crm.entity.Email;
 import ai.rnt.crm.entity.LeadTask;
 import ai.rnt.crm.entity.Leads;
 import ai.rnt.crm.entity.MeetingTask;
+import ai.rnt.crm.entity.OpportunityTask;
 import ai.rnt.crm.entity.PhoneCallTask;
 import ai.rnt.crm.entity.TaskNotifications;
 import ai.rnt.crm.entity.VisitTask;
@@ -59,6 +61,8 @@ public class TaskRemainderUtil {
 
 	private final LeadTaskDaoService leadTaskDaoService;
 
+	private final OpportunityTaskDaoService opportunityTaskDaoService;
+
 	private final LeadDaoService leadDaoService;
 
 	private final EmailDaoService emailDaoService;
@@ -71,7 +75,7 @@ public class TaskRemainderUtil {
 
 	private final EmailUtil emailUtil;
 
-	@Scheduled(cron = "0 * * * * ?") // for every minute.
+	 @Scheduled(cron = "0 * * * * ?") // for every minute.
 	public void reminderForTask() throws Exception {
 		log.info("inside the reminderForTask method...{}");
 		try {
@@ -136,6 +140,20 @@ public class TaskRemainderUtil {
 					emailUtil.sendLeadTaskReminderMail(e, emailId);
 				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
 					leadNotification(e.getLeadTaskId());
+			});
+
+			List<OpportunityTask> optyTasksList = opportunityTaskDaoService.getTodaysOptyTask(todayAsDate, time);
+			optyTasksList.forEach(e -> {
+				String emailId = null;
+				if (!e.getAssignTo().getStaffId().equals(e.getCreatedBy()))
+					emailId = employeeDaoService.getEmailId(e.getCreatedBy());
+				if (nonNull(e.getRemainderVia()) && BOTH.equalsIgnoreCase(e.getRemainderVia())) {
+					emailUtil.sendOptyTaskReminderMail(e, emailId);
+					optyNotification(e.getOptyTaskId());
+				} else if (nonNull(e.getRemainderVia()) && EMAIL.equalsIgnoreCase(e.getRemainderVia()))
+					emailUtil.sendOptyTaskReminderMail(e, emailId);
+				else if (nonNull(e.getRemainderVia()) && NOTIFICATION.equalsIgnoreCase(e.getRemainderVia()))
+					optyNotification(e.getOptyTaskId());
 			});
 
 			List<Leads> followUpLeads = leadDaoService.getFollowUpLeads(todayAsDate, time);
@@ -233,6 +251,22 @@ public class TaskRemainderUtil {
 			taskNotificationsUtil.sendTaskNotification(taskNotifications);
 		} catch (Exception e) {
 			log.error("Got Exception while sending leadTask notification..{}", e);
+			throw new CRMException(e);
+		}
+	}
+
+	public void optyNotification(Integer optyTaskId) {
+		log.info("inside optyNotification method...{}", optyTaskId);
+		try {
+			TaskNotifications taskNotifications = new TaskNotifications();
+			taskNotifications.setOptyTask(opportunityTaskDaoService.getOptyTaskById(optyTaskId)
+					.orElseThrow(() -> new ResourceNotFoundException("OpportunityTask", "optyTaskId", optyTaskId)));
+			taskNotifications.setCreatedBy(1375);
+			taskNotifications.setNotifTo(taskNotifications.getOptyTask().getAssignTo());
+			taskNotifications.setNotifStatus(true);
+			taskNotificationsUtil.sendTaskNotification(taskNotifications);
+		} catch (Exception e) {
+			log.error("Got Exception while sending OpportunityTask notification..{}", e);
 			throw new CRMException(e);
 		}
 	}

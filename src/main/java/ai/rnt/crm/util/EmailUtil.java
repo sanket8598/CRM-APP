@@ -2,37 +2,28 @@ package ai.rnt.crm.util;
 
 import static java.lang.String.format;
 import static java.time.format.DateTimeFormatter.ofPattern;
-import static java.util.Collections.emptyList;
+import static java.util.Base64.getDecoder;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.of;
-import static javax.mail.Message.RecipientType.BCC;
-import static javax.mail.Message.RecipientType.CC;
-import static javax.mail.Message.RecipientType.TO;
-import static javax.mail.Transport.send;
+import static javax.mail.Part.ATTACHMENT;
 
 import java.time.LocalDate;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 
 import javax.activation.DataHandler;
-import javax.mail.Authenticator;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Part;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
 import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
-import ai.rnt.crm.dao.service.EmailDaoService;
 import ai.rnt.crm.entity.Attachment;
 import ai.rnt.crm.entity.Contacts;
 import ai.rnt.crm.entity.Email;
@@ -58,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class EmailUtil extends PropertyUtil {
 
-	private final EmailDaoService emailDaoService;
+	private final JavaMailSender emailSender;
 
 	private static final String THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY = " The task is scheduled for completion by ";
 	private static final String I_HOPE_THIS_EMAIL_FINDS_YOU_WELL_THIS_IS_A_FRIENDLY_REMINDER_ABOUT_THE_TASK_FOR_THE = "I hope this email finds you well. This is a friendly reminder about the Task for the ";
@@ -68,121 +59,87 @@ public class EmailUtil extends PropertyUtil {
 	private static final String SINGLE_BR = "<br>";
 	private static final String REGARDS = "Regards,";
 	private static final String TASK_REMINDER = "Task Reminder : ";
-	private static final String TEXT_HTML = "text/html";
 	private static final String DEAR = "Dear ";
+
+	public void emailWithAttachment(String[] to, String[] cc, String[] bcc, String subject, String content,
+			List<Attachment> list) {
+		log.info("inside the emailWithAttachment method...}");
+		email(to, cc, bcc, subject, content, list);
+	}
+
+	public void emailWithoutAttachment(String[] to, String[] cc, String[] bcc, String subject, String content) {
+		log.info("inside the emailWithoutAttachment method...}");
+		email(to, cc, bcc, subject, content, null);
+	}
+
+	private void email(String[] to, String[] cc, String[] bcc, String subject, String content, List<Attachment> list) {
+		log.info("inside the email method...}");
+		try {
+			MimeMessage message = emailSender.createMimeMessage();
+			MimeMessageHelper helper = new MimeMessageHelper(message, !(isNull(list) || list.isEmpty()));
+			helper.setFrom(userName);
+			helper.setTo(to);
+			helper.setCc(cc);
+			helper.setBcc(bcc);
+			helper.setSubject(subject);
+			helper.setSentDate(new Date());
+			helper.setText(content, true);
+			MimeMultipart multipart = new MimeMultipart();
+			MimeBodyPart bodyPart = new MimeBodyPart();
+			bodyPart.setContent(content, "text/html; charset=utf-8");
+			multipart.addBodyPart(bodyPart);
+			if (nonNull(list) && !list.isEmpty()) {
+				for (Attachment data : list) {
+					MimeBodyPart attachmentBodyPart = new MimeBodyPart();
+					attachmentBodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(
+							getDecoder().decode(data.getAttachmentData().split(",")[1]), data.getAttachType())));
+					attachmentBodyPart.setFileName(data.getAttachName());
+					attachmentBodyPart.setDisposition(ATTACHMENT);
+					multipart.addBodyPart(attachmentBodyPart);
+				}
+			}
+			message.setContent(multipart);
+			emailSender.send(message);
+		} catch (MessagingException e) {
+			log.error("Got Exception while sendingEmail the mail..{}", e.getMessage());
+			throw new CRMException(e);
+		}
+	}
 
 	public boolean sendEmail(Email email) throws AddressException {
 		log.info("inside the sendEmail method...");
 		try {
-			// create a message with headers
-			Message msg = new MimeMessage(getSession());
-			msg.setFrom(new InternetAddress(getUserName()));// change it to mail from.
+			String[] recipientList = nonNull(email.getToMail())
+					? of(email.getToMail().split(",")).map(String::trim).toArray(String[]::new)
+					: new String[0];
+			String[] ccAddresses = nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()
+					? of(email.getCcMail().split(",")).map(String::trim).toArray(String[]::new)
+					: new String[0];
+			String[] bccAddress = (nonNull(email.getBccMail()) && !email.getBccMail().isEmpty())
+					? of(email.getBccMail().split(",")).map(String::trim).toArray(String[]::new)
+					: new String[0];
 
-			List<String> recipientList = nonNull(email.getToMail())
-					? of(email.getToMail().split(",")).map(String::trim).collect(toList())
-					: emptyList();
-			InternetAddress[] recipientAddress = new InternetAddress[recipientList.size()];
-			int counter = 0;
-			for (String recipient : recipientList)
-				recipientAddress[counter++] = new InternetAddress(recipient.trim());
-			msg.setRecipients(TO, recipientAddress);
-
-			if (nonNull(email.getCcMail()) && !email.getCcMail().isEmpty()) {
-				List<String> ccAddresses = of(email.getCcMail().split(",")).map(String::trim).collect(toList());
-				InternetAddress[] ccAddressList = new InternetAddress[ccAddresses.size()];
-				int count = 0;
-				for (String cc : ccAddresses)
-					ccAddressList[count++] = new InternetAddress(cc.trim());
-				msg.setRecipients(CC, ccAddressList);
-			}
-			if (nonNull(email.getBccMail()) && !email.getBccMail().isEmpty()) {
-				List<String> bccAddress = of(email.getBccMail().split(",")).map(String::trim).collect(toList());
-				InternetAddress[] bccAddressList = new InternetAddress[bccAddress.size()];
-				int index = 0;
-				for (String bcc : bccAddress)
-					bccAddressList[index++] = new InternetAddress(bcc.trim());
-				msg.setRecipients(BCC, bccAddressList);
-			}
-			msg.setSubject(email.getSubject());
-			msg.setSentDate(new Date());
-			// create body of the mail
 			StringBuilder content = new StringBuilder().append("<br>").append(String.format("%s", email.getContent()))
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
-			if (email.getAttachment().isEmpty())
-				msg = sendAsPlainText(msg, content.toString());
-
-			else
-				msg = sendWithAttachments(msg, content.toString(), email.getAttachment());
-
-			// send the message
-			send(msg);
+			email(recipientList, ccAddresses, bccAddress, email.getSubject(), content.toString(),
+					(email.getAttachment().isEmpty()) ? null : email.getAttachment());
 			return true;
-		} catch (MessagingException ex) {
+		} catch (Exception ex) {
 			log.error("error occured while sending the email..{}", ex.getMessage());
 			return false;
 		}
 	}
 
-	public String getMailPassword(String userName) {
-		return emailDaoService.findPasswordByMailId(userName);
-	}
-
-	public Session getSession() {
-		if (nonNull(getUserName()) && getUserName().endsWith(".com"))
-			PROPERTIES.put("mail.smtp.host", "smtp.zoho.com");
-		return Session.getInstance(PROPERTIES, new Authenticator() {
-			@Override
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(getUserName(), getMailPassword(getUserName()));
-			}
-		});
-	}
-
-	public Message sendWithAttachments(Message msg, String content, List<Attachment> list) throws MessagingException {
-		log.info("inside the sendWithAttachments method...}");
-		try {
-			MimeBodyPart messageBodyPart = new MimeBodyPart();
-			MimeMultipart multipart = new MimeMultipart();
-			for (Attachment data : list) {
-				if (nonNull(data.getAttachmentData())) {
-					MimeBodyPart attachemntBodyPart = new MimeBodyPart();
-					attachemntBodyPart.setDataHandler(new DataHandler(new ByteArrayDataSource(
-							Base64.getDecoder().decode(data.getAttachmentData().split(",")[1]), data.getAttachType())));
-					attachemntBodyPart.setDisposition(Part.ATTACHMENT);
-					attachemntBodyPart.setFileName(data.getAttachName());
-					multipart.addBodyPart(attachemntBodyPart);
-				}
-			}
-			messageBodyPart.setContent(content, TEXT_HTML);
-			multipart.addBodyPart(messageBodyPart);
-			msg.setContent(multipart);
-			return msg;
-		} catch (Exception e) {
-			log.error("Got Exception while sendWithAttachments the mail..{}", e.getMessage());
-			throw new CRMException(e);
-		}
-	}
-
-	public static Message sendAsPlainText(Message msg, String content) throws MessagingException {
-		msg.setContent(content, TEXT_HTML);
-		return msg;
-	}
-
 	public void sendCallTaskReminderMail(PhoneCallTask callTask, String emailId) {
 		log.info("inside the sendCallTaskReminderMail method...}");
 		try {
-			Message msg = new MimeMessage(getSession());
-			InternetAddress[] recipientAddress = new InternetAddress[1];
-			recipientAddress[0] = new InternetAddress(callTask.getAssignTo().getEmailId());
+			String[] recipientAddress = new String[1];
+			recipientAddress[0] = callTask.getAssignTo().getEmailId();
 			if (nonNull(emailId) && !emailId.isEmpty()) {
-				recipientAddress = new InternetAddress[2];
-				recipientAddress[0] = new InternetAddress(callTask.getAssignTo().getEmailId());
-				recipientAddress[1] = new InternetAddress(emailId);
+				recipientAddress = new String[2];
+				recipientAddress[0] = callTask.getAssignTo().getEmailId();
+				recipientAddress[1] = emailId;
 			}
-			msg.setFrom(new InternetAddress(getUserName()));
-			msg.setRecipients(TO, recipientAddress);
-			msg.setSubject(TASK_REMINDER + callTask.getSubject() + " - " + formatDate(callTask.getDueDate()));
-			msg.setSentDate(new Date());
 			String leadName = callTask.getCall().getLead().getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
@@ -194,8 +151,9 @@ public class EmailUtil extends PropertyUtil {
 							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(callTask.getDueDate()) + " At "
 							+ callTask.getDueTime12Hours() + ".")
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
-			msg.setContent(content.toString(), TEXT_HTML);
-			send(msg);
+			emailWithoutAttachment(recipientAddress, new String[0], new String[0],
+					TASK_REMINDER + callTask.getSubject() + " - " + formatDate(callTask.getDueDate()),
+					content.toString());
 		} catch (Exception e) {
 			log.error("Got Exception while sending call task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
@@ -205,18 +163,13 @@ public class EmailUtil extends PropertyUtil {
 	public void sendVisitTaskReminderMail(VisitTask visitTask, String emailId) {
 		log.info("inside the sendVisitTaskReminderMail method...}");
 		try {
-			Message msg = new MimeMessage(getSession());
-			InternetAddress[] recipientAddress = new InternetAddress[1];
-			recipientAddress[0] = new InternetAddress(visitTask.getAssignTo().getEmailId());
+			String[] recipientAddress = new String[1];
+			recipientAddress[0] = visitTask.getAssignTo().getEmailId();
 			if (nonNull(emailId) && !emailId.isEmpty()) {
-				recipientAddress = new InternetAddress[2];
-				recipientAddress[0] = new InternetAddress(visitTask.getAssignTo().getEmailId());
-				recipientAddress[1] = new InternetAddress(emailId);
+				recipientAddress = new String[2];
+				recipientAddress[0] = visitTask.getAssignTo().getEmailId();
+				recipientAddress[1] = emailId;
 			}
-			msg.setFrom(new InternetAddress(getUserName()));
-			msg.setRecipients(TO, recipientAddress);
-			msg.setSubject(TASK_REMINDER + visitTask.getSubject() + " - " + formatDate(visitTask.getDueDate()));
-			msg.setSentDate(new Date());
 			String leadName = visitTask.getVisit().getLead().getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
@@ -228,8 +181,9 @@ public class EmailUtil extends PropertyUtil {
 							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(visitTask.getDueDate()) + " At "
 							+ visitTask.getDueTime12Hours() + ".")
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
-			msg.setContent(content.toString(), TEXT_HTML);
-			send(msg);
+			emailWithoutAttachment(recipientAddress, new String[0], new String[0],
+					TASK_REMINDER + visitTask.getSubject() + " - " + formatDate(visitTask.getDueDate()),
+					content.toString());
 		} catch (Exception e) {
 			log.error("Got Exception while sending visit task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
@@ -239,19 +193,13 @@ public class EmailUtil extends PropertyUtil {
 	public void sendMeetingTaskReminderMail(MeetingTask meetingTask, String emailId) {
 		log.info("inside the sendMeetingTaskReminderMail method...}");
 		try {
-			Message msg = new MimeMessage(getSession());
-
-			InternetAddress[] recipientAddress = new InternetAddress[1];
-			recipientAddress[0] = new InternetAddress(meetingTask.getAssignTo().getEmailId());
+			String[] recipientAddress = new String[1];
+			recipientAddress[0] = meetingTask.getAssignTo().getEmailId();
 			if (nonNull(emailId) && !emailId.isEmpty()) {
-				recipientAddress = new InternetAddress[2];
-				recipientAddress[0] = new InternetAddress(meetingTask.getAssignTo().getEmailId());
-				recipientAddress[1] = new InternetAddress(emailId);
+				recipientAddress = new String[2];
+				recipientAddress[0] = meetingTask.getAssignTo().getEmailId();
+				recipientAddress[1] = emailId;
 			}
-			msg.setFrom(new InternetAddress(getUserName()));
-			msg.setRecipients(TO, recipientAddress);
-			msg.setSubject(TASK_REMINDER + meetingTask.getSubject() + " - " + formatDate(meetingTask.getDueDate()));
-			msg.setSentDate(new Date());
 			String leadName = meetingTask.getMeetings().getLead().getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
@@ -263,8 +211,9 @@ public class EmailUtil extends PropertyUtil {
 							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(meetingTask.getDueDate()) + " At "
 							+ meetingTask.getDueTime12Hours() + ".")
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
-			msg.setContent(content.toString(), TEXT_HTML);
-			send(msg);
+			emailWithoutAttachment(recipientAddress, new String[0], new String[0],
+					TASK_REMINDER + meetingTask.getSubject() + " - " + formatDate(meetingTask.getDueDate()),
+					content.toString());
 		} catch (Exception e) {
 			log.error("Got Exception while sending meeting task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
@@ -274,19 +223,13 @@ public class EmailUtil extends PropertyUtil {
 	public void sendLeadTaskReminderMail(LeadTask leadTask, String emailId) {
 		log.info("inside the sendLeadTaskReminderMail method...{}", emailId);
 		try {
-			Message msg = new MimeMessage(getSession());
-
-			InternetAddress[] recipientAddress = new InternetAddress[1];
-			recipientAddress[0] = new InternetAddress(leadTask.getAssignTo().getEmailId());
+			String[] recipientAddress = new String[1];
+			recipientAddress[0] = leadTask.getAssignTo().getEmailId();
 			if (nonNull(emailId) && !emailId.isEmpty()) {
-				recipientAddress = new InternetAddress[2];
-				recipientAddress[0] = new InternetAddress(leadTask.getAssignTo().getEmailId());
-				recipientAddress[1] = new InternetAddress(emailId);
+				recipientAddress = new String[2];
+				recipientAddress[0] = leadTask.getAssignTo().getEmailId();
+				recipientAddress[1] = emailId;
 			}
-			msg.setFrom(new InternetAddress(getUserName()));
-			msg.setRecipients(TO, recipientAddress);
-			msg.setSubject(TASK_REMINDER + leadTask.getSubject() + " - " + formatDate(leadTask.getDueDate()));
-			msg.setSentDate(new Date());
 			String leadName = leadTask.getLead().getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
@@ -298,8 +241,9 @@ public class EmailUtil extends PropertyUtil {
 							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(leadTask.getDueDate()) + " At "
 							+ leadTask.getDueTime12Hours() + ".")
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
-			msg.setContent(content.toString(), TEXT_HTML);
-			send(msg);
+			emailWithoutAttachment(recipientAddress, new String[0], new String[0],
+					TASK_REMINDER + leadTask.getSubject() + " - " + formatDate(leadTask.getDueDate()),
+					content.toString());
 		} catch (Exception e) {
 			log.error("Got Exception while sending lead task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
@@ -309,19 +253,13 @@ public class EmailUtil extends PropertyUtil {
 	public void sendOptyTaskReminderMail(OpportunityTask optyTask, String emailId) {
 		log.info("inside the sendOptyTaskReminderMail method...{}", emailId);
 		try {
-			Message msg = new MimeMessage(getSession());
-
-			InternetAddress[] recipientAddress = new InternetAddress[1];
-			recipientAddress[0] = new InternetAddress(optyTask.getAssignTo().getEmailId());
+			String[] recipientAddress = new String[1];
+			recipientAddress[0] = optyTask.getAssignTo().getEmailId();
 			if (nonNull(emailId) && !emailId.isEmpty()) {
-				recipientAddress = new InternetAddress[2];
-				recipientAddress[0] = new InternetAddress(optyTask.getAssignTo().getEmailId());
-				recipientAddress[1] = new InternetAddress(emailId);
+				recipientAddress = new String[2];
+				recipientAddress[0] = optyTask.getAssignTo().getEmailId();
+				recipientAddress[1] = emailId;
 			}
-			msg.setFrom(new InternetAddress(getUserName()));
-			msg.setRecipients(TO, recipientAddress);
-			msg.setSubject(TASK_REMINDER + optyTask.getSubject() + " - " + formatDate(optyTask.getDueDate()));
-			msg.setSentDate(new Date());
 			String optyName = optyTask.getOpportunity().getLeads().getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
 			StringBuilder content = new StringBuilder().append("<br>")
@@ -333,8 +271,9 @@ public class EmailUtil extends PropertyUtil {
 							+ THE_TASK_IS_SCHEDULED_FOR_COMPLETION_BY + formatDate(optyTask.getDueDate()) + " At "
 							+ optyTask.getDueTime12Hours() + ".")
 					.append(BR).append(REGARDS).append("<br>").append(RABBIT_AND_TORTOISE_TECHNOLOGY);
-			msg.setContent(content.toString(), TEXT_HTML);
-			send(msg);
+			emailWithoutAttachment(recipientAddress, new String[0], new String[0],
+					TASK_REMINDER + optyTask.getSubject() + " - " + formatDate(optyTask.getDueDate()),
+					content.toString());
 		} catch (Exception e) {
 			log.error("Got Exception while sending opportunity task reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
@@ -344,28 +283,24 @@ public class EmailUtil extends PropertyUtil {
 	public void sendFollowUpLeadReminderMail(Leads leads, String emailId) {
 		log.info("inside the sendFollowUpLeadReminderMail method...}");
 		try {
-			Message msg = new MimeMessage(getSession());
-			InternetAddress[] recipientAddress = new InternetAddress[1];
-			recipientAddress[0] = new InternetAddress(leads.getEmployee().getEmailId());
+			String[] recipientAddress = new String[1];
+			recipientAddress[0] = leads.getEmployee().getEmailId();
 			if (nonNull(emailId) && !emailId.isEmpty()) {
-				recipientAddress = new InternetAddress[2];
-				recipientAddress[0] = new InternetAddress(leads.getEmployee().getEmailId());
-				recipientAddress[1] = new InternetAddress(emailId);
+				recipientAddress = new String[2];
+				recipientAddress[0] = leads.getEmployee().getEmailId();
+				recipientAddress[1] = emailId;
 			}
 			String leadName = leads.getContacts().stream().filter(Contacts::getPrimary)
 					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
-			msg.setFrom(new InternetAddress(getUserName()));
-			msg.setRecipients(TO, recipientAddress);
-			msg.setSubject("Follow-Up Reminder : " + leads.getTopic() + " by " + leadName + "-"
-					+ formatDate(leads.getRemainderDueOn()) + " At " + leads.getRemainderDueAt12Hours());
-			msg.setSentDate(new Date());
 			StringBuilder content = new StringBuilder().append("<br>").append(format("%s",
 					DEAR + leads.getEmployee().getFirstName() + " " + leads.getEmployee().getLastName() + COMMA_BR_BR)
-					+ "I hope this email finds you well. This is a friendly reminder about the follow-up for the lead: "
+					+ "I hope this emailWithoutAttachment finds you well. This is a friendly reminder about the follow-up for the lead: "
 					+ leads.getTopic() + " by " + leadName + ".").append(BR).append(REGARDS).append("<br>")
 					.append(RABBIT_AND_TORTOISE_TECHNOLOGY);
-			msg.setContent(content.toString(), TEXT_HTML);
-			send(msg);
+			emailWithoutAttachment(recipientAddress, new String[0], new String[0],
+					"Follow-Up Reminder : " + leads.getTopic() + " by " + leadName + "-"
+							+ formatDate(leads.getRemainderDueOn()) + " At " + leads.getRemainderDueAt12Hours(),
+					content.toString());
 		} catch (Exception e) {
 			log.error("Got Exception while sending follow up lead reminder mail..{}", e.getMessage());
 			throw new CRMException(e);
@@ -385,33 +320,29 @@ public class EmailUtil extends PropertyUtil {
 	public boolean sendLeadAssignMail(Leads leads) {
 		log.info("inside the sendLeadAssignMail method...}");
 		try {
-			Message msg = new MimeMessage(getSession());
-			InternetAddress[] recipientAddress = new InternetAddress[1];
-			recipientAddress[0] = new InternetAddress(leads.getEmployee().getEmailId());
-
-			String leadName = leads.getContacts().stream().filter(Contacts::getPrimary)
-					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
-			msg.setFrom(new InternetAddress(getUserName()));
-			msg.setRecipients(TO, recipientAddress);
-			msg.setSubject("New Lead Assigned : " + leadName);
-			msg.setSentDate(new Date());
-			String primaryPhoneNumber = leads.getContacts().stream().filter(Contacts::getPrimary).findFirst()
-					.map(Contacts::getContactNumberPrimary).orElse("No primary contact found.");
-			StringBuilder content = new StringBuilder().append("<br>")
-					.append(format("%s",
-							DEAR + leads.getEmployee().getFirstName() + " " + leads.getEmployee().getLastName()
-									+ COMMA_BR_BR)
-							+ "A new lead has been assigned to you in CRM system:" + BR + "Lead Name : " + leadName
-							+ "." + SINGLE_BR + "Contact Information : " + primaryPhoneNumber + SINGLE_BR + "Source : "
-							+ leads.getLeadSourceMaster().getSourceName() + SINGLE_BR + "Assigned By : "
-							+ leads.getAssignBy().getFirstName() + " " + leads.getAssignBy().getLastName() + "."
-							+ SINGLE_BR + "Assigned Date : " + leads.getAssignDate() + "." + BR
-							+ "Thank you for your attention to this lead.")
-					.append(BR).append(REGARDS).append("<br>").append("RNT Sales Team");
-			msg.setContent(content.toString(), TEXT_HTML);
-			send(msg);
+			if (nonNull(leads)) {
+				String[] recipientAddress = new String[1];
+				recipientAddress[0] = leads.getEmployee().getEmailId();
+				String leadName = leads.getContacts().stream().filter(Contacts::getPrimary)
+						.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
+				String primaryPhoneNumber = leads.getContacts().stream().filter(Contacts::getPrimary).findFirst()
+						.map(Contacts::getContactNumberPrimary).orElse("No primary contact found.");
+				StringBuilder content = new StringBuilder().append("<br>")
+						.append(format("%s",
+								DEAR + leads.getEmployee().getFirstName() + " " + leads.getEmployee().getLastName()
+										+ COMMA_BR_BR)
+								+ "A new lead has been assigned to you in CRM system:" + BR + "Lead Name : " + leadName
+								+ "." + SINGLE_BR + "Contact Information : " + primaryPhoneNumber + SINGLE_BR
+								+ "Source : " + leads.getLeadSourceMaster().getSourceName() + SINGLE_BR
+								+ "Assigned By : " + leads.getAssignBy().getFirstName() + " "
+								+ leads.getAssignBy().getLastName() + "." + SINGLE_BR + "Assigned Date : "
+								+ leads.getAssignDate() + "." + BR + "Thank you for your attention to this lead.")
+						.append(BR).append(REGARDS).append("<br>").append("RNT Sales Team");
+				emailWithoutAttachment(recipientAddress, new String[0], new String[0],
+						"New Lead Assigned : " + leadName, content.toString());
+			}
 			return true;
-		} catch (MessagingException ex) {
+		} catch (Exception ex) {
 			log.error("Got Exception while sending lead assigned reminder mail..{}", ex.getMessage());
 			return false;
 		}
@@ -420,34 +351,31 @@ public class EmailUtil extends PropertyUtil {
 	public boolean sendOptyAssignMail(Opportunity opportunity) {
 		log.info("inside the sendOptyAssignMail method...}");
 		try {
-			Message msg = new MimeMessage(getSession());
-			InternetAddress[] recipientAddress = new InternetAddress[1];
-			recipientAddress[0] = new InternetAddress(opportunity.getEmployee().getEmailId());
-
-			String optyName = opportunity.getLeads().getContacts().stream().filter(Contacts::getPrimary)
-					.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
-			msg.setFrom(new InternetAddress(getUserName()));
-			msg.setRecipients(TO, recipientAddress);
-			msg.setSubject("New Opportunity Assigned : " + optyName);
-			msg.setSentDate(new Date());
-			String primaryPhoneNumber = opportunity.getLeads().getContacts().stream().filter(Contacts::getPrimary)
-					.findFirst().map(Contacts::getContactNumberPrimary).orElse("No primary contact found.");
-			StringBuilder content = new StringBuilder().append("<br>")
-					.append(format("%s",
-							DEAR + opportunity.getEmployee().getFirstName() + " "
-									+ opportunity.getEmployee().getLastName() + COMMA_BR_BR)
-							+ "A new opportunity has been assigned to you in CRM system:" + BR + "Opportunity Name : "
-							+ optyName + "." + SINGLE_BR + "Contact Information : " + primaryPhoneNumber + SINGLE_BR
-							+ "Source : " + opportunity.getLeads().getLeadSourceMaster().getSourceName() + SINGLE_BR
-							+ "Assigned By : " + opportunity.getAssignBy().getFirstName() + " "
-							+ opportunity.getAssignBy().getLastName() + "." + SINGLE_BR + "Assigned Date : "
-							+ opportunity.getAssignDate() + "." + BR
-							+ "Thank you for your attention to this opportunity.")
-					.append(BR).append(REGARDS).append("<br>").append("RNT Sales Team");
-			msg.setContent(content.toString(), TEXT_HTML);
-			send(msg);
+			if (nonNull(opportunity)) {
+				String[] recipientAddress = new String[1];
+				recipientAddress[0] = opportunity.getEmployee().getEmailId();
+				String optyName = opportunity.getLeads().getContacts().stream().filter(Contacts::getPrimary)
+						.map(con -> con.getFirstName() + " " + con.getLastName()).findFirst().orElse("");
+				String primaryPhoneNumber = opportunity.getLeads().getContacts().stream().filter(Contacts::getPrimary)
+						.findFirst().map(Contacts::getContactNumberPrimary).orElse("No primary contact found.");
+				StringBuilder content = new StringBuilder().append("<br>")
+						.append(format("%s",
+								DEAR + opportunity.getEmployee().getFirstName() + " "
+										+ opportunity.getEmployee().getLastName() + COMMA_BR_BR)
+								+ "A new opportunity has been assigned to you in CRM system:" + BR
+								+ "Opportunity Name : " + optyName + "." + SINGLE_BR + "Contact Information : "
+								+ primaryPhoneNumber + SINGLE_BR + "Source : "
+								+ opportunity.getLeads().getLeadSourceMaster().getSourceName() + SINGLE_BR
+								+ "Assigned By : " + opportunity.getAssignBy().getFirstName() + " "
+								+ opportunity.getAssignBy().getLastName() + "." + SINGLE_BR + "Assigned Date : "
+								+ opportunity.getAssignDate() + "." + BR
+								+ "Thank you for your attention to this opportunity.")
+						.append(BR).append(REGARDS).append("<br>").append("RNT Sales Team");
+				emailWithoutAttachment(recipientAddress, new String[0], new String[0],
+						"New Opportunity Assigned : " + optyName, content.toString());
+			}
 			return true;
-		} catch (MessagingException ex) {
+		} catch (Exception ex) {
 			log.error("Got Exception while sending opportunity assigned reminder mail..{}", ex.getMessage());
 			return false;
 		}

@@ -192,11 +192,11 @@ public class OpportunityServiceImpl implements OpportunityService {
 			Map<String, Object> countMap = new HashMap<>();
 			Map<String, Object> dataMap = new HashMap<>();
 			if (auditAwareUtil.isAdmin()) {
-				countMap.put(ALL_OPPORTUNITY, opportunityDashboardData.stream().count());
+				countMap.put(ALL_OPPORTUNITY, opportunityDashboardData.parallelStream().count());
 				countMap.put(IN_PIPELINE_OPPORTUNITY,
-						opportunityDashboardData.stream().filter(IN_PIPELINE_OPPORTUNITIES).count());
-				countMap.put(WON_OPPORTUNITY, opportunityDashboardData.stream().filter(WON_OPPORTUNITIES).count());
-				countMap.put(LOSS_OPPORTUNITY, opportunityDashboardData.stream().filter(LOSS_OPPORTUNITIES).count());
+						opportunityDashboardData.parallelStream().filter(IN_PIPELINE_OPPORTUNITIES).count());
+				countMap.put(WON_OPPORTUNITY, opportunityDashboardData.parallelStream().filter(WON_OPPORTUNITIES).count());
+				countMap.put(LOSS_OPPORTUNITY, opportunityDashboardData.parallelStream().filter(LOSS_OPPORTUNITIES).count());
 				dataMap.put(COUNTDATA, countMap);
 				if (nonNull(status) && status.equalsIgnoreCase(ALL)) {
 					dataMap.put(ApiResponseKeyConstant.DATA,
@@ -206,44 +206,44 @@ public class OpportunityServiceImpl implements OpportunityService {
 					if (IN_PIPELINE.equalsIgnoreCase(status))
 						dataMap.put(ApiResponseKeyConstant.DATA,
 								TO_DASHBOARD_OPPORTUNITY_DTOS.apply(opportunityDaoService
-										.getOpportunityByStatusIn(asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE)).stream()
+										.getOpportunityByStatusIn(asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE)).parallelStream()
 										.collect(toList())));
 					else
 						dataMap.put(ApiResponseKeyConstant.DATA, TO_DASHBOARD_OPPORTUNITY_DTOS.apply(
-								opportunityDaoService.getOpportunityByStatus(status).stream().collect(toList())));
+								opportunityDaoService.getOpportunityByStatus(status).parallelStream().collect(toList())));
 					opportunityDataByStatus.put(DATA, dataMap);
 				}
 			} else if (auditAwareUtil.isUser() && nonNull(loggedInStaffId)) {
-				countMap.put(ALL_OPPORTUNITY, opportunityDashboardData.stream()
+				countMap.put(ALL_OPPORTUNITY, opportunityDashboardData.parallelStream()
 						.filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId)).count());
-				countMap.put(IN_PIPELINE_OPPORTUNITY, opportunityDashboardData.stream().filter(
+				countMap.put(IN_PIPELINE_OPPORTUNITY, opportunityDashboardData.parallelStream().filter(
 						l -> IN_PIPELINE_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 						.count());
 				countMap.put(WON_OPPORTUNITY,
-						opportunityDashboardData.stream().filter(
+						opportunityDashboardData.parallelStream().filter(
 								l -> WON_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 								.count());
 				countMap.put(LOSS_OPPORTUNITY,
-						opportunityDashboardData.stream().filter(
+						opportunityDashboardData.parallelStream().filter(
 								l -> LOSS_OPPORTUNITIES.test(l) && ASSIGNED_OPPORTUNITIES.test(l, loggedInStaffId))
 								.count());
 				dataMap.put(COUNTDATA, countMap);
 				if (nonNull(status) && status.equalsIgnoreCase(ALL)) {
 					dataMap.put(ApiResponseKeyConstant.DATA,
-							TO_DASHBOARD_OPPORTUNITY_DTOS.apply(opportunityDashboardData.stream()
+							TO_DASHBOARD_OPPORTUNITY_DTOS.apply(opportunityDashboardData.parallelStream()
 									.filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId)).collect(toList())));
 					opportunityDataByStatus.put(DATA, dataMap);
 				} else {
 					if (IN_PIPELINE.equalsIgnoreCase(status))
 						dataMap.put(ApiResponseKeyConstant.DATA,
 								TO_DASHBOARD_OPPORTUNITY_DTOS.apply(opportunityDaoService
-										.getOpportunityByStatusIn(asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE)).stream()
+										.getOpportunityByStatusIn(asList(ANALYSIS, PROPOSE, QUALIFY, CLOSE)).parallelStream()
 										.filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId))
 										.collect(toList())));
 					else
 						dataMap.put(ApiResponseKeyConstant.DATA,
 								TO_DASHBOARD_OPPORTUNITY_DTOS.apply(opportunityDaoService.getOpportunityByStatus(status)
-										.stream().filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId))
+										.parallelStream().filter(d -> ASSIGNED_OPPORTUNITIES.test(d, loggedInStaffId))
 										.collect(toList())));
 					opportunityDataByStatus.put(DATA, dataMap);
 				}
